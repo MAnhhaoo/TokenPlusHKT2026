@@ -27,7 +27,7 @@ export interface DistrictWeatherResult {
   riskScore: number;
 }
 
-const HCMC_DISTRICTS = [
+export const HCMC_DISTRICTS = [
   {
     district: "Bình Thạnh",
     hotspot: "Nguyễn Hữu Cảnh",
@@ -76,6 +76,97 @@ const HCMC_DISTRICTS = [
     lat: 10.6842,
     lng: 106.7021,
     defaultElevationM: 1.4,
+  },
+  {
+    district: "Quận 1",
+    hotspot: "Bến Nghé - Bến Thành",
+    lat: 10.7769,
+    lng: 106.7009,
+    defaultElevationM: 3.5,
+  },
+  {
+    district: "Quận 3",
+    hotspot: "Nam Kỳ Khởi Nghĩa",
+    lat: 10.7844,
+    lng: 106.6844,
+    defaultElevationM: 4.0,
+  },
+  {
+    district: "Quận 4",
+    hotspot: "Đoàn Văn Bơ",
+    lat: 10.7578,
+    lng: 106.7012,
+    defaultElevationM: 2.0,
+  },
+  {
+    district: "Quận 5",
+    hotspot: "Hải Thượng Lãn Ông",
+    lat: 10.7554,
+    lng: 106.6669,
+    defaultElevationM: 3.2,
+  },
+  {
+    district: "Quận 6",
+    hotspot: "An Dương Vương",
+    lat: 10.7471,
+    lng: 106.6352,
+    defaultElevationM: 2.3,
+  },
+  {
+    district: "Quận 8",
+    hotspot: "Cầu Chà Và - Bến Bình Đông",
+    lat: 10.7501,
+    lng: 106.6567,
+    defaultElevationM: 1.6,
+  },
+  {
+    district: "Quận 10",
+    hotspot: "Đường 3 Tháng 2",
+    lat: 10.7716,
+    lng: 106.6675,
+    defaultElevationM: 3.8,
+  },
+  {
+    district: "Quận 11",
+    hotspot: "Lạc Long Quân",
+    lat: 10.7629,
+    lng: 106.6504,
+    defaultElevationM: 3.6,
+  },
+  {
+    district: "Tân Bình",
+    hotspot: "Tân Sơn Nhất - Trường Chinh",
+    lat: 10.8188,
+    lng: 106.6519,
+    defaultElevationM: 4.5,
+  },
+  {
+    district: "Tân Phú",
+    hotspot: "Thoại Ngọc Hầu",
+    lat: 10.7901,
+    lng: 106.6284,
+    defaultElevationM: 4.8,
+  },
+  {
+    district: "Bình Tân",
+    hotspot: "Kinh Dương Vương - An Lạc",
+    lat: 10.7445,
+    lng: 106.6083,
+    defaultElevationM: 3.2,
+  },
+  {
+    district: "Hóc Môn",
+    hotspot: "Quốc lộ 22",
+    lat: 10.8847,
+    lng: 106.5919,
+    defaultElevationM: 6.2,
+  },
+  {
+    district: "Cần Giờ",
+    hotspot: "Rừng Sác",
+    lat: 10.4114,
+    lng: 106.9556,
+    defaultElevationM: 1.1,
   },
 ];
 
@@ -306,14 +397,77 @@ export class WeatherService {
   }
 
   /**
-   * Lấy thông tin thời tiết, độ cao và rủi ro ngập của 7 quận/huyện trọng điểm TP.HCM
+   * Gọi Open-Meteo multi-location để lấy lượng mưa thời gian thực chính xác của từng quận/huyện
+   */
+  async getRealtimeDistrictRainMap(): Promise<Map<string, number>> {
+    const rainMap = new Map<string, number>();
+    const baseUrl = this.configService.get<string>(
+      "OPEN_METEO_BASE_URL",
+      "https://api.open-meteo.com/v1",
+    );
+
+    try {
+      const lats = HCMC_DISTRICTS.map((d) => d.lat).join(",");
+      const lngs = HCMC_DISTRICTS.map((d) => d.lng).join(",");
+      const resp = await firstValueFrom(
+        this.httpService.get(`${baseUrl}/forecast`, {
+          params: {
+            latitude: lats,
+            longitude: lngs,
+            current: "precipitation,rain",
+            timezone: "Asia/Bangkok",
+          },
+          timeout: 4500,
+        }),
+      );
+
+      const items = Array.isArray(resp.data) ? resp.data : [resp.data];
+      items.forEach((item: any, idx: number) => {
+        const d = HCMC_DISTRICTS[idx];
+        if (d) {
+          const cur = item?.current ?? {};
+          const rain = Number(cur.rain ?? cur.precipitation ?? 0);
+          rainMap.set(d.district, rain);
+          rainMap.set(d.district.toLowerCase(), rain);
+          if (d.district.includes("Thủ Đức")) {
+            rainMap.set("thủ đức", rain);
+            rainMap.set("tp thủ đức", rain);
+            rainMap.set("tp. thủ đức", rain);
+            rainMap.set("quận 2", rain);
+            rainMap.set("quận 9", rain);
+          }
+        }
+      });
+      return rainMap;
+    } catch (err) {
+      this.logger.warn(`Lỗi lấy mưa quận Open-Meteo: ${(err as Error).message}`);
+      try {
+        const cityWeather = await this.getCurrentWeather();
+        const baseRain = Number(cityWeather?.currentRainMm ?? 0);
+        HCMC_DISTRICTS.forEach((d) => {
+          rainMap.set(d.district, baseRain);
+          rainMap.set(d.district.toLowerCase(), baseRain);
+        });
+      } catch {
+        // ignore
+      }
+      return rainMap;
+    }
+  }
+
+  /**
+   * Lấy thông tin thời tiết, độ cao và rủi ro ngập của các quận/huyện TP.HCM từ Open-Meteo thực tế
    */
   async getDistrictsWeather(): Promise<DistrictWeatherResult[]> {
-    const baseSnapshot = await this.getCurrentWeather();
-    const baseRain = baseSnapshot.currentRainMm;
+    const [baseSnapshot, districtRainMap] = await Promise.all([
+      this.getCurrentWeather(),
+      this.getRealtimeDistrictRainMap(),
+    ]);
 
     return HCMC_DISTRICTS.map((item, idx) => {
-      const rainMm = Math.max(0, Math.round(baseRain * 10) / 10);
+      const rainMm =
+        districtRainMap.get(item.district.toLowerCase()) ??
+        baseSnapshot.currentRainMm;
       const risk = this.calculateFloodRisk(rainMm, item.defaultElevationM);
 
       return {
@@ -323,8 +477,8 @@ export class WeatherService {
         lng: item.lng,
         elevationM: item.defaultElevationM,
         temperatureC:
-          Math.round((baseSnapshot.temperatureC - idx * 0.15) * 10) / 10,
-        humidityPercent: Math.min(99, baseSnapshot.humidityPercent + (idx % 4)),
+          Math.round((baseSnapshot.temperatureC - idx * 0.1) * 10) / 10,
+        humidityPercent: Math.min(99, baseSnapshot.humidityPercent + (idx % 3)),
         windSpeedKmh: baseSnapshot.windSpeedKmh,
         currentRainMm: rainMm,
         weatherCondition: this.describeWmoCode(0, rainMm),
