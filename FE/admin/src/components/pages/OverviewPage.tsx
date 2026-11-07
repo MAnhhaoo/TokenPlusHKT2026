@@ -83,7 +83,6 @@ function OverviewPage({
             <span className="trend-up">Realtime</span> cập nhật tự động
           </>
         ),
-        data: [8, 11, 10, 17, 21, 19, 28],
       },
       {
         icon: <TriangleAlert size={20} />,
@@ -98,7 +97,6 @@ function OverviewPage({
               : "Không có điểm nghiêm trọng"}
           </>
         ),
-        data: [9, 12, 8, 15, 17, 19, 18],
       },
       {
         icon: <Sparkles size={20} />,
@@ -113,7 +111,6 @@ function OverviewPage({
               : "Chưa có báo cáo mới"}
           </>
         ),
-        data: [16, 13, 18, 12, 10, 7, 5],
       },
       {
         icon: <Bell size={20} />,
@@ -127,7 +124,6 @@ function OverviewPage({
               : "Hệ thống an toàn"}
           </>
         ),
-        data: [3, 4, 4, 6, 5, 7, 7],
       },
     ],
     [
