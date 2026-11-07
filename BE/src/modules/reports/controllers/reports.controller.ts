@@ -82,14 +82,26 @@ export class ReportsController {
   }
 
   /**
-   * Điều phối viên từ chối báo cáo kèm lý do.
+   * Điều phối viên khóa / ẩn báo cáo khỏi bản đồ cộng đồng.
    */
   @UseGuards(OperatorAuthGuard)
   @Patch(":id/reject")
   @ApiOperation({
-    summary: "Điều phối viên từ chối báo cáo kèm lý do",
+    summary: "Quản trị viên khóa / ẩn báo cáo khỏi bản đồ cộng đồng kèm lý do",
   })
   reject(@Param("id") id: string, @Body() dto: RejectReportDto) {
     return this.reportsService.reject(id, dto.reason);
+  }
+
+  /**
+   * Quản trị viên chuyển đổi trạng thái Khóa / Mở lại báo cáo.
+   */
+  @UseGuards(OperatorAuthGuard)
+  @Patch(":id/toggle-lock")
+  @ApiOperation({
+    summary: "Quản trị viên bật/tắt khóa báo cáo (Khóa hoặc Mở khóa lại)",
+  })
+  toggleLock(@Param("id") id: string, @Body() dto: RejectReportDto) {
+    return this.reportsService.toggleLock(id, dto.reason);
   }
 }

@@ -1,5 +1,13 @@
 import { useMemo } from "react"
-import { AlertTriangle, Check, CircleUserRound, Info, MapPin, Sparkles, XCircle } from "lucide-react"
+import {
+  AlertTriangle,
+  CircleUserRound,
+  Info,
+  Lock,
+  MapPin,
+  Sparkles,
+  Unlock,
+} from "lucide-react"
 import Button from "@/components/ui/Button"
 import Heading from "@/components/ui/Heading"
 import ReportVisual from "@/components/reports/ReportVisual"
@@ -81,13 +89,66 @@ function ReportReviewModal({
     return matches.sort((a, b) => a.distanceM - b.distanceM)
   }, [report, reports])
 
+  const isLocked = report.status === "rejected"
+
   return (
     <ModalShell
-      title="Xác minh báo cáo hiện trường"
+      title="Kiểm duyệt & Quản lý báo cáo AI"
       subtitle={`${report.id} · Gửi ${report.minutesAgo} phút trước`}
       onClose={onClose}
       wide
     >
+      {/* Banner trạng thái duyệt tự động của AI / khóa bởi admin */}
+      {isLocked ? (
+        <div
+          style={{
+            marginBottom: "16px",
+            padding: "12px 16px",
+            background: "rgba(239, 68, 68, 0.1)",
+            border: "1px solid rgba(239, 68, 68, 0.3)",
+            borderRadius: "8px",
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            color: "#b91c1c",
+          }}
+        >
+          <Lock size={20} style={{ flexShrink: 0, color: "#ef4444" }} />
+          <div>
+            <strong style={{ display: "block", fontSize: "14px", fontWeight: 600 }}>
+              🔒 Báo cáo đang bị khóa · Đã ẩn khỏi bản đồ công khai
+            </strong>
+            <span style={{ fontSize: "12.5px", color: "var(--text-muted, #64748b)" }}>
+              Báo cáo này đã bị tạm dừng hiển thị. Bạn có thể mở khóa bất kỳ lúc nào để đưa lại điểm ngập này lên bản đồ.
+            </span>
+          </div>
+        </div>
+      ) : (
+        <div
+          style={{
+            marginBottom: "16px",
+            padding: "12px 16px",
+            background: "rgba(16, 185, 129, 0.1)",
+            border: "1px solid rgba(16, 185, 129, 0.3)",
+            borderRadius: "8px",
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            color: "#047857",
+          }}
+        >
+          <Sparkles size={20} style={{ flexShrink: 0, color: "#10b981" }} />
+          <div>
+            <strong style={{ display: "block", fontSize: "14px", fontWeight: 600 }}>
+              ⚡ Tự động duyệt bởi AI Gemini · Đang hiển thị trực tiếp trên bản đồ TP.HCM
+            </strong>
+            <span style={{ fontSize: "12.5px", color: "var(--text-muted, #64748b)" }}>
+              Báo cáo được AI phân tích và đưa thẳng lên bản đồ công khai. Quản trị viên có quyền Khóa báo cáo nếu phát hiện sai lệch hoặc spam.
+            </span>
+          </div>
+        </div>
+      )}
+
       <div className="review-grid">
         <div className="review-media">
           <ReportVisual type={report.visual} large photoUrl={report.photoUrl} />
@@ -187,13 +248,19 @@ function ReportReviewModal({
         <span className="reporter-note">
           <CircleUserRound size={16} /> Người gửi đã được ẩn danh
         </span>
-        <div>
-          <Button variant="danger" onClick={onReject}>
-            <XCircle size={16} /> Từ chối
+        <div style={{ display: "flex", gap: "10px" }}>
+          <Button variant="ghost" onClick={onClose}>
+            Đóng
           </Button>
-          <Button onClick={onApprove}>
-            <Check size={16} /> Xác nhận báo cáo
-          </Button>
+          {isLocked ? (
+            <Button onClick={onApprove}>
+              <Unlock size={16} /> Mở khóa báo cáo (Hiển thị lại)
+            </Button>
+          ) : (
+            <Button variant="danger" onClick={onReject}>
+              <Lock size={16} /> Khóa báo cáo (Ẩn khỏi bản đồ)
+            </Button>
+          )}
         </div>
       </div>
     </ModalShell>

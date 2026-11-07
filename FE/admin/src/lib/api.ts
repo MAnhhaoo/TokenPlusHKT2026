@@ -536,6 +536,23 @@ export async function rejectReportApi(
   }
 }
 
+export async function toggleReportLockApi(
+  id: string,
+  reason?: string,
+): Promise<{ report: FloodReport; updatedMapPoint?: MapPoint | null } | null> {
+  try {
+    const res = await fetch(`${API_BASE}/reports/${id}/toggle-lock`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ reason }),
+    })
+    if (!res.ok) return null
+    return await res.json()
+  } catch {
+    return null
+  }
+}
+
 export async function createAlertApi(
   draft: AlertDraft,
 ): Promise<AreaAlert | null> {

@@ -206,8 +206,8 @@ export default function App() {
     return () => window.clearTimeout(timer)
   }, [toast])
 
-  const pendingCount = reports.filter(
-    (report) => report.status === "pending",
+  const liveReportsCount = reports.filter(
+    (report) => report.status === "verified",
   ).length
   const activeAlertCount = alerts.filter(
     (alert) => alert.status === "active",
@@ -227,7 +227,7 @@ export default function App() {
     setSelectedMapPoint(point.id)
     if (point.linkedReportId) {
       const report = reports.find(
-        (item) => item.id === point.linkedReportId && item.status === "pending",
+        (item) => item.id === point.linkedReportId,
       )
       if (report) setReviewing(report)
     }
@@ -255,15 +255,19 @@ export default function App() {
           : report,
       ),
     )
-    setMapPoints((current) =>
-      current.map((point) =>
-        point.linkedReportId === targetId
-          ? apiResult?.updatedMapPoint ?? { ...point, type: "flood" }
-          : point,
-      ),
-    )
+    if (apiResult?.updatedMapPoint) {
+      setMapPoints((current) => {
+        const exists = current.some((pt) => pt.linkedReportId === targetId)
+        if (exists) {
+          return current.map((pt) =>
+            pt.linkedReportId === targetId ? apiResult.updatedMapPoint! : pt,
+          )
+        }
+        return [...current, apiResult.updatedMapPoint!]
+      })
+    }
     setReviewing(null)
-    setToast(`Đã xác nhận báo cáo ${targetId} và cập nhật bản đồ.`)
+    setToast(`Đã mở khóa báo cáo ${targetId} và hiển thị lại trên bản đồ.`)
   }
 
   const rejectReport = async (reason?: string) => {
@@ -277,10 +281,13 @@ export default function App() {
           : report,
       ),
     )
+    setMapPoints((current) =>
+      current.filter((point) => point.linkedReportId !== targetId),
+    )
     setRejecting(null)
     setReviewing(null)
     setToast(
-      `Đã từ chối báo cáo ${targetId}${reason ? `: ${reason}` : ""}.`,
+      `Đã khóa báo cáo ${targetId}${reason ? `: ${reason}` : ""} và ẩn khỏi bản đồ.`,
     )
   }
 
@@ -414,7 +421,7 @@ export default function App() {
         onNavigate={navigate}
         open={sidebarOpen}
         page={page}
-        pendingCount={pendingCount}
+        pendingCount={liveReportsCount}
         setOpen={setSidebarOpen}
       />
       <main className="main">
@@ -516,9 +523,9 @@ export default function App() {
       )}
       {rejecting && (
         <ConfirmDialog
-          title="Từ chối báo cáo?"
-          description="Báo cáo sẽ được loại khỏi hàng chờ và không dùng để cập nhật cảnh báo."
-          confirmLabel="Xác nhận từ chối"
+          title="Khóa báo cáo hiện trường?"
+          description={`Báo cáo ${rejecting.id} tại "${rejecting.location}" sẽ bị khóa và ẩn khỏi bản đồ công khai TP.HCM. Bạn có thể mở khóa lại bất kỳ lúc nào.`}
+          confirmLabel="Khóa báo cáo (Ẩn khỏi bản đồ)"
           onClose={() => setRejecting(null)}
           onConfirm={rejectReport}
           withReason
