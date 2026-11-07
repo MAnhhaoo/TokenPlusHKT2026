@@ -31,22 +31,17 @@ export class GeminiVisionService {
   ): Promise<FloodImageAnalysisResult> {
     const apiKey = process.env.GEMINI_API_KEY?.trim();
     const primaryModel =
-      process.env.GEMINI_MODEL?.trim() || "gemini-1.5-flash";
+      process.env.GEMINI_MODEL?.trim() || "gemini-3.5-flash-lite";
 
-    // Google Generative Language API chỉ chấp nhận API Key chuẩn bắt đầu bằng "AIzaSy"
-    const isValidAiStudioKey =
-      Boolean(apiKey && apiKey.startsWith("AIzaSy") && apiKey.length >= 30);
+    // Hỗ trợ cả định dạng API key Google AI Studio truyền thống (AIzaSy...) và định dạng mới (AQ...)
+    const isValidKey = Boolean(apiKey && apiKey.length >= 20);
 
-    if (
-      isValidAiStudioKey &&
-      this.isBase64Image(imageDataUrlOrBase64)
-    ) {
+    if (isValidKey && this.isBase64Image(imageDataUrlOrBase64)) {
       const candidateModels = [
         primaryModel,
-        "gemini-1.5-flash",
-        "gemini-2.0-flash",
-        "gemini-1.5-flash-8b",
-        "gemini-1.5-pro",
+        "gemini-3.5-flash-lite",
+        "gemini-3.5-flash",
+        "gemini-3-flash-preview",
       ];
       const uniqueModels = Array.from(new Set(candidateModels));
 
@@ -71,10 +66,6 @@ export class GeminiVisionService {
           );
         }
       }
-    } else if (apiKey && !isValidAiStudioKey) {
-      this.logger.warn(
-        `[GeminiVision] GEMINI_API_KEY hiện tại (${apiKey.slice(0, 6)}...) không phải là Google AI Studio key (cần bắt đầu bằng AIzaSy...). Tự động kích hoạt SaigonDrain Computer Vision Engine.`,
-      );
     }
 
     // SaigonDrain Computer Vision Engine phân tích trực tiếp dữ liệu ảnh
@@ -98,7 +89,8 @@ export class GeminiVisionService {
     const { mimeType, base64Data } = this.extractBase64(imageDataUrl);
     if (!base64Data) return null;
 
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+    // Không truyền key vào query string để tương thích hoàn toàn với cả khóa AIzaSy và AQ
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
 
     const prompt = `
 Bạn là chuyên gia thị giác máy tính và cứu hộ đô thị của hệ thống SaigonDrain AI (TP. Hồ Chí Minh).
