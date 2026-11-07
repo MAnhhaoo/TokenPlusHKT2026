@@ -5,11 +5,7 @@ import { Geolocation } from "@capacitor/geolocation";
 import type { GeoJSONSource, Map as LibreMap } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import maplibreWorkerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?url";
-import {
-  computeRouteWithGoogle,
-  GOOGLE_MAP_TILE_URLS,
-  type GoogleMapLayerType,
-} from "@/lib/googleMaps";
+import { GOOGLE_MAP_TILE_URLS, type GoogleMapLayerType } from "@/lib/googleMaps";
 import type { MapFloodPoint, RouteEndpoint, RouteId, RouteItem } from "@/types";
 
 function MapCanvas({
@@ -361,7 +357,7 @@ function MapCanvas({
       if (
         routesData?.safe?.coordinates &&
         Array.isArray(routesData.safe.coordinates) &&
-        routesData.safe.coordinates.length > 2 &&
+        routesData.safe.coordinates.length > 1 &&
         isMatchingCurrentEndpoints(routesData.safe.coordinates)
       ) {
         let safeCoords = routesData.safe.coordinates;
@@ -415,162 +411,22 @@ function MapCanvas({
         }
       }
 
-      let safeCoords: number[][] = [origCoords, destCoords];
-      let altCoords: number[][] = [];
-
-      let hasGoogleRoute = false;
-      try {
-        const googleRes = await computeRouteWithGoogle(origCoords, destCoords);
-        if (
-          googleRes &&
-          Array.isArray(googleRes.safeRoute?.coordinates) &&
-          googleRes.safeRoute.coordinates.length > 1
-        ) {
-          safeCoords = googleRes.safeRoute.coordinates;
-          altCoords =
-            !isNavigating &&
-            Array.isArray(googleRes.balancedRoute?.coordinates) &&
-            googleRes.balancedRoute.coordinates.length > 2
-              ? googleRes.balancedRoute.coordinates
-              : [];
-          if (active) setRouteStatus("live");
-          hasGoogleRoute = true;
-        }
-      } catch (err) {
-        console.warn("Google Maps geometry fallback:", err);
-      }
-
-      if (!hasGoogleRoute) {
-        try {
-          const backendRes = await fetch(
-            `/api/journey/compute-route?fromLat=${origCoords[1]}&fromLng=${origCoords[0]}&toLat=${destCoords[1]}&toLng=${destCoords[0]}`,
-          );
-          if (backendRes.ok) {
-            const backendData = await backendRes.json();
-            const safeC = backendData?.safeRoute?.coordinates ?? backendData?.safeRoute?.waypoints;
-            const altC =
-              backendData?.balancedRoute?.coordinates ?? backendData?.balancedRoute?.waypoints;
-            if (
-              backendData?.provider !== "database-fallback" &&
-              Array.isArray(safeC) &&
-              safeC.length > 2
-            ) {
-              safeCoords = safeC;
-              if (Array.isArray(altC) && altC.length > 2) {
-                altCoords = altC;
-              }
-              if (active) setRouteStatus("live");
-            } else {
-              throw new Error("Need live road route");
-            }
-          } else {
-            throw new Error("Backend route unavailable");
-          }
-        } catch {
-          try {
-            const primaryResponse = await fetch(
-              `https://router.project-osrm.org/route/v1/bike/${origCoords.join(",")};${destCoords.join(",")}?steps=true&geometries=geojson&overview=full`,
-            );
-            if (primaryResponse.ok) {
-              const primaryData = await primaryResponse.json();
-              if (primaryData.routes?.[0]?.geometry?.coordinates?.length > 1) {
-                safeCoords = primaryData.routes[0].geometry.coordinates;
-              }
-            }
-            altCoords = [];
-            if (active) setRouteStatus("live");
-          } catch {
-            if (active) setRouteStatus("fallback");
-          }
-        }
-      }
-
-      const currentMap = mapRef.current;
-      if (!active || !currentMap) return;
-
-      // Cập nhật đường nối chấm tròn (walking trail) từ trong nhà ra mép hẻm (giống Google Maps)
-      const alleySrc = currentMap.getSource("alley-connector") as GeoJSONSource | undefined;
-      if (origCoords && safeCoords.length > 0) {
-        const dx = origCoords[0] - safeCoords[0][0];
-        const dy = origCoords[1] - safeCoords[0][1];
-        const dSq = dx * dx + dy * dy;
-        if (dSq > 0.00000004 && dSq < 0.00002) {
-          alleySrc?.setData({
-            type: "Feature",
-            properties: {},
-            geometry: { type: "LineString", coordinates: [origCoords, safeCoords[0]] },
-          });
-        } else {
-          alleySrc?.setData({
+      // App owns route requests. Keep the active navigation drawing until replacement succeeds.
+      if (!isNavigating) {
+        activeRouteCoordsRef.current = [];
+        for (const sourceId of ["sgu-route", "east-route", "alley-connector"]) {
+          const source = mapRef.current?.getSource(sourceId) as GeoJSONSource | undefined;
+          source?.setData({
             type: "Feature",
             properties: {},
             geometry: { type: "LineString", coordinates: [] },
           });
         }
-      } else {
-        alleySrc?.setData({
-          type: "Feature",
-          properties: {},
-          geometry: { type: "LineString", coordinates: [] },
-        });
+        etaMarkerRef.current?.remove();
+        etaMarkerRef.current = null;
+        etaRef.current = null;
       }
-
-      activeRouteCoordsRef.current = safeCoords;
-      setRouteVersion((v) => v + 1);
-
-      const sguSrc = currentMap.getSource("sgu-route") as GeoJSONSource | undefined;
-      sguSrc?.setData({
-        type: "Feature",
-        properties: {},
-        geometry: { type: "LineString", coordinates: safeCoords },
-      });
-
-      const eastSrc = currentMap.getSource("east-route") as GeoJSONSource | undefined;
-      eastSrc?.setData({
-        type: "Feature",
-        properties: {},
-        geometry: { type: "LineString", coordinates: isNavigating ? [] : altCoords },
-      });
-
-      const midSafe = safeCoords[Math.floor(safeCoords.length / 2)] ?? origCoords;
-
-      if (!etaMarkerRef.current) {
-        const etaElement = document.createElement("div");
-        etaElement.className = "map-route-eta is-primary";
-        const etaTime = document.createElement("strong");
-        etaTime.textContent = routesData[route].time;
-        const etaDistance = document.createElement("span");
-        etaDistance.textContent = routesData[route].distance;
-        etaElement.append(etaTime, etaDistance);
-        etaRef.current = etaElement;
-        etaMarkerRef.current = new maplibregl.Marker({
-          element: etaElement,
-          anchor: "center",
-        })
-          .setLngLat(midSafe as [number, number])
-          .addTo(currentMap);
-      } else {
-        etaMarkerRef.current.setLngLat(midSafe as [number, number]);
-      }
-
-      const allCoords = [...safeCoords, ...altCoords];
-      const bounds = allCoords.reduce(
-        (result, coordinate) => result.extend(coordinate as [number, number]),
-        new maplibregl.LngLatBounds(
-          allCoords[0] as [number, number],
-          allCoords[0] as [number, number],
-        ),
-      );
-      if (!isNavigatingRef.current) {
-        currentMap.fitBounds(bounds, {
-          padding:
-            window.innerWidth < 760
-              ? { top: 190, right: 40, bottom: 300, left: 40 }
-              : { top: 90, right: 80, bottom: 110, left: 80 },
-          duration: 850,
-          maxZoom: 15.4,
-        });
-      }
+      setRouteStatus("loading");
     }
 
     loadRouteGeometry();
@@ -612,8 +468,7 @@ function MapCanvas({
           coords = fresh;
           activeRouteCoordsRef.current = fresh;
         } else {
-          coords = [origin.coords, destination.coords];
-          activeRouteCoordsRef.current = coords;
+          if (!isNavigating) return;
         }
       }
     }
@@ -821,12 +676,14 @@ function MapCanvas({
     };
 
     // Xử lý khi có tọa độ GPS thật gửi về từ cảm biến thiết bị của người dùng
+    let watchActive = true;
     const handleRawGpsUpdate = (
       rawLng: number,
       rawLat: number,
       heading?: number | null,
       speed?: number | null,
     ) => {
+      if (!watchActive) return;
       userRealGpsRef.current = [rawLng, rawLat];
 
       // Tìm điểm chiếu gần nhất trên tuyến đường (Map Matching)
@@ -894,6 +751,10 @@ function MapCanvas({
             }
           })
             .then((id) => {
+              if (!watchActive) {
+                void Geolocation.clearWatch({ id });
+                return;
+              }
               capWatchIdRef.current = id;
             })
             .catch((err) => {
@@ -937,6 +798,7 @@ function MapCanvas({
     }
 
     return () => {
+      watchActive = false;
       if (capWatchIdRef.current !== null) {
         Geolocation.clearWatch({ id: capWatchIdRef.current });
         capWatchIdRef.current = null;
@@ -957,6 +819,7 @@ function MapCanvas({
     recenterTrigger,
     stepForwardTrigger,
     navigationSteps.length,
+    origin?.isCurrentLocation,
   ]);
 
   // Hiển thị các điểm ngập và cảnh báo lên bản đồ ngay khi khởi tạo (không cần chờ tile tải xong)

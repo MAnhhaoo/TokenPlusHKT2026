@@ -30,34 +30,45 @@ function RouteSearch({
   const wrapRef = useRef<HTMLDivElement>(null);
   const swappingRef = useRef(false);
   const reqSeqRef = useRef(0);
+  const searchAbortRef = useRef<AbortController | null>(null);
+  useEffect(() => () => searchAbortRef.current?.abort(), []);
+
+  async function searchPlaces(query: string, allowNominatim = true) {
+    searchAbortRef.current?.abort();
+    const controller = new AbortController();
+    searchAbortRef.current = controller;
+    const results = await searchPlacesApi(query, controller.signal, { allowNominatim });
+    return controller.signal.aborted ? [] : results;
+  }
   const [gpsLoading, setGpsLoading] = useState(false);
 
   const handleGetOriginGps = async () => {
     setGpsLoading(true);
     try {
-      const { latitude, longitude } = await getUserLocation();
+      const { latitude, longitude, isIpFallback } = await getUserLocation();
+      const locationLabel = isIpFallback ? "Vị trí gần đúng" : "Vị trí của bạn";
       try {
         const geo = await reverseGeocodeApi(latitude, longitude);
         const street =
           geo.location || (geo.district ? `${geo.district}, TP.HCM` : "Vị trí của bạn");
-        const label = `Vị trí của bạn · ${street}`;
+        const label = `${locationLabel} · ${street}`;
         const place: RouteEndpoint = {
           label,
           address: geo.location,
           district: geo.district,
           coords: [longitude, latitude],
-          isCurrentLocation: true,
+          isCurrentLocation: !isIpFallback,
         };
         onSelectOrigin(place);
         setOriginText(label);
         setActiveField(null);
         setSuggestions([]);
       } catch {
-        const label = `Vị trí của bạn (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`;
+        const label = `${locationLabel} (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`;
         const place: RouteEndpoint = {
           label,
           coords: [longitude, latitude],
-          isCurrentLocation: true,
+          isCurrentLocation: !isIpFallback,
         };
         onSelectOrigin(place);
         setOriginText(label);
@@ -99,13 +110,13 @@ function RouteSearch({
 
     // Nếu người dùng mới gõ chữ mà chưa bấm chọn gợi ý, tự động phân giải địa điểm khi đảo chiều
     if (!prevDest && prevDestText.trim().length >= 2) {
-      const res = await searchPlacesApi(prevDestText.trim());
+      const res = await searchPlaces(prevDestText.trim());
       if (res.length > 0) {
         onSelectOrigin(res[0]);
       }
     }
     if (!prevOrigin && prevOriginText.trim().length >= 2) {
-      const res = await searchPlacesApi(prevOriginText.trim());
+      const res = await searchPlaces(prevOriginText.trim());
       if (res.length > 0) {
         onSelectDestination(res[0]);
       }
@@ -140,17 +151,19 @@ function RouteSearch({
       setLoading(true);
     }
 
-    // 2. Truy vấn mở rộng trực tiếp API bản đồ thực tế với debounce 25ms (không hủy giữa chừng để làm giàu cache)
+    // Debounce autocomplete; Nominatim is reserved for explicit commits.
     const seq = ++reqSeqRef.current;
     const timer = window.setTimeout(async () => {
-      const results = await searchPlacesApi(query);
+      const results = await searchPlaces(query, false);
       if (reqSeqRef.current !== seq) return;
       setSuggestions(results);
       setHighlightIndex(results.length > 0 ? 0 : -1);
       setLoading(false);
-    }, 25);
+    }, 300);
 
     return () => {
+      ++reqSeqRef.current;
+      searchAbortRef.current?.abort();
       window.clearTimeout(timer);
     };
   }, [activeField, originText, destText, origin?.label, destination?.label]);
@@ -211,7 +224,7 @@ function RouteSearch({
         commitPlace(chosen, field);
         return;
       }
-      const results = await searchPlacesApi(text);
+      const results = await searchPlaces(text);
       if (results.length > 0) {
         commitPlace(results[0], field);
       } else {
@@ -275,7 +288,7 @@ function RouteSearch({
                   window.setTimeout(async () => {
                     const text = originText.trim();
                     if (text && (!origin || origin.label !== text)) {
-                      const res = await searchPlacesApi(text);
+                      const res = await searchPlaces(text);
                       if (res.length > 0) {
                         commitPlace(res[0], "origin");
                       }
@@ -337,7 +350,7 @@ function RouteSearch({
                   window.setTimeout(async () => {
                     const text = destText.trim();
                     if (text && (!destination || destination.label !== text)) {
-                      const res = await searchPlacesApi(text);
+                      const res = await searchPlaces(text);
                       if (res.length > 0) {
                         commitPlace(res[0], "dest");
                       }

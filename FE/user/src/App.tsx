@@ -1,5 +1,5 @@
 import WeatherPage from "@/components/weather/WeatherPage";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import BottomNav from "@/components/layout/BottomNav";
 import TopBar from "@/components/layout/TopBar";
 import NotificationsModal from "@/components/layout/NotificationsModal";
@@ -105,7 +105,7 @@ function App() {
     let active = true;
     const currentSlot = forecasts[forecastIndex] ?? forecasts[0];
     const slotRain = currentSlot
-      ? Number.parseInt(currentSlot.rain, 10) || 0
+      ? Number.parseFloat(currentSlot.rain) || 0
       : (weather?.currentRainMm ?? 0);
 
     async function updatePoints() {
@@ -147,7 +147,7 @@ function App() {
       onRouteRecomputeNeeded: async () => {
         const pointsRes = await fetchMapPointsApi();
         if (!active) return;
-        if (pointsRes.length > 0) setFloodPoints(pointsRes);
+        setFloodPoints(pointsRes);
       },
       onAlertsChanged: async () => {
         const alertsRes = await fetchActiveAlertsApi();
@@ -162,6 +162,10 @@ function App() {
     };
   }, []);
 
+  const previousRouteKey = useRef("");
+  const endpointKey = JSON.stringify([origin?.coords, destination?.coords, vehicleMode]);
+  const floodKey = JSON.stringify(floodPoints);
+
   // 2. TỨC THÌ TÍNH TOÁN LỘ TRÌNH NGAY KHI ĐIỂM ĐI, ĐIỂM ĐẾN HOẶC PHƯƠNG TIỆN THAY ĐỔI
   useEffect(() => {
     if (!origin || !destination) {
@@ -174,13 +178,15 @@ function App() {
     }
 
     let active = true;
-    // Xóa ngay dữ liệu tuyến cũ để tránh hiển thị nhầm lộ trình cũ của điểm trước đó
-    setRoutesData({
-      safe: { ...EMPTY_ROUTES.safe },
-      balanced: { ...EMPTY_ROUTES.balanced },
-    });
-    setNavigationSteps([]);
-
+    const endpointsChanged = previousRouteKey.current !== endpointKey;
+    previousRouteKey.current = endpointKey;
+    if (endpointsChanged && !isNavigating) {
+      setRoutesData({
+        safe: { ...EMPTY_ROUTES.safe },
+        balanced: { ...EMPTY_ROUTES.balanced },
+      });
+      setNavigationSteps([]);
+    }
     async function computeRoutesNow() {
       try {
         const routesRes = await fetchJourneyRoutes(
@@ -197,9 +203,13 @@ function App() {
         ) {
           setRoutesData(routesRes.routes);
           setNavigationSteps(routesRes.navigationSteps);
+          setNavStepIndex(0);
+          setLiveDistanceToTurn(null);
         }
       } catch (err) {
         console.warn("fetchJourneyRoutes error:", err);
+      } finally {
+        if (active) setRerouteNotice(null);
       }
     }
 
@@ -214,6 +224,7 @@ function App() {
     destination?.coords[0],
     destination?.coords[1],
     vehicleMode,
+    floodKey,
   ]);
 
   async function handleSyncWeather() {
@@ -248,7 +259,7 @@ function App() {
   }
 
   const forecast = forecasts[forecastIndex] ?? forecasts[0] ?? EMPTY_FORECAST;
-  const rainValue = Number.parseInt(forecast.rain, 10) || 0;
+  const rainValue = Number.parseFloat(forecast.rain) || 0;
 
   useEffect(() => {
     if (!reportOpen) return;
@@ -275,7 +286,7 @@ function App() {
     setActiveTab("map");
   }
 
-  async function handleAutoReroute(currentCoords: [number, number]) {
+  function handleAutoReroute(currentCoords: [number, number]) {
     if (!destination) return;
     setRerouteNotice("Đang tính toán lại lộ trình tránh ngập...");
 
@@ -287,32 +298,6 @@ function App() {
       isCurrentLocation: true,
     };
     setOrigin(updatedOrigin);
-
-    try {
-      const routesRes = await fetchJourneyRoutes(
-        currentCoords,
-        destination.coords,
-        floodPoints,
-        vehicleMode,
-      );
-      if (
-        routesRes &&
-        routesRes.routes?.safe?.coordinates &&
-        routesRes.routes.safe.coordinates.length > 1
-      ) {
-        setRoutesData(routesRes.routes);
-        setNavigationSteps(routesRes.navigationSteps);
-        setNavStepIndex(0);
-        setLiveDistanceToTurn(null);
-        setRerouteNotice("Đã đổi lộ trình mới tránh ngập!");
-        setTimeout(() => setRerouteNotice(null), 3000);
-      } else {
-        setRerouteNotice(null);
-      }
-    } catch (err) {
-      console.warn("Auto-reroute error:", err);
-      setRerouteNotice(null);
-    }
   }
 
   function handleStopNavigation() {

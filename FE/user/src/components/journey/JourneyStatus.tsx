@@ -20,7 +20,7 @@ function JourneyStatus({
       zone: 0 as const,
     };
 
-  const rainValue = Number.parseInt(forecast.rain, 10) || 0;
+  const rainValue = Number.parseFloat(forecast.rain) || 0;
   const isHighRisk = forecast.zone >= 2;
   const isWarning = forecast.zone === 1;
   const isRaining = rainValue > 0 || isHighRisk || isWarning;

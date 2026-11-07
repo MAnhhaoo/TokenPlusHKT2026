@@ -25,6 +25,7 @@ export interface DailyForecastItem {
 }
 
 export interface DetailedWeatherData {
+  live: boolean;
   locationName: string;
   coords: [number, number]; // [lng, lat]
   updatedAt: string;
@@ -164,6 +165,7 @@ function formatDayLabel(dateStr: string, index: number): string {
 }
 
 export const DEFAULT_HCMC_WEATHER: DetailedWeatherData = {
+  live: false,
   locationName: "Hồ Chí Minh",
   coords: [106.7009, 10.7769],
   updatedAt: "Vừa xong",
@@ -497,6 +499,7 @@ export async function fetchFullRealWeather(
       condition: decoded.condition,
       narrative,
       humidityPercent,
+      live: true,
       windSpeedKmh,
       windDirectionText,
       sunriseTime,

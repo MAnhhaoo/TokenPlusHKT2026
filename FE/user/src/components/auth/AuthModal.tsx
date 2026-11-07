@@ -1,3 +1,4 @@
+import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { useState } from "react";
 import Icon from "@/components/ui/Icon";
 import { clearAuthSession, loginUserApi, registerUserApi } from "@/lib/api";
@@ -47,6 +48,7 @@ function AuthModal({
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
+  const panelRef = useDialogFocus(open, onClose);
   if (!open) return null;
 
   async function handleLoginSubmit(ev: React.FormEvent) {
@@ -119,9 +121,11 @@ function AuthModal({
       aria-label="Hộp thoại tài khoản người dùng"
       aria-modal="true"
       className="modal-backdrop"
-      onClick={(ev) => {
+      onMouseDown={(ev) => {
         if (ev.target === ev.currentTarget) onClose();
       }}
+      ref={panelRef}
+      tabIndex={-1}
       role="dialog"
     >
       <div className="report-modal auth-modal">

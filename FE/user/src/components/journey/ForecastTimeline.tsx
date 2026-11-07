@@ -29,7 +29,7 @@ function ForecastTimeline({
       </div>
       <div aria-label="Mốc thời gian dự báo" className="forecast-tabs" role="group">
         {slots.map((slot, index) => {
-          const rain = Number.parseInt(slot.rain, 10);
+          const rain = Number.parseFloat(slot.rain);
           const height = Math.max(16, Math.min(100, (rain / 60) * 100));
 
           return (

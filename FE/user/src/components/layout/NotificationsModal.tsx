@@ -1,3 +1,4 @@
+import { useDialogFocus } from "@/hooks/useDialogFocus";
 import Icon from "@/components/ui/Icon";
 import type { AreaAlertItem } from "@/types";
 
@@ -14,6 +15,7 @@ function NotificationsModal({
   onClose: () => void;
   alerts: AreaAlertItem[];
 }) {
+  const panelRef = useDialogFocus(open, onClose);
   if (!open) return null;
 
   return (
@@ -21,9 +23,11 @@ function NotificationsModal({
       aria-label="Cảnh báo khu vực và hướng dẫn an toàn"
       aria-modal="true"
       className="modal-backdrop"
-      onClick={(ev) => {
+      onMouseDown={(ev) => {
         if (ev.target === ev.currentTarget) onClose();
       }}
+      ref={panelRef}
+      tabIndex={-1}
       role="dialog"
     >
       <div className="report-modal auth-modal">

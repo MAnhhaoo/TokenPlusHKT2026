@@ -584,7 +584,11 @@ function WeatherPage({
               <strong>{data.locationName}</strong>
               <span className="dot-divider">|</span>
               <span className="live-status">
-                {loading ? "Đang đồng bộ…" : data.updatedAt || "Vừa xong"}
+                {loading
+                  ? "Đang đồng bộ…"
+                  : !data.live
+                    ? "Thời tiết không khả dụng · dữ liệu mẫu"
+                    : data.updatedAt || "Vừa xong"}
               </span>
             </div>
 

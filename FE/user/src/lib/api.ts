@@ -430,13 +430,15 @@ if (typeof window !== "undefined") {
 export async function searchPlacesApi(
   query: string,
   signal?: AbortSignal,
+  options: { allowNominatim?: boolean } = {},
 ): Promise<RouteEndpoint[]> {
+  if (signal?.aborted) return [];
   const clean = query.trim();
   if (!clean) {
     return [];
   }
 
-  const cacheKey = normalizeVn(clean);
+  const cacheKey = `${options.allowNominatim === false ? "autocomplete:" : "commit:"}${normalizeVn(clean)}`;
   const cached = placeSearchCache.get(cacheKey);
   if (cached && cached.length > 0) {
     return cached;
@@ -449,9 +451,13 @@ export async function searchPlacesApi(
   });
 
   const arcgisDirectPromise = fetchArcgisCandidates(clean, 7, signal);
-  const nominatimPromise = fetchNominatimCandidates(clean, 7, signal);
+  const nominatimPromise =
+    options.allowNominatim === false
+      ? Promise.resolve([])
+      : fetchNominatimCandidates(clean, 7, signal);
 
   const backendPromise = (async (): Promise<RouteEndpoint[]> => {
+    if (options.allowNominatim === false) return [];
     try {
       const res = await fetch(`${API_BASE}/map/geocode/search?q=${encodeURIComponent(clean)}`, {
         signal,
@@ -508,6 +514,7 @@ export async function searchPlacesApi(
     void backendPromise.then(handleBatch);
   });
 
+  if (signal?.aborted) return [];
   const merged: RouteEndpoint[] = [...remoteBatch, ...results];
   const unique: RouteEndpoint[] = [];
   for (const item of merged) {
@@ -655,6 +662,7 @@ export async function fetchCurrentWeather(): Promise<WeatherSnapshot | null> {
 
   try {
     const real = await fetchFullRealWeather(10.7769, 106.7009, "Hồ Chí Minh");
+    if (!real.live) throw new Error("Weather unavailable");
     return {
       provider: "Open-Meteo",
       locationName: real.locationName,
@@ -671,16 +679,7 @@ export async function fetchCurrentWeather(): Promise<WeatherSnapshot | null> {
             : "Thấp",
     };
   } catch {
-    return {
-      provider: "Default",
-      locationName: "Hồ Chí Minh",
-      temperatureC: 31,
-      humidityPercent: 75,
-      windSpeedKmh: 10,
-      currentRainMm: 0,
-      weatherCondition: "Nắng ráo",
-      floodRiskLevel: "Thấp",
-    };
+    return null;
   }
 }
 
@@ -722,6 +721,7 @@ export async function fetchForecastSlots(): Promise<{
   // Fallback: Gọi trực tiếp Open-Meteo API thời gian thực trên client
   try {
     const real = await fetchFullRealWeather(10.7769, 106.7009, "Hồ Chí Minh");
+    if (!real.live) throw new Error("Weather unavailable");
     const hourly = real.hourly || [];
     const nowRain = Math.round((hourly[0]?.rainMm ?? 0) * 10) / 10;
     const slot30Rain =

@@ -1,3 +1,4 @@
+import { useDialogFocus } from "@/hooks/useDialogFocus";
 import { useEffect, useRef, useState } from "react";
 import Icon from "@/components/ui/Icon";
 import { getUserLocation } from "@/lib/location";
@@ -66,6 +67,7 @@ function ReportModal({
   const [severity, setSeverity] = useState<Severity>("medium");
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [createdReportId, setCreatedReportId] = useState<string | null>(null);
   const [photoName, setPhotoName] = useState("");
   const [photoDataUrl, setPhotoDataUrl] = useState("");
@@ -78,13 +80,13 @@ function ReportModal({
   const [locatingGps, setLocatingGps] = useState(false);
   const [description, setDescription] = useState("");
 
-  const closeRef = useRef<HTMLButtonElement>(null);
-  const panelRef = useRef<HTMLDivElement>(null);
+  const panelRef = useDialogFocus(open, closeModal);
   const successRef = useRef<HTMLDivElement>(null);
 
   function closeModal() {
     onClose();
     window.setTimeout(() => {
+      setSubmitError(null);
       setSubmitted(false);
       setSubmitting(false);
       setCreatedReportId(null);
@@ -150,67 +152,34 @@ function ReportModal({
 
   async function handleSubmit() {
     setSubmitting(true);
-    const rawLoc = locationText.trim() || "Nguyễn Hữu Cảnh, Bình Thạnh";
-    const cleanLocation = rawLoc.split(/[·,]/)[0].trim() || rawLoc;
-    const created = await createCitizenReport({
-      reportType: type,
-      severity,
-      photoUrl: photoDataUrl || photoName || undefined,
-      location: cleanLocation,
-      district: selectedDistrict,
-      description: description.trim() || undefined,
-      lat: coords[1],
-      lng: coords[0],
-      reporterId,
-    });
-    setCreatedReportId(created?.id ?? null);
-    setSubmitting(false);
-    setSubmitted(true);
-    if (created) onReportCreated?.();
-  }
-
-  const closeModalRef = useRef(closeModal);
-  closeModalRef.current = closeModal;
-
-  useEffect(() => {
-    if (!open) return;
-
-    const previousFocus = document.activeElement as HTMLElement | null;
-    closeRef.current?.focus();
-
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        event.preventDefault();
-        closeModalRef.current();
+    setSubmitError(null);
+    try {
+      const rawLoc = locationText.trim() || "Nguyễn Hữu Cảnh, Bình Thạnh";
+      const cleanLocation = rawLoc.split(/[·,]/)[0].trim() || rawLoc;
+      const created = await createCitizenReport({
+        reportType: type,
+        severity,
+        photoUrl: photoDataUrl || photoName || undefined,
+        location: cleanLocation,
+        district: selectedDistrict,
+        description: description.trim() || undefined,
+        lat: coords[1],
+        lng: coords[0],
+        reporterId,
+      });
+      if (!created) {
+        setSubmitError("Không thể gửi báo cáo. Vui lòng thử lại.");
         return;
       }
-      if (event.key !== "Tab") return;
-      const panel = panelRef.current;
-      if (!panel) return;
-      const focusable = Array.from(
-        panel.querySelectorAll<HTMLElement>(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-        ),
-      ).filter((element) => !element.hasAttribute("disabled"));
-      if (focusable.length === 0) return;
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first.focus();
-      }
-    };
-
-    window.addEventListener("keydown", onKeyDown);
-
-    return () => {
-      window.removeEventListener("keydown", onKeyDown);
-      previousFocus?.focus();
-    };
-  }, [open]);
+      setCreatedReportId(created.id);
+      setSubmitted(true);
+      onReportCreated?.();
+    } catch {
+      setSubmitError("Không thể gửi báo cáo. Vui lòng thử lại.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
 
   useEffect(() => {
     if (submitted) successRef.current?.focus();
@@ -226,6 +195,7 @@ function ReportModal({
         aria-modal="true"
         className="report-modal"
         onMouseDown={(event) => event.stopPropagation()}
+        tabIndex={-1}
         ref={panelRef}
         role="dialog"
       >
@@ -233,7 +203,6 @@ function ReportModal({
           aria-label="Đóng báo cáo"
           className="icon-button modal-close"
           onClick={closeModal}
-          ref={closeRef}
           type="button"
         >
           <Icon name="close" size={20} />
@@ -422,6 +391,7 @@ function ReportModal({
               />
             </label>
 
+            {submitError && <p role="alert">{submitError}</p>}
             <button
               className="primary-modal-button"
               disabled={submitting}
