@@ -2692,9 +2692,15 @@ h3 {
   margin-bottom: 4px;
 }
 
-.map-point-popup .popup-badge.critical { background: #dc2626; }
-.map-point-popup .popup-badge.high { background: #d97706; }
-.map-point-popup .popup-badge.medium { background: #0f766e; }
+.map-point-popup .popup-badge.critical {
+  background: #dc2626;
+}
+.map-point-popup .popup-badge.high {
+  background: #d97706;
+}
+.map-point-popup .popup-badge.medium {
+  background: #0f766e;
+}
 
 .map-point-popup .popup-top strong {
   font-size: 13.5px;
