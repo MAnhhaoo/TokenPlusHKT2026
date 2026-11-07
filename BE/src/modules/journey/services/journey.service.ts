@@ -32,6 +32,9 @@ export class JourneyService {
     @Optional() private readonly weatherService?: WeatherService,
   ) {}
 
+  /**
+   * Lấy danh sách các khung giờ dự báo mưa và rủi ro ngập đã đồng bộ.
+   */
   async getForecasts(): Promise<ForecastSlotEntity[]> {
     if (this.weatherService) {
       try {
@@ -48,6 +51,9 @@ export class JourneyService {
     return this.forecastRepo.find({ order: { sortOrder: "ASC" } });
   }
 
+  /**
+   * Lấy dữ liệu lộ trình đề xuất và dự phòng mặc định từ cơ sở dữ liệu.
+   */
   async getRoutesData() {
     const routeEntities = await this.routeRepo.find();
     const safe = routeEntities.find((r) => r.id === "safe");
@@ -178,21 +184,17 @@ export class JourneyService {
         let riskPenalty = 0;
         const nearbyFloodLabels = new Set<string>();
 
-        for (const [lng, lat] of coords) {
-          for (const fp of floodPoints) {
-            if (fp.type !== "flood" && fp.type !== "pending") continue;
-            const dist = this.haversineMeters(lat, lng, fp.lat, fp.lng);
-            if (dist <= 300) {
-              const penalty =
-                fp.severity === "critical"
-                  ? 50
-                  : fp.severity === "high"
-                    ? 30
-                    : 15;
-              riskPenalty += penalty;
-              nearbyFloodLabels.add(fp.label);
-            }
-          }
+        for (const fp of floodPoints) {
+          if (fp.type !== "flood" && fp.type !== "pending") continue;
+          const hit = coords.some(
+            ([lng, lat]) =>
+              this.haversineMeters(lat, lng, fp.lat, fp.lng) <= 300,
+          );
+          if (!hit) continue;
+          const penalty =
+            fp.severity === "critical" ? 50 : fp.severity === "high" ? 30 : 15;
+          riskPenalty += penalty;
+          nearbyFloodLabels.add(fp.label);
         }
 
         const durationMinutes = Math.max(

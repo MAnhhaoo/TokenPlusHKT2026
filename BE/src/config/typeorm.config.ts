@@ -5,6 +5,9 @@ import { Client } from "pg";
 
 const logger = new Logger("TypeOrmConfig");
 
+/**
+ * Kiểm tra kết nối tới PostgreSQL và tự động khởi tạo database đích nếu chưa tồn tại.
+ */
 async function verifyAndEnsurePostgresDatabase(
   host: string,
   port: number,
@@ -44,23 +47,38 @@ async function verifyAndEnsurePostgresDatabase(
   }
 }
 
+/**
+ * Khởi tạo cấu hình TypeORM hỗ trợ tách biệt cơ sở dữ liệu kiểm thử E2E và xác thực chứng chỉ SSL.
+ */
 export async function createTypeOrmOptions(
   configService: ConfigService,
 ): Promise<TypeOrmModuleOptions> {
   const databaseUrl = configService.get<string>("DATABASE_URL");
   const synchronize =
-    configService.get<string>("DB_SYNCHRONIZE", "true") === "true";
+    configService.get<string>("DB_SYNCHRONIZE", "false") === "true";
+  const dbType = configService.get<string>("DB_TYPE", "postgres");
+  const isIsolatedTestRun =
+    dbType === "sqljs" || process.env.NODE_ENV === "test";
 
-  if (databaseUrl) {
+  if (databaseUrl && !isIsolatedTestRun) {
     const isCloud =
       databaseUrl.includes("neon") ||
       databaseUrl.includes("supabase") ||
       databaseUrl.includes("sslmode=require");
+    const rejectUnauthorized =
+      configService.get<string>("DB_SSL_REJECT_UNAUTHORIZED", "true") !==
+      "false";
+    const sslCa = configService.get<string>("DB_SSL_CA");
     logger.log("Đang kết nối PostgreSQL qua DATABASE_URL...");
     return {
       type: "postgres",
       url: databaseUrl,
-      ssl: isCloud ? { rejectUnauthorized: false } : undefined,
+      ssl: isCloud
+        ? {
+            rejectUnauthorized,
+            ...(sslCa ? { ca: sslCa } : {}),
+          }
+        : undefined,
       autoLoadEntities: true,
       synchronize,
     };
@@ -70,7 +88,10 @@ export async function createTypeOrmOptions(
   const port = Number(configService.get<number>("DB_PORT", 5432));
   const username = configService.get<string>("DB_USERNAME", "postgres");
   const password = configService.get<string>("DB_PASSWORD", "postgres");
-  const database = configService.get<string>("DB_DATABASE", "saigondrain");
+  const configuredDb = configService.get<string>("DB_DATABASE", "saigondrain");
+  const database = isIsolatedTestRun
+    ? configService.get<string>("DB_TEST_DATABASE", `${configuredDb}_test`)
+    : configuredDb;
 
   const check = await verifyAndEnsurePostgresDatabase(
     host,

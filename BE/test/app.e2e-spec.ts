@@ -27,6 +27,8 @@ describe("SaigonDrain AI — Full-Stack & MVC E2E Suite (9 Modules + Realtime SS
 
   beforeAll(async () => {
     process.env.DB_TYPE = "sqljs";
+    process.env.DB_SYNCHRONIZE = "true";
+    process.env.DB_TEST_DATABASE = "saigondrain_test";
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();

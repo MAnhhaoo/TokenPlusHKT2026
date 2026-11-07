@@ -1,12 +1,29 @@
-import { Controller, Get, Header, Post } from "@nestjs/common";
+import { Controller, Get, Header, Post, UseGuards } from "@nestjs/common";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { SeedService } from "../services/seed.service";
+import { OperatorAuthGuard } from "../../../common/guards/operator-auth.guard";
+
+/**
+ * Mã hóa các ký tự HTML đặc biệt để chống tấn công Stored XSS khi hiển thị dữ liệu.
+ */
+function escapeHtml(value: unknown): string {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
 
 @ApiTags("8. Seed & Database Explorer (Quản trị & Xem Cơ sở dữ liệu)")
+@UseGuards(OperatorAuthGuard)
 @Controller("seed")
 export class SeedController {
   constructor(private readonly seedService: SeedService) {}
 
+  /**
+   * Khôi phục toàn bộ cơ sở dữ liệu về trạng thái dữ liệu mẫu chuẩn.
+   */
   @Post("reset")
   @ApiOperation({
     summary:
@@ -16,6 +33,9 @@ export class SeedController {
     return this.seedService.resetAndSeed();
   }
 
+  /**
+   * Trả về toàn bộ các bảng dữ liệu đã lọc thông tin nhạy cảm dưới dạng JSON.
+   */
   @Get("tables")
   @ApiOperation({
     summary:
@@ -25,6 +45,9 @@ export class SeedController {
     return this.seedService.inspectAllTables();
   }
 
+  /**
+   * Render giao diện HTML xem dữ liệu 8 bảng với đầy đủ cơ chế escape chống XSS.
+   */
   @Get("db-viewer")
   @Header("Content-Type", "text/html; charset=utf-8")
   @ApiOperation({
@@ -35,12 +58,13 @@ export class SeedController {
     const data = await this.seedService.inspectAllTables();
     const tableBlocks = Object.entries(data.tables)
       .map(([tableName, rows]) => {
+        const safeTableName = escapeHtml(tableName);
         const list = rows as unknown as Record<string, unknown>[];
         if (list.length === 0) {
-          return `<section class="card"><h2>Bảng: <code>${tableName}</code> <span class="badge">0 bản ghi</span></h2><p>Bảng hiện đang trống.</p></section>`;
+          return `<section class="card"><h2>Bảng: <code>${safeTableName}</code> <span class="badge">0 bản ghi</span></h2><p>Bảng hiện đang trống.</p></section>`;
         }
         const cols = Object.keys(list[0]);
-        const ths = cols.map((c) => `<th>${c}</th>`).join("");
+        const ths = cols.map((c) => `<th>${escapeHtml(c)}</th>`).join("");
         const trs = list
           .map(
             (row) =>
@@ -51,15 +75,15 @@ export class SeedController {
                     val === null || val === undefined
                       ? "<em>null</em>"
                       : typeof val === "object"
-                        ? `<code>${JSON.stringify(val)}</code>`
-                        : String(val);
+                        ? `<code>${escapeHtml(JSON.stringify(val))}</code>`
+                        : escapeHtml(val);
                   return `<td>${str}</td>`;
                 })
                 .join("")}</tr>`,
           )
           .join("");
         return `<section class="card">
-          <h2>Bảng: <code>${tableName}</code> <span class="badge">${list.length} bản ghi</span></h2>
+          <h2>Bảng: <code>${safeTableName}</code> <span class="badge">${list.length} bản ghi</span></h2>
           <div class="table-wrap"><table><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table></div>
         </section>`;
       })
@@ -90,7 +114,7 @@ export class SeedController {
   <header>
     <div>
       <h1>SaigonDrain AI — Trình xem Cơ sở dữ liệu (8 Bảng)</h1>
-      <small>Cập nhật lúc: ${data.inspectedAt}</small>
+      <small>Cập nhật lúc: ${escapeHtml(data.inspectedAt)}</small>
     </div>
     <a href="/api/seed/db-viewer">Làm mới dữ liệu</a>
   </header>

@@ -31,6 +31,9 @@ export class AnalyticsService {
     private readonly userRepo: Repository<CommunityUserEntity>,
   ) {}
 
+  /**
+   * Tổng hợp các chỉ số phân tích tổng quan về báo cáo, bản đồ ngập, cảnh báo và người đóng góp hàng đầu.
+   */
   async getOverviewAnalytics() {
     const [reports, alerts, mapPoints, users] = await Promise.all([
       this.reportRepo.find(),
@@ -110,7 +113,18 @@ export class AnalyticsService {
 
     const topContributors = [...users]
       .sort((a, b) => b.verifiedReports - a.verifiedReports)
-      .slice(0, 5);
+      .slice(0, 5)
+      .map((u) => ({
+        id: u.id,
+        name: u.name,
+        initials: u.initials,
+        district: u.district,
+        reports: u.reports,
+        verifiedReports: u.verifiedReports,
+        trustScore: u.trustScore,
+        status: u.status,
+        identityVerified: u.identityVerified,
+      }));
 
     const channelMap = new Map<string, number>();
     alerts.forEach((alert) => {
@@ -142,6 +156,9 @@ export class AnalyticsService {
     };
   }
 
+  /**
+   * Lấy dữ liệu chuỗi thời gian xu hướng mưa và báo cáo ngập theo khung 24h, 7d hoặc 30d.
+   */
   async getTrends(range?: "24h" | "7d" | "30d") {
     if (range) {
       const item = await this.trendRepo.findOne({

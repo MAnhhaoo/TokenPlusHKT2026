@@ -14,6 +14,9 @@ export class AlertsService {
     @Optional() private readonly realtimeService?: RealtimeService,
   ) {}
 
+  /**
+   * Truy vấn danh sách cảnh báo khu vực theo trạng thái và mức độ.
+   */
   async findAll(query: QueryAlertDto): Promise<AreaAlertEntity[]> {
     const where: Record<string, unknown> = {};
     if (query.status) where.status = query.status;
@@ -25,6 +28,9 @@ export class AlertsService {
     });
   }
 
+  /**
+   * Tìm kiếm một cảnh báo khu vực theo mã định danh.
+   */
   async findOne(id: string): Promise<AreaAlertEntity> {
     const alert = await this.alertRepo.findOne({ where: { id } });
     if (!alert) {
@@ -33,6 +39,9 @@ export class AlertsService {
     return alert;
   }
 
+  /**
+   * Khởi tạo cảnh báo khu vực mới và phát thông báo thời gian thực qua SSE.
+   */
   async create(dto: CreateAlertDto): Promise<AreaAlertEntity> {
     const count = await this.alertRepo.count();
     const nextNumber = 190 + count;
@@ -62,6 +71,9 @@ export class AlertsService {
     return saved;
   }
 
+  /**
+   * Cập nhật thông tin cảnh báo khu vực và phát sự kiện cập nhật.
+   */
   async update(id: string, dto: UpdateAlertDto): Promise<AreaAlertEntity> {
     const alert = await this.findOne(id);
     Object.assign(alert, dto);
@@ -70,6 +82,9 @@ export class AlertsService {
     return saved;
   }
 
+  /**
+   * Kết thúc một cảnh báo khu vực đang có hiệu lực.
+   */
   async endAlert(id: string) {
     const alert = await this.findOne(id);
     alert.status = "ended";

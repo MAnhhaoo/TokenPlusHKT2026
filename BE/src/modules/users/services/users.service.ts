@@ -7,7 +7,6 @@ import {
   UnauthorizedException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { createHash } from "node:crypto";
 import { Repository } from "typeorm";
 import {
   CommunityUserEntity,
@@ -19,11 +18,15 @@ import {
   RegisterUserDto,
 } from "../dtos/update-user-status.dto";
 import { RealtimeService } from "../../realtime/services/realtime.service";
+import {
+  hashPassword,
+  issueSignedToken,
+  verifyPassword,
+} from "../../../common/utils/auth-token.util";
 
-function hashPassword(raw: string): string {
-  return createHash("sha256").update(raw).digest("hex");
-}
-
+/**
+ * Tạo chuỗi viết tắt tên người dùng gồm 2 ký tự in hoa.
+ */
 function buildInitials(fullName: string): string {
   const parts = fullName.trim().split(/\s+/).filter(Boolean);
   if (parts.length === 0) return "SD";
@@ -31,9 +34,33 @@ function buildInitials(fullName: string): string {
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
+/**
+ * Loại bỏ trường passwordHash trước khi trả về thông tin người dùng cho tầng dịch vụ.
+ */
 function sanitizeUser(user: CommunityUserEntity) {
   const { passwordHash: _pw, ...safe } = user;
   return safe;
+}
+
+/**
+ * Tạo bản tóm tắt công khai không chứa thông tin liên lạc cá nhân (email, số điện thoại) cho kênh SSE.
+ */
+function toPublicBroadcastUser(user: CommunityUserEntity) {
+  return {
+    id: user.id,
+    name: user.name,
+    initials: user.initials,
+    district: user.district,
+    joinedAt: user.joinedAt,
+    lastActive: user.lastActive,
+    reports: user.reports,
+    verifiedReports: user.verifiedReports,
+    rejectedReports: user.rejectedReports,
+    trustScore: user.trustScore,
+    status: user.status,
+    identityVerified: user.identityVerified,
+    warnings: user.warnings,
+  };
 }
 
 @Injectable()
@@ -44,6 +71,9 @@ export class UsersService {
     @Optional() private readonly realtimeService?: RealtimeService,
   ) {}
 
+  /**
+   * Đăng ký tài khoản người dùng cộng đồng mới với mật khẩu băm có muối (scrypt) và phát hành token ký số.
+   */
   async register(dto: RegisterUserDto) {
     const emailClean = dto.email.trim().toLowerCase();
     const phoneClean = dto.phone.trim();
@@ -97,12 +127,10 @@ export class UsersService {
 
     this.realtimeService?.broadcast("user.updated", {
       action: "registered",
-      user: safeUser,
+      user: toPublicBroadcastUser(saved),
     });
 
-    const token = Buffer.from(
-      `${saved.id}:${saved.email}:${Date.now()}`,
-    ).toString("base64");
+    const token = issueSignedToken(saved.id, "citizen");
 
     return {
       message: "Đăng ký tài khoản thành công!",
@@ -111,6 +139,9 @@ export class UsersService {
     };
   }
 
+  /**
+   * Xác thực đăng nhập bằng mật khẩu đã băm (constant-time) và phát hành token ký số có thời hạn.
+   */
   async login(dto: LoginUserDto) {
     const rawId = dto.identifier.trim().toLowerCase();
     const idDigits = rawId.replace(/\s+/g, "");
@@ -129,19 +160,11 @@ export class UsersService {
       );
     }
 
-    const incomingHash = hashPassword(dto.password);
-    if (user.passwordHash) {
-      if (user.passwordHash !== incomingHash) {
-        throw new UnauthorizedException("Mật khẩu không chính xác.");
-      }
-    } else {
-      // Tài khoản cộng đồng có sẵn trong DB dùng mật khẩu mặc định 123456
-      if (dto.password !== "123456") {
-        throw new UnauthorizedException(
-          "Mật khẩu không chính xác (tài khoản mẫu dùng mật khẩu mặc định: 123456).",
-        );
-      }
-      user.passwordHash = incomingHash;
+    if (
+      !user.passwordHash ||
+      !verifyPassword(dto.password, user.passwordHash)
+    ) {
+      throw new UnauthorizedException("Mật khẩu không chính xác.");
     }
 
     if (user.status === "blocked") {
@@ -156,12 +179,10 @@ export class UsersService {
 
     this.realtimeService?.broadcast("user.updated", {
       action: "login",
-      user: safeUser,
+      user: toPublicBroadcastUser(saved),
     });
 
-    const token = Buffer.from(
-      `${saved.id}:${saved.email}:${Date.now()}`,
-    ).toString("base64");
+    const token = issueSignedToken(saved.id, "citizen");
 
     return {
       message: "Đăng nhập thành công!",
@@ -170,6 +191,9 @@ export class UsersService {
     };
   }
 
+  /**
+   * Lấy danh sách người dùng cộng đồng có lọc theo trạng thái, quận/huyện và từ khóa tìm kiếm.
+   */
   async findAll(query: QueryUserDto): Promise<CommunityUserEntity[]> {
     const users = await this.userRepo.find({
       order: { trustScore: "DESC" },
@@ -193,6 +217,9 @@ export class UsersService {
       .map((u) => sanitizeUser(u) as CommunityUserEntity);
   }
 
+  /**
+   * Xem chi tiết hồ sơ người dùng kèm tỷ lệ báo cáo được xác minh.
+   */
   async findOne(id: string) {
     const user = await this.userRepo.findOne({ where: { id } });
     if (!user) {
@@ -207,6 +234,9 @@ export class UsersService {
     };
   }
 
+  /**
+   * Cập nhật trạng thái hoạt động của tài khoản người dùng và phát sự kiện cập nhật công khai.
+   */
   async updateStatus(id: string, status: UserStatus) {
     const user = await this.userRepo.findOne({ where: { id } });
     if (!user) {
@@ -218,7 +248,7 @@ export class UsersService {
 
     this.realtimeService?.broadcast("user.updated", {
       action: "status_changed",
-      user: safeUser,
+      user: toPublicBroadcastUser(saved),
     });
 
     const message =
@@ -234,6 +264,9 @@ export class UsersService {
     };
   }
 
+  /**
+   * Sinh nội dung báo cáo CSV UTF-8 BOM cho danh sách người dùng đóng góp cộng đồng.
+   */
   async generateCsvContent(): Promise<string> {
     const users = await this.userRepo.find({
       order: { trustScore: "DESC" },

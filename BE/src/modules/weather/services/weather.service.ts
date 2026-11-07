@@ -116,6 +116,9 @@ export class WeatherService {
     return { level: "Thấp", zone: 0, score };
   }
 
+  /**
+   * Chuyển đổi mã thời tiết WMO và lượng mưa thực tế sang mô tả tiếng Việt.
+   */
   public describeWmoCode(code: number, rainMm: number): string {
     if (code >= 95 || rainMm >= 40) return "Mưa dông diện rộng";
     if (code >= 80 || rainMm >= 20) return "Mưa rào lớn";
@@ -310,11 +313,7 @@ export class WeatherService {
     const baseRain = baseSnapshot.currentRainMm;
 
     return HCMC_DISTRICTS.map((item, idx) => {
-      const localVariation = [14, 8, 5, 11, 3, -2, 6][idx] ?? 0;
-      const rainMm = Math.max(
-        0,
-        Math.round((baseRain + localVariation) * 10) / 10,
-      );
+      const rainMm = Math.max(0, Math.round(baseRain * 10) / 10);
       const risk = this.calculateFloodRisk(rainMm, item.defaultElevationM);
 
       return {
@@ -328,7 +327,7 @@ export class WeatherService {
         humidityPercent: Math.min(99, baseSnapshot.humidityPercent + (idx % 4)),
         windSpeedKmh: baseSnapshot.windSpeedKmh,
         currentRainMm: rainMm,
-        weatherCondition: this.describeWmoCode(rainMm >= 25 ? 80 : 61, rainMm),
+        weatherCondition: this.describeWmoCode(0, rainMm),
         floodRiskLevel: risk.level,
         riskScore: risk.score,
       };
@@ -422,6 +421,9 @@ export class WeatherService {
     return result;
   }
 
+  /**
+   * Lấy lịch sử các bản chụp thời tiết gần nhất đã lưu trong cơ sở dữ liệu.
+   */
   async getWeatherHistory(limit = 10): Promise<WeatherSnapshotEntity[]> {
     return this.weatherRepo.find({
       order: { fetchedAt: "DESC" },

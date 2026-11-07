@@ -6,6 +6,9 @@ import { AppModule } from "./app.module";
 import { AllExceptionsFilter } from "./common/filters/http-exception.filter";
 import { TransformInterceptor } from "./common/interceptors/transform.interceptor";
 
+/**
+ * Khởi tạo ứng dụng NestJS SaigonDrain AI, cấu hình CORS, ValidationPipe và tài liệu Swagger.
+ */
 async function bootstrap() {
   const logger = new Logger("Bootstrap");
   const app = await NestFactory.create(AppModule);

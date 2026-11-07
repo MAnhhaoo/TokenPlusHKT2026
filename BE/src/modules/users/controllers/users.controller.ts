@@ -8,6 +8,7 @@ import {
   Post,
   Query,
   Res,
+  UseGuards,
 } from "@nestjs/common";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { Response } from "express";
@@ -18,6 +19,7 @@ import {
   RegisterUserDto,
   UpdateUserStatusDto,
 } from "../dtos/update-user-status.dto";
+import { OperatorAuthGuard } from "../../../common/guards/operator-auth.guard";
 
 @ApiTags(
   "6. Community Users & Auth (Đăng ký, Đăng nhập & Người dùng cộng đồng)",
@@ -26,6 +28,9 @@ import {
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  /**
+   * Đăng ký tài khoản người dùng cộng đồng mới.
+   */
   @Post("register")
   @ApiOperation({
     summary:
@@ -35,6 +40,9 @@ export class UsersController {
     return this.usersService.register(dto);
   }
 
+  /**
+   * Đăng nhập bằng Email, Số điện thoại hoặc mã người dùng kèm mật khẩu.
+   */
   @Post("login")
   @ApiOperation({
     summary: "Đăng nhập bằng Email hoặc Số điện thoại + Mật khẩu",
@@ -43,6 +51,10 @@ export class UsersController {
     return this.usersService.login(dto);
   }
 
+  /**
+   * Lấy danh sách người dùng cộng đồng phục vụ quản trị điều hành.
+   */
+  @UseGuards(OperatorAuthGuard)
   @Get()
   @ApiOperation({
     summary:
@@ -52,6 +64,10 @@ export class UsersController {
     return this.usersService.findAll(query);
   }
 
+  /**
+   * Xuất danh sách người dùng cộng đồng ra file CSV chuẩn UTF-8 BOM.
+   */
+  @UseGuards(OperatorAuthGuard)
   @Get("export-csv")
   @Header("Content-Type", "text/csv; charset=utf-8")
   @Header(
@@ -67,6 +83,9 @@ export class UsersController {
     res.send(csv);
   }
 
+  /**
+   * Xem hồ sơ chi tiết người dùng kèm tỷ lệ báo cáo chính xác.
+   */
   @Get(":id")
   @ApiOperation({
     summary:
@@ -76,6 +95,10 @@ export class UsersController {
     return this.usersService.findOne(id);
   }
 
+  /**
+   * Đổi trạng thái hoạt động của tài khoản người dùng.
+   */
+  @UseGuards(OperatorAuthGuard)
   @Patch(":id/status")
   @ApiOperation({
     summary:

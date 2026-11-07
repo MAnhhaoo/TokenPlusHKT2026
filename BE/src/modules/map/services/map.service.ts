@@ -1,4 +1,9 @@
-import { Injectable, Logger, NotFoundException } from "@nestjs/common";
+import {
+  ConflictException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from "@nestjs/common";
 import { HttpService } from "@nestjs/axios";
 import { ConfigService } from "@nestjs/config";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -62,6 +67,9 @@ export class MapService {
     };
   }
 
+  /**
+   * Lọc danh sách điểm giám sát ngập theo lớp hiển thị, lượng mưa thời gian thực và chu kỳ triều cường.
+   */
   async findAllPoints(query: QueryMapPointsDto): Promise<MapPointEntity[]> {
     const allPoints = await this.mapPointRepo.find();
 
@@ -202,6 +210,9 @@ export class MapService {
     return dynamicPoints;
   }
 
+  /**
+   * Truy vấn chi tiết một điểm trên bản đồ kèm báo cáo hiện trường liên kết (nếu có).
+   */
   async findPointById(id: string) {
     const point = await this.mapPointRepo.findOne({ where: { id } });
     if (!point) {
@@ -219,7 +230,17 @@ export class MapService {
     };
   }
 
+  /**
+   * Thêm mới điểm giám sát bản đồ (insert-only), từ chối nếu mã ID đã tồn tại để tránh ghi đè dữ liệu cũ.
+   */
   async createPoint(dto: CreateMapPointDto): Promise<MapPointEntity> {
+    const existing = await this.mapPointRepo.findOne({ where: { id: dto.id } });
+    if (existing) {
+      throw new ConflictException(
+        `Điểm bản đồ với mã ${dto.id} đã tồn tại trên hệ thống.`,
+      );
+    }
+
     const lat = dto.lat ?? 10.7769;
     const lng = dto.lng ?? 106.7009;
     const elevationM = await this.weatherService.fetchElevation(lat, lng, 2.8);
@@ -231,9 +252,13 @@ export class MapService {
       elevationM,
       historyCount: dto.historyCount ?? 1,
     });
-    return this.mapPointRepo.save(point);
+    await this.mapPointRepo.insert(point);
+    return point;
   }
 
+  /**
+   * Cập nhật thuộc tính của một điểm giám sát bản đồ hiện có.
+   */
   async updatePoint(
     id: string,
     dto: UpdateMapPointDto,

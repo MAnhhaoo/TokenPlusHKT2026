@@ -1,6 +1,11 @@
 import * as fs from "fs";
 import * as path from "path";
-import { Injectable, Logger, OnApplicationBootstrap } from "@nestjs/common";
+import {
+  ForbiddenException,
+  Injectable,
+  Logger,
+  OnApplicationBootstrap,
+} from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { FloodReportEntity } from "../../reports/models/flood-report.entity";
@@ -11,6 +16,7 @@ import { ForecastSlotEntity } from "../../journey/models/forecast-slot.entity";
 import { RouteOptionEntity } from "../../journey/models/route-option.entity";
 import { TrendSeriesEntity } from "../../analytics/models/trend-series.entity";
 import { WeatherSnapshotEntity } from "../../weather/models/weather-snapshot.entity";
+import { hashPassword } from "../../../common/utils/auth-token.util";
 
 @Injectable()
 export class SeedService implements OnApplicationBootstrap {
@@ -35,16 +41,34 @@ export class SeedService implements OnApplicationBootstrap {
     private readonly weatherRepo: Repository<WeatherSnapshotEntity>,
   ) {}
 
+  /**
+   * Tự động khởi tạo dữ liệu mẫu khi các bảng đang trống hoặc khi bật cờ SEED_ON_BOOTSTRAP=true.
+   */
   async onApplicationBootstrap() {
-    const p1 = await this.mapPointRepo.findOne({ where: { id: "p1" } });
-    const count = await this.mapPointRepo.count();
-    const slot30 = await this.forecastRepo.findOne({ where: { id: "30" } });
-    if (p1 || count < 50 || slot30?.rainMm === 34) {
+    const forceSeed = process.env.SEED_ON_BOOTSTRAP === "true";
+    const [pointCount, forecastCount, reportCount, userCount] =
+      await Promise.all([
+        this.mapPointRepo.count(),
+        this.forecastRepo.count(),
+        this.reportRepo.count(),
+        this.userRepo.count(),
+      ]);
+    const isEmpty =
+      pointCount === 0 &&
+      forecastCount === 0 &&
+      reportCount === 0 &&
+      userCount === 0;
+
+    if (forceSeed || isEmpty) {
       this.logger.log(
-        "Phát hiện dữ liệu mẫu cũ hoặc mốc dự báo cứng 34mm — đang nạp lại dữ liệu chuẩn...",
+        forceSeed
+          ? "SEED_ON_BOOTSTRAP=true — đang làm mới và nạp lại dữ liệu chuẩn..."
+          : "Cơ sở dữ liệu đang trống — đang khởi tạo dữ liệu chuẩn lần đầu...",
       );
-      await this.mapPointRepo.clear();
-      await this.forecastRepo.clear();
+      if (forceSeed) {
+        await this.mapPointRepo.clear();
+        await this.forecastRepo.clear();
+      }
       await this.seedAll();
       this.logger.log(
         "Khởi tạo 250 điểm thực nghiệm IRD và mốc dự báo thời gian thực hoàn tất!",
@@ -52,7 +76,18 @@ export class SeedService implements OnApplicationBootstrap {
     }
   }
 
+  /**
+   * Xóa dữ liệu hiện tại và khôi phục dữ liệu mẫu chuẩn cho môi trường dev/test/demo được phép.
+   */
   async resetAndSeed() {
+    if (
+      process.env.NODE_ENV === "production" &&
+      process.env.ALLOW_SEED_IN_PROD !== "true"
+    ) {
+      throw new ForbiddenException(
+        "Chức năng khôi phục dữ liệu mẫu bị vô hiệu hóa trên môi trường production.",
+      );
+    }
     await this.reportRepo.clear();
     await this.alertRepo.clear();
     await this.mapPointRepo.clear();
@@ -68,6 +103,9 @@ export class SeedService implements OnApplicationBootstrap {
     };
   }
 
+  /**
+   * Nạp dữ liệu mẫu chuẩn cho 7 bảng nghiệp vụ của hệ thống SaigonDrain AI.
+   */
   private async seedAll() {
     const reports: Partial<FloodReportEntity>[] = [
       {
@@ -399,7 +437,15 @@ export class SeedService implements OnApplicationBootstrap {
         warnings: 0,
       },
     ];
-    await this.userRepo.save(users);
+    const seededPasswordHash = hashPassword(
+      process.env.SEED_USER_PASSWORD || "123456",
+    );
+    await this.userRepo.save(
+      users.map((u) => ({
+        ...u,
+        passwordHash: seededPasswordHash,
+      })),
+    );
 
     const forecasts: ForecastSlotEntity[] = [
       {
@@ -539,12 +585,23 @@ export class SeedService implements OnApplicationBootstrap {
     await this.trendRepo.save(trends);
   }
 
+  /**
+   * Truy vấn dữ liệu 8 bảng phục vụ kiểm tra quản trị và ẩn các cột nhạy cảm của người dùng.
+   */
   async inspectAllTables() {
+    if (
+      process.env.NODE_ENV === "production" &&
+      process.env.ALLOW_SEED_IN_PROD !== "true"
+    ) {
+      throw new ForbiddenException(
+        "Chức năng xem trực tiếp bảng dữ liệu bị vô hiệu hóa trên môi trường production.",
+      );
+    }
     const [
       flood_reports,
       map_points,
       area_alerts,
-      community_users,
+      raw_users,
       weather_snapshots,
       forecast_slots,
       route_options,
@@ -559,6 +616,22 @@ export class SeedService implements OnApplicationBootstrap {
       this.routeRepo.find(),
       this.trendRepo.find(),
     ]);
+
+    const community_users = raw_users.map((u) => ({
+      id: u.id,
+      name: u.name,
+      initials: u.initials,
+      district: u.district,
+      joinedAt: u.joinedAt,
+      lastActive: u.lastActive,
+      reports: u.reports,
+      verifiedReports: u.verifiedReports,
+      rejectedReports: u.rejectedReports,
+      trustScore: u.trustScore,
+      status: u.status,
+      identityVerified: u.identityVerified,
+      warnings: u.warnings,
+    }));
 
     return {
       inspectedAt: new Date().toISOString(),
