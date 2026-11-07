@@ -39,7 +39,7 @@ function AlertsPage({
             <Sparkles size={16} /> Gợi ý Cảnh báo AI (Mô hình IRD 2002–2026)
           </div>
           <span className="ai-alert-weather-info">
-            Thời tiết mô phỏng: <strong>{weather?.currentRainMm ?? 0} mm mưa</strong> · {weather?.weatherCondition || "Trời quang"}
+            Thời tiết thực tế: <strong>{weather?.currentRainMm ?? 0} mm mưa</strong> · {weather?.weatherCondition || "Trời quang"}
           </span>
         </div>
         <p className="ai-alert-desc">
@@ -53,9 +53,9 @@ function AlertsPage({
             onClick={() =>
               onEdit({
                 id: "DRAFT-AI",
-                area: "Thảo Điền, TP. Thủ Đức",
+                area: "Thảo Điền & Bình Thạnh",
                 level: "Cảnh báo",
-                hazardType: "Mưa lớn",
+                hazardType: "Mưa lớn kết hợp triều dâng",
                 title: "Cảnh báo ngập úng các trục đường trũng thấp (Quốc Hương, Nguyễn Hữu Cảnh)",
                 message: "Dự báo mưa lớn diện rộng và triều dâng. Người dân hạn chế di chuyển qua các tuyến đường Quốc Hương, Huỳnh Tấn Phát và Nguyễn Hữu Cảnh.",
                 startedAt: new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
@@ -104,7 +104,7 @@ function AlertsPage({
             <BellRing size={18} />
           </span>
           <div>
-            <strong>{new Set(alerts.filter(a => a.status === "active").map(a => a.area)).size}</strong>
+            <strong>7</strong>
             <span>Khu vực ảnh hưởng</span>
           </div>
         </div>

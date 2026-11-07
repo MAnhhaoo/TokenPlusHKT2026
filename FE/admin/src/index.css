@@ -4667,13 +4667,3 @@ textarea.form-control {
   gap: 10px;
   flex-wrap: wrap;
 }
-
-/* Local schematic map: no network tiles. */
-.mock-basemap { position:absolute; inset:0; width:100%; height:100%; --map-land:#edf1df; --map-park:#d8e6cc; --map-river:#a9d7df; --map-road:#fffdf5; }
-.mock-basemap-satellite { --map-land:#bcccb5; --map-park:#8fb591; --map-river:#73aabb; --map-road:#e8dfc4; }
-.mock-basemap-terrain { --map-land:#eee5cc; --map-park:#d6dcb4; --map-river:#a1cbd0; --map-road:#fffaf0; }
-.mock-map-note {position:absolute;bottom:10px;left:12px;font-size:10px;background:#ffffffe6;padding:4px 8px;border-radius:5px;pointer-events:none;}
-.map-canvas {overflow:hidden;}
-.weather-chip {border:1px solid var(--line); text-align:left;}
-
-.mock-map-note {z-index:2;bottom:4px;left:50%;transform:translateX(-50%);white-space:nowrap;}

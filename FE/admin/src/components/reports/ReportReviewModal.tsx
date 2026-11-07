@@ -160,10 +160,10 @@ function ReportReviewModal({
           <CircleUserRound size={16} /> Người gửi đã được ẩn danh
         </span>
         <div>
-          <Button disabled={report.status !== "pending"} variant="danger" onClick={onReject}>
+          <Button variant="danger" onClick={onReject}>
             <XCircle size={16} /> Từ chối
           </Button>
-          <Button disabled={report.status !== "pending"} onClick={onApprove}>
+          <Button onClick={onApprove}>
             <Check size={16} /> Xác nhận báo cáo
           </Button>
         </div>

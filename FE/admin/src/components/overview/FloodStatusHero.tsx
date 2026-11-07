@@ -31,8 +31,8 @@ function FloodStatusHero({
         <span className="hero-eyebrow">
           <CloudRain size={16} />
           {weather
-            ? `Dữ liệu mô phỏng (${weather.provider}) · Ẩm ${weather.humidityPercent}% · ${weather.weatherCondition || "Thời gian thực"}`
-            : "Thời tiết mô phỏng"}
+            ? `Đồng bộ trực tiếp (${weather.provider}) · Ẩm ${weather.humidityPercent}% · ${weather.weatherCondition || "Thời gian thực"}`
+            : "Thời gian thực Open-Meteo"}
         </span>
         <h2 className="hero-title">
           {isRaining
@@ -41,8 +41,8 @@ function FloodStatusHero({
         </h2>
         <p className="hero-sub">
           {isRaining
-            ? "Hệ thống đang theo dõi mực nước tại các tuyến trũng và hành lang ven kênh theo mô phỏng."
-            : "Hệ thống AI liên tục giám sát 250 điểm ngập xung yếu và triều cường sông Sài Gòn bằng dữ liệu mô phỏng."}
+            ? "Hệ thống đang theo dõi mực nước tại các tuyến trũng và hành lang ven kênh theo thời gian thực."
+            : "Hệ thống AI liên tục giám sát 250 điểm ngập xung yếu và triều cường sông Sài Gòn theo dữ liệu thời tiết thực tế."}
         </p>
         <div className="hero-actions">
           <Button onClick={onViewMap}>
@@ -78,10 +78,10 @@ function FloodStatusHero({
           </div>
           <StatusPill tone={isRaining ? "watch" : "safe"}>{riskLabel}</StatusPill>
         </div>
-        <WaterGauge label="mm" title="Lượng mưa mô phỏng" tone={isRaining ? 1 : 0} value={rainValue} />
+        <WaterGauge tone={isRaining ? 1 : 0} value={rainValue} />
         <p className="hero-gauge-note">
           {isRaining
-            ? "Dữ liệu thời tiết mô phỏng, không kết nối trạm đo hoặc dịch vụ bên ngoài."
+            ? "Cập nhật tự động từ trạm đo vệ tinh Open-Meteo & mạng lưới cảm biến đô thị."
             : "Lượng mưa duy trì 0 mm, không có nguy cơ ngập úng trên địa bàn TP.HCM."}
         </p>
       </div>

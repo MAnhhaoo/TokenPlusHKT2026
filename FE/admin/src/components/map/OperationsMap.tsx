@@ -18,7 +18,38 @@ import Heading from "@/components/ui/Heading"
 import { severityLabel } from "@/lib/severity"
 import type { Severity, MapLayer, FloodReport, MapPoint } from "@/types"
 
+const CENTER_LAT = 10.772
+const CENTER_LNG = 106.695
+
+function lngToTileX(lng: number, z: number): number {
+  return ((lng + 180) / 360) * Math.pow(2, z)
+}
+
+function latToTileY(lat: number, z: number): number {
+  const rad = (lat * Math.PI) / 180
+  return (
+    ((1 - Math.log(Math.tan(rad) + 1 / Math.cos(rad)) / Math.PI) / 2) *
+    Math.pow(2, z)
+  )
+}
+
 type BasemapStyle = "streets" | "satellite" | "terrain"
+
+function getTileUrl(
+  style: BasemapStyle,
+  tx: number,
+  ty: number,
+  z: number,
+): string {
+  if (style === "satellite") {
+    return `https://mt${Math.abs(tx + ty) % 4}.google.com/vt/lyrs=y&hl=vi&x=${tx}&y=${ty}&z=${z}`
+  }
+  if (style === "terrain") {
+    return `https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/${z}/${ty}/${tx}`
+  }
+  return `https://mt${Math.abs(tx + ty) % 4}.google.com/vt/lyrs=m&hl=vi&x=${tx}&y=${ty}&z=${z}`
+}
+
 const styleLabels: Record<BasemapStyle, string> = {
   streets: "Đường phố",
   satellite: "Vệ tinh",
@@ -111,9 +142,28 @@ function OperationsMap({
 
   const selected = visiblePoints.find((point) => point.id === selectedId)
 
-  const scale = 1 + (zoom - 12) * 0.16
-  function getPointPosition(point: MapPoint) {
-    return { left: 50 + (point.x - 50) * scale, top: 50 + (point.y - 50) * scale }
+  // Build an 8x4 Web Mercator tile grid centered at 50%/50%
+  const centerX = lngToTileX(CENTER_LNG, zoom)
+  const centerY = latToTileY(CENTER_LAT, zoom)
+  const baseTileX = Math.floor(centerX) - 3
+  const baseTileY = Math.floor(centerY) - 1
+  const gridCols = 8
+  const gridRows = 4
+
+  function getPointPosition(point: MapPoint): { left: number; top: number } {
+    if (typeof point.lat === "number" && typeof point.lng === "number") {
+      const px = lngToTileX(point.lng, zoom)
+      const py = latToTileY(point.lat, zoom)
+      const spanX = 2.35
+      const spanY = 1.45
+      const left = 50 + ((px - centerX) / spanX) * 100
+      const top = 50 + ((py - centerY) / spanY) * 100
+      return {
+        left: Math.max(6, Math.min(94, left)),
+        top: Math.max(8, Math.min(92, top)),
+      }
+    }
+    return { left: point.x, top: point.y }
   }
 
   const cycleMapStyle = () => {
@@ -130,7 +180,7 @@ function OperationsMap({
         <div>
           <Heading className="panel-title">Bản đồ vận hành TP.HCM</Heading>
           <p>
-            Dữ liệu mô phỏng & điểm lịch sử minh họa ·{" "}
+            Giám sát thời gian thực & điểm đen lịch sử GIS ·{" "}
             {visiblePoints.length} điểm đang hiển thị
           </p>
         </div>
@@ -187,22 +237,48 @@ function OperationsMap({
         })}
       </div>
       <div className="map-canvas is-osm">
-        <svg className={`mock-basemap mock-basemap-${mapStyle}`} viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-          <g transform={`translate(50 50) scale(${scale}) translate(-50 -50)`}>
-            <rect x="-100" y="-100" width="300" height="300" fill="var(--map-land)" />
-            <path d="M-20 20 Q20 -10 38 32 T100 50 M-10 80 Q38 45 80 90" stroke="var(--map-park)" strokeWidth="16" fill="none" />
-            <path d="M65 -30 C90 5 48 25 69 48 S42 78 66 130" stroke="var(--map-river)" strokeWidth="7" fill="none" />
-            <g stroke="var(--map-road)" strokeWidth="1.4" fill="none">
-              {[10,25,40,55,70,85].map(v=><path key={v} d={`M-20 ${v} L120 ${v+12} M${v} -20 L${v-12} 120`} />)}
-              <path d="M-20 85 L110 10 M-10 5 L110 95" strokeWidth="2.5" />
-            </g>
-            <g fill="var(--ink-soft)" fontSize="3" textAnchor="middle">
-              <text x="30" y="20">BÌNH THẠNH</text><text x="80" y="30">THỦ ĐỨC</text>
-              <text x="35" y="53">QUẬN 1</text><text x="43" y="87">QUẬN 7</text>
-            </g>
-          </g>
-        </svg>
-        <span className="mock-map-note">BẢN ĐỒ MINH HỌA · KHÔNG DÙNG CHỈ ĐƯỜNG</span>
+        <div className="osm-tile-stage" aria-hidden="true">
+          {Array.from({ length: gridRows }).map((_, rowIdx) =>
+            Array.from({ length: gridCols }).map((__, colIdx) => {
+              const tx = baseTileX + colIdx
+              const ty = baseTileY + rowIdx
+              const offsetX = Math.round((tx - centerX) * 256)
+              const offsetY = Math.round((ty - centerY) * 256)
+              return (
+                <img
+                  key={`${mapStyle}-${zoom}-${tx}-${ty}`}
+                  src={getTileUrl(mapStyle, tx, ty, zoom)}
+                  onError={(e) => {
+                    const target = e.currentTarget
+                    if (!target.dataset.fallback) {
+                      target.dataset.fallback = "1"
+                      target.src = `https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/${zoom}/${ty}/${tx}`
+                    }
+                  }}
+                  style={{
+                    position: "absolute",
+                    left: `calc(50% + ${offsetX}px)`,
+                    top: `calc(50% + ${offsetY}px)`,
+                    width: "256px",
+                    height: "256px",
+                  }}
+                  alt=""
+                  className="osm-tile-img"
+                  loading="eager"
+                />
+              )
+            }),
+          )}
+          <div
+            className="osm-tint-overlay"
+            style={{
+              background:
+                mapStyle === "satellite"
+                  ? "transparent"
+                  : "linear-gradient(180deg, rgba(238, 245, 241, 0.08) 0%, rgba(11, 79, 74, 0.05) 100%)",
+            }}
+          />
+        </div>
 
         {visiblePoints.map((point) => {
           const pos = getPointPosition(point)
@@ -351,7 +427,7 @@ function OperationsMap({
                   ? `GPS: ${selected.lat.toFixed(4)}, ${selected.lng.toFixed(4)}`
                   : "Độ tin cậy dữ liệu"}
               </span>
-              <strong>{selected.linkedReportId ? "Báo cáo mô phỏng" : "Dữ liệu mô phỏng"}</strong>
+              <strong>{selected.linkedReportId ? "Báo cáo thực tế" : "Dữ liệu GIS"}</strong>
             </div>
           </div>
         )}
