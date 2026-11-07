@@ -31,6 +31,9 @@ describe("Map layer and provider contracts", () => {
       getCurrentWeather: jest
         .fn()
         .mockRejectedValue(new Error("fixture offline")),
+      getRealtimeDistrictRainMap: jest
+        .fn()
+        .mockResolvedValue(new Map()),
       fetchElevation: jest.fn().mockResolvedValue(2.8),
     };
     return {
