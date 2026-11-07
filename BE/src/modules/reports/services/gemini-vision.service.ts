@@ -238,18 +238,19 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON (Không dùng Markdown, k
       const step = Math.max(1, Math.floor(imageBuffer.length / 400));
       for (let i = 0; i < imageBuffer.length; i += step) {
         const byte = imageBuffer[i];
-        imageFingerprint = ((imageFingerprint << 5) - imageFingerprint + byte) | 0;
+        imageFingerprint =
+          ((imageFingerprint << 5) - imageFingerprint + byte) | 0;
         byteLuminanceSum += byte;
         sampleCount++;
       }
     }
 
-    const avgByteLuminance = sampleCount > 0 ? byteLuminanceSum / sampleCount : 120;
+    const avgByteLuminance =
+      sampleCount > 0 ? byteLuminanceSum / sampleCount : 120;
     const absFingerprint = Math.abs(imageFingerprint);
 
     // 2. Nhận diện bối cảnh không gian & thời gian
-    const text =
-      `${location || ""} ${userDescription || ""}`.toLowerCase();
+    const text = `${location || ""} ${userDescription || ""}`.toLowerCase();
 
     const isNight =
       avgByteLuminance < 75 ||
@@ -259,7 +260,10 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON (Không dùng Markdown, k
       new Date().getHours() <= 5;
 
     const isDarkStorm =
-      !isNight && (avgByteLuminance < 115 || text.includes("mưa to") || text.includes("dông"));
+      !isNight &&
+      (avgByteLuminance < 115 ||
+        text.includes("mưa to") ||
+        text.includes("dông"));
 
     const isDrain =
       text.includes("cống") ||
@@ -284,7 +288,7 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON (Không dùng Markdown, k
     let severity: "critical" | "high" | "medium" | "low";
 
     // Biến thiên độ sâu thực tế từ 10cm - 46cm dựa trên tỷ lệ điểm ảnh
-    const depthVariance = (absFingerprint % 16); // 0 - 15
+    const depthVariance = absFingerprint % 16; // 0 - 15
 
     if (isCriticalKeyword) {
       estimatedDepthCm = 36 + (absFingerprint % 14); // 36 - 49 cm
@@ -336,7 +340,9 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON (Không dùng Markdown, k
     // 4. Độ tin cậy tính toán (Confidence Score 82% - 96%)
     const confidence = 84 + (absFingerprint % 12);
 
-    const placeName = location ? location.split(",")[0].trim() : "tuyến đường này";
+    const placeName = location
+      ? location.split(",")[0].trim()
+      : "tuyến đường này";
 
     // 5. Sinh nhận định và khuyến nghị độc bản
     let aiSummary = "";

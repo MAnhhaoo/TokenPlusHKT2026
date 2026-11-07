@@ -581,9 +581,7 @@ export async function fetchMapPointsApi(
                   district: r.district || "TP. Hồ Chí Minh",
                   type: "flood",
                   severity:
-                    r.severity === "critical" ||
-                    r.severity === "high" ||
-                    r.severity === "medium"
+                    r.severity === "critical" || r.severity === "high" || r.severity === "medium"
                       ? r.severity
                       : "medium",
                   depth,
@@ -641,15 +639,12 @@ export async function fetchMapPointsApi(
 
   // 2. Chế độ chẩn đoán thời gian thực theo lượng mưa thực tế (Thuật toán Thủy văn & Địa hình thực tế)
   const actualRain = rainMm ?? 0;
-  const vnDate = new Date(
-    new Date().toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" }),
-  );
+  const vnDate = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" }));
   const vnHour = vnDate.getHours();
   const vnMinute = vnDate.getMinutes();
   const timeDecimal = vnHour + vnMinute / 60;
   const isTidePeak =
-    (timeDecimal >= 16.5 && timeDecimal <= 19.5) ||
-    (timeDecimal >= 4.5 && timeDecimal <= 7.5);
+    (timeDecimal >= 16.5 && timeDecimal <= 19.5) || (timeDecimal >= 4.5 && timeDecimal <= 7.5);
 
   // Nếu trời khô ráo (mưa < 3mm) và ngoài giờ triều cường: ĐƯỜNG KHÔ RÁO HOÀN TOÀN!
   if (actualRain < 3 && !isTidePeak) {
@@ -664,12 +659,12 @@ export async function fetchMapPointsApi(
       elevation <= 1.4
         ? 1.45
         : elevation <= 1.8
-          ? 1.30
+          ? 1.3
           : elevation <= 2.5
             ? 1.15
             : elevation <= 4.0
-              ? 1.00
-              : 0.80;
+              ? 1.0
+              : 0.8;
 
     const histCount = h.historyCount || 5;
     const histFactor = 1 + Math.min(0.35, histCount * 0.015);
@@ -689,8 +684,7 @@ export async function fetchMapPointsApi(
 
     if (isTidePeak && isRiversideLowland) {
       const tidePeakHeight =
-        (timeDecimal >= 17 && timeDecimal <= 18.5) ||
-        (timeDecimal >= 5 && timeDecimal <= 6.5)
+        (timeDecimal >= 17 && timeDecimal <= 18.5) || (timeDecimal >= 5 && timeDecimal <= 6.5)
           ? 1.68
           : 1.58;
       tideDepth = Math.max(0, Math.round((tidePeakHeight - elevation) * 70));
@@ -723,8 +717,7 @@ export async function fetchMapPointsApi(
       dynamicDepth = 0;
     }
 
-    const severity =
-      dynamicDepth >= 35 ? "critical" : dynamicDepth >= 20 ? "high" : "medium";
+    const severity = dynamicDepth >= 35 ? "critical" : dynamicDepth >= 20 ? "high" : "medium";
 
     predictedPoints.push({
       id: h.id,
@@ -1154,10 +1147,7 @@ export async function analyzeReportImageApi(payload: {
 
   const text = `${payload.location || ""} ${payload.description || ""}`.toLowerCase();
   const isDrain =
-    text.includes("cống") ||
-    text.includes("rác") ||
-    text.includes("miệng") ||
-    absHash % 7 === 0;
+    text.includes("cống") || text.includes("rác") || text.includes("miệng") || absHash % 7 === 0;
 
   const isCritical =
     text.includes("nguy hiểm") ||

@@ -300,7 +300,8 @@ function ReportModal({
             <h2 id="report-title">Báo cáo đã xuất hiện trên bản đồ cộng đồng!</h2>
             <p id="report-description">
               Hệ thống AI Gemini đã phân tích ảnh và tự động xác thực báo cáo tại{" "}
-              <strong>{locationText.trim() || "khu vực bạn chọn"}</strong>. Báo cáo đã lập tức hiển thị công khai trên bản đồ thời gian thực để cảnh báo cho người dân.
+              <strong>{locationText.trim() || "khu vực bạn chọn"}</strong>. Báo cáo đã lập tức hiển
+              thị công khai trên bản đồ thời gian thực để cảnh báo cho người dân.
             </p>
             <button className="primary-modal-button" onClick={closeModal} type="button">
               Quay lại bản đồ

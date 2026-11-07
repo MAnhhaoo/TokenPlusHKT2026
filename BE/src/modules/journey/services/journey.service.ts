@@ -271,9 +271,7 @@ export class JourneyService {
           : `Lộ trình tối ưu nhưng cần lưu ý: ${safest.avoidedOrNearbyFloods.slice(0, 2).join("; ")}.`;
 
       const altBadge =
-        alternative.riskPenalty === 0
-          ? "Tuyến phụ khô ráo"
-          : "Tuyến dự phòng";
+        alternative.riskPenalty === 0 ? "Tuyến phụ khô ráo" : "Tuyến dự phòng";
 
       const altDetail =
         alternative.avoidedOrNearbyFloods.length === 0

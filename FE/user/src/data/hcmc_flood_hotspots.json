@@ -17,21 +17,9 @@
     "maxDepth": 140,
     "minDepth": 20,
     "depth": 140,
-    "causes": [
-      "Mưa lớn",
-      "Triều cường",
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa lớn", "Triều cường", "Mưa & Triều"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2011,
-      2018,
-      2019,
-      2020,
-      2023,
-      2025,
-      2026
-    ]
+    "years": [2011, 2018, 2019, 2020, 2023, 2025, 2026]
   },
   {
     "id": "ird_17",
@@ -51,23 +39,9 @@
     "maxDepth": 100,
     "minDepth": 20,
     "depth": 100,
-    "causes": [
-      "Mưa lớn",
-      "Triều cường",
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa lớn", "Triều cường", "Mưa & Triều"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2008,
-      2010,
-      2011,
-      2013,
-      2016,
-      2018,
-      2019,
-      2020,
-      2024
-    ]
+    "years": [2008, 2010, 2011, 2013, 2016, 2018, 2019, 2020, 2024]
   },
   {
     "id": "ird_242",
@@ -87,19 +61,9 @@
     "maxDepth": 20,
     "minDepth": 20,
     "depth": 20,
-    "causes": [
-      "Triều cường",
-      "Mưa lớn",
-      "Mưa & Triều"
-    ],
+    "causes": ["Triều cường", "Mưa lớn", "Mưa & Triều"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2008,
-      2018,
-      2019,
-      2020,
-      2023
-    ]
+    "years": [2008, 2018, 2019, 2020, 2023]
   },
   {
     "id": "ird_7",
@@ -119,18 +83,9 @@
     "maxDepth": 60,
     "minDepth": 10,
     "depth": 60,
-    "causes": [
-      "Triều cường",
-      "Mưa lớn"
-    ],
+    "causes": ["Triều cường", "Mưa lớn"],
     "primaryCause": "Triều cường",
-    "years": [
-      2018,
-      2019,
-      2020,
-      2024,
-      2025
-    ]
+    "years": [2018, 2019, 2020, 2024, 2025]
   },
   {
     "id": "ird_3",
@@ -150,21 +105,9 @@
     "maxDepth": 50,
     "minDepth": 15,
     "depth": 50,
-    "causes": [
-      "Triều cường",
-      "Mưa lớn",
-      "Mưa & Triều"
-    ],
+    "causes": ["Triều cường", "Mưa lớn", "Mưa & Triều"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002,
-      2010,
-      2011,
-      2012,
-      2016,
-      2023,
-      2025
-    ]
+    "years": [2002, 2010, 2011, 2012, 2016, 2023, 2025]
   },
   {
     "id": "ird_2",
@@ -184,17 +127,9 @@
     "maxDepth": 60,
     "minDepth": 15,
     "depth": 60,
-    "causes": [
-      "Triều cường",
-      "Mưa & Triều"
-    ],
+    "causes": ["Triều cường", "Mưa & Triều"],
     "primaryCause": "Triều cường",
-    "years": [
-      2011,
-      2019,
-      2023,
-      2025
-    ]
+    "years": [2011, 2019, 2023, 2025]
   },
   {
     "id": "ird_34",
@@ -214,17 +149,9 @@
     "maxDepth": 60,
     "minDepth": 15,
     "depth": 60,
-    "causes": [
-      "Triều cường",
-      "Mưa & Triều"
-    ],
+    "causes": ["Triều cường", "Mưa & Triều"],
     "primaryCause": "Triều cường",
-    "years": [
-      2011,
-      2012,
-      2018,
-      2025
-    ]
+    "years": [2011, 2012, 2018, 2025]
   },
   {
     "id": "ird_42",
@@ -244,19 +171,9 @@
     "maxDepth": 50,
     "minDepth": 15,
     "depth": 50,
-    "causes": [
-      "Mưa & Triều",
-      "Triều cường",
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa & Triều", "Triều cường", "Mưa lớn"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2010,
-      2012,
-      2018,
-      2019,
-      2026
-    ]
+    "years": [2010, 2012, 2018, 2019, 2026]
   },
   {
     "id": "ird_18",
@@ -276,21 +193,9 @@
     "maxDepth": 40,
     "minDepth": 30,
     "depth": 40,
-    "causes": [
-      "Mưa lớn",
-      "Triều cường",
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa lớn", "Triều cường", "Mưa & Triều"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2002,
-      2008,
-      2010,
-      2012,
-      2013,
-      2019,
-      2020
-    ]
+    "years": [2002, 2008, 2010, 2012, 2013, 2019, 2020]
   },
   {
     "id": "ird_35",
@@ -310,17 +215,9 @@
     "maxDepth": 50,
     "minDepth": 20,
     "depth": 50,
-    "causes": [
-      "Triều cường",
-      "Mưa & Triều"
-    ],
+    "causes": ["Triều cường", "Mưa & Triều"],
     "primaryCause": "Triều cường",
-    "years": [
-      2007,
-      2010,
-      2011,
-      2012
-    ]
+    "years": [2007, 2010, 2011, 2012]
   },
   {
     "id": "ird_52",
@@ -340,18 +237,9 @@
     "maxDepth": 50,
     "minDepth": 30,
     "depth": 50,
-    "causes": [
-      "Mưa lớn",
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa lớn", "Mưa & Triều"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2016,
-      2018,
-      2019,
-      2020,
-      2024
-    ]
+    "years": [2016, 2018, 2019, 2020, 2024]
   },
   {
     "id": "ird_19",
@@ -371,18 +259,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2017,
-      2019,
-      2020,
-      2022,
-      2023,
-      2024
-    ]
+    "years": [2017, 2019, 2020, 2022, 2023, 2024]
   },
   {
     "id": "ird_20",
@@ -402,18 +281,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn",
-      "Triều cường"
-    ],
+    "causes": ["Mưa lớn", "Triều cường"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2005,
-      2017,
-      2019,
-      2020,
-      2024
-    ]
+    "years": [2005, 2017, 2019, 2020, 2024]
   },
   {
     "id": "ird_4",
@@ -433,16 +303,9 @@
     "maxDepth": 50,
     "minDepth": 15,
     "depth": 50,
-    "causes": [
-      "Triều cường",
-      "Mưa & Triều"
-    ],
+    "causes": ["Triều cường", "Mưa & Triều"],
     "primaryCause": "Triều cường",
-    "years": [
-      2011,
-      2012,
-      2025
-    ]
+    "years": [2011, 2012, 2025]
   },
   {
     "id": "ird_49",
@@ -462,17 +325,9 @@
     "maxDepth": 60,
     "minDepth": 30,
     "depth": 60,
-    "causes": [
-      "Mưa & Triều",
-      "Triều cường"
-    ],
+    "causes": ["Mưa & Triều", "Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2008,
-      2011,
-      2012,
-      2025
-    ]
+    "years": [2008, 2011, 2012, 2025]
   },
   {
     "id": "ird_140",
@@ -492,15 +347,9 @@
     "maxDepth": 40,
     "minDepth": 30,
     "depth": 40,
-    "causes": [
-      "Triều cường",
-      "Mưa & Triều"
-    ],
+    "causes": ["Triều cường", "Mưa & Triều"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002,
-      2010
-    ]
+    "years": [2002, 2010]
   },
   {
     "id": "ird_130",
@@ -520,18 +369,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn",
-      "Triều cường",
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa lớn", "Triều cường", "Mưa & Triều"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2002,
-      2010,
-      2016,
-      2024
-    ]
+    "years": [2002, 2010, 2016, 2024]
   },
   {
     "id": "ird_143",
@@ -551,16 +391,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường",
-      "Mưa lớn"
-    ],
+    "causes": ["Triều cường", "Mưa lớn"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002,
-      2013,
-      2016
-    ]
+    "years": [2002, 2013, 2016]
   },
   {
     "id": "ird_256",
@@ -580,16 +413,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2023,
-      2024,
-      2025,
-      2026
-    ]
+    "years": [2023, 2024, 2025, 2026]
   },
   {
     "id": "ird_172",
@@ -609,15 +435,9 @@
     "maxDepth": 100,
     "minDepth": 50,
     "depth": 100,
-    "causes": [
-      "Mưa & Triều",
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa & Triều", "Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2002,
-      2016
-    ]
+    "years": [2002, 2016]
   },
   {
     "id": "ird_81",
@@ -637,15 +457,9 @@
     "maxDepth": 50,
     "minDepth": 20,
     "depth": 50,
-    "causes": [
-      "Triều cường",
-      "Mưa & Triều"
-    ],
+    "causes": ["Triều cường", "Mưa & Triều"],
     "primaryCause": "Triều cường",
-    "years": [
-      2011,
-      2012
-    ]
+    "years": [2011, 2012]
   },
   {
     "id": "ird_145",
@@ -665,16 +479,9 @@
     "maxDepth": 50,
     "minDepth": 50,
     "depth": 50,
-    "causes": [
-      "Triều cường",
-      "Mưa & Triều",
-      "Mưa lớn"
-    ],
+    "causes": ["Triều cường", "Mưa & Triều", "Mưa lớn"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002,
-      2019
-    ]
+    "years": [2002, 2019]
   },
   {
     "id": "ird_1",
@@ -694,14 +501,9 @@
     "maxDepth": 45,
     "minDepth": 15,
     "depth": 45,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2006,
-      2025
-    ]
+    "years": [2006, 2025]
   },
   {
     "id": "ird_79",
@@ -721,14 +523,9 @@
     "maxDepth": 40,
     "minDepth": 20,
     "depth": 40,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2011,
-      2023
-    ]
+    "years": [2011, 2023]
   },
   {
     "id": "ird_160",
@@ -748,15 +545,9 @@
     "maxDepth": 30,
     "minDepth": 10,
     "depth": 30,
-    "causes": [
-      "Triều cường",
-      "Mưa & Triều"
-    ],
+    "causes": ["Triều cường", "Mưa & Triều"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002,
-      2006
-    ]
+    "years": [2002, 2006]
   },
   {
     "id": "ird_23",
@@ -776,15 +567,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2019,
-      2023,
-      2025
-    ]
+    "years": [2019, 2023, 2025]
   },
   {
     "id": "ird_24",
@@ -804,16 +589,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn",
-      "Triều cường"
-    ],
+    "causes": ["Mưa lớn", "Triều cường"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2008,
-      2015,
-      2023
-    ]
+    "years": [2008, 2015, 2023]
   },
   {
     "id": "ird_213",
@@ -833,16 +611,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường",
-      "Mưa lớn"
-    ],
+    "causes": ["Triều cường", "Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2007,
-      2019,
-      2024
-    ]
+    "years": [2007, 2019, 2024]
   },
   {
     "id": "ird_255",
@@ -862,15 +633,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2023,
-      2024,
-      2025
-    ]
+    "years": [2023, 2024, 2025]
   },
   {
     "id": "ird_351",
@@ -890,15 +655,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2010,
-      2013,
-      2015
-    ]
+    "years": [2010, 2013, 2015]
   },
   {
     "id": "ird_114",
@@ -918,14 +677,9 @@
     "maxDepth": 100,
     "minDepth": 80,
     "depth": 100,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002,
-      2008
-    ]
+    "years": [2002, 2008]
   },
   {
     "id": "ird_224",
@@ -945,14 +699,9 @@
     "maxDepth": 100,
     "minDepth": 100,
     "depth": 100,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2006,
-      2011
-    ]
+    "years": [2006, 2011]
   },
   {
     "id": "ird_38",
@@ -972,15 +721,9 @@
     "maxDepth": 50,
     "minDepth": 30,
     "depth": 50,
-    "causes": [
-      "Triều cường",
-      "Mưa & Triều"
-    ],
+    "causes": ["Triều cường", "Mưa & Triều"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002,
-      2012
-    ]
+    "years": [2002, 2012]
   },
   {
     "id": "ird_39",
@@ -1000,15 +743,9 @@
     "maxDepth": 50,
     "minDepth": 30,
     "depth": 50,
-    "causes": [
-      "Mưa & Triều",
-      "Triều cường"
-    ],
+    "causes": ["Mưa & Triều", "Triều cường"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2002,
-      2012
-    ]
+    "years": [2002, 2012]
   },
   {
     "id": "ird_44",
@@ -1028,15 +765,9 @@
     "maxDepth": 50,
     "minDepth": 50,
     "depth": 50,
-    "causes": [
-      "Mưa & Triều",
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa & Triều", "Mưa lớn"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2002,
-      2012
-    ]
+    "years": [2002, 2012]
   },
   {
     "id": "ird_82",
@@ -1056,14 +787,9 @@
     "maxDepth": 50,
     "minDepth": 30,
     "depth": 50,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2008,
-      2011
-    ]
+    "years": [2008, 2011]
   },
   {
     "id": "ird_83",
@@ -1083,14 +809,9 @@
     "maxDepth": 50,
     "minDepth": 30,
     "depth": 50,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2011,
-      2012
-    ]
+    "years": [2011, 2012]
   },
   {
     "id": "ird_102",
@@ -1110,14 +831,9 @@
     "maxDepth": 50,
     "minDepth": 20,
     "depth": 50,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002,
-      2011
-    ]
+    "years": [2002, 2011]
   },
   {
     "id": "ird_122",
@@ -1137,14 +853,9 @@
     "maxDepth": 50,
     "minDepth": 30,
     "depth": 50,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2019,
-      2023
-    ]
+    "years": [2019, 2023]
   },
   {
     "id": "ird_212",
@@ -1164,14 +875,9 @@
     "maxDepth": 50,
     "minDepth": 20,
     "depth": 50,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2006,
-      2007
-    ]
+    "years": [2006, 2007]
   },
   {
     "id": "ird_22",
@@ -1191,14 +897,9 @@
     "maxDepth": 40,
     "minDepth": 20,
     "depth": 40,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2023,
-      2025
-    ]
+    "years": [2023, 2025]
   },
   {
     "id": "ird_187",
@@ -1218,14 +919,9 @@
     "maxDepth": 40,
     "minDepth": 20,
     "depth": 40,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2005,
-      2007
-    ]
+    "years": [2005, 2007]
   },
   {
     "id": "ird_217",
@@ -1245,14 +941,9 @@
     "maxDepth": 40,
     "minDepth": 20,
     "depth": 40,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2006,
-      2023
-    ]
+    "years": [2006, 2023]
   },
   {
     "id": "ird_406",
@@ -1272,13 +963,9 @@
     "maxDepth": 40,
     "minDepth": 30,
     "depth": 40,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2010
-    ]
+    "years": [2010]
   },
   {
     "id": "ird_155",
@@ -1298,14 +985,9 @@
     "maxDepth": 30,
     "minDepth": 10,
     "depth": 30,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002,
-      2006
-    ]
+    "years": [2002, 2006]
   },
   {
     "id": "ird_156",
@@ -1325,14 +1007,9 @@
     "maxDepth": 30,
     "minDepth": 10,
     "depth": 30,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002,
-      2006
-    ]
+    "years": [2002, 2006]
   },
   {
     "id": "ird_159",
@@ -1352,15 +1029,9 @@
     "maxDepth": 30,
     "minDepth": 10,
     "depth": 30,
-    "causes": [
-      "Triều cường",
-      "Mưa lớn"
-    ],
+    "causes": ["Triều cường", "Mưa lớn"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002,
-      2019
-    ]
+    "years": [2002, 2019]
   },
   {
     "id": "ird_27",
@@ -1380,14 +1051,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2023,
-      2025
-    ]
+    "years": [2023, 2025]
   },
   {
     "id": "ird_30",
@@ -1407,13 +1073,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2023
-    ]
+    "years": [2023]
   },
   {
     "id": "ird_32",
@@ -1433,15 +1095,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường",
-      "Mưa lớn"
-    ],
+    "causes": ["Triều cường", "Mưa lớn"],
     "primaryCause": "Triều cường",
-    "years": [
-      2013,
-      2025
-    ]
+    "years": [2013, 2025]
   },
   {
     "id": "ird_53",
@@ -1461,14 +1117,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2010,
-      2016
-    ]
+    "years": [2010, 2016]
   },
   {
     "id": "ird_57",
@@ -1488,14 +1139,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2016,
-      2023
-    ]
+    "years": [2016, 2023]
   },
   {
     "id": "ird_64",
@@ -1515,14 +1161,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2010,
-      2022
-    ]
+    "years": [2010, 2022]
   },
   {
     "id": "ird_65",
@@ -1542,14 +1183,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2010,
-      2022
-    ]
+    "years": [2010, 2022]
   },
   {
     "id": "ird_71",
@@ -1569,15 +1205,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường",
-      "Mưa & Triều"
-    ],
+    "causes": ["Triều cường", "Mưa & Triều"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002,
-      2025
-    ]
+    "years": [2002, 2025]
   },
   {
     "id": "ird_113",
@@ -1597,13 +1227,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2008
-    ]
+    "years": [2008]
   },
   {
     "id": "ird_128",
@@ -1623,14 +1249,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2017,
-      2024
-    ]
+    "years": [2017, 2024]
   },
   {
     "id": "ird_138",
@@ -1650,14 +1271,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2018,
-      2025
-    ]
+    "years": [2018, 2025]
   },
   {
     "id": "ird_139",
@@ -1677,13 +1293,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_147",
@@ -1703,14 +1315,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002,
-      2008
-    ]
+    "years": [2002, 2008]
   },
   {
     "id": "ird_232",
@@ -1730,14 +1337,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa & Triều"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2010,
-      2012
-    ]
+    "years": [2010, 2012]
   },
   {
     "id": "ird_254",
@@ -1757,14 +1359,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2023,
-      2025
-    ]
+    "years": [2023, 2025]
   },
   {
     "id": "ird_262",
@@ -1784,14 +1381,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2023,
-      2024
-    ]
+    "years": [2023, 2024]
   },
   {
     "id": "ird_307",
@@ -1811,14 +1403,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2024,
-      2026
-    ]
+    "years": [2024, 2026]
   },
   {
     "id": "ird_308",
@@ -1838,14 +1425,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2024,
-      2025
-    ]
+    "years": [2024, 2025]
   },
   {
     "id": "ird_384",
@@ -1865,13 +1447,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2013
-    ]
+    "years": [2013]
   },
   {
     "id": "ird_387",
@@ -1891,13 +1469,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2013
-    ]
+    "years": [2013]
   },
   {
     "id": "ird_393",
@@ -1917,14 +1491,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2010,
-      2013
-    ]
+    "years": [2010, 2013]
   },
   {
     "id": "ird_206",
@@ -1944,13 +1513,9 @@
     "maxDepth": 300,
     "minDepth": 300,
     "depth": 300,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2007
-    ]
+    "years": [2007]
   },
   {
     "id": "ird_207",
@@ -1970,13 +1535,9 @@
     "maxDepth": 300,
     "minDepth": 300,
     "depth": 300,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2007
-    ]
+    "years": [2007]
   },
   {
     "id": "ird_208",
@@ -1996,13 +1557,9 @@
     "maxDepth": 300,
     "minDepth": 300,
     "depth": 300,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2007
-    ]
+    "years": [2007]
   },
   {
     "id": "ird_209",
@@ -2022,13 +1579,9 @@
     "maxDepth": 300,
     "minDepth": 300,
     "depth": 300,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2007
-    ]
+    "years": [2007]
   },
   {
     "id": "ird_321",
@@ -2048,13 +1601,9 @@
     "maxDepth": 120,
     "minDepth": 120,
     "depth": 120,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_169",
@@ -2074,13 +1623,9 @@
     "maxDepth": 100,
     "minDepth": 50,
     "depth": 100,
-    "causes": [
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa & Triều"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_177",
@@ -2100,13 +1645,9 @@
     "maxDepth": 100,
     "minDepth": 80,
     "depth": 100,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_179",
@@ -2126,13 +1667,9 @@
     "maxDepth": 100,
     "minDepth": 80,
     "depth": 100,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_180",
@@ -2152,13 +1689,9 @@
     "maxDepth": 100,
     "minDepth": 80,
     "depth": 100,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_181",
@@ -2178,13 +1711,9 @@
     "maxDepth": 100,
     "minDepth": 80,
     "depth": 100,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_205",
@@ -2204,13 +1733,9 @@
     "maxDepth": 100,
     "minDepth": 100,
     "depth": 100,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2007
-    ]
+    "years": [2007]
   },
   {
     "id": "ird_382",
@@ -2230,13 +1755,9 @@
     "maxDepth": 100,
     "minDepth": 100,
     "depth": 100,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2013
-    ]
+    "years": [2013]
   },
   {
     "id": "ird_87",
@@ -2256,13 +1777,9 @@
     "maxDepth": 70,
     "minDepth": 70,
     "depth": 70,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2012
-    ]
+    "years": [2012]
   },
   {
     "id": "ird_210",
@@ -2282,13 +1799,9 @@
     "maxDepth": 70,
     "minDepth": 70,
     "depth": 70,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2007
-    ]
+    "years": [2007]
   },
   {
     "id": "ird_194",
@@ -2308,13 +1821,9 @@
     "maxDepth": 60,
     "minDepth": 30,
     "depth": 60,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2025
-    ]
+    "years": [2025]
   },
   {
     "id": "ird_202",
@@ -2334,13 +1843,9 @@
     "maxDepth": 60,
     "minDepth": 30,
     "depth": 60,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2006
-    ]
+    "years": [2006]
   },
   {
     "id": "ird_203",
@@ -2360,13 +1865,9 @@
     "maxDepth": 60,
     "minDepth": 30,
     "depth": 60,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2006
-    ]
+    "years": [2006]
   },
   {
     "id": "ird_314",
@@ -2386,13 +1887,9 @@
     "maxDepth": 60,
     "minDepth": 60,
     "depth": 60,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2024
-    ]
+    "years": [2024]
   },
   {
     "id": "ird_40",
@@ -2412,13 +1909,9 @@
     "maxDepth": 50,
     "minDepth": 30,
     "depth": 50,
-    "causes": [
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa & Triều"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2012
-    ]
+    "years": [2012]
   },
   {
     "id": "ird_41",
@@ -2438,13 +1931,9 @@
     "maxDepth": 50,
     "minDepth": 30,
     "depth": 50,
-    "causes": [
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa & Triều"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2012
-    ]
+    "years": [2012]
   },
   {
     "id": "ird_50",
@@ -2464,13 +1953,9 @@
     "maxDepth": 50,
     "minDepth": 50,
     "depth": 50,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2016
-    ]
+    "years": [2016]
   },
   {
     "id": "ird_85",
@@ -2490,13 +1975,9 @@
     "maxDepth": 50,
     "minDepth": 30,
     "depth": 50,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2011
-    ]
+    "years": [2011]
   },
   {
     "id": "ird_98",
@@ -2516,13 +1997,9 @@
     "maxDepth": 50,
     "minDepth": 20,
     "depth": 50,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2011
-    ]
+    "years": [2011]
   },
   {
     "id": "ird_105",
@@ -2542,13 +2019,9 @@
     "maxDepth": 50,
     "minDepth": 50,
     "depth": 50,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2011
-    ]
+    "years": [2011]
   },
   {
     "id": "ird_106",
@@ -2568,13 +2041,9 @@
     "maxDepth": 50,
     "minDepth": 50,
     "depth": 50,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2011
-    ]
+    "years": [2011]
   },
   {
     "id": "ird_107",
@@ -2594,13 +2063,9 @@
     "maxDepth": 50,
     "minDepth": 50,
     "depth": 50,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2011
-    ]
+    "years": [2011]
   },
   {
     "id": "ird_108",
@@ -2620,13 +2085,9 @@
     "maxDepth": 50,
     "minDepth": 50,
     "depth": 50,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2011
-    ]
+    "years": [2011]
   },
   {
     "id": "ird_112",
@@ -2646,13 +2107,9 @@
     "maxDepth": 50,
     "minDepth": 50,
     "depth": 50,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2011
-    ]
+    "years": [2011]
   },
   {
     "id": "ird_116",
@@ -2672,13 +2129,9 @@
     "maxDepth": 50,
     "minDepth": 30,
     "depth": 50,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_117",
@@ -2698,13 +2151,9 @@
     "maxDepth": 50,
     "minDepth": 30,
     "depth": 50,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_118",
@@ -2724,13 +2173,9 @@
     "maxDepth": 50,
     "minDepth": 30,
     "depth": 50,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_119",
@@ -2750,13 +2195,9 @@
     "maxDepth": 50,
     "minDepth": 30,
     "depth": 50,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_120",
@@ -2776,13 +2217,9 @@
     "maxDepth": 50,
     "minDepth": 30,
     "depth": 50,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_121",
@@ -2802,13 +2239,9 @@
     "maxDepth": 50,
     "minDepth": 30,
     "depth": 50,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_175",
@@ -2828,13 +2261,9 @@
     "maxDepth": 50,
     "minDepth": 50,
     "depth": 50,
-    "causes": [
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa & Triều"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_182",
@@ -2854,13 +2283,9 @@
     "maxDepth": 50,
     "minDepth": 50,
     "depth": 50,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_183",
@@ -2880,13 +2305,9 @@
     "maxDepth": 50,
     "minDepth": 50,
     "depth": 50,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_223",
@@ -2906,13 +2327,9 @@
     "maxDepth": 50,
     "minDepth": 40,
     "depth": 50,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2006
-    ]
+    "years": [2006]
   },
   {
     "id": "ird_266",
@@ -2932,13 +2349,9 @@
     "maxDepth": 50,
     "minDepth": 50,
     "depth": 50,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2026
-    ]
+    "years": [2026]
   },
   {
     "id": "ird_333",
@@ -2958,13 +2371,9 @@
     "maxDepth": 50,
     "minDepth": 50,
     "depth": 50,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_334",
@@ -2984,13 +2393,9 @@
     "maxDepth": 50,
     "minDepth": 50,
     "depth": 50,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_335",
@@ -3010,13 +2415,9 @@
     "maxDepth": 50,
     "minDepth": 50,
     "depth": 50,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_360",
@@ -3036,13 +2437,9 @@
     "maxDepth": 50,
     "minDepth": 50,
     "depth": 50,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2008
-    ]
+    "years": [2008]
   },
   {
     "id": "ird_361",
@@ -3062,13 +2459,9 @@
     "maxDepth": 50,
     "minDepth": 30,
     "depth": 50,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2008
-    ]
+    "years": [2008]
   },
   {
     "id": "ird_362",
@@ -3088,13 +2481,9 @@
     "maxDepth": 50,
     "minDepth": 30,
     "depth": 50,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2008
-    ]
+    "years": [2008]
   },
   {
     "id": "ird_381",
@@ -3114,13 +2503,9 @@
     "maxDepth": 50,
     "minDepth": 50,
     "depth": 50,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2013
-    ]
+    "years": [2013]
   },
   {
     "id": "ird_410",
@@ -3140,13 +2525,9 @@
     "maxDepth": 50,
     "minDepth": 50,
     "depth": 50,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2010
-    ]
+    "years": [2010]
   },
   {
     "id": "ird_417",
@@ -3166,13 +2547,9 @@
     "maxDepth": 50,
     "minDepth": 50,
     "depth": 50,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2010
-    ]
+    "years": [2010]
   },
   {
     "id": "ird_164",
@@ -3192,13 +2569,9 @@
     "maxDepth": 40,
     "minDepth": 20,
     "depth": 40,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_165",
@@ -3218,13 +2591,9 @@
     "maxDepth": 40,
     "minDepth": 20,
     "depth": 40,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_166",
@@ -3244,13 +2613,9 @@
     "maxDepth": 40,
     "minDepth": 20,
     "depth": 40,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_239",
@@ -3270,13 +2635,9 @@
     "maxDepth": 40,
     "minDepth": 20,
     "depth": 40,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2023
-    ]
+    "years": [2023]
   },
   {
     "id": "ird_405",
@@ -3296,13 +2657,9 @@
     "maxDepth": 40,
     "minDepth": 30,
     "depth": 40,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2010
-    ]
+    "years": [2010]
   },
   {
     "id": "ird_407",
@@ -3322,13 +2679,9 @@
     "maxDepth": 40,
     "minDepth": 30,
     "depth": 40,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2010
-    ]
+    "years": [2010]
   },
   {
     "id": "ird_416",
@@ -3348,13 +2701,9 @@
     "maxDepth": 40,
     "minDepth": 30,
     "depth": 40,
-    "causes": [
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa & Triều"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2010
-    ]
+    "years": [2010]
   },
   {
     "id": "ird_5",
@@ -3374,13 +2723,9 @@
     "maxDepth": 30,
     "minDepth": 15,
     "depth": 30,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2025
-    ]
+    "years": [2025]
   },
   {
     "id": "ird_6",
@@ -3400,13 +2745,9 @@
     "maxDepth": 30,
     "minDepth": 15,
     "depth": 30,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2025
-    ]
+    "years": [2025]
   },
   {
     "id": "ird_8",
@@ -3426,13 +2767,9 @@
     "maxDepth": 30,
     "minDepth": 15,
     "depth": 30,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2025
-    ]
+    "years": [2025]
   },
   {
     "id": "ird_9",
@@ -3452,13 +2789,9 @@
     "maxDepth": 30,
     "minDepth": 15,
     "depth": 30,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2025
-    ]
+    "years": [2025]
   },
   {
     "id": "ird_154",
@@ -3478,13 +2811,9 @@
     "maxDepth": 30,
     "minDepth": 10,
     "depth": 30,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_157",
@@ -3504,13 +2833,9 @@
     "maxDepth": 30,
     "minDepth": 10,
     "depth": 30,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_158",
@@ -3530,13 +2855,9 @@
     "maxDepth": 30,
     "minDepth": 10,
     "depth": 30,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_161",
@@ -3556,13 +2877,9 @@
     "maxDepth": 30,
     "minDepth": 10,
     "depth": 30,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_211",
@@ -3582,13 +2899,9 @@
     "maxDepth": 30,
     "minDepth": 30,
     "depth": 30,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2007
-    ]
+    "years": [2007]
   },
   {
     "id": "ird_273",
@@ -3608,13 +2921,9 @@
     "maxDepth": 30,
     "minDepth": 15,
     "depth": 30,
-    "causes": [
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa & Triều"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2018
-    ]
+    "years": [2018]
   },
   {
     "id": "ird_274",
@@ -3634,13 +2943,9 @@
     "maxDepth": 30,
     "minDepth": 15,
     "depth": 30,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2018
-    ]
+    "years": [2018]
   },
   {
     "id": "ird_276",
@@ -3660,13 +2965,9 @@
     "maxDepth": 30,
     "minDepth": 15,
     "depth": 30,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2018
-    ]
+    "years": [2018]
   },
   {
     "id": "ird_296",
@@ -3686,13 +2987,9 @@
     "maxDepth": 25,
     "minDepth": 25,
     "depth": 25,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_163",
@@ -3712,13 +3009,9 @@
     "maxDepth": 20,
     "minDepth": 20,
     "depth": 20,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_297",
@@ -3738,13 +3031,9 @@
     "maxDepth": 20,
     "minDepth": 20,
     "depth": 20,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_10",
@@ -3764,13 +3053,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2025
-    ]
+    "years": [2025]
   },
   {
     "id": "ird_11",
@@ -3790,13 +3075,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2025
-    ]
+    "years": [2025]
   },
   {
     "id": "ird_12",
@@ -3816,13 +3097,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2025
-    ]
+    "years": [2025]
   },
   {
     "id": "ird_13",
@@ -3842,13 +3119,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2025
-    ]
+    "years": [2025]
   },
   {
     "id": "ird_14",
@@ -3868,13 +3141,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2016
-    ]
+    "years": [2016]
   },
   {
     "id": "ird_15",
@@ -3894,13 +3163,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2016
-    ]
+    "years": [2016]
   },
   {
     "id": "ird_21",
@@ -3920,13 +3185,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2020
-    ]
+    "years": [2020]
   },
   {
     "id": "ird_25",
@@ -3946,13 +3207,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2023
-    ]
+    "years": [2023]
   },
   {
     "id": "ird_26",
@@ -3972,13 +3229,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2023
-    ]
+    "years": [2023]
   },
   {
     "id": "ird_28",
@@ -3998,13 +3251,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2023
-    ]
+    "years": [2023]
   },
   {
     "id": "ird_29",
@@ -4024,13 +3273,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2023
-    ]
+    "years": [2023]
   },
   {
     "id": "ird_31",
@@ -4050,13 +3295,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2023
-    ]
+    "years": [2023]
   },
   {
     "id": "ird_33",
@@ -4076,13 +3317,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa & Triều"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2025
-    ]
+    "years": [2025]
   },
   {
     "id": "ird_45",
@@ -4102,13 +3339,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa & Triều"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2012
-    ]
+    "years": [2012]
   },
   {
     "id": "ird_46",
@@ -4128,13 +3361,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa & Triều"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2012
-    ]
+    "years": [2012]
   },
   {
     "id": "ird_47",
@@ -4154,13 +3383,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa & Triều"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2012
-    ]
+    "years": [2012]
   },
   {
     "id": "ird_48",
@@ -4180,13 +3405,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa & Triều"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2012
-    ]
+    "years": [2012]
   },
   {
     "id": "ird_54",
@@ -4206,13 +3427,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2016
-    ]
+    "years": [2016]
   },
   {
     "id": "ird_55",
@@ -4232,13 +3449,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2016
-    ]
+    "years": [2016]
   },
   {
     "id": "ird_56",
@@ -4258,13 +3471,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2016
-    ]
+    "years": [2016]
   },
   {
     "id": "ird_58",
@@ -4284,13 +3493,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2016
-    ]
+    "years": [2016]
   },
   {
     "id": "ird_59",
@@ -4310,13 +3515,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2016
-    ]
+    "years": [2016]
   },
   {
     "id": "ird_61",
@@ -4336,13 +3537,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2016
-    ]
+    "years": [2016]
   },
   {
     "id": "ird_62",
@@ -4362,13 +3559,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2022
-    ]
+    "years": [2022]
   },
   {
     "id": "ird_63",
@@ -4388,13 +3581,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2022
-    ]
+    "years": [2022]
   },
   {
     "id": "ird_67",
@@ -4414,13 +3603,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2022
-    ]
+    "years": [2022]
   },
   {
     "id": "ird_73",
@@ -4440,13 +3625,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa & Triều"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2025
-    ]
+    "years": [2025]
   },
   {
     "id": "ird_78",
@@ -4466,13 +3647,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2011
-    ]
+    "years": [2011]
   },
   {
     "id": "ird_86",
@@ -4492,13 +3669,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2012
-    ]
+    "years": [2012]
   },
   {
     "id": "ird_89",
@@ -4518,13 +3691,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2012
-    ]
+    "years": [2012]
   },
   {
     "id": "ird_93",
@@ -4544,13 +3713,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2012
-    ]
+    "years": [2012]
   },
   {
     "id": "ird_94",
@@ -4570,13 +3735,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2012
-    ]
+    "years": [2012]
   },
   {
     "id": "ird_95",
@@ -4596,13 +3757,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2012
-    ]
+    "years": [2012]
   },
   {
     "id": "ird_96",
@@ -4622,13 +3779,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2012
-    ]
+    "years": [2012]
   },
   {
     "id": "ird_97",
@@ -4648,13 +3801,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2012
-    ]
+    "years": [2012]
   },
   {
     "id": "ird_123",
@@ -4674,13 +3823,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_124",
@@ -4700,13 +3845,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_129",
@@ -4726,13 +3867,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2024
-    ]
+    "years": [2024]
   },
   {
     "id": "ird_131",
@@ -4752,13 +3889,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2008
-    ]
+    "years": [2008]
   },
   {
     "id": "ird_132",
@@ -4778,13 +3911,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2008
-    ]
+    "years": [2008]
   },
   {
     "id": "ird_133",
@@ -4804,13 +3933,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2008
-    ]
+    "years": [2008]
   },
   {
     "id": "ird_134",
@@ -4830,13 +3955,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2008
-    ]
+    "years": [2008]
   },
   {
     "id": "ird_135",
@@ -4856,13 +3977,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2008
-    ]
+    "years": [2008]
   },
   {
     "id": "ird_136",
@@ -4882,13 +3999,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2008
-    ]
+    "years": [2008]
   },
   {
     "id": "ird_137",
@@ -4908,13 +4021,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2008
-    ]
+    "years": [2008]
   },
   {
     "id": "ird_141",
@@ -4934,13 +4043,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_142",
@@ -4960,13 +4065,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_152",
@@ -4986,13 +4087,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_162",
@@ -5012,13 +4109,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_170",
@@ -5038,13 +4131,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa & Triều"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_171",
@@ -5064,13 +4153,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa & Triều"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_186",
@@ -5090,13 +4175,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2007
-    ]
+    "years": [2007]
   },
   {
     "id": "ird_189",
@@ -5116,13 +4197,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2007
-    ]
+    "years": [2007]
   },
   {
     "id": "ird_190",
@@ -5142,13 +4219,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2007
-    ]
+    "years": [2007]
   },
   {
     "id": "ird_193",
@@ -5168,13 +4241,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2005
-    ]
+    "years": [2005]
   },
   {
     "id": "ird_218",
@@ -5194,13 +4263,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2006
-    ]
+    "years": [2006]
   },
   {
     "id": "ird_219",
@@ -5220,13 +4285,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2006
-    ]
+    "years": [2006]
   },
   {
     "id": "ird_220",
@@ -5246,13 +4307,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2006
-    ]
+    "years": [2006]
   },
   {
     "id": "ird_221",
@@ -5272,13 +4329,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2006
-    ]
+    "years": [2006]
   },
   {
     "id": "ird_222",
@@ -5298,13 +4351,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2006
-    ]
+    "years": [2006]
   },
   {
     "id": "ird_225",
@@ -5324,13 +4373,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2007
-    ]
+    "years": [2007]
   },
   {
     "id": "ird_226",
@@ -5350,13 +4395,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa & Triều"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2012
-    ]
+    "years": [2012]
   },
   {
     "id": "ird_227",
@@ -5376,13 +4417,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa & Triều"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2012
-    ]
+    "years": [2012]
   },
   {
     "id": "ird_228",
@@ -5402,13 +4439,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa & Triều"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2012
-    ]
+    "years": [2012]
   },
   {
     "id": "ird_229",
@@ -5428,13 +4461,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa & Triều"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2012
-    ]
+    "years": [2012]
   },
   {
     "id": "ird_231",
@@ -5454,13 +4483,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa & Triều"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2012
-    ]
+    "years": [2012]
   },
   {
     "id": "ird_233",
@@ -5480,13 +4505,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa & Triều"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2012
-    ]
+    "years": [2012]
   },
   {
     "id": "ird_243",
@@ -5506,13 +4527,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2023
-    ]
+    "years": [2023]
   },
   {
     "id": "ird_245",
@@ -5532,13 +4549,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2016
-    ]
+    "years": [2016]
   },
   {
     "id": "ird_250",
@@ -5558,13 +4571,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2016
-    ]
+    "years": [2016]
   },
   {
     "id": "ird_251",
@@ -5584,13 +4593,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2016
-    ]
+    "years": [2016]
   },
   {
     "id": "ird_252",
@@ -5610,13 +4615,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2016
-    ]
+    "years": [2016]
   },
   {
     "id": "ird_310",
@@ -5636,13 +4637,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2024
-    ]
+    "years": [2024]
   },
   {
     "id": "ird_311",
@@ -5662,13 +4659,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2024
-    ]
+    "years": [2024]
   },
   {
     "id": "ird_317",
@@ -5688,13 +4681,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2016
-    ]
+    "years": [2016]
   },
   {
     "id": "ird_318",
@@ -5714,13 +4703,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_319",
@@ -5740,13 +4725,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_322",
@@ -5766,13 +4747,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_323",
@@ -5792,13 +4769,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_324",
@@ -5818,13 +4791,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_326",
@@ -5844,13 +4813,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_327",
@@ -5870,13 +4835,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_329",
@@ -5896,13 +4857,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_338",
@@ -5922,13 +4879,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_340",
@@ -5948,13 +4901,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_342",
@@ -5974,13 +4923,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_347",
@@ -6000,13 +4945,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2017
-    ]
+    "years": [2017]
   },
   {
     "id": "ird_349",
@@ -6026,13 +4967,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2025
-    ]
+    "years": [2025]
   },
   {
     "id": "ird_350",
@@ -6052,13 +4989,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2025
-    ]
+    "years": [2025]
   },
   {
     "id": "ird_352",
@@ -6078,13 +5011,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2015
-    ]
+    "years": [2015]
   },
   {
     "id": "ird_353",
@@ -6104,13 +5033,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2015
-    ]
+    "years": [2015]
   },
   {
     "id": "ird_355",
@@ -6130,13 +5055,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2008
-    ]
+    "years": [2008]
   },
   {
     "id": "ird_357",
@@ -6156,13 +5077,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2008
-    ]
+    "years": [2008]
   },
   {
     "id": "ird_359",
@@ -6182,13 +5099,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2008
-    ]
+    "years": [2008]
   },
   {
     "id": "ird_368",
@@ -6208,13 +5121,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2008
-    ]
+    "years": [2008]
   },
   {
     "id": "ird_370",
@@ -6234,13 +5143,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2026
-    ]
+    "years": [2026]
   },
   {
     "id": "ird_372",
@@ -6260,13 +5165,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2026
-    ]
+    "years": [2026]
   },
   {
     "id": "ird_373",
@@ -6286,13 +5187,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2025
-    ]
+    "years": [2025]
   },
   {
     "id": "ird_378",
@@ -6312,13 +5209,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2025
-    ]
+    "years": [2025]
   },
   {
     "id": "ird_380",
@@ -6338,13 +5231,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2025
-    ]
+    "years": [2025]
   },
   {
     "id": "ird_383",
@@ -6364,13 +5253,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2013
-    ]
+    "years": [2013]
   },
   {
     "id": "ird_385",
@@ -6390,13 +5275,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2013
-    ]
+    "years": [2013]
   },
   {
     "id": "ird_388",
@@ -6416,13 +5297,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2013
-    ]
+    "years": [2013]
   },
   {
     "id": "ird_389",
@@ -6442,13 +5319,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2013
-    ]
+    "years": [2013]
   },
   {
     "id": "ird_390",
@@ -6468,13 +5341,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2013
-    ]
+    "years": [2013]
   },
   {
     "id": "ird_394",
@@ -6494,13 +5363,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2013
-    ]
+    "years": [2013]
   },
   {
     "id": "ird_396",
@@ -6520,13 +5385,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2013
-    ]
+    "years": [2013]
   },
   {
     "id": "ird_403",
@@ -6546,13 +5407,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2010
-    ]
+    "years": [2010]
   },
   {
     "id": "ird_404",
@@ -6572,13 +5429,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2010
-    ]
+    "years": [2010]
   },
   {
     "id": "ird_420",
@@ -6598,13 +5451,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2010
-    ]
+    "years": [2010]
   },
   {
     "id": "ird_421",
@@ -6624,13 +5473,9 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa & Triều"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2010
-    ]
+    "years": [2010]
   },
   {
     "id": "ird_425",
@@ -6650,12 +5495,8 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2010
-    ]
+    "years": [2010]
   }
 ]

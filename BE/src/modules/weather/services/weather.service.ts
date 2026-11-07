@@ -299,9 +299,7 @@ export class WeatherService {
         const curTimeStr = String(current.time ?? "");
         const mIdx = Math.max(
           0,
-          curTimeStr
-            ? min15Times.findIndex((t) => t === curTimeStr)
-            : 0,
+          curTimeStr ? min15Times.findIndex((t) => t === curTimeStr) : 0,
         );
         this.latestMinutely15Slots = [
           Math.round(currentRainMm * 10) / 10,
@@ -463,7 +461,9 @@ export class WeatherService {
       });
       return rainMap;
     } catch (err) {
-      this.logger.warn(`Lỗi lấy mưa quận Open-Meteo: ${(err as Error).message}`);
+      this.logger.warn(
+        `Lỗi lấy mưa quận Open-Meteo: ${(err as Error).message}`,
+      );
       try {
         const cityWeather = await this.getCurrentWeather();
         const baseRain = Number(cityWeather?.currentRainMm ?? 0);
@@ -518,13 +518,13 @@ export class WeatherService {
     const snapshot = await this.getCurrentWeather();
     const hourly = snapshot.hourlyForecast ?? [];
 
-    const [nowRain, slot30Rain, slot60Rain, slot90Rain] =
-      this.latestMinutely15Slots ?? [
-        Math.round((snapshot.currentRainMm || 0) * 10) / 10,
-        Math.round((hourly[1]?.rainMm ?? 0) * 10) / 10,
-        Math.round((hourly[2]?.rainMm ?? 0) * 10) / 10,
-        Math.round((hourly[3]?.rainMm ?? 0) * 10) / 10,
-      ];
+    const [nowRain, slot30Rain, slot60Rain, slot90Rain] = this
+      .latestMinutely15Slots ?? [
+      Math.round((snapshot.currentRainMm || 0) * 10) / 10,
+      Math.round((hourly[1]?.rainMm ?? 0) * 10) / 10,
+      Math.round((hourly[2]?.rainMm ?? 0) * 10) / 10,
+      Math.round((hourly[3]?.rainMm ?? 0) * 10) / 10,
+    ];
 
     const riskNow = this.calculateFloodRisk(nowRain, snapshot.elevationM);
     const risk30 = this.calculateFloodRisk(slot30Rain, snapshot.elevationM);

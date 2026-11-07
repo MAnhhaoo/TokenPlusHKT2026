@@ -153,7 +153,10 @@ export class MapService {
         } else {
           // Khớp mờ tên quận
           for (const [distKey, rVal] of districtRainMap.entries()) {
-            if (cleanDistrict.includes(distKey) || distKey.includes(cleanDistrict)) {
+            if (
+              cleanDistrict.includes(distKey) ||
+              distKey.includes(cleanDistrict)
+            ) {
               localRain = rVal;
               break;
             }
@@ -170,12 +173,12 @@ export class MapService {
         elevation <= 1.4
           ? 1.45
           : elevation <= 1.8
-            ? 1.30
+            ? 1.3
             : elevation <= 2.5
               ? 1.15
               : elevation <= 4.0
-                ? 1.00
-                : 0.80;
+                ? 1.0
+                : 0.8;
 
       // 2. Hệ số tổn thương tần suất ngập lịch sử (Historical Vulnerability Factor)
       const histCount = point.historyCount || 5;
@@ -210,7 +213,8 @@ export class MapService {
       const isAtRisk =
         !isRainFlooded &&
         !isTideFlooded &&
-        ((localRain >= 3 && effectiveRain >= threshold * 0.65) || tideDepth >= 10);
+        ((localRain >= 3 && effectiveRain >= threshold * 0.65) ||
+          tideDepth >= 10);
 
       // Nếu không có mưa và không triều cường: ĐƯỜNG KHÔ RÁO HOÀN TOÀN
       if (!isRainFlooded && !isTideFlooded && !isAtRisk) {
@@ -706,9 +710,7 @@ export class MapService {
       const depth = p.depth || 0;
 
       const sElev =
-        elev !== null
-          ? Math.max(0, Math.min(1, 1.0 - (elev - 0.5) / 4.0))
-          : 0;
+        elev !== null ? Math.max(0, Math.min(1, 1.0 - (elev - 0.5) / 4.0)) : 0;
       const sHistory = Math.max(0, Math.min(1, historyCount / 10));
       const sDepth = Math.max(0, Math.min(1, depth / 60));
 

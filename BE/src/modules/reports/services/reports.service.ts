@@ -150,8 +150,7 @@ export class ReportsService {
       dto.reportedDepth && dto.reportedDepth > 0
         ? dto.reportedDepth
         : (depthBySeverity[dto.severity] ?? 24);
-    let aiDepth =
-      dto.aiDepth && dto.aiDepth > 0 ? dto.aiDepth : reportedDepth;
+    let aiDepth = dto.aiDepth && dto.aiDepth > 0 ? dto.aiDepth : reportedDepth;
     let aiConfidence =
       dto.aiConfidence && dto.aiConfidence > 0 ? dto.aiConfidence : 0;
     let aiSummary = dto.aiSummary;
@@ -200,7 +199,9 @@ export class ReportsService {
           ? "critical"
           : detectedSeverity;
 
-    const isAutoVerified = Boolean(dto.photoUrl || dto.aiSummary || dto.recommendation);
+    const isAutoVerified = Boolean(
+      dto.photoUrl || dto.aiSummary || dto.recommendation,
+    );
 
     const report = this.reportRepo.create({
       id: nextId,

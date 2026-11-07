@@ -811,9 +811,7 @@ function MapCanvas({
       el.className = `libre-flood-marker ${pt.severity} severity-${pt.severity}`;
       const histCount = (pt as any).historyCount;
       const depthInfo =
-        pt.depth && pt.depth > 0
-          ? `Mực nước ngập: ${pt.depth} cm`
-          : "Chưa ghi nhận độ sâu";
+        pt.depth && pt.depth > 0 ? `Mực nước ngập: ${pt.depth} cm` : "Chưa ghi nhận độ sâu";
       const extraInfo =
         mapMode === "history" && histCount
           ? ` · Lịch sử ngập: ${histCount} lần`
@@ -822,11 +820,7 @@ function MapCanvas({
             : "";
       el.title = `${pt.label} (${pt.district}) · ${depthInfo}${extraInfo}`;
       const badgeText =
-        pt.depth && pt.depth > 0
-          ? `${pt.depth}cm`
-          : histCount
-            ? `${histCount} lần`
-            : "";
+        pt.depth && pt.depth > 0 ? `${pt.depth}cm` : histCount ? `${histCount} lần` : "";
       el.innerHTML = `<span class="libre-flood-pulse"></span><span class="flood-label">${pt.label}</span><span class="flood-depth">${badgeText}</span>`;
       el.addEventListener("click", (ev) => {
         ev.stopPropagation();
