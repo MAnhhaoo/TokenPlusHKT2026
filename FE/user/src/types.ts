@@ -91,6 +91,12 @@ export type MapFloodPoint = {
   severity: "critical" | "high" | "medium";
   depth: number;
   rainfall: number;
+  historyCount?: number;
+  elevationM?: number;
+  estimatedDurationMin?: number;
+  estimatedClearAt?: string;
+  drainageRateCmPerMin?: number;
+  linkedReportId?: string;
 };
 
 export type CommunityUserProfile = {

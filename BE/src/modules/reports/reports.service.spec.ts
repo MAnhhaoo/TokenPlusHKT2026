@@ -20,6 +20,11 @@ describe("ReportsService", () => {
       findOne: jest.fn(),
       save: jest.fn((entity) => Promise.resolve(entity)),
     };
+    const mockAlertRepo = {
+      count: jest.fn().mockResolvedValue(0),
+      create: jest.fn((entity) => entity),
+      save: jest.fn((entity) => Promise.resolve(entity)),
+    };
     mockMapService = {
       reverseGeocode: jest.fn(),
     };
@@ -43,6 +48,7 @@ describe("ReportsService", () => {
       mockReportRepo,
       mockMapPointRepo,
       mockUserRepo,
+      mockAlertRepo as any,
       mockMapService,
       mockGeminiVisionService as any,
     );

@@ -65,6 +65,18 @@ export class MapPointEntity {
   @Column({ type: "varchar", length: 32, nullable: true })
   linkedReportId?: string;
 
+  @ApiProperty({ required: false, example: 45 })
+  @Column({ name: "estimateddurationmin", type: "int", nullable: true })
+  estimatedDurationMin?: number;
+
+  @ApiProperty({ required: false, example: "00:25, 08/11/2026" })
+  @Column({ name: "estimatedclearat", type: "varchar", length: 64, nullable: true })
+  estimatedClearAt?: string;
+
+  @ApiProperty({ required: false, example: 0.65 })
+  @Column({ name: "drainageratecmpermin", type: "float", nullable: true })
+  drainageRateCmPerMin?: number;
+
   @UpdateDateColumn()
   updatedAt: Date;
 }

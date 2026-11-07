@@ -9,6 +9,7 @@ import { Repository } from "typeorm";
 import { FloodReportEntity } from "../models/flood-report.entity";
 import { MapPointEntity } from "../../map/models/map-point.entity";
 import { CommunityUserEntity } from "../../users/models/community-user.entity";
+import { AreaAlertEntity } from "../../alerts/models/area-alert.entity";
 import { CreateReportDto } from "../dtos/create-report.dto";
 import { AnalyzeImageDto } from "../dtos/analyze-image.dto";
 import { QueryReportDto } from "../dtos/query-report.dto";
@@ -25,6 +26,8 @@ export class ReportsService {
     private readonly mapPointRepo: Repository<MapPointEntity>,
     @InjectRepository(CommunityUserEntity)
     private readonly userRepo: Repository<CommunityUserEntity>,
+    @InjectRepository(AreaAlertEntity)
+    private readonly alertRepo: Repository<AreaAlertEntity>,
     private readonly mapService: MapService,
     private readonly geminiVisionService: GeminiVisionService,
     @Optional() private readonly realtimeService?: RealtimeService,
@@ -203,6 +206,102 @@ export class ReportsService {
       dto.photoUrl || dto.aiSummary || dto.recommendation,
     );
 
+    // 1. Đối chiếu lịch sử ngập và cao độ địa hình thực tế tại khu vực này
+    let historyCount = 6;
+    let elevationM = 2.2;
+    try {
+      const allPoints = await this.mapPointRepo.find();
+      const cleanLoc = (location || "").toLowerCase();
+      let matchedPoint = allPoints.find(
+        (p) =>
+          p.label &&
+          (cleanLoc.includes(p.label.toLowerCase()) ||
+            p.label.toLowerCase().includes(cleanLoc)),
+      );
+      if (!matchedPoint) {
+        matchedPoint = allPoints.find(
+          (p) => Math.abs(p.lat - lat) < 0.008 && Math.abs(p.lng - lng) < 0.008,
+        );
+      }
+      if (matchedPoint) {
+        historyCount = matchedPoint.historyCount || 6;
+        elevationM = matchedPoint.elevationM || 2.2;
+      }
+    } catch {
+      // Safe fallback
+    }
+
+    // 2. Tra cứu lượng mưa thực tế thời gian thực tại quận này (Open-Meteo)
+    let currentRain = 0;
+    try {
+      if (this.mapService?.getCurrentRainForDistrict && district) {
+        currentRain = await this.mapService.getCurrentRainForDistrict(district);
+      }
+    } catch {
+      currentRain = 0;
+    }
+
+    // 3. Thuật toán Thủy văn tính toán tốc độ thoát nước và thời gian hết ngập
+    let drainageRate =
+      elevationM <= 1.4
+        ? 0.35
+        : elevationM <= 1.8
+          ? 0.45
+          : elevationM <= 2.5
+            ? 0.65
+            : 0.85;
+
+    if (dto.reportType === "drain") {
+      drainageRate = Math.round(drainageRate * 0.6 * 100) / 100;
+    }
+    if (historyCount >= 10) {
+      drainageRate = Math.round(drainageRate * 0.8 * 100) / 100;
+    }
+    drainageRate = Math.max(0.2, drainageRate);
+
+    // Thời gian thoát nước cơ bản tính từ độ sâu ngập
+    let estimatedDurationMin = Math.round(reportedDepth / drainageRate);
+
+    // Bổ sung thời gian kéo dài nếu thời tiết đang có mưa
+    if (currentRain >= 15) {
+      estimatedDurationMin += 45;
+    } else if (currentRain >= 5) {
+      estimatedDurationMin += 25;
+    }
+
+    // Kiểm tra đỉnh triều cường sông Sài Gòn
+    const vnHour = new Date(
+      now.toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" }),
+    ).getHours();
+    const isTidePeak = (vnHour >= 16 && vnHour <= 19) || (vnHour >= 4 && vnHour <= 7);
+    const cleanDist = (district || "").toLowerCase();
+    const isRiverside =
+      elevationM <= 1.6 &&
+      (cleanDist.includes("7") ||
+        cleanDist.includes("nhà bè") ||
+        cleanDist.includes("bình thạnh") ||
+        cleanDist.includes("thủ đức") ||
+        cleanDist.includes("8") ||
+        cleanDist.includes("4"));
+
+    if (isTidePeak && isRiverside) {
+      estimatedDurationMin += 35;
+    }
+
+    estimatedDurationMin = Math.max(15, estimatedDurationMin);
+
+    const clearDate = new Date(now.getTime() + estimatedDurationMin * 60 * 1000);
+    const clearHourStr = String(clearDate.getHours()).padStart(2, "0");
+    const clearMinStr = String(clearDate.getMinutes()).padStart(2, "0");
+    const estimatedClearAt = `${clearHourStr}:${clearMinStr}, ${String(
+      clearDate.getDate(),
+    ).padStart(2, "0")}/${String(clearDate.getMonth() + 1).padStart(2, "0")}/${clearDate.getFullYear()}`;
+
+    const clearNotice = ` Dự kiến nước rút hết sau ~${estimatedDurationMin} phút (khoảng ${clearHourStr}:${clearMinStr}).`;
+    if (aiSummary && !aiSummary.includes("Dự kiến nước rút")) {
+      aiSummary += clearNotice;
+    }
+
     const report = this.reportRepo.create({
       id: nextId,
       location,
@@ -224,12 +323,15 @@ export class ReportsService {
       status: isAutoVerified ? "verified" : "pending",
       priority: dto.reportType === "drain" ? "Cống tắc" : "Trục đường chính",
       coordinates: dto.coordinates || `${lat.toFixed(4)}, ${lng.toFixed(4)}`,
-      historyCount: 1,
+      historyCount,
       visual,
       photoUrl: dto.photoUrl,
       reporterId: dto.reporterId,
       aiSummary,
       recommendation,
+      estimatedDurationMin,
+      estimatedClearAt,
+      drainageRateCmPerMin: drainageRate,
     });
 
     const saved = await this.reportRepo.save(report);
@@ -240,18 +342,55 @@ export class ReportsService {
       y: 50,
       lat,
       lng,
-      elevationM: 2.5,
+      elevationM,
       // Điểm ngập được tự động hiển thị trực tiếp lên bản đồ cộng đồng khi đã xác nhận
       type: isAutoVerified ? "flood" : "pending",
       severity: normalizedSeverity,
       label: location,
       district,
-      rainfall: 0,
+      rainfall: currentRain,
       depth: reportedDepth,
-      historyCount: 1,
+      historyCount,
+      estimatedDurationMin,
+      estimatedClearAt,
+      drainageRateCmPerMin: drainageRate,
       linkedReportId: saved.id,
     });
     const savedPoint = await this.mapPointRepo.save(newPoint);
+
+    // Tự động tạo và phát cảnh báo khẩn cấp đến toàn cộng đồng (Area Alert)
+    let savedAlert: AreaAlertEntity | null = null;
+    try {
+      const alertCount = await this.alertRepo.count();
+      const alertId = `AL-0${190 + alertCount}`;
+      const startHourMin = `${String(now.getHours()).padStart(2, "0")}:${String(
+        now.getMinutes(),
+      ).padStart(2, "0")}`;
+      const endHourMin = `${clearHourStr}:${clearMinStr}`;
+
+      const alertLevel =
+        normalizedSeverity === "critical"
+          ? "Nghiêm trọng"
+          : detectedSeverity === "high" || detectedSeverity === "medium"
+            ? "Cảnh báo"
+            : "Theo dõi";
+
+      const newAlert = this.alertRepo.create({
+        id: alertId,
+        area: `${location}, ${district}`,
+        level: alertLevel,
+        hazardType:
+          dto.reportType === "drain" ? "Cống tắc nghẽn" : "Ngập úng mặt đường",
+        title: `Cảnh báo ngập: ${location}`,
+        message: `Mực nước quan trắc ~${reportedDepth} cm. Lượng mưa hiện tại: ${currentRain} mm. Lịch sử ghi nhận ${historyCount} lần ngập. Dự kiến nước rút hoàn toàn sau ~${estimatedDurationMin} phút (khoảng ${endHourMin}).`,
+        startedAt: startHourMin,
+        expiresAt: endHourMin,
+        status: "active",
+      });
+      savedAlert = await this.alertRepo.save(newAlert);
+    } catch {
+      // Safe fallback if alert table insert fails
+    }
 
     // Tự động ghi nhận đóng góp tích cực cho người dân
     if (dto.reporterId) {
@@ -269,7 +408,11 @@ export class ReportsService {
     this.realtimeService?.broadcast("report.created", {
       report: saved,
       mapPoint: savedPoint,
+      alert: savedAlert,
     });
+    if (savedAlert) {
+      this.realtimeService?.broadcast("alert.created", savedAlert);
+    }
     this.realtimeService?.broadcast("report.approved", {
       report: saved,
       updatedMapPoint: savedPoint,
