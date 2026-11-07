@@ -1,15 +1,15 @@
 import { useMemo } from "react"
-import { Bell, Droplets, Sparkles, TriangleAlert } from "lucide-react"
+import { Droplets, Sparkles, TriangleAlert, Users } from "lucide-react"
 import Button from "@/components/ui/Button"
 import FloodStatusHero from "@/components/overview/FloodStatusHero"
 import MetricCard from "@/components/overview/MetricCard"
 import TrendChart from "@/components/overview/TrendChart"
 import OperationsMap from "@/components/map/OperationsMap"
 import ReportQueue from "@/components/reports/ReportQueue"
-import AlertTable from "@/components/alerts/AlertTable"
 import SectionHeader from "@/components/ui/SectionHeader"
+import { topContributors } from "@/lib/analytics"
 import type {
-  AreaAlert,
+  CommunityUser,
   FloodReport,
   MapLayer,
   MapPoint,
@@ -21,7 +21,7 @@ import type {
 
 function OverviewPage({
   reports,
-  alerts,
+  users = [],
   points,
   trendsData,
   weather,
@@ -35,11 +35,9 @@ function OverviewPage({
   setTrendRange,
   onNavigate,
   onReview,
-  onEditAlert,
-  onEndAlert,
 }: {
   reports: FloodReport[]
-  alerts: AreaAlert[]
+  users?: CommunityUser[]
   points: MapPoint[]
   trendsData: TrendsMap
   weather?: WeatherSnapshot | null
@@ -53,23 +51,21 @@ function OverviewPage({
   setTrendRange: (range: keyof TrendsMap) => void
   onNavigate: (page: Page) => void
   onReview: (report: FloodReport) => void
-  onEditAlert: (alert: AreaAlert) => void
-  onEndAlert: (alert: AreaAlert) => void
 }) {
   const verifiedCount = reports.filter(
     (report) => report.status === "verified",
   ).length
-  const activeAlerts = alerts.filter((alert) => alert.status === "active")
   const highRiskCount = points.filter(
     (point) => point.severity !== "medium",
   ).length
   const criticalPointsCount = points.filter(
     (point) => point.severity === "critical",
   ).length
-  const alertAreasCount = new Set(activeAlerts.map((a) => a.area)).size
   const totalReports = reports.filter(
     (report) => report.status !== "rejected",
   ).length
+  const activeUsersCount = users.filter((u) => u.status === "active").length
+  const contributors = useMemo(() => topContributors(users, 4), [users])
 
   const trendReports = trendsData?.[trendRange]?.reports?.length
     ? trendsData[trendRange].reports
@@ -118,25 +114,26 @@ function OverviewPage({
         ),
       },
       {
-        icon: <Bell size={20} />,
+        icon: <Users size={20} />,
         tone: "teal",
-        value: activeAlerts.length,
-        label: "Cảnh báo đang phát",
+        value: users.length,
+        label: "Thành viên cộng đồng",
         meta: (
           <>
-            {activeAlerts.length > 0
-              ? `Phủ ${alertAreasCount} khu vực ảnh hưởng`
+            <span className="urgent-dot" style={{ background: "#10b981" }} />{" "}
+            {activeUsersCount > 0
+              ? `${activeUsersCount} tài khoản hoạt động`
               : "Hệ thống an toàn"}
           </>
         ),
       },
     ],
     [
-      activeAlerts.length,
-      alertAreasCount,
+      activeUsersCount,
       criticalPointsCount,
       highRiskCount,
       trendReports,
+      users.length,
       verifiedCount,
       totalReports,
     ],
@@ -145,8 +142,7 @@ function OverviewPage({
   return (
     <div className="page-stack">
       <FloodStatusHero
-        activeAlertCount={activeAlerts.length}
-        onViewAlerts={() => onNavigate("reports")}
+        onViewReports={() => onNavigate("reports")}
         onViewMap={() => onNavigate("map")}
         pendingCount={verifiedCount}
         weather={weather}
@@ -183,22 +179,34 @@ function OverviewPage({
           setSeverityFilter={setSeverityFilter}
           severityFilter={severityFilter}
         />
-        <section className="panel overview-alerts">
+        <section className="panel contributors-panel" style={{ margin: 0 }}>
           <SectionHeader
             action={
-              <Button variant="ghost" onClick={() => onNavigate("reports")}>
+              <Button variant="ghost" onClick={() => onNavigate("users")}>
                 Xem tất cả <span>→</span>
               </Button>
             }
-            description="Đang phát tới người dân trong khu vực"
-            title="Cảnh báo đang hoạt động"
+            description="Thành viên tích cực báo cáo và hỗ trợ thẩm định ngập"
+            title="Đóng góp cộng đồng nổi bật"
           />
-          <AlertTable
-            alerts={activeAlerts}
-            limit={2}
-            onEdit={onEditAlert}
-            onEnd={onEndAlert}
-          />
+          <div className="contributor-list">
+            {contributors.map((user, index) => (
+              <div className="contributor-row" key={user.id}>
+                <span className="rank">{index + 1}</span>
+                <span className="table-avatar">{user.initials}</span>
+                <div className="contributor-info">
+                  <strong>{user.name}</strong>
+                  <span>
+                    {user.district} · {user.verifiedReports}/{user.reports} báo cáo đã xác minh
+                  </span>
+                </div>
+                <div className="contributor-score">
+                  <strong>{user.trustScore}</strong>
+                  <span>điểm tin cậy</span>
+                </div>
+              </div>
+            ))}
+          </div>
         </section>
       </div>
     </div>
