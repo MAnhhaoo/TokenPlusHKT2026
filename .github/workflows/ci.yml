@@ -100,16 +100,25 @@ jobs:
           has_source_files() {
             git ls-files "$1" | grep -qvE '(^|/)\.gitkeep$'
           }
+          has_changed_source() {
+            local directory="$1"
+            while IFS= read -r file; do
+              if [[ "$file" == "$directory/"* && "${file##*/}" != .gitkeep ]]; then
+                return 0
+              fi
+            done <<<"$changed_files"
+            return 1
+          }
 
           backend=false
           user=false
           admin=false
           ml=false
 
-          if grep -qE '^BE/.+' <<<"$changed_files" && grep -qvE '^BE/.*/?\.gitkeep$|^BE/\.gitkeep$' <<<"$changed_files"; then backend=true; fi
-          if grep -qE '^FE/user/.+' <<<"$changed_files" && grep -qvE '^FE/user/.*/?\.gitkeep$' <<<"$changed_files"; then user=true; fi
-          if grep -qE '^FE/admin/.+' <<<"$changed_files" && grep -qvE '^FE/admin/.*/?\.gitkeep$' <<<"$changed_files"; then admin=true; fi
-          if grep -qE '^ML/.+' <<<"$changed_files" && grep -qvE '^ML/.*/?\.gitkeep$|^ML/\.gitkeep$' <<<"$changed_files"; then ml=true; fi
+          has_changed_source BE && backend=true || true
+          has_changed_source FE/user && user=true || true
+          has_changed_source FE/admin && admin=true || true
+          has_changed_source ML && ml=true || true
 
           # A shared pnpm manifest or lockfile affects every migrated Node package.
           if grep -Eq '^(package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml)$' <<<"$changed_files"; then
@@ -141,8 +150,12 @@ jobs:
             echo "node_components=$node_json"
           } >> "$GITHUB_OUTPUT"
 
-          printf '{"backend":%s,"user":%s,"admin":%s,"ml":%s,"any_application":%s}\n' \
-            "$backend" "$user" "$admin" "$ml" "$any_application" > "$RUNNER_TEMP/ci-scope.json"
+          pr_number=0
+          if [[ "$GITHUB_EVENT_NAME" == pull_request ]]; then
+            pr_number="$(jq -r '.pull_request.number' "$GITHUB_EVENT_PATH")"
+          fi
+          printf '{"backend":%s,"user":%s,"admin":%s,"ml":%s,"any_application":%s,"pr_number":%s}\n' \
+            "$backend" "$user" "$admin" "$ml" "$any_application" "$pr_number" > "$RUNNER_TEMP/ci-scope.json"
 
       - name: Upload CI scope for trusted preview workflow
         if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && vars.GCP_PREVIEW_ENABLED == 'true'

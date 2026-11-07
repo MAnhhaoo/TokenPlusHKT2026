@@ -34,6 +34,7 @@
 - Create `.github/workflows/ci.yml` for PR checks and reusable full validation.
 - Create `.github/workflows/deploy.yml` to publish trusted Firebase PR previews, call full validation on `master`/release, then deploy staging and release-gated production.
 - Create `firebase.json` for the two Hosting targets and their build directories.
+- Create `.gitignore` entries for generated Workload Identity credential files and environment-specific Firebase mappings.
 - Create `docs/deployment/google-cloud-cicd.md` for Google Cloud, GitHub Environment, WIF, Firebase target, and activation setup.
 
 ### Task 1: CI for Migrated Packages
@@ -64,7 +65,8 @@
 
 - [ ] Define Firebase Hosting targets `user` and `admin` with public directories `FE/user/dist` and `FE/admin/dist`.
 - [ ] Configure staging after successful reusable CI on merge to `master`, production on a published release after staging and the protected environment gate, and Firebase PR preview from the trusted deploy workflow after CI succeeds.
-- [ ] Authenticate with `google-github-actions/auth@v3` and Workload Identity Federation; grant only `contents: read` and `id-token: write` to deploy jobs.
+- [ ] Pass only PR number and changed-frontend booleans plus static build artifacts from same-repository PR checks; do not give PR jobs OIDC access or execute downloaded artifact contents in the trusted workflow.
+- [ ] Authenticate with `google-github-actions/auth@v3` and Workload Identity Federation; grant `contents: read` and `id-token: write` to deploy jobs, with `actions: read` only on the trusted preview jobs that download CI artifacts.
 - [ ] Deploy the API to Cloud Run from `BE/`; deploy ML only when a serving entrypoint exists. Do not deploy training notebooks or datasets.
 - [ ] Document the required Google APIs, WIF provider/service-account roles, GitHub Environment variables, Firebase site targets, and the manual owner-side environment protection step.
 - [ ] Validate workflow YAML with `actionlint`, parse `firebase.json`, inspect permission scopes, and confirm deployment cannot run from fork PRs.

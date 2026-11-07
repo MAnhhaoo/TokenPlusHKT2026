@@ -1,0 +1,651 @@
+name: Deploy
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'BE/**'
+      - 'FE/user/**'
+      - 'FE/admin/**'
+      - 'ML/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - 'firebase.json'
+  release:
+    types: [published]
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-${{ github.event.workflow_run.id || github.event.release.tag_name || github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  preview-scope:
+    name: Check preview artifact scope
+    if: >-
+      github.event_name == 'workflow_run' &&
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_repository.full_name == github.repository &&
+      vars.GCP_PREVIEW_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+    outputs:
+      user: ${{ steps.scope.outputs.user }}
+      admin: ${{ steps.scope.outputs.admin }}
+      pr_number: ${{ steps.scope.outputs.pr_number }}
+    steps:
+      - name: Download the CI scope artifact
+        uses: actions/download-artifact@v8.0.2
+        with:
+          name: ci-scope
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: ${{ runner.temp }}/ci-scope
+
+      - name: Read changed frontend targets
+        id: scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          scope_file="$RUNNER_TEMP/ci-scope/ci-scope.json"
+          [[ -f "$scope_file" ]] || { echo 'CI scope artifact is missing.' >&2; exit 1; }
+          echo "user=$(jq -r '.user' "$scope_file")" >> "$GITHUB_OUTPUT"
+          echo "admin=$(jq -r '.admin' "$scope_file")" >> "$GITHUB_OUTPUT"
+          echo "pr_number=$(jq -r '.pr_number' "$scope_file")" >> "$GITHUB_OUTPUT"
+
+  firebase-preview:
+    name: Firebase Hosting PR preview
+    needs: preview-scope
+    if: >-
+      needs.preview-scope.result == 'success' &&
+      (needs.preview-scope.outputs.user == 'true' || needs.preview-scope.outputs.admin == 'true')
+    runs-on: ubuntu-latest
+    environment: preview
+    permissions:
+      actions: read
+      contents: read
+      id-token: write
+    env:
+      GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+      GCP_WORKLOAD_IDENTITY_PROVIDER: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+      GCP_DEPLOY_SERVICE_ACCOUNT: ${{ vars.GCP_DEPLOY_SERVICE_ACCOUNT }}
+      FIREBASE_PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
+      FIREBASE_USER_SITE_ID: ${{ vars.FIREBASE_USER_SITE_ID }}
+      FIREBASE_ADMIN_SITE_ID: ${{ vars.FIREBASE_ADMIN_SITE_ID }}
+    steps:
+      - name: Checkout trusted Hosting configuration
+        uses: actions/checkout@v7
+        with:
+          ref: master
+          persist-credentials: false
+
+      - name: Download static frontend artifacts from CI
+        uses: actions/download-artifact@v8.0.2
+        with:
+          pattern: hosting-*
+          merge-multiple: false
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: ${{ runner.temp }}/hosting-artifacts
+
+      - name: Place artifacts in trusted Hosting directories
+        id: artifacts
+        shell: bash
+        env:
+          USER_CHANGED: ${{ needs.preview-scope.outputs.user }}
+          ADMIN_CHANGED: ${{ needs.preview-scope.outputs.admin }}
+        run: |
+          set -euo pipefail
+          artifact_root="$RUNNER_TEMP/hosting-artifacts"
+          targets=()
+          if [[ "$USER_CHANGED" == true ]]; then
+            [[ -d "$artifact_root/hosting-user" ]] || { echo 'User frontend artifact is missing.' >&2; exit 1; }
+            mkdir -p FE/user/dist
+            cp -R "$artifact_root/hosting-user/." FE/user/dist/
+            targets+=(user)
+          fi
+          if [[ "$ADMIN_CHANGED" == true ]]; then
+            [[ -d "$artifact_root/hosting-admin" ]] || { echo 'Admin frontend artifact is missing.' >&2; exit 1; }
+            mkdir -p FE/admin/dist
+            cp -R "$artifact_root/hosting-admin/." FE/admin/dist/
+            targets+=(admin)
+          fi
+          [[ ${#targets[@]} -gt 0 ]] || { echo 'No changed frontend artifact was found.' >&2; exit 1; }
+          printf 'targets=%s\n' "$(IFS=,; echo "${targets[*]}")" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Node.js for Firebase CLI
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24.22.2
+
+      - name: Install Firebase CLI
+        run: npm install --global firebase-tools@15.34.2
+
+      - name: Authenticate to Google Cloud with Workload Identity Federation
+        uses: google-github-actions/auth@v3
+        with:
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SERVICE_ACCOUNT }}
+
+      - name: Deploy changed Hosting targets to a preview channel
+        shell: bash
+        env:
+          TARGETS: ${{ steps.artifacts.outputs.targets }}
+          PR_NUMBER: ${{ needs.preview-scope.outputs.pr_number }}
+        run: |
+          set -euo pipefail
+          [[ -n "$GCP_PROJECT_ID" && -n "$GCP_WORKLOAD_IDENTITY_PROVIDER" && -n "$GCP_DEPLOY_SERVICE_ACCOUNT" ]] || { echo 'Preview Google Cloud WIF variables are incomplete.' >&2; exit 1; }
+          [[ -n "$FIREBASE_PROJECT_ID" ]] || { echo 'FIREBASE_PROJECT_ID is required in the preview environment.' >&2; exit 1; }
+          only=()
+          IFS=',' read -ra targets <<< "$TARGETS"
+          for target in "${targets[@]}"; do
+            case "$target" in
+              user)
+                [[ -n "$FIREBASE_USER_SITE_ID" ]] || { echo 'FIREBASE_USER_SITE_ID is required for a user preview.' >&2; exit 1; }
+                firebase target:apply hosting user "$FIREBASE_USER_SITE_ID" --project "$FIREBASE_PROJECT_ID"
+                only+=(user)
+                ;;
+              admin)
+                [[ -n "$FIREBASE_ADMIN_SITE_ID" ]] || { echo 'FIREBASE_ADMIN_SITE_ID is required for an admin preview.' >&2; exit 1; }
+                firebase target:apply hosting admin "$FIREBASE_ADMIN_SITE_ID" --project "$FIREBASE_PROJECT_ID"
+                only+=(admin)
+                ;;
+              *) echo "Unexpected Firebase target: $target" >&2; exit 1 ;;
+            esac
+          done
+          firebase hosting:channel:deploy "pr-${PR_NUMBER}" --project "$FIREBASE_PROJECT_ID" --only "$(IFS=,; echo "${only[*]}")" --expires 7d --non-interactive
+
+  deployment-scope:
+    name: Detect deployable changes
+    if: github.event_name == 'push' || github.event_name == 'release'
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.detect.outputs.backend }}
+      user: ${{ steps.detect.outputs.user }}
+      admin: ${{ steps.detect.outputs.admin }}
+      ml: ${{ steps.detect.outputs.ml }}
+      ml_serving: ${{ steps.detect.outputs.ml_serving }}
+      any_application: ${{ steps.detect.outputs.any_application }}
+      any_deployable: ${{ steps.detect.outputs.any_deployable }}
+    steps:
+      - name: Checkout repository history
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Identify changed deployable packages
+        id: detect
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$GITHUB_EVENT_NAME" == release ]]; then
+            changed_files="$(git ls-files | grep -vE '(^|/)\.gitkeep$' || true)"
+          else
+            base="$(jq -r '.before' "$GITHUB_EVENT_PATH")"
+            if [[ "$base" =~ ^0+$ ]]; then
+              changed_files="$(git ls-files | grep -vE '(^|/)\.gitkeep$' || true)"
+            else
+              changed_files="$(git diff --name-only "$base" "$GITHUB_SHA")"
+            fi
+          fi
+
+          has_source_files() {
+            git ls-files "$1" | grep -qvE '(^|/)\.gitkeep$'
+          }
+          has_changed_source() {
+            local directory="$1"
+            while IFS= read -r file; do
+              if [[ "$file" == "$directory/"* && "${file##*/}" != .gitkeep ]]; then
+                return 0
+              fi
+            done <<<"$changed_files"
+            return 1
+          }
+          backend=false
+          user=false
+          admin=false
+          ml=false
+
+          has_changed_source BE && backend=true || true
+          has_changed_source FE/user && user=true || true
+          has_changed_source FE/admin && admin=true || true
+          has_changed_source ML && ml=true || true
+
+          if grep -Eq '^(package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml)$' <<<"$changed_files"; then
+            has_source_files BE && backend=true || true
+            has_source_files FE/user && user=true || true
+            has_source_files FE/admin && admin=true || true
+          fi
+          if grep -qx 'firebase.json' <<<"$changed_files"; then
+            [[ -f FE/user/package.json ]] && user=true || true
+            [[ -f FE/admin/package.json ]] && admin=true || true
+          fi
+
+          ml_serving=false
+          if [[ "$ml" == true && -f ML/serving/Dockerfile ]]; then ml_serving=true; fi
+          any_application=false
+          any_deployable=false
+          [[ "$backend" == true || "$user" == true || "$admin" == true || "$ml" == true ]] && any_application=true
+          [[ "$backend" == true || "$user" == true || "$admin" == true || "$ml_serving" == true ]] && any_deployable=true
+
+          {
+            echo "backend=$backend"
+            echo "user=$user"
+            echo "admin=$admin"
+            echo "ml=$ml"
+            echo "ml_serving=$ml_serving"
+            echo "any_application=$any_application"
+            echo "any_deployable=$any_deployable"
+          } >> "$GITHUB_OUTPUT"
+
+  validate:
+    name: Validate migrated packages
+    if: github.event_name == 'push' || github.event_name == 'release'
+    needs: deployment-scope
+    permissions:
+      contents: read
+    uses: ./.github/workflows/ci.yml
+    with:
+      full_validation: true
+
+  deploy-status:
+    name: Deploy not configured or no deployable code
+    if: >-
+      (github.event_name == 'push' || github.event_name == 'release') &&
+      needs.deployment-scope.result == 'success' &&
+      needs.validate.result == 'success' &&
+      (needs.validate.outputs.any_application != 'true' ||
+       needs.deployment-scope.outputs.any_application != 'true' ||
+       needs.deployment-scope.outputs.any_deployable != 'true' ||
+       vars.GCP_DEPLOY_STAGING != 'true')
+    runs-on: ubuntu-latest
+    needs: [deployment-scope, validate]
+    steps:
+      - name: Explain why nothing was deployed
+        env:
+          CI_HAS_APPLICATION: ${{ needs.validate.outputs.any_application }}
+          CHANGED_APPLICATION: ${{ needs.deployment-scope.outputs.any_application }}
+          DEPLOYABLE: ${{ needs.deployment-scope.outputs.any_deployable }}
+          STAGING_ENABLED: ${{ vars.GCP_DEPLOY_STAGING }}
+        run: |
+          {
+            echo '## Deployment status'
+            if [[ "$CI_HAS_APPLICATION" != true || "$CHANGED_APPLICATION" != true ]]; then
+              echo 'No migrated application source was available for this revision. CI did not claim application checks passed, and no deployment ran.'
+            elif [[ "$DEPLOYABLE" != true ]]; then
+              echo 'The changed ML package has no ML/serving/Dockerfile HTTP serving entrypoint. Training code, notebooks, and datasets were not deployed.'
+            elif [[ "$STAGING_ENABLED" != true ]]; then
+              echo 'GCP_DEPLOY_STAGING is not set to true. CI completed, but staging and production deployment were not configured.'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo 'No deployment job ran for this revision.'
+
+  deploy-staging:
+    name: Deploy staging
+    if: >-
+      (github.event_name == 'push' || github.event_name == 'release') &&
+      needs.deployment-scope.result == 'success' &&
+      needs.validate.result == 'success' &&
+      needs.validate.outputs.any_application == 'true' &&
+      needs.deployment-scope.outputs.any_deployable == 'true' &&
+      vars.GCP_DEPLOY_STAGING == 'true'
+    runs-on: ubuntu-latest
+    environment: staging
+    permissions:
+      contents: read
+      id-token: write
+    needs: [deployment-scope, validate]
+    env:
+      GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+      GCP_REGION: ${{ vars.GCP_REGION }}
+      GCP_WORKLOAD_IDENTITY_PROVIDER: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+      GCP_DEPLOY_SERVICE_ACCOUNT: ${{ vars.GCP_DEPLOY_SERVICE_ACCOUNT }}
+      GCP_RUNTIME_SERVICE_ACCOUNT: ${{ vars.GCP_RUNTIME_SERVICE_ACCOUNT }}
+      GCP_API_PUBLIC: ${{ vars.GCP_API_PUBLIC }}
+      VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
+      FIREBASE_PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
+      FIREBASE_USER_SITE_ID: ${{ vars.FIREBASE_USER_SITE_ID }}
+      FIREBASE_ADMIN_SITE_ID: ${{ vars.FIREBASE_ADMIN_SITE_ID }}
+    steps:
+      - name: Checkout exact validated revision
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Validate Google Cloud deployment variables
+        shell: bash
+        env:
+          BACKEND_CHANGED: ${{ needs.deployment-scope.outputs.backend }}
+          USER_CHANGED: ${{ needs.deployment-scope.outputs.user }}
+          ADMIN_CHANGED: ${{ needs.deployment-scope.outputs.admin }}
+          ML_SERVING: ${{ needs.deployment-scope.outputs.ml_serving }}
+        run: |
+          set -euo pipefail
+          required=(GCP_PROJECT_ID GCP_REGION GCP_WORKLOAD_IDENTITY_PROVIDER GCP_DEPLOY_SERVICE_ACCOUNT)
+          if [[ "$BACKEND_CHANGED" == true || "$ML_SERVING" == true ]]; then
+            required+=(GCP_RUNTIME_SERVICE_ACCOUNT)
+          fi
+          if [[ "$USER_CHANGED" == true || "$ADMIN_CHANGED" == true ]]; then
+            required+=(FIREBASE_PROJECT_ID)
+          fi
+          if [[ "$USER_CHANGED" == true ]]; then required+=(FIREBASE_USER_SITE_ID); fi
+          if [[ "$ADMIN_CHANGED" == true ]]; then required+=(FIREBASE_ADMIN_SITE_ID); fi
+          for name in "${required[@]}"; do
+            if [[ -z "${!name:-}" ]]; then
+              echo "::error title=Staging not configured::$name is required in the staging GitHub Environment."
+              exit 1
+            fi
+          done
+
+      - name: Authenticate to Google Cloud with Workload Identity Federation
+        uses: google-github-actions/auth@v3
+        with:
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SERVICE_ACCOUNT }}
+
+      - name: Deploy API to Cloud Run from BE
+        id: deploy_api
+        if: needs.deployment-scope.outputs.backend == 'true'
+        uses: google-github-actions/deploy-cloudrun@v3
+        with:
+          service: ${{ vars.CLOUD_RUN_API_SERVICE || 'saigondrain-api' }}
+          source: ./BE
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+          region: ${{ vars.GCP_REGION }}
+          flags: >-
+            --service-account=${{ vars.GCP_RUNTIME_SERVICE_ACCOUNT }}
+            --${{ vars.GCP_API_PUBLIC == 'true' && 'allow-unauthenticated' || 'no-allow-unauthenticated' }}
+
+      - name: Deploy serving ML service to Cloud Run
+        if: needs.deployment-scope.outputs.ml_serving == 'true'
+        uses: google-github-actions/deploy-cloudrun@v3
+        with:
+          service: ${{ vars.CLOUD_RUN_ML_SERVICE || 'saigondrain-ml' }}
+          source: ./ML/serving
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+          region: ${{ vars.GCP_REGION }}
+          flags: --service-account=${{ vars.GCP_RUNTIME_SERVICE_ACCOUNT }}
+
+      - name: Report training-only ML package
+        if: needs.deployment-scope.outputs.ml == 'true' && needs.deployment-scope.outputs.ml_serving != 'true'
+        run: echo 'ML package contains no ML/serving/Dockerfile entrypoint; training code was not deployed.' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Setup Node.js for frontend build
+        if: needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true'
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22.23.4
+
+      - name: Setup pnpm for frontend build
+        if: needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true'
+        uses: pnpm/action-setup@v6.1.0
+        with:
+          version: 12.15.0
+          cache: true
+          cache_dependency_path: pnpm-lock.yaml
+
+      - name: Install locked frontend dependencies
+        if: needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true'
+        run: pnpm install --frozen-lockfile
+
+      - name: Export API URL for Vite
+        if: needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true'
+        shell: bash
+        env:
+          DEPLOYED_API_URL: ${{ steps.deploy_api.outputs.url }}
+          CONFIGURED_API_URL: ${{ vars.VITE_API_BASE_URL }}
+        run: |
+          set -euo pipefail
+          api_url="$DEPLOYED_API_URL"
+          if [[ -z "$api_url" ]]; then api_url="$CONFIGURED_API_URL"; fi
+          if [[ -z "$api_url" ]]; then
+            echo '::error title=Vite API URL missing::Deploy the API first or set VITE_API_BASE_URL in the staging GitHub Environment.'
+            exit 1
+          fi
+          echo "VITE_API_BASE_URL=$api_url" >> "$GITHUB_ENV"
+
+      - name: Build user frontend
+        if: needs.deployment-scope.outputs.user == 'true'
+        working-directory: FE/user
+        run: pnpm run build
+
+      - name: Build admin frontend
+        if: needs.deployment-scope.outputs.admin == 'true'
+        working-directory: FE/admin
+        run: pnpm run build
+
+      - name: Setup Node.js for Firebase CLI
+        if: needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true'
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24.22.2
+
+      - name: Install Firebase CLI
+        if: needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true'
+        run: npm install --global firebase-tools@15.34.2
+
+      - name: Deploy changed Firebase Hosting sites
+        if: needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true'
+        shell: bash
+        env:
+          USER_CHANGED: ${{ needs.deployment-scope.outputs.user }}
+          ADMIN_CHANGED: ${{ needs.deployment-scope.outputs.admin }}
+        run: |
+          set -euo pipefail
+          targets=()
+          if [[ "$USER_CHANGED" == true ]]; then
+            firebase target:apply hosting user "$FIREBASE_USER_SITE_ID" --project "$FIREBASE_PROJECT_ID"
+            targets+=(hosting:user)
+          fi
+          if [[ "$ADMIN_CHANGED" == true ]]; then
+            firebase target:apply hosting admin "$FIREBASE_ADMIN_SITE_ID" --project "$FIREBASE_PROJECT_ID"
+            targets+=(hosting:admin)
+          fi
+          firebase deploy --project "$FIREBASE_PROJECT_ID" --only "$(IFS=,; echo "${targets[*]}")" --non-interactive
+
+      - name: Verify live Firebase Hosting roots
+        if: needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true'
+        shell: bash
+        env:
+          USER_CHANGED: ${{ needs.deployment-scope.outputs.user }}
+          ADMIN_CHANGED: ${{ needs.deployment-scope.outputs.admin }}
+        run: |
+          set -euo pipefail
+          if [[ "$USER_CHANGED" == true ]]; then curl --fail --silent --show-error --retry 3 "https://${FIREBASE_USER_SITE_ID}.web.app/" >/dev/null; fi
+          if [[ "$ADMIN_CHANGED" == true ]]; then curl --fail --silent --show-error --retry 3 "https://${FIREBASE_ADMIN_SITE_ID}.web.app/" >/dev/null; fi
+
+      - name: Summarize staging deployment
+        run: echo 'Staging deploy steps completed for the changed, migrated services.' >> "$GITHUB_STEP_SUMMARY"
+
+  production-not-configured:
+    name: Production not configured
+    if: >-
+      github.event_name == 'release' &&
+      needs.deploy-staging.result == 'success' &&
+      vars.GCP_DEPLOY_PRODUCTION != 'true'
+    runs-on: ubuntu-latest
+    needs: [deploy-staging]
+    steps:
+      - run: echo 'Staging completed, but GCP_DEPLOY_PRODUCTION is not set to true. No production deployment ran.' >> "$GITHUB_STEP_SUMMARY"
+
+  deploy-production:
+    name: Deploy production
+    if: >-
+      github.event_name == 'release' &&
+      needs.deploy-staging.result == 'success' &&
+      needs.validate.result == 'success' &&
+      needs.deployment-scope.outputs.any_deployable == 'true' &&
+      vars.GCP_DEPLOY_PRODUCTION == 'true'
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: read
+      id-token: write
+    needs: [deployment-scope, validate, deploy-staging]
+    env:
+      GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+      GCP_REGION: ${{ vars.GCP_REGION }}
+      GCP_WORKLOAD_IDENTITY_PROVIDER: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+      GCP_DEPLOY_SERVICE_ACCOUNT: ${{ vars.GCP_DEPLOY_SERVICE_ACCOUNT }}
+      GCP_RUNTIME_SERVICE_ACCOUNT: ${{ vars.GCP_RUNTIME_SERVICE_ACCOUNT }}
+      GCP_API_PUBLIC: ${{ vars.GCP_API_PUBLIC }}
+      VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
+      FIREBASE_PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
+      FIREBASE_USER_SITE_ID: ${{ vars.FIREBASE_USER_SITE_ID }}
+      FIREBASE_ADMIN_SITE_ID: ${{ vars.FIREBASE_ADMIN_SITE_ID }}
+    steps:
+      - name: Checkout exact validated revision
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Validate Google Cloud deployment variables
+        shell: bash
+        env:
+          BACKEND_CHANGED: ${{ needs.deployment-scope.outputs.backend }}
+          USER_CHANGED: ${{ needs.deployment-scope.outputs.user }}
+          ADMIN_CHANGED: ${{ needs.deployment-scope.outputs.admin }}
+          ML_SERVING: ${{ needs.deployment-scope.outputs.ml_serving }}
+        run: |
+          set -euo pipefail
+          required=(GCP_PROJECT_ID GCP_REGION GCP_WORKLOAD_IDENTITY_PROVIDER GCP_DEPLOY_SERVICE_ACCOUNT)
+          if [[ "$BACKEND_CHANGED" == true || "$ML_SERVING" == true ]]; then required+=(GCP_RUNTIME_SERVICE_ACCOUNT); fi
+          if [[ "$USER_CHANGED" == true || "$ADMIN_CHANGED" == true ]]; then required+=(FIREBASE_PROJECT_ID); fi
+          if [[ "$USER_CHANGED" == true ]]; then required+=(FIREBASE_USER_SITE_ID); fi
+          if [[ "$ADMIN_CHANGED" == true ]]; then required+=(FIREBASE_ADMIN_SITE_ID); fi
+          for name in "${required[@]}"; do
+            if [[ -z "${!name:-}" ]]; then
+              echo "::error title=Production not configured::$name is required in the production GitHub Environment."
+              exit 1
+            fi
+          done
+
+      - name: Authenticate to Google Cloud with Workload Identity Federation
+        uses: google-github-actions/auth@v3
+        with:
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SERVICE_ACCOUNT }}
+
+      - name: Deploy API to Cloud Run from BE
+        id: deploy_api
+        if: needs.deployment-scope.outputs.backend == 'true'
+        uses: google-github-actions/deploy-cloudrun@v3
+        with:
+          service: ${{ vars.CLOUD_RUN_API_SERVICE || 'saigondrain-api' }}
+          source: ./BE
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+          region: ${{ vars.GCP_REGION }}
+          flags: >-
+            --service-account=${{ vars.GCP_RUNTIME_SERVICE_ACCOUNT }}
+            --${{ vars.GCP_API_PUBLIC == 'true' && 'allow-unauthenticated' || 'no-allow-unauthenticated' }}
+
+      - name: Deploy serving ML service to Cloud Run
+        if: needs.deployment-scope.outputs.ml_serving == 'true'
+        uses: google-github-actions/deploy-cloudrun@v3
+        with:
+          service: ${{ vars.CLOUD_RUN_ML_SERVICE || 'saigondrain-ml' }}
+          source: ./ML/serving
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+          region: ${{ vars.GCP_REGION }}
+          flags: --service-account=${{ vars.GCP_RUNTIME_SERVICE_ACCOUNT }}
+
+      - name: Setup Node.js for frontend build
+        if: needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true'
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22.23.4
+
+      - name: Setup pnpm for frontend build
+        if: needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true'
+        uses: pnpm/action-setup@v6.1.0
+        with:
+          version: 12.15.0
+          cache: true
+          cache_dependency_path: pnpm-lock.yaml
+
+      - name: Install locked frontend dependencies
+        if: needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true'
+        run: pnpm install --frozen-lockfile
+
+      - name: Export API URL for Vite
+        if: needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true'
+        shell: bash
+        env:
+          DEPLOYED_API_URL: ${{ steps.deploy_api.outputs.url }}
+          CONFIGURED_API_URL: ${{ vars.VITE_API_BASE_URL }}
+        run: |
+          set -euo pipefail
+          api_url="$DEPLOYED_API_URL"
+          if [[ -z "$api_url" ]]; then api_url="$CONFIGURED_API_URL"; fi
+          if [[ -z "$api_url" ]]; then
+            echo '::error title=Vite API URL missing::Deploy the API first or set VITE_API_BASE_URL in the production GitHub Environment.'
+            exit 1
+          fi
+          echo "VITE_API_BASE_URL=$api_url" >> "$GITHUB_ENV"
+
+      - name: Build user frontend
+        if: needs.deployment-scope.outputs.user == 'true'
+        working-directory: FE/user
+        run: pnpm run build
+
+      - name: Build admin frontend
+        if: needs.deployment-scope.outputs.admin == 'true'
+        working-directory: FE/admin
+        run: pnpm run build
+
+      - name: Setup Node.js for Firebase CLI
+        if: needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true'
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24.22.2
+
+      - name: Install Firebase CLI
+        if: needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true'
+        run: npm install --global firebase-tools@15.34.2
+
+      - name: Deploy changed Firebase Hosting sites
+        if: needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true'
+        shell: bash
+        env:
+          USER_CHANGED: ${{ needs.deployment-scope.outputs.user }}
+          ADMIN_CHANGED: ${{ needs.deployment-scope.outputs.admin }}
+        run: |
+          set -euo pipefail
+          targets=()
+          if [[ "$USER_CHANGED" == true ]]; then
+            firebase target:apply hosting user "$FIREBASE_USER_SITE_ID" --project "$FIREBASE_PROJECT_ID"
+            targets+=(hosting:user)
+          fi
+          if [[ "$ADMIN_CHANGED" == true ]]; then
+            firebase target:apply hosting admin "$FIREBASE_ADMIN_SITE_ID" --project "$FIREBASE_PROJECT_ID"
+            targets+=(hosting:admin)
+          fi
+          firebase deploy --project "$FIREBASE_PROJECT_ID" --only "$(IFS=,; echo "${targets[*]}")" --non-interactive
+
+      - name: Verify live Firebase Hosting roots
+        if: needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true'
+        shell: bash
+        env:
+          USER_CHANGED: ${{ needs.deployment-scope.outputs.user }}
+          ADMIN_CHANGED: ${{ needs.deployment-scope.outputs.admin }}
+        run: |
+          set -euo pipefail
+          if [[ "$USER_CHANGED" == true ]]; then curl --fail --silent --show-error --retry 3 "https://${FIREBASE_USER_SITE_ID}.web.app/" >/dev/null; fi
+          if [[ "$ADMIN_CHANGED" == true ]]; then curl --fail --silent --show-error --retry 3 "https://${FIREBASE_ADMIN_SITE_ID}.web.app/" >/dev/null; fi
+
+      - name: Summarize production deployment
+        run: echo 'Production deploy steps completed for the same source revision that passed CI and staging.' >> "$GITHUB_STEP_SUMMARY"
