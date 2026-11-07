@@ -10,9 +10,11 @@ import { FloodReportEntity } from "../models/flood-report.entity";
 import { MapPointEntity } from "../../map/models/map-point.entity";
 import { CommunityUserEntity } from "../../users/models/community-user.entity";
 import { CreateReportDto } from "../dtos/create-report.dto";
+import { AnalyzeImageDto } from "../dtos/analyze-image.dto";
 import { QueryReportDto } from "../dtos/query-report.dto";
 import { MapService } from "../../map/services/map.service";
 import { RealtimeService } from "../../realtime/services/realtime.service";
+import { GeminiVisionService } from "./gemini-vision.service";
 
 @Injectable()
 export class ReportsService {
@@ -24,8 +26,20 @@ export class ReportsService {
     @InjectRepository(CommunityUserEntity)
     private readonly userRepo: Repository<CommunityUserEntity>,
     private readonly mapService: MapService,
+    private readonly geminiVisionService: GeminiVisionService,
     @Optional() private readonly realtimeService?: RealtimeService,
   ) {}
+
+  /**
+   * Phân tích ảnh hiện trường bằng mô hình Google Gemini 1.5 Flash Vision.
+   */
+  async analyzeImage(dto: AnalyzeImageDto) {
+    return this.geminiVisionService.analyzeImage(
+      dto.image,
+      dto.location,
+      dto.description,
+    );
+  }
 
   /**
    * Thực thi tác vụ ghi dữ liệu báo cáo, bản đồ và người dùng trong cùng một giao dịch (transaction).
@@ -128,10 +142,38 @@ export class ReportsService {
       high: 35,
       critical: 45,
     };
-    const reportedDepth =
+    let reportedDepth =
       dto.reportedDepth ?? depthBySeverity[dto.severity] ?? 24;
-    const aiDepth = Math.max(8, reportedDepth - 2);
-    const aiConfidence = dto.photoUrl ? 93 : 87;
+    let aiDepth = Math.max(8, reportedDepth - 2);
+    let aiConfidence = dto.photoUrl ? 94 : 88;
+    let aiSummary = dto.aiSummary;
+    let recommendation = dto.recommendation;
+    let visual = dto.visual ?? (dto.reportType === "drain" ? "drain" : "street");
+    let detectedSeverity = dto.severity;
+
+    // Tự động phân tích ảnh hiện trường bằng Google Gemini Multimodal nếu có đính kèm ảnh
+    if (dto.photoUrl) {
+      try {
+        const visionResult = await this.geminiVisionService.analyzeImage(
+          dto.photoUrl,
+          location,
+          dto.description,
+        );
+        if (visionResult) {
+          aiDepth = visionResult.estimatedDepthCm;
+          aiConfidence = visionResult.confidence;
+          if (!aiSummary) aiSummary = visionResult.aiSummary;
+          if (!recommendation) recommendation = visionResult.recommendation;
+          visual = visionResult.visual;
+          if (!dto.reportedDepth) reportedDepth = visionResult.estimatedDepthCm;
+          if (!dto.severity || dto.severity === "medium") {
+            detectedSeverity = visionResult.severity;
+          }
+        }
+      } catch {
+        // Safe fallback
+      }
+    }
 
     const now = new Date();
     const timeStr = `${String(now.getHours()).padStart(2, "0")}:${String(
@@ -141,11 +183,11 @@ export class ReportsService {
     ).padStart(2, "0")}/${now.getFullYear()}`;
 
     const normalizedSeverity =
-      dto.severity === "low"
+      detectedSeverity === "low"
         ? "medium"
-        : dto.severity === "high"
+        : detectedSeverity === "high"
           ? "critical"
-          : dto.severity;
+          : detectedSeverity;
 
     const report = this.reportRepo.create({
       id: nextId,
@@ -155,6 +197,7 @@ export class ReportsService {
       minutesAgo: 1,
       description:
         dto.description ||
+        aiSummary ||
         (dto.reportType === "drain"
           ? "Miệng cống bị rác che kín, nước thoát chậm tại hiện trường."
           : "Nước đang dâng trên mặt đường, phương tiện di chuyển chậm."),
@@ -167,9 +210,11 @@ export class ReportsService {
       priority: dto.reportType === "drain" ? "Cống tắc" : "Trục đường chính",
       coordinates: dto.coordinates || `${lat.toFixed(4)}, ${lng.toFixed(4)}`,
       historyCount: 6,
-      visual: dto.visual ?? (dto.reportType === "drain" ? "drain" : "street"),
+      visual,
       photoUrl: dto.photoUrl,
       reporterId: dto.reporterId,
+      aiSummary,
+      recommendation,
     });
 
     const saved = await this.reportRepo.save(report);

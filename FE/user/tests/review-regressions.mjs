@@ -92,7 +92,10 @@ const api = {
   getSavedRoutes: () => [],
   fetchCurrentWeather: async () => null,
   fetchForecastSlots: async () => ({ slots: [{ id: "now", rain: "4.8 mm" }], live: true }),
-  fetchMapPointsApi: async (rain) => { rainfallInputs.push(rain); return points; },
+  fetchMapPointsApi: async (rain) => {
+    rainfallInputs.push(rain);
+    return points;
+  },
   fetchActiveAlertsApi: async () => [],
   subscribeUserRealtime: (callbacks) => {
     realtime = callbacks;
@@ -239,63 +242,119 @@ console.log(
 );
 
 // Route search debounces autocomplete, cancels it, and distinguishes IP from GPS.
-let timerId = 0, selectedOrigin;
-const timers = new Map(), searches = [];
-const search = harness('src/components/journey/RouteSearch.tsx', {
-  '@/lib/api': {
-    matchDynamicPlacePool: () => [],
-    reverseGeocodeApi: async () => ({ location: 'Synthetic street', district: 'Test district' }),
-    searchPlacesApi: async (...args) => { searches.push(args); return []; },
+let timerId = 0,
+  selectedOrigin;
+const timers = new Map(),
+  searches = [];
+const search = harness(
+  "src/components/journey/RouteSearch.tsx",
+  {
+    "@/lib/api": {
+      matchDynamicPlacePool: () => [],
+      reverseGeocodeApi: async () => ({ location: "Synthetic street", district: "Test district" }),
+      searchPlacesApi: async (...args) => {
+        searches.push(args);
+        return [];
+      },
+    },
+    "@/lib/location": {
+      getUserLocation: async () => ({ latitude: 10.7, longitude: 106.7, isIpFallback: true }),
+    },
   },
-  '@/lib/location': { getUserLocation: async () => ({ latitude: 10.7, longitude: 106.7, isIpFallback: true }) },
-}, {
-  AbortController,
-  document: { addEventListener() {}, removeEventListener() {} },
-  window: {
-    setTimeout(fn, delay) { timers.set(++timerId, { fn, delay }); return timerId; },
-    clearTimeout(id) { timers.delete(id); },
+  {
+    AbortController,
+    document: { addEventListener() {}, removeEventListener() {} },
+    window: {
+      setTimeout(fn, delay) {
+        timers.set(++timerId, { fn, delay });
+        return timerId;
+      },
+      clearTimeout(id) {
+        timers.delete(id);
+      },
+    },
   },
-});
-const searchProps = { origin: null, destination: null, onSelectOrigin(p) { selectedOrigin = p; }, onSelectDestination() {}, onSwap() {} };
-tree = search.render(searchProps); search.effects();
-let input = find(tree, n => n.type === 'input');
-input.props.onFocus(); input.props.onChange({ target: { value: 'synthetic query' } });
-tree = search.render(searchProps); search.effects();
+);
+const searchProps = {
+  origin: null,
+  destination: null,
+  onSelectOrigin(p) {
+    selectedOrigin = p;
+  },
+  onSelectDestination() {},
+  onSwap() {},
+};
+tree = search.render(searchProps);
+search.effects();
+let input = find(tree, (n) => n.type === "input");
+input.props.onFocus();
+input.props.onChange({ target: { value: "synthetic query" } });
+tree = search.render(searchProps);
+search.effects();
 const timer = [...timers.values()].at(-1);
 assert.ok(timer.delay >= 300);
 await timer.fn();
 assert.equal(searches[0][2].allowNominatim, false);
-input = find(tree, n => n.type === 'input');
-input.props.onChange({ target: { value: 'new query' } });
-tree = search.render(searchProps); search.effects();
+input = find(tree, (n) => n.type === "input");
+input.props.onChange({ target: { value: "new query" } });
+tree = search.render(searchProps);
+search.effects();
 assert.equal(searches[0][1].aborted, true);
-input = find(tree, n => n.type === 'input');
-input.props.onChange({ target: { value: '' } });
-tree = search.render(searchProps); search.effects();
-await find(tree, n => n.type === 'button' && n.props.onClick?.name === 'handleGetOriginGps').props.onClick();
+input = find(tree, (n) => n.type === "input");
+input.props.onChange({ target: { value: "" } });
+tree = search.render(searchProps);
+search.effects();
+await find(
+  tree,
+  (n) => n.type === "button" && n.props.onClick?.name === "handleGetOriginGps",
+).props.onClick();
 assert.equal(selectedOrigin.isCurrentLocation, false);
-assert.ok(selectedOrigin.label.startsWith('Vị trí gần đúng'));
+assert.ok(selectedOrigin.label.startsWith("Vị trí gần đúng"));
 search.unmount();
 
 // Run the native watch registration/cleanup blocks with a delayed Capacitor promise.
-const mapSource = readFileSync(resolve(root, 'src/components/map/MapCanvas.tsx'), 'utf8');
-const registration = mapSource.slice(mapSource.lastIndexOf('    if (isUsingRealGps) {'), mapSource.indexOf('    // Hiển thị vị trí ban đầu'));
-const cleanupStart = mapSource.indexOf('    return () => {\n      watchActive = false;');
-const cleanup = mapSource.slice(cleanupStart, mapSource.indexOf('\n  }, [', cleanupStart));
+const mapSource = readFileSync(resolve(root, "src/components/map/MapCanvas.tsx"), "utf8");
+const registration = mapSource.slice(
+  mapSource.lastIndexOf("    if (isUsingRealGps) {"),
+  mapSource.indexOf("    // Hiển thị vị trí ban đầu"),
+);
+const cleanupStart = mapSource.indexOf("    return () => {\n      watchActive = false;");
+const cleanup = mapSource.slice(cleanupStart, mapSource.indexOf("\n  }, [", cleanupStart));
 for (const late of [true, false]) {
   let resolveWatch, callback;
-  const cleared = [], ref = { current: null };
-  const native = { watchPosition(_, cb) { callback = cb; return new Promise(resolve => { resolveWatch = resolve; }); }, clearWatch({ id }) { cleared.push(id); } };
+  const cleared = [],
+    ref = { current: null };
+  const native = {
+    watchPosition(_, cb) {
+      callback = cb;
+      return new Promise((resolve) => {
+        resolveWatch = resolve;
+      });
+    },
+    clearWatch({ id }) {
+      cleared.push(id);
+    },
+  };
   const exports = {};
-  vm.runInNewContext(`exports.start = () => { let watchActive = true; const isUsingRealGps = true; ${registration} ${cleanup} };`, {
-    exports, window: {}, console, Capacitor: { isNativePlatform: () => true }, Geolocation: native,
-    capWatchIdRef: ref, watchIdRef: { current: null }, handleRawGpsUpdate() {},
-  });
+  vm.runInNewContext(
+    `exports.start = () => { let watchActive = true; const isUsingRealGps = true; ${registration} ${cleanup} };`,
+    {
+      exports,
+      window: {},
+      console,
+      Capacitor: { isNativePlatform: () => true },
+      Geolocation: native,
+      capWatchIdRef: ref,
+      watchIdRef: { current: null },
+      handleRawGpsUpdate() {},
+    },
+  );
   const dispose = exports.start();
   if (late) dispose();
-  resolveWatch('synthetic-watch'); await tick();
+  resolveWatch("synthetic-watch");
+  await tick();
   if (!late) dispose();
-  assert.deepEqual(cleared, ['synthetic-watch']);
+  assert.deepEqual(cleared, ["synthetic-watch"]);
   assert.equal(ref.current, null);
   assert.ok(callback);
 }
@@ -304,13 +363,19 @@ assert.match(mapSource, /\) => \{\s*if \(!watchActive\) return;\s*userRealGpsRef
 
 // Failure results are explicit and successful responses are marked live.
 let weatherFails = true;
-const weather = harness('src/lib/weatherApi.ts', {}, {
-  fetch: async () => {
-    if (weatherFails) throw new Error('synthetic offline');
-    return { ok: true, json: async () => ({ current: { rain: 4.8 }, hourly: {}, daily: {} }) };
+const weather = harness(
+  "src/lib/weatherApi.ts",
+  {},
+  {
+    fetch: async () => {
+      if (weatherFails) throw new Error("synthetic offline");
+      return { ok: true, json: async () => ({ current: { rain: 4.8 }, hourly: {}, daily: {} }) };
+    },
   },
-});
+);
 assert.equal((await weather.exports.fetchFullRealWeather()).live, false);
 weatherFails = false;
 assert.equal((await weather.exports.fetchFullRealWeather()).live, true);
-console.log('Review regressions passed: autocomplete cancellation, approximate location, native watch cleanup, weather availability');
+console.log(
+  "Review regressions passed: autocomplete cancellation, approximate location, native watch cleanup, weather availability",
+);

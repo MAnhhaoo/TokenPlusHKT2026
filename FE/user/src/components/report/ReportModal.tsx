@@ -3,10 +3,12 @@ import { useEffect, useRef, useState } from "react";
 import Icon from "@/components/ui/Icon";
 import { getUserLocation } from "@/lib/location";
 import {
+  analyzeReportImageApi,
   createCitizenReport,
   matchDynamicPlacePool,
   reverseGeocodeApi,
   searchPlacesApi,
+  type FloodAiAnalysis,
 } from "@/lib/api";
 import type { ReportType, RouteEndpoint, Severity } from "@/types";
 
@@ -71,6 +73,8 @@ function ReportModal({
   const [createdReportId, setCreatedReportId] = useState<string | null>(null);
   const [photoName, setPhotoName] = useState("");
   const [photoDataUrl, setPhotoDataUrl] = useState("");
+  const [aiAnalysis, setAiAnalysis] = useState<FloodAiAnalysis | null>(null);
+  const [analyzingImage, setAnalyzingImage] = useState(false);
 
   const [locationText, setLocationText] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("Bình Thạnh");
@@ -92,6 +96,8 @@ function ReportModal({
       setCreatedReportId(null);
       setPhotoName("");
       setPhotoDataUrl("");
+      setAiAnalysis(null);
+      setAnalyzingImage(false);
       setDescription("");
       setType("flood");
       setSeverity("medium");
@@ -143,11 +149,50 @@ function ReportModal({
     if (!file) {
       setPhotoName("");
       setPhotoDataUrl("");
+      setAiAnalysis(null);
       return;
     }
     setPhotoName(file.name);
     const dataUrl = await compressImageToDataUrl(file);
     setPhotoDataUrl(dataUrl);
+
+    if (dataUrl) {
+      setAnalyzingImage(true);
+      try {
+        const rawLoc = locationText.trim() || "TP. Hồ Chí Minh";
+        const analysis = await analyzeReportImageApi({
+          image: dataUrl,
+          location: rawLoc,
+          description: description.trim() || undefined,
+        });
+
+        if (analysis) {
+          setAiAnalysis(analysis);
+          // Tự động gợi ý loại sự cố phù hợp từ Gemini Vision
+          if (analysis.reportType === "drain") {
+            setType("drain");
+          } else {
+            setType("flood");
+          }
+          // Tự động phân cấp mức độ nghiêm trọng
+          if (analysis.severity === "critical" || analysis.severity === "high") {
+            setSeverity("high");
+          } else if (analysis.severity === "low") {
+            setSeverity("low");
+          } else {
+            setSeverity("medium");
+          }
+          // Bổ sung mô tả nếu người dùng chưa nhập
+          if (!description.trim() && analysis.aiSummary) {
+            setDescription(analysis.aiSummary);
+          }
+        }
+      } catch (err) {
+        console.warn("AI Image analysis error:", err);
+      } finally {
+        setAnalyzingImage(false);
+      }
+    }
   }
 
   async function handleSubmit() {
@@ -162,10 +207,13 @@ function ReportModal({
         photoUrl: photoDataUrl || photoName || undefined,
         location: cleanLocation,
         district: selectedDistrict,
-        description: description.trim() || undefined,
+        description: description.trim() || aiAnalysis?.aiSummary || undefined,
         lat: coords[1],
         lng: coords[0],
         reporterId,
+        aiSummary: aiAnalysis?.aiSummary,
+        recommendation: aiAnalysis?.recommendation,
+        reportedDepth: aiAnalysis?.estimatedDepthCm,
       });
       if (!created) {
         setSubmitError("Không thể gửi báo cáo. Vui lòng thử lại.");
@@ -390,6 +438,61 @@ function ReportModal({
                 type="file"
               />
             </label>
+
+            {analyzingImage && (
+              <div className="ai-analyzing-card">
+                <span className="ai-spin-icon">
+                  <Icon name="camera" size={18} />
+                </span>
+                <div>
+                  <strong>⚡ AI Gemini đang phân tích hiện trường từ ảnh...</strong>
+                  <small>
+                    Ước tính mực nước, kiểm tra miệng cống, nhận diện mưa gió & đánh giá rủi ro
+                  </small>
+                </div>
+              </div>
+            )}
+
+            {aiAnalysis && !analyzingImage && (
+              <div className="ai-result-card">
+                <div className="ai-result-header">
+                  <span className="ai-badge">
+                    <Icon name="check" size={13} /> Gemini Vision AI ({aiAnalysis.confidence}% tin cậy)
+                  </span>
+                  <span className={`ai-severity-tag ${aiAnalysis.severity}`}>
+                    {aiAnalysis.severity === "critical"
+                      ? "Rất nguy hiểm"
+                      : aiAnalysis.severity === "high"
+                        ? "Nguy hiểm"
+                        : aiAnalysis.severity === "medium"
+                          ? "Đáng chú ý"
+                          : "Nhẹ"}
+                  </span>
+                </div>
+                <div className="ai-metrics-row">
+                  <div className="ai-metric">
+                    <small>Mực nước AI</small>
+                    <strong>~{aiAnalysis.estimatedDepthCm} cm</strong>
+                  </div>
+                  <div className="ai-metric">
+                    <small>Thời tiết</small>
+                    <strong>{aiAnalysis.weatherCondition}</strong>
+                  </div>
+                  <div className="ai-metric">
+                    <small>Miệng cống</small>
+                    <strong>{aiAnalysis.drainStatus}</strong>
+                  </div>
+                </div>
+                <p className="ai-summary-text">
+                  🤖 <strong>Nhận định AI:</strong> {aiAnalysis.aiSummary}
+                </p>
+                {aiAnalysis.recommendation && (
+                  <div className="ai-recommendation-box">
+                    <strong>💡 Khuyến nghị cho người dân:</strong> {aiAnalysis.recommendation}
+                  </div>
+                )}
+              </div>
+            )}
 
             {submitError && <p role="alert">{submitError}</p>}
             <button

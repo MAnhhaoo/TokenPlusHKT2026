@@ -1,0 +1,302 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [master]
+  workflow_call:
+    inputs:
+      full_validation:
+        description: Validate every migrated BE and FE/user package.
+        required: false
+        type: boolean
+        default: false
+    outputs:
+      backend:
+        description: Whether the backend package is in scope.
+        value: ${{ jobs.changes.outputs.backend }}
+      user:
+        description: Whether the user frontend package is in scope.
+        value: ${{ jobs.changes.outputs.user }}
+      any_application:
+        description: Whether either supported package is in scope.
+        value: ${{ jobs.changes.outputs.any_application }}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || format('{0}-{1}', github.ref, github.sha) }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  changes:
+    name: Detect BE and FE/user changes
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.detect.outputs.backend }}
+      user: ${{ steps.detect.outputs.user }}
+      any_application: ${{ steps.detect.outputs.any_application }}
+      node_components: ${{ steps.detect.outputs.node_components }}
+      any_node: ${{ steps.detect.outputs.any_node }}
+      source_any_application: ${{ steps.detect.outputs.source_any_application }}
+    steps:
+      - name: Checkout repository history
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Identify changed packages
+        id: detect
+        shell: bash
+        env:
+          FULL_VALIDATION: ${{ inputs.full_validation || false }}
+        run: |
+          set -euo pipefail
+
+          if [[ "$FULL_VALIDATION" == true ]]; then
+            changed_files="$(git ls-files | grep -vE '(^|/)\.gitkeep$' || true)"
+            case "$GITHUB_EVENT_NAME" in
+              push)
+                before="$(jq -r '.before' "$GITHUB_EVENT_PATH")"
+                if [[ "$before" =~ ^0+$ ]]; then
+                  source_changed_files="$changed_files"
+                else
+                  source_changed_files="$(git diff --name-only "$before" "$GITHUB_SHA")"
+                fi
+                ;;
+              release|workflow_dispatch)
+                parent="$(git rev-parse "${GITHUB_SHA}^" 2>/dev/null || true)"
+                if [[ -n "$parent" ]]; then
+                  source_changed_files="$(git diff --name-only "$parent" "$GITHUB_SHA")"
+                else
+                  source_changed_files="$changed_files"
+                fi
+                ;;
+              *) source_changed_files="$changed_files" ;;
+            esac
+          else
+            if [[ "$GITHUB_EVENT_NAME" != pull_request ]]; then
+              echo "Unsupported event without full_validation: $GITHUB_EVENT_NAME" >&2
+              exit 1
+            fi
+            base="$(jq -r '.pull_request.base.sha' "$GITHUB_EVENT_PATH")"
+            head="$(jq -r '.pull_request.head.sha' "$GITHUB_EVENT_PATH")"
+            changed_files="$(git diff --name-only "$base...$head")"
+            source_changed_files="$changed_files"
+          fi
+
+          has_source_files() {
+            git ls-files "$1" | grep -qvE '(^|/)\.gitkeep$'
+          }
+          has_changed_source() {
+            local directory="$1"
+            local files="$2"
+            while IFS= read -r file; do
+              if [[ "$file" == "$directory/"* && "${file##*/}" != .gitkeep ]]; then
+                return 0
+              fi
+            done <<<"$files"
+            return 1
+          }
+
+          source_backend=false
+          source_user=false
+          has_changed_source BE "$source_changed_files" && source_backend=true || true
+          has_changed_source FE/user "$source_changed_files" && source_user=true || true
+          source_any_application=false
+          [[ "$source_backend" == true || "$source_user" == true ]] && source_any_application=true
+
+          # Workflow edits get a full regression run so the pipeline validates itself.
+          if [[ "$GITHUB_EVENT_NAME" == pull_request ]] && grep -qE '^\.github/workflows/' <<<"$source_changed_files"; then
+            changed_files="$(git ls-files | grep -vE '(^|/)\.gitkeep$' || true)"
+          fi
+
+          backend=false
+          user=false
+          has_changed_source BE "$changed_files" && backend=true || true
+          has_changed_source FE/user "$changed_files" && user=true || true
+
+          if grep -Eq '^(package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml)$' <<<"$changed_files"; then
+            has_source_files BE && backend=true || true
+            has_source_files FE/user && user=true || true
+          fi
+          if grep -qx 'firebase.json' <<<"$changed_files"; then
+            [[ -f FE/user/package.json ]] && user=true || true
+          fi
+
+          any_node=false
+          any_application=false
+          node_components=()
+          [[ "$backend" == true ]] && node_components+=(BE)
+          [[ "$user" == true ]] && node_components+=(FE/user)
+          [[ ${#node_components[@]} -gt 0 ]] && any_node=true
+          [[ "$backend" == true || "$user" == true ]] && any_application=true
+
+          node_json='["__none__"]'
+          if [[ ${#node_components[@]} -gt 0 ]]; then
+            node_json="$(printf '%s\n' "${node_components[@]}" | jq -R . | jq -s -c .)"
+          fi
+          {
+            echo "backend=$backend"
+            echo "user=$user"
+            echo "any_node=$any_node"
+            echo "any_application=$any_application"
+            echo "node_components=$node_json"
+            echo "source_any_application=$source_any_application"
+          } >> "$GITHUB_OUTPUT"
+
+  preflight:
+    name: Package readiness
+    runs-on: ubuntu-latest
+    needs: changes
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Explain validation scope
+        shell: bash
+        env:
+          ANY_APPLICATION: ${{ needs.changes.outputs.any_application }}
+        run: |
+          if [[ "$ANY_APPLICATION" != true ]]; then
+            {
+              echo '## CI readiness'
+              echo
+              echo 'No BE or FE/user application package is in scope. This run does not validate application code.'
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'BE and/or FE/user changed; required package scripts and lockfiles will be checked.'
+          fi
+
+      - name: Require runnable packages for changed paths
+        if: needs.changes.outputs.any_node == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          components='${{ needs.changes.outputs.node_components }}'
+          while IFS= read -r component; do
+            [[ -n "$component" ]] || continue
+            manifest="$component/package.json"
+            if [[ ! -f "$manifest" ]]; then
+              echo "::error title=Missing package manifest::$component changed but $manifest is missing."
+              exit 1
+            fi
+            node - "$manifest" "$component" <<'NODE'
+          const fs = require('node:fs');
+          const path = require('node:path');
+          const [manifest, component] = process.argv.slice(2);
+          const pkg = JSON.parse(fs.readFileSync(manifest, 'utf8'));
+          const scripts = pkg.scripts ?? {};
+          const missing = ['build', 'typecheck'].filter((name) => !scripts[name]);
+          if (!fs.existsSync(path.join(path.dirname(manifest), 'package-lock.json'))) {
+            for (const file of ['package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml']) {
+              if (!fs.existsSync(file)) missing.push(file);
+            }
+            const rootPkg = fs.existsSync('package.json')
+              ? JSON.parse(fs.readFileSync('package.json', 'utf8'))
+              : {};
+            if (rootPkg.packageManager !== 'pnpm@12.15.0') missing.push('packageManager: pnpm@12.15.0');
+          }
+          if (!scripts.lint && !scripts.format) missing.push('lint or format script');
+          if (!scripts.test && !scripts['test:smoke']) missing.push('test or test:smoke script');
+          if (missing.length) {
+            console.error(`${component}/package.json is not CI-ready; missing ${missing.join(', ')}.`);
+            process.exit(1);
+          }
+          NODE
+          done < <(jq -r '.[]' <<<"$components")
+
+  node-checks:
+    name: Node checks (${{ matrix.component }})
+    runs-on: ubuntu-latest
+    needs: [changes, preflight]
+    if: needs.preflight.result == 'success' && needs.changes.outputs.any_node == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        component: ${{ fromJSON(needs.changes.outputs.node_components) }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22.23.4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6.1.0
+        with:
+          version: 12.15.0
+
+      - name: Install locked dependencies
+        env:
+          COMPONENT: ${{ matrix.component }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -f "$COMPONENT/package-lock.json" ]]; then
+            (cd "$COMPONENT" && npm ci)
+          else
+            pnpm install --frozen-lockfile
+          fi
+
+      - name: Build, typecheck, lint or format, and test
+        env:
+          COMPONENT: ${{ matrix.component }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$COMPONENT"
+          if [[ -f package-lock.json ]]; then
+            package_run() { npm run "$1" -- "${@:2}"; }
+            has_script() { node -e "const p=require('./package.json'); process.exit(p.scripts?.['$1'] ? 0 : 1)"; }
+          else
+            package_run() { pnpm run "$1" "${@:2}"; }
+            has_script() { node -e "const p=require('./package.json'); process.exit(p.scripts?.['$1'] ? 0 : 1)"; }
+          fi
+
+          package_run build
+          package_run typecheck
+          if has_script lint; then
+            package_run lint
+          else
+            package_run format --check
+          fi
+          if has_script test; then
+            package_run test
+          else
+            package_run test:smoke
+          fi
+
+  ci-summary:
+    name: CI result
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [changes, preflight, node-checks]
+    steps:
+      - name: Report validation status
+        env:
+          CHANGES_RESULT: ${{ needs.changes.result }}
+          PREFLIGHT_RESULT: ${{ needs.preflight.result }}
+          NODE_RESULT: ${{ needs.node-checks.result }}
+          SOURCE_APPLICATION_CHANGED: ${{ needs.changes.outputs.source_any_application }}
+          APPLICATION_IN_SCOPE: ${{ needs.changes.outputs.any_application }}
+        run: |
+          set -euo pipefail
+          if [[ "$CHANGES_RESULT" != success || "$PREFLIGHT_RESULT" != success || "$NODE_RESULT" == failure || "$NODE_RESULT" == cancelled ]]; then
+            echo 'CI validation failed. See the failed package job for details.' >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          if [[ "$SOURCE_APPLICATION_CHANGED" != true && "$APPLICATION_IN_SCOPE" == true ]]; then
+            echo 'No BE or FE/user source changed; workflow validation ran regression checks for migrated packages.' >> "$GITHUB_STEP_SUMMARY"
+          elif [[ "$APPLICATION_IN_SCOPE" != true ]]; then
+            echo 'No BE or FE/user package was in scope; this run does not validate application code.' >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'Build, typecheck, lint/format, and test checks completed for BE and/or FE/user.' >> "$GITHUB_STEP_SUMMARY"
+          fi

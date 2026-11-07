@@ -26,6 +26,14 @@ import {
   updateAlertApi,
   updateUserStatusApi,
 } from "@/lib/api"
+import {
+  mockAlerts,
+  mockPoints,
+  mockReports,
+  mockTrends,
+  mockUsers,
+  mockWeather,
+} from "@/data/mockData"
 import type {
   AlertDraft,
   AreaAlert,
@@ -40,25 +48,12 @@ import type {
   WeatherSnapshot,
 } from "@/types"
 
-const emptyTrendItem = {
-  labels: ["00:00"],
-  reports: [0],
-  rain: [0],
-  insight: "Đang tải dữ liệu xu hướng từ cơ sở dữ liệu…",
-}
-
-const emptyTrends: TrendsMap = {
-  "24h": emptyTrendItem,
-  "7d": emptyTrendItem,
-  "30d": emptyTrendItem,
-}
-
 export default function App() {
-  const [reports, setReports] = useState<FloodReport[]>([])
-  const [alerts, setAlerts] = useState<AreaAlert[]>([])
-  const [mapPoints, setMapPoints] = useState<MapPoint[]>([])
-  const [trendsData, setTrendsData] = useState<TrendsMap>(emptyTrends)
-  const [weather, setWeather] = useState<WeatherSnapshot | null>(null)
+  const [reports, setReports] = useState<FloodReport[]>(mockReports)
+  const [alerts, setAlerts] = useState<AreaAlert[]>(mockAlerts)
+  const [mapPoints, setMapPoints] = useState<MapPoint[]>(mockPoints)
+  const [trendsData, setTrendsData] = useState<TrendsMap>(mockTrends)
+  const [weather, setWeather] = useState<WeatherSnapshot | null>(mockWeather)
   const [isLiveBackend, setIsLiveBackend] = useState(false)
   const [selectedMapPoint, setSelectedMapPoint] = useState<string | null>("p1")
   const [layers, setLayers] = useState<MapLayer[]>([
@@ -79,7 +74,7 @@ export default function App() {
   const [toast, setToast] = useState<string | null>(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [page, setPage] = useState<Page>("overview")
-  const [users, setUsers] = useState<CommunityUser[]>([])
+  const [users, setUsers] = useState<CommunityUser[]>(mockUsers)
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null)
 
   useEffect(() => {
@@ -87,11 +82,34 @@ export default function App() {
     async function loadInitial() {
       const data = await fetchAdminInitialData()
       if (!active || !data.live) return
-      if (data.reports) setReports(data.reports)
-      if (data.alerts) setAlerts(data.alerts)
-      if (data.mapPoints) setMapPoints(data.mapPoints)
-      if (data.users) setUsers(data.users)
-      if (data.trends) setTrendsData(data.trends)
+      if (Array.isArray(data.reports) && data.reports.length > 0) {
+        setReports(data.reports)
+      }
+      if (Array.isArray(data.alerts) && data.alerts.length > 0) {
+        setAlerts(data.alerts)
+      }
+      if (Array.isArray(data.mapPoints) && data.mapPoints.length > 0) {
+        setMapPoints(data.mapPoints)
+      }
+      if (Array.isArray(data.users) && data.users.length > 0) {
+        setUsers(data.users)
+      }
+      if (data.trends && typeof data.trends === "object") {
+        setTrendsData((prev) => ({
+          "24h":
+            data.trends?.["24h"]?.labels?.length
+              ? data.trends["24h"]
+              : prev["24h"],
+          "7d":
+            data.trends?.["7d"]?.labels?.length
+              ? data.trends["7d"]
+              : prev["7d"],
+          "30d":
+            data.trends?.["30d"]?.labels?.length
+              ? data.trends["30d"]
+              : prev["30d"],
+        }))
+      }
       if (data.weather) setWeather(data.weather)
       setIsLiveBackend(true)
     }
