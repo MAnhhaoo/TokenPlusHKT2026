@@ -1,0 +1,6661 @@
+[
+  {
+    "id": "ird_16",
+    "x": 50,
+    "y": 50,
+    "lat": 10.806938,
+    "lng": 106.729381,
+    "label": "Quốc Hương",
+    "fullAddress": "Đường Quốc Hương, Phường Thảo Điền, TP. Thủ Đức (Quận 2 cũ)",
+    "district": "TP. Thủ Đức (Quận 2 cũ)",
+    "ward": "Phường Thảo Điền",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 18,
+    "maxDepth": 140,
+    "minDepth": 15,
+    "depth": 140,
+    "causes": [
+      "Mưa lớn",
+      "Triều cường",
+      "Mưa & Triều"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2011,
+      2018,
+      2019,
+      2020,
+      2023,
+      2025,
+      2026
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_17",
+    "x": 50,
+    "y": 50,
+    "lat": 10.79419,
+    "lng": 106.716439,
+    "label": "Nguyễn Hữu Cảnh",
+    "fullAddress": "Đường Nguyễn Hữu Cảnh, Phường 22, Bình Thạnh",
+    "district": "Bình Thạnh",
+    "ward": "Phường 22",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 11,
+    "maxDepth": 100,
+    "minDepth": 15,
+    "depth": 100,
+    "causes": [
+      "Mưa lớn",
+      "Triều cường",
+      "Mưa & Triều"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2008,
+      2010,
+      2011,
+      2013,
+      2016,
+      2018,
+      2019,
+      2020,
+      2024
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_173",
+    "x": 50,
+    "y": 50,
+    "lat": 10.809646,
+    "lng": 106.73105,
+    "label": "Thảo Điền",
+    "fullAddress": "Đường Thảo Điền, Phường Thảo Điền, TP. Thủ Đức (Quận 2 cũ)",
+    "district": "TP. Thủ Đức (Quận 2 cũ)",
+    "ward": "Phường Thảo Điền",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 10,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường",
+      "Mưa lớn",
+      "Mưa & Triều"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2008,
+      2018,
+      2019,
+      2020,
+      2023
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_7",
+    "x": 50,
+    "y": 50,
+    "lat": 10.81369,
+    "lng": 106.730502,
+    "label": "Nguyễn Văn Hưởng",
+    "fullAddress": "Đường Nguyễn Văn Hưởng, Phường Thảo Điền, TP. Thủ Đức (Quận 2 cũ)",
+    "district": "TP. Thủ Đức (Quận 2 cũ)",
+    "ward": "Phường Thảo Điền",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 9,
+    "maxDepth": 60,
+    "minDepth": 10,
+    "depth": 60,
+    "causes": [
+      "Triều cường",
+      "Mưa lớn"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2018,
+      2019,
+      2020,
+      2024,
+      2025
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_3",
+    "x": 50,
+    "y": 50,
+    "lat": 10.709913,
+    "lng": 106.735464,
+    "label": "Huỳnh Tấn Phát",
+    "fullAddress": "Đường Huỳnh Tấn Phát, Phường Phú Mỹ, Quận 7",
+    "district": "Quận 7",
+    "ward": "Phường Phú Mỹ",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 9,
+    "maxDepth": 50,
+    "minDepth": 15,
+    "depth": 50,
+    "causes": [
+      "Triều cường",
+      "Mưa lớn",
+      "Mưa & Triều"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2002,
+      2010,
+      2011,
+      2012,
+      2016,
+      2023,
+      2025
+    ],
+    "elevationM": 1.2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_2",
+    "x": 50,
+    "y": 50,
+    "lat": 10.752863,
+    "lng": 106.708898,
+    "label": "Trần Xuân Soạn",
+    "fullAddress": "Đường Trần Xuân Soạn, Phường Tân Kiểng, Quận 7",
+    "district": "Quận 7",
+    "ward": "Phường Tân Kiểng",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 7,
+    "maxDepth": 60,
+    "minDepth": 15,
+    "depth": 60,
+    "causes": [
+      "Triều cường",
+      "Mưa & Triều"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2011,
+      2019,
+      2023,
+      2025
+    ],
+    "elevationM": 1.2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_34",
+    "x": 50,
+    "y": 50,
+    "lat": 10.78609,
+    "lng": 106.727517,
+    "label": "Lương Định Của",
+    "fullAddress": "Đường Lương Định Của, An Khánh, TP. Thủ Đức (Quận 2 cũ)",
+    "district": "TP. Thủ Đức (Quận 2 cũ)",
+    "ward": "An Khánh",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 7,
+    "maxDepth": 60,
+    "minDepth": 15,
+    "depth": 60,
+    "causes": [
+      "Triều cường",
+      "Mưa & Triều"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2011,
+      2012,
+      2018,
+      2025
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_40",
+    "x": 50,
+    "y": 50,
+    "lat": 10.841296,
+    "lng": 106.734766,
+    "label": "Kha Vạn Cân",
+    "fullAddress": "Đường Kha Vạn Cân, Hiệp Bình Chánh, TP. Thủ Đức",
+    "district": "TP. Thủ Đức",
+    "ward": "Hiệp Bình Chánh",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 7,
+    "maxDepth": 50,
+    "minDepth": 15,
+    "depth": 50,
+    "causes": [
+      "Mưa & Triều",
+      "Triều cường",
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa & Triều",
+    "years": [
+      2010,
+      2012,
+      2018,
+      2019,
+      2026
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_18",
+    "x": 50,
+    "y": 50,
+    "lat": 10.8037,
+    "lng": 106.720459,
+    "label": "Ung Văn Khiêm",
+    "fullAddress": "Đường Ung Văn Khiêm, Phường 25, Bình Thạnh",
+    "district": "Bình Thạnh",
+    "ward": "Phường 25",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 7,
+    "maxDepth": 40,
+    "minDepth": 15,
+    "depth": 40,
+    "causes": [
+      "Mưa lớn",
+      "Triều cường",
+      "Mưa & Triều"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2002,
+      2008,
+      2010,
+      2012,
+      2013,
+      2019,
+      2020
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_35",
+    "x": 50,
+    "y": 50,
+    "lat": 10.792837,
+    "lng": 106.712173,
+    "label": "Ngô Tất Tố",
+    "fullAddress": "Đường Ngô Tất Tố, Phường 22, Bình Thạnh",
+    "district": "Bình Thạnh",
+    "ward": "Phường 22",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 6,
+    "maxDepth": 50,
+    "minDepth": 15,
+    "depth": 50,
+    "causes": [
+      "Triều cường",
+      "Mưa & Triều"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2007,
+      2010,
+      2011,
+      2012
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_48",
+    "x": 50,
+    "y": 50,
+    "lat": 10.788863,
+    "lng": 106.763938,
+    "label": "Nguyễn Duy Trinh",
+    "fullAddress": "Đường Nguyễn Duy Trinh, Bình Trưng Tây, TP. Thủ Đức (Quận 2 cũ)",
+    "district": "TP. Thủ Đức (Quận 2 cũ)",
+    "ward": "Bình Trưng Tây",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 6,
+    "maxDepth": 50,
+    "minDepth": 15,
+    "depth": 50,
+    "causes": [
+      "Mưa lớn",
+      "Mưa & Triều"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2016,
+      2018,
+      2019,
+      2020,
+      2024
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_19",
+    "x": 50,
+    "y": 50,
+    "lat": 10.86166,
+    "lng": 106.744177,
+    "label": "Tô Ngọc Vân",
+    "fullAddress": "Đường Tô Ngọc Vân, Linh Đông, TP. Thủ Đức",
+    "district": "TP. Thủ Đức",
+    "ward": "Linh Đông",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 6,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2017,
+      2019,
+      2020,
+      2022,
+      2023,
+      2024
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_20",
+    "x": 50,
+    "y": 50,
+    "lat": 10.851654,
+    "lng": 106.763345,
+    "label": "Võ Văn Ngân",
+    "fullAddress": "Đường Võ Văn Ngân, Linh Chiểu, TP. Thủ Đức",
+    "district": "TP. Thủ Đức",
+    "ward": "Linh Chiểu",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 6,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn",
+      "Triều cường"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2005,
+      2017,
+      2019,
+      2020,
+      2024
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_4",
+    "x": 50,
+    "y": 50,
+    "lat": 10.711734,
+    "lng": 106.700263,
+    "label": "Lê Văn Lương",
+    "fullAddress": "Đường Lê Văn Lương, Nhà Bè, Nhà Bè",
+    "district": "Nhà Bè",
+    "ward": "Nhà Bè",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 5,
+    "maxDepth": 50,
+    "minDepth": 15,
+    "depth": 50,
+    "causes": [
+      "Triều cường",
+      "Mưa & Triều"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2011,
+      2012,
+      2025
+    ],
+    "elevationM": 1.2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_46",
+    "x": 50,
+    "y": 50,
+    "lat": 10.733414,
+    "lng": 106.64108,
+    "label": "Phạm Thế Hiển",
+    "fullAddress": "Đường Phạm Thế Hiển, Phường 5, Quận 8",
+    "district": "Quận 8",
+    "ward": "Phường 5",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 4,
+    "maxDepth": 60,
+    "minDepth": 15,
+    "depth": 60,
+    "causes": [
+      "Mưa & Triều",
+      "Triều cường"
+    ],
+    "primaryCause": "Mưa & Triều",
+    "years": [
+      2008,
+      2011,
+      2012,
+      2025
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_108",
+    "x": 50,
+    "y": 50,
+    "lat": 10.793188,
+    "lng": 106.705069,
+    "label": "Xô Viết Nghệ Tĩnh",
+    "fullAddress": "Đường Xô Viết Nghệ Tĩnh, Phường 17, Bình Thạnh",
+    "district": "Bình Thạnh",
+    "ward": "Phường 17",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 4,
+    "maxDepth": 40,
+    "minDepth": 15,
+    "depth": 40,
+    "causes": [
+      "Triều cường",
+      "Mưa & Triều"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2002,
+      2010
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_98",
+    "x": 50,
+    "y": 50,
+    "lat": 10.804168,
+    "lng": 106.705261,
+    "label": "Bạch Đằng",
+    "fullAddress": "Đường Bạch Đằng, Phường 15, Bình Thạnh",
+    "district": "Bình Thạnh",
+    "ward": "Phường 15",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 4,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn",
+      "Triều cường",
+      "Mưa & Triều"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2002,
+      2010,
+      2016,
+      2024
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_111",
+    "x": 50,
+    "y": 50,
+    "lat": 10.81843,
+    "lng": 106.710521,
+    "label": "Đinh Bộ Lĩnh",
+    "fullAddress": "Đường Đinh Bộ Lĩnh, Phường 26, Bình Thạnh",
+    "district": "Bình Thạnh",
+    "ward": "Phường 26",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 4,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường",
+      "Mưa lớn"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2002,
+      2013,
+      2016
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_181",
+    "x": 50,
+    "y": 50,
+    "lat": 10.85171,
+    "lng": 106.75145,
+    "label": "Đặng Thị Rành",
+    "fullAddress": "Đường Đặng Thị Rành, Phường Linh Tây, TP. Thủ Đức",
+    "district": "TP. Thủ Đức",
+    "ward": "Phường Linh Tây",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 4,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2023,
+      2024,
+      2025,
+      2026
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_131",
+    "x": 50,
+    "y": 50,
+    "lat": 10.817742,
+    "lng": 106.69604,
+    "label": "Nơ Trang Long",
+    "fullAddress": "Đường Nơ Trang Long, Phường 12, Bình Thạnh",
+    "district": "Bình Thạnh",
+    "ward": "Phường 12",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 3,
+    "maxDepth": 100,
+    "minDepth": 15,
+    "depth": 100,
+    "causes": [
+      "Mưa & Triều",
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa & Triều",
+    "years": [
+      2002,
+      2016
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_66",
+    "x": 50,
+    "y": 50,
+    "lat": 10.796139,
+    "lng": 106.696162,
+    "label": "Bùi Hữu Nghĩa",
+    "fullAddress": "Đường Bùi Hữu Nghĩa, Phường 2, Bình Thạnh",
+    "district": "Bình Thạnh",
+    "ward": "Phường 2",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 3,
+    "maxDepth": 50,
+    "minDepth": 15,
+    "depth": 50,
+    "causes": [
+      "Triều cường",
+      "Mưa & Triều"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2011,
+      2012
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_1",
+    "x": 50,
+    "y": 50,
+    "lat": 10.821707,
+    "lng": 106.725583,
+    "label": "Bình quới",
+    "fullAddress": "Đường Bình quới, Phường 27, Bình Thạnh",
+    "district": "Bình Thạnh",
+    "ward": "Phường 27",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 3,
+    "maxDepth": 45,
+    "minDepth": 15,
+    "depth": 45,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2006,
+      2025
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_65",
+    "x": 50,
+    "y": 50,
+    "lat": 10.739423,
+    "lng": 106.71251,
+    "label": "Nguyễn Thị Thập",
+    "fullAddress": "Đường Nguyễn Thị Thập, Phường Tân Quy, Quận 7",
+    "district": "Quận 7",
+    "ward": "Phường Tân Quy",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 3,
+    "maxDepth": 40,
+    "minDepth": 15,
+    "depth": 40,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2011,
+      2023
+    ],
+    "elevationM": 1.2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_23",
+    "x": 50,
+    "y": 50,
+    "lat": 10.718887,
+    "lng": 106.611957,
+    "label": "Hồ Học Lãm",
+    "fullAddress": "Đường Hồ Học Lãm, Phường An Lạc, Bình Tân",
+    "district": "Bình Tân",
+    "ward": "Phường An Lạc",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 3,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2019,
+      2023,
+      2025
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_24",
+    "x": 50,
+    "y": 50,
+    "lat": 10.744361,
+    "lng": 106.619197,
+    "label": "Kinh Dương Vương",
+    "fullAddress": "Đường Kinh Dương Vương, Phường 13, Bình Tân",
+    "district": "Bình Tân",
+    "ward": "Phường 13",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 3,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn",
+      "Triều cường"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2008,
+      2015,
+      2023
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_112",
+    "x": 50,
+    "y": 50,
+    "lat": 10.820321,
+    "lng": 106.702512,
+    "label": "Nguyễn Xí",
+    "fullAddress": "Đường Nguyễn Xí, Phường 13, Bình Thạnh",
+    "district": "Bình Thạnh",
+    "ward": "Phường 13",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 3,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường",
+      "Mưa & Triều",
+      "Mưa lớn"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2002,
+      2019
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_121",
+    "x": 50,
+    "y": 50,
+    "lat": 10.693289,
+    "lng": 106.563999,
+    "label": "Xã Tân Nhựt",
+    "fullAddress": "Đường Xã Tân Nhựt, Xã Tân Nhựt, Bình Chánh",
+    "district": "Bình Chánh",
+    "ward": "Xã Tân Nhựt",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 3,
+    "maxDepth": 30,
+    "minDepth": 10,
+    "depth": 30,
+    "causes": [
+      "Triều cường",
+      "Mưa & Triều"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2002,
+      2006
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_155",
+    "x": 50,
+    "y": 50,
+    "lat": 10.830605,
+    "lng": 106.712357,
+    "label": "Quốc lộ 13",
+    "fullAddress": "Đường Quốc lộ 13, Phường Hiệp Bình Chánh, TP. Thủ Đức",
+    "district": "TP. Thủ Đức",
+    "ward": "Phường Hiệp Bình Chánh",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 3,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường",
+      "Mưa lớn"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2007,
+      2019,
+      2024
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_180",
+    "x": 50,
+    "y": 50,
+    "lat": 10.850784,
+    "lng": 106.753373,
+    "label": "Hồ Văn Tư",
+    "fullAddress": "Đường Hồ Văn Tư, Phường Trường Thọ, TP. Thủ Đức",
+    "district": "TP. Thủ Đức",
+    "ward": "Phường Trường Thọ",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 3,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2023,
+      2024,
+      2025
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_213",
+    "x": 50,
+    "y": 50,
+    "lat": 10.765616,
+    "lng": 106.621854,
+    "label": "An Dương Vương",
+    "fullAddress": "Đường An Dương Vương, Phường 14, Quận 6",
+    "district": "Quận 6",
+    "ward": "Phường 14",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 3,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2010,
+      2013,
+      2015
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_86",
+    "x": 50,
+    "y": 50,
+    "lat": 10.747361,
+    "lng": 106.654111,
+    "label": "Bình Đông",
+    "fullAddress": "Đường Bình Đông, Phường Xóm Củi, Quận 8",
+    "district": "Quận 8",
+    "ward": "Phường Xóm Củi",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 2,
+    "maxDepth": 100,
+    "minDepth": 15,
+    "depth": 100,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2002,
+      2008
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_36",
+    "x": 50,
+    "y": 50,
+    "lat": 10.700394,
+    "lng": 106.738019,
+    "label": "Huỳnh Tấn Phát",
+    "fullAddress": "Đường Huỳnh Tấn Phát, Xã Nhà Bè, Nhà Bè",
+    "district": "Nhà Bè",
+    "ward": "Xã Nhà Bè",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 2,
+    "maxDepth": 50,
+    "minDepth": 15,
+    "depth": 50,
+    "causes": [
+      "Triều cường",
+      "Mưa & Triều"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2002,
+      2012
+    ],
+    "elevationM": 1.2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_37",
+    "x": 50,
+    "y": 50,
+    "lat": 10.852109,
+    "lng": 106.714718,
+    "label": "Phường Hiệp Bình",
+    "fullAddress": "Đường Phường Hiệp Bình, Phường Hiệp Bình, TP. Thủ Đức",
+    "district": "TP. Thủ Đức",
+    "ward": "Phường Hiệp Bình",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 2,
+    "maxDepth": 50,
+    "minDepth": 15,
+    "depth": 50,
+    "causes": [
+      "Mưa & Triều",
+      "Triều cường"
+    ],
+    "primaryCause": "Mưa & Triều",
+    "years": [
+      2002,
+      2012
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_41",
+    "x": 50,
+    "y": 50,
+    "lat": 10.742768,
+    "lng": 106.651803,
+    "label": "Phường 12",
+    "fullAddress": "Đường Phường 12, Phường 12, Quận 8",
+    "district": "Quận 8",
+    "ward": "Phường 12",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 2,
+    "maxDepth": 50,
+    "minDepth": 15,
+    "depth": 50,
+    "causes": [
+      "Mưa & Triều",
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa & Triều",
+    "years": [
+      2002,
+      2012
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_67",
+    "x": 50,
+    "y": 50,
+    "lat": 10.791134,
+    "lng": 106.712407,
+    "label": "Phú Mỹ",
+    "fullAddress": "Đường Phú Mỹ, Phường 22, Bình Thạnh",
+    "district": "Bình Thạnh",
+    "ward": "Phường 22",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 2,
+    "maxDepth": 50,
+    "minDepth": 15,
+    "depth": 50,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2008,
+      2011
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_68",
+    "x": 50,
+    "y": 50,
+    "lat": 10.750664,
+    "lng": 106.665053,
+    "label": "Bến Bình Đông",
+    "fullAddress": "Đường Bến Bình Đông, Phường Xóm Củi, Quận 8",
+    "district": "Quận 8",
+    "ward": "Phường Xóm Củi",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 2,
+    "maxDepth": 50,
+    "minDepth": 15,
+    "depth": 50,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2011,
+      2012
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_79",
+    "x": 50,
+    "y": 50,
+    "lat": 10.792154,
+    "lng": 106.694922,
+    "label": "Đinh Tiên Hoàng",
+    "fullAddress": "Đường Đinh Tiên Hoàng, Phường Đa Kao, Quận 1",
+    "district": "Quận 1",
+    "ward": "Phường Đa Kao",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 2,
+    "maxDepth": 50,
+    "minDepth": 15,
+    "depth": 50,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2002,
+      2011
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_93",
+    "x": 50,
+    "y": 50,
+    "lat": 10.850448,
+    "lng": 106.648805,
+    "label": "Phạm Văn Chiêu",
+    "fullAddress": "Đường Phạm Văn Chiêu, Phường 14, Gò Vấp",
+    "district": "Gò Vấp",
+    "ward": "Phường 14",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 2,
+    "maxDepth": 50,
+    "minDepth": 15,
+    "depth": 50,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2019,
+      2023
+    ],
+    "elevationM": 4,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_154",
+    "x": 50,
+    "y": 50,
+    "lat": 10.746142,
+    "lng": 106.496848,
+    "label": "Khu B, Xã Bình Lợi",
+    "fullAddress": "Đường Khu B, Xã Bình Lợi, Bình Chánh, Bình Chánh",
+    "district": "Bình Chánh",
+    "ward": "Bình Chánh",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 2,
+    "maxDepth": 50,
+    "minDepth": 15,
+    "depth": 50,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2006,
+      2007
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_22",
+    "x": 50,
+    "y": 50,
+    "lat": 10.741899,
+    "lng": 106.605836,
+    "label": "Số 17A",
+    "fullAddress": "Đường Số 17A, Phường An Lạc A, Bình Tân",
+    "district": "Bình Tân",
+    "ward": "Phường An Lạc A",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 2,
+    "maxDepth": 40,
+    "minDepth": 15,
+    "depth": 40,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2023,
+      2025
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_140",
+    "x": 50,
+    "y": 50,
+    "lat": 10.816948,
+    "lng": 106.71804,
+    "label": "Chợ Thanh Đa",
+    "fullAddress": "Đường Chợ Thanh Đa, Phường 27, Bình Thạnh",
+    "district": "Bình Thạnh",
+    "ward": "Phường 27",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 2,
+    "maxDepth": 40,
+    "minDepth": 20,
+    "depth": 40,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2005,
+      2007
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_156",
+    "x": 50,
+    "y": 50,
+    "lat": 10.715056,
+    "lng": 106.653805,
+    "label": "Quốc Lộ 50",
+    "fullAddress": "Đường Quốc Lộ 50, Xã Bình Hưng, Bình Chánh",
+    "district": "Bình Chánh",
+    "ward": "Xã Bình Hưng",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 2,
+    "maxDepth": 40,
+    "minDepth": 15,
+    "depth": 40,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2006,
+      2023
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_243",
+    "x": 50,
+    "y": 50,
+    "lat": 10.753049,
+    "lng": 106.657168,
+    "label": "Châu Văn Liêm",
+    "fullAddress": "Đường Châu Văn Liêm, Phường 14, Quận 5",
+    "district": "Quận 5",
+    "ward": "Phường 14",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 2,
+    "maxDepth": 40,
+    "minDepth": 15,
+    "depth": 40,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2010
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_27",
+    "x": 50,
+    "y": 50,
+    "lat": 10.736859,
+    "lng": 106.604791,
+    "label": "Sinco",
+    "fullAddress": "Đường Sinco, Đường Sinco, Bình Tân",
+    "district": "Bình Tân",
+    "ward": "Đường Sinco",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 2,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2023,
+      2025
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_30",
+    "x": 50,
+    "y": 50,
+    "lat": 10.843435,
+    "lng": 106.656508,
+    "label": "Nguyễn Văn Khối",
+    "fullAddress": "Đường Nguyễn Văn Khối, Phường 8, Gò Vấp",
+    "district": "Gò Vấp",
+    "ward": "Phường 8",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 2,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2023
+    ],
+    "elevationM": 4,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_32",
+    "x": 50,
+    "y": 50,
+    "lat": 10.818386,
+    "lng": 106.718018,
+    "label": "Thanh Đa",
+    "fullAddress": "Đường Thanh Đa, Phường 27, Bình Thạnh",
+    "district": "Bình Thạnh",
+    "ward": "Phường 27",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 2,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường",
+      "Mưa lớn"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2013,
+      2025
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_49",
+    "x": 50,
+    "y": 50,
+    "lat": 10.778398,
+    "lng": 106.695569,
+    "label": "Nam Kỳ Khởi Nghĩa",
+    "fullAddress": "Đường Nam Kỳ Khởi Nghĩa, Bến Nghé, Quận 1",
+    "district": "Quận 1",
+    "ward": "Bến Nghé",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 2,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2010,
+      2016
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_53",
+    "x": 50,
+    "y": 50,
+    "lat": 10.850338,
+    "lng": 106.664034,
+    "label": "Lê Đức Thọ",
+    "fullAddress": "Đường Lê Đức Thọ, Phường 16, Gò Vấp",
+    "district": "Gò Vấp",
+    "ward": "Phường 16",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 2,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2016,
+      2023
+    ],
+    "elevationM": 4,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_59",
+    "x": 50,
+    "y": 50,
+    "lat": 10.771219,
+    "lng": 106.692456,
+    "label": "Lê Lai",
+    "fullAddress": "Đường Lê Lai, Phường Bến Thành, Quận 1",
+    "district": "Quận 1",
+    "ward": "Phường Bến Thành",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 2,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2010,
+      2022
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_60",
+    "x": 50,
+    "y": 50,
+    "lat": 10.774269,
+    "lng": 106.698223,
+    "label": "Lê Lợi",
+    "fullAddress": "Đường Lê Lợi, Phường Bến Thành, Quận 1",
+    "district": "Quận 1",
+    "ward": "Phường Bến Thành",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 2,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2010,
+      2022
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_62",
+    "x": 50,
+    "y": 50,
+    "lat": 10.592087,
+    "lng": 106.741199,
+    "label": "Nguyễn Văn Tạo",
+    "fullAddress": "Đường Nguyễn Văn Tạo, Xã Hiệp, Nhà Bè",
+    "district": "Nhà Bè",
+    "ward": "Xã Hiệp",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 2,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường",
+      "Mưa & Triều"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2002,
+      2025
+    ],
+    "elevationM": 1.2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_85",
+    "x": 50,
+    "y": 50,
+    "lat": 10.736875,
+    "lng": 106.632004,
+    "label": "Nguyễn Văn Luông",
+    "fullAddress": "Đường Nguyễn Văn Luông, Phường 10, Quận 6",
+    "district": "Quận 6",
+    "ward": "Phường 10",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 2,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2008
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_96",
+    "x": 50,
+    "y": 50,
+    "lat": 10.845904,
+    "lng": 106.786233,
+    "label": "Lê Văn Việt",
+    "fullAddress": "Đường Lê Văn Việt, Phường Tăng Nhơn Phú A, TP. Thủ Đức",
+    "district": "TP. Thủ Đức",
+    "ward": "Phường Tăng Nhơn Phú A",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 2,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2017,
+      2024
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_106",
+    "x": 50,
+    "y": 50,
+    "lat": 10.830951,
+    "lng": 106.631009,
+    "label": "Phan Huy Ích",
+    "fullAddress": "Đường Phan Huy Ích, Phường 15, Tân Bình",
+    "district": "Tân Bình",
+    "ward": "Phường 15",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 2,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2018,
+      2025
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_107",
+    "x": 50,
+    "y": 50,
+    "lat": 10.808823,
+    "lng": 106.701701,
+    "label": "Bùi Đình Túy",
+    "fullAddress": "Đường Bùi Đình Túy, Phường 14, Bình Thạnh",
+    "district": "Bình Thạnh",
+    "ward": "Phường 14",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 2,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2002
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_113",
+    "x": 50,
+    "y": 50,
+    "lat": 10.802464,
+    "lng": 106.709558,
+    "label": "Cầu vượt Hàng Xanh",
+    "fullAddress": "Cầu vượt Hàng Xanh, Phường 19, Bình Thạnh",
+    "district": "Bình Thạnh",
+    "ward": "Phường 19",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 2,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2002,
+      2008
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_116",
+    "x": 50,
+    "y": 50,
+    "lat": 10.677108,
+    "lng": 106.651845,
+    "label": "Xã Đa Phước",
+    "fullAddress": "Đường Xã Đa Phước, Xã Hưng Long, Bình Chánh",
+    "district": "Bình Chánh",
+    "ward": "Xã Hưng Long",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 2,
+    "maxDepth": 30,
+    "minDepth": 10,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2002,
+      2006
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_117",
+    "x": 50,
+    "y": 50,
+    "lat": 10.690835,
+    "lng": 106.622523,
+    "label": "Xã An Phú Tây",
+    "fullAddress": "Đường Xã An Phú Tây, Xã Bình Chánh, Bình Chánh",
+    "district": "Bình Chánh",
+    "ward": "Xã Bình Chánh",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 2,
+    "maxDepth": 30,
+    "minDepth": 10,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2002,
+      2006
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_120",
+    "x": 50,
+    "y": 50,
+    "lat": 10.702644,
+    "lng": 106.591566,
+    "label": "Xã Tân Kiên",
+    "fullAddress": "Đường Xã Tân Kiên, Xã Tân Nhựt, Bình Chánh",
+    "district": "Bình Chánh",
+    "ward": "Xã Tân Nhựt",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 2,
+    "maxDepth": 30,
+    "minDepth": 10,
+    "depth": 30,
+    "causes": [
+      "Triều cường",
+      "Mưa lớn"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2002,
+      2019
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_163",
+    "x": 50,
+    "y": 50,
+    "lat": 10.842476,
+    "lng": 106.707735,
+    "label": "Số 7",
+    "fullAddress": "Đường Số 7, Phường Hiệp Bình Phước, TP. Thủ Đức",
+    "district": "TP. Thủ Đức",
+    "ward": "Phường Hiệp Bình Phước",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 2,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2006,
+      2011
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_170",
+    "x": 50,
+    "y": 50,
+    "lat": 10.802091,
+    "lng": 106.712676,
+    "label": "Điện Biên Phủ",
+    "fullAddress": "Đường Điện Biên Phủ, Phường 25, Bình Thạnh",
+    "district": "Bình Thạnh",
+    "ward": "Phường 25",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 2,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa & Triều"
+    ],
+    "primaryCause": "Mưa & Triều",
+    "years": [
+      2010,
+      2012
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_179",
+    "x": 50,
+    "y": 50,
+    "lat": 10.851116,
+    "lng": 106.751092,
+    "label": "Văn Cam",
+    "fullAddress": "Đường Văn Cam, Phường Linh Tây, TP. Thủ Đức",
+    "district": "TP. Thủ Đức",
+    "ward": "Phường Linh Tây",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 2,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2023,
+      2025
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_182",
+    "x": 50,
+    "y": 50,
+    "lat": 10.81575,
+    "lng": 106.811086,
+    "label": "Lã Xuân Oai",
+    "fullAddress": "Đường Lã Xuân Oai, Phường Long Trường, TP. Thủ Đức (Quận 9 cũ)",
+    "district": "TP. Thủ Đức (Quận 9 cũ)",
+    "ward": "Phường Long Trường",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 2,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2023,
+      2024
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_189",
+    "x": 50,
+    "y": 50,
+    "lat": 10.846029,
+    "lng": 106.784501,
+    "label": "Lê Văn Việt",
+    "fullAddress": "Đường Lê Văn Việt, Phường Hiệp Phú, TP. Thủ Đức (Quận 9 cũ)",
+    "district": "TP. Thủ Đức (Quận 9 cũ)",
+    "ward": "Phường Hiệp Phú",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 2,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2024,
+      2026
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_190",
+    "x": 50,
+    "y": 50,
+    "lat": 10.850626,
+    "lng": 106.751665,
+    "label": "Dương Văn Cam",
+    "fullAddress": "Đường Dương Văn Cam, Phường Linh Tây, TP. Thủ Đức",
+    "district": "TP. Thủ Đức",
+    "ward": "Phường Linh Tây",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 2,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2024,
+      2025
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_231",
+    "x": 50,
+    "y": 50,
+    "lat": 10.758006,
+    "lng": 106.634133,
+    "label": "Tân Hóa",
+    "fullAddress": "Đường Tân Hóa, Phường 1, Quận 11",
+    "district": "Quận 11",
+    "ward": "Phường 1",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 2,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2013
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_233",
+    "x": 50,
+    "y": 50,
+    "lat": 10.794366,
+    "lng": 106.641638,
+    "label": "Bàu Cát",
+    "fullAddress": "Đường Bàu Cát, Phường 14, Tân Bình",
+    "district": "Tân Bình",
+    "ward": "Phường 14",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 2,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2013
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_237",
+    "x": 50,
+    "y": 50,
+    "lat": 10.770547,
+    "lng": 106.632328,
+    "label": "Hòa Bình",
+    "fullAddress": "Đường Hòa Bình, Phường Hiệp Tân, Tân Phú",
+    "district": "Tân Phú",
+    "ward": "Phường Hiệp Tân",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 2,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2010,
+      2013
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_148",
+    "x": 50,
+    "y": 50,
+    "lat": 10.841321,
+    "lng": 106.723623,
+    "label": "Phường Hiệp Bình Phước, khu phố 6",
+    "fullAddress": "Đường Phường Hiệp Bình Phước, khu phố 6, Phường Hiệp Bình Chánh, TP. Thủ Đức",
+    "district": "TP. Thủ Đức",
+    "ward": "Phường Hiệp Bình Chánh",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 300,
+    "minDepth": 15,
+    "depth": 300,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2007
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_149",
+    "x": 50,
+    "y": 50,
+    "lat": 10.830339,
+    "lng": 106.725559,
+    "label": "Phường Hiệp Bình Chánh, khu phố 5",
+    "fullAddress": "Đường Phường Hiệp Bình Chánh, khu phố 5, Phường Hiệp Bình Chánh, TP. Thủ Đức",
+    "district": "TP. Thủ Đức",
+    "ward": "Phường Hiệp Bình Chánh",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 300,
+    "minDepth": 15,
+    "depth": 300,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2007
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_150",
+    "x": 50,
+    "y": 50,
+    "lat": 10.823323,
+    "lng": 106.716455,
+    "label": "Phường Hiệp Bình Chánh, khu phố 3",
+    "fullAddress": "Đường Phường Hiệp Bình Chánh, khu phố 3, Phường Hiệp Bình Chánh, TP. Thủ Đức",
+    "district": "TP. Thủ Đức",
+    "ward": "Phường Hiệp Bình Chánh",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 300,
+    "minDepth": 15,
+    "depth": 300,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2007
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_151",
+    "x": 50,
+    "y": 50,
+    "lat": 10.825217,
+    "lng": 106.72362,
+    "label": "Phường Hiệp Bình Chánh, khu phố 4",
+    "fullAddress": "Đường Phường Hiệp Bình Chánh, khu phố 4, Phường Hiệp Bình Chánh, TP. Thủ Đức",
+    "district": "TP. Thủ Đức",
+    "ward": "Phường Hiệp Bình Chánh",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 300,
+    "minDepth": 15,
+    "depth": 300,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2007
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_197",
+    "x": 50,
+    "y": 50,
+    "lat": 10.779706,
+    "lng": 106.711234,
+    "label": "Khu đô thị Thảo Thiểm",
+    "fullAddress": "Đường Khu đô thị Thảo Thiểm, Phường Thủ Thiêm, TP. Thủ Đức (Quận 2 cũ)",
+    "district": "TP. Thủ Đức (Quận 2 cũ)",
+    "ward": "Phường Thủ Thiêm",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 120,
+    "minDepth": 15,
+    "depth": 120,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2019
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_128",
+    "x": 50,
+    "y": 50,
+    "lat": 10.899835,
+    "lng": 106.679327,
+    "label": "Xã Nhị Bình",
+    "fullAddress": "Đường Xã Nhị Bình, Xã Nhị Bình, Quận 12",
+    "district": "Quận 12",
+    "ward": "Xã Nhị Bình",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 100,
+    "minDepth": 50,
+    "depth": 100,
+    "causes": [
+      "Mưa & Triều"
+    ],
+    "primaryCause": "Mưa & Triều",
+    "years": [
+      2002
+    ],
+    "elevationM": 4,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_133",
+    "x": 50,
+    "y": 50,
+    "lat": 10.719249,
+    "lng": 106.625927,
+    "label": "Bến Mễ Cốc",
+    "fullAddress": "Đường Bến Mễ Cốc, Phường 15, Quận 8",
+    "district": "Quận 8",
+    "ward": "Phường 15",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 100,
+    "minDepth": 80,
+    "depth": 100,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2002
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_134",
+    "x": 50,
+    "y": 50,
+    "lat": 10.74435,
+    "lng": 106.659488,
+    "label": "Nguyễn Duy",
+    "fullAddress": "Đường Nguyễn Duy, Phường Hưng Phú, Quận 8",
+    "district": "Quận 8",
+    "ward": "Phường Hưng Phú",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 100,
+    "minDepth": 80,
+    "depth": 100,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2002
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_135",
+    "x": 50,
+    "y": 50,
+    "lat": 10.71759,
+    "lng": 106.626652,
+    "label": "Rạch Cát",
+    "fullAddress": "Đường Rạch Cát, Phường 15, Quận 8",
+    "district": "Quận 8",
+    "ward": "Phường 15",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 100,
+    "minDepth": 80,
+    "depth": 100,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2002
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_136",
+    "x": 50,
+    "y": 50,
+    "lat": 10.737362,
+    "lng": 106.640774,
+    "label": "Nguyễn Nhược Thị",
+    "fullAddress": "Đường Nguyễn Nhược Thị, Phường 15, Quận 8",
+    "district": "Quận 8",
+    "ward": "Phường 15",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 100,
+    "minDepth": 80,
+    "depth": 100,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2002
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_229",
+    "x": 50,
+    "y": 50,
+    "lat": 10.769533,
+    "lng": 106.637075,
+    "label": "Hòa Bình",
+    "fullAddress": "Đường Hòa Bình, Phường 3, Quận 11",
+    "district": "Quận 11",
+    "ward": "Phường 3",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 100,
+    "minDepth": 15,
+    "depth": 100,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2013
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_152",
+    "x": 50,
+    "y": 50,
+    "lat": 10.854155,
+    "lng": 106.70598,
+    "label": "Khu Villa An Phú Đông 12",
+    "fullAddress": "Đường Khu Villa An Phú Đông 12, Phường An Phú Đông, Quận 12",
+    "district": "Quận 12",
+    "ward": "Phường An Phú Đông",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 70,
+    "minDepth": 15,
+    "depth": 70,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2007
+    ],
+    "elevationM": 4,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_144",
+    "x": 50,
+    "y": 50,
+    "lat": 10.705643,
+    "lng": 106.731156,
+    "label": "Phạm Hữu Lầu",
+    "fullAddress": "Đường Phạm Hữu Lầu, Phường Phú Mỹ, Quận 7",
+    "district": "Quận 7",
+    "ward": "Phường Phú Mỹ",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 60,
+    "minDepth": 30,
+    "depth": 60,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2025
+    ],
+    "elevationM": 1.2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_145",
+    "x": 50,
+    "y": 50,
+    "lat": 10.856104,
+    "lng": 106.727457,
+    "label": "Phường Hiệp Bình Phước",
+    "fullAddress": "Đường Phường Hiệp Bình Phước, Phường Hiệp Bình Phước, TP. Thủ Đức",
+    "district": "TP. Thủ Đức",
+    "ward": "Phường Hiệp Bình Phước",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 60,
+    "minDepth": 30,
+    "depth": 60,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2006
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_146",
+    "x": 50,
+    "y": 50,
+    "lat": 10.848803,
+    "lng": 106.740408,
+    "label": "Phường Linh Đông",
+    "fullAddress": "Đường Phường Linh Đông, Phường Linh Đông, TP. Thủ Đức",
+    "district": "TP. Thủ Đức",
+    "ward": "Phường Linh Đông",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 60,
+    "minDepth": 30,
+    "depth": 60,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2006
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_193",
+    "x": 50,
+    "y": 50,
+    "lat": 10.851897,
+    "lng": 106.75025,
+    "label": "Kha Vạn Câm",
+    "fullAddress": "Đường Kha Vạn Câm, Phường Linh Đông, TP. Thủ Đức",
+    "district": "TP. Thủ Đức",
+    "ward": "Phường Linh Đông",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 60,
+    "minDepth": 15,
+    "depth": 60,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2024
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_38",
+    "x": 50,
+    "y": 50,
+    "lat": 10.716644,
+    "lng": 106.613402,
+    "label": "Hồ Ngọc Lãm",
+    "fullAddress": "Đường Hồ Ngọc Lãm, Phường An Lạc, Bình Tân",
+    "district": "Bình Tân",
+    "ward": "Phường An Lạc",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 50,
+    "minDepth": 30,
+    "depth": 50,
+    "causes": [
+      "Mưa & Triều"
+    ],
+    "primaryCause": "Mưa & Triều",
+    "years": [
+      2012
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_39",
+    "x": 50,
+    "y": 50,
+    "lat": 10.722142,
+    "lng": 106.602877,
+    "label": "Đại lộ Võ Văn Kiệt",
+    "fullAddress": "Đường Đại lộ Võ Văn Kiệt, Phường An Lạc, Bình Tân",
+    "district": "Bình Tân",
+    "ward": "Phường An Lạc",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 50,
+    "minDepth": 30,
+    "depth": 50,
+    "causes": [
+      "Mưa & Triều"
+    ],
+    "primaryCause": "Mưa & Triều",
+    "years": [
+      2012
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_47",
+    "x": 50,
+    "y": 50,
+    "lat": 10.771928,
+    "lng": 106.700705,
+    "label": "Pasteur-Hàm Nghị",
+    "fullAddress": "Đường Pasteur-Hàm Nghị, Bến Nghé, Quận 1",
+    "district": "Quận 1",
+    "ward": "Bến Nghé",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 50,
+    "minDepth": 15,
+    "depth": 50,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2016
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_69",
+    "x": 50,
+    "y": 50,
+    "lat": 10.794429,
+    "lng": 106.683211,
+    "label": "Phan Đình Phùn",
+    "fullAddress": "Đường Phan Đình Phùn, Phường 2, Phú Nhuận",
+    "district": "Phú Nhuận",
+    "ward": "Phường 2",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 50,
+    "minDepth": 30,
+    "depth": 50,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2011
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_78",
+    "x": 50,
+    "y": 50,
+    "lat": 10.807237,
+    "lng": 106.709764,
+    "label": "Xô Viết Nghệ",
+    "fullAddress": "Đường Xô Viết Nghệ, Phường 25, Bình Thạnh",
+    "district": "Bình Thạnh",
+    "ward": "Phường 25",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 50,
+    "minDepth": 20,
+    "depth": 50,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2011
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_80",
+    "x": 50,
+    "y": 50,
+    "lat": 10.712915,
+    "lng": 106.621836,
+    "label": "Phú Định",
+    "fullAddress": "Đường Phú Định, Phường 16, Quận 8",
+    "district": "Quận 8",
+    "ward": "Phường 16",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 50,
+    "minDepth": 15,
+    "depth": 50,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2011
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_81",
+    "x": 50,
+    "y": 50,
+    "lat": 10.738954,
+    "lng": 106.632696,
+    "label": "Lò Gốm",
+    "fullAddress": "Đường Lò Gốm, Phường 7, Quận 6",
+    "district": "Quận 6",
+    "ward": "Phường 7",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 50,
+    "minDepth": 15,
+    "depth": 50,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2011
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_82",
+    "x": 50,
+    "y": 50,
+    "lat": 10.713353,
+    "lng": 106.615433,
+    "label": "Hồ Học Lãm",
+    "fullAddress": "Đường Hồ Học Lãm, Phường 16, Quận 8",
+    "district": "Quận 8",
+    "ward": "Phường 16",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 50,
+    "minDepth": 15,
+    "depth": 50,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2011
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_87",
+    "x": 50,
+    "y": 50,
+    "lat": 10.80629,
+    "lng": 106.729603,
+    "label": "Quốc Hương & Tống Hữu Định",
+    "fullAddress": "Đường Quốc Hương & Tống Hữu Định, Phường Thảo Điền, TP. Thủ Đức (Quận 2 cũ)",
+    "district": "TP. Thủ Đức (Quận 2 cũ)",
+    "ward": "Phường Thảo Điền",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 50,
+    "minDepth": 30,
+    "depth": 50,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2019
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_88",
+    "x": 50,
+    "y": 50,
+    "lat": 10.806112,
+    "lng": 106.731264,
+    "label": "Lê Văn Miến",
+    "fullAddress": "Đường Lê Văn Miến, Phường Thảo Điền, TP. Thủ Đức (Quận 2 cũ)",
+    "district": "TP. Thủ Đức (Quận 2 cũ)",
+    "ward": "Phường Thảo Điền",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 50,
+    "minDepth": 30,
+    "depth": 50,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2019
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_89",
+    "x": 50,
+    "y": 50,
+    "lat": 10.789687,
+    "lng": 106.773234,
+    "label": "số 46",
+    "fullAddress": "Đường số 46, Phường Bình Trưng Đông, TP. Thủ Đức (Quận 2 cũ)",
+    "district": "TP. Thủ Đức (Quận 2 cũ)",
+    "ward": "Phường Bình Trưng Đông",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 50,
+    "minDepth": 30,
+    "depth": 50,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2019
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_90",
+    "x": 50,
+    "y": 50,
+    "lat": 10.790679,
+    "lng": 106.771575,
+    "label": "số 48",
+    "fullAddress": "Đường số 48, Phường Bình Trưng Đông, TP. Thủ Đức (Quận 2 cũ)",
+    "district": "TP. Thủ Đức (Quận 2 cũ)",
+    "ward": "Phường Bình Trưng Đông",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 50,
+    "minDepth": 30,
+    "depth": 50,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2019
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_91",
+    "x": 50,
+    "y": 50,
+    "lat": 10.786969,
+    "lng": 106.770013,
+    "label": "số 41",
+    "fullAddress": "Đường số 41, Phường Bình Trưng Đông, TP. Thủ Đức (Quận 2 cũ)",
+    "district": "TP. Thủ Đức (Quận 2 cũ)",
+    "ward": "Phường Bình Trưng Đông",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 50,
+    "minDepth": 30,
+    "depth": 50,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2019
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_92",
+    "x": 50,
+    "y": 50,
+    "lat": 10.845567,
+    "lng": 106.645112,
+    "label": "Cây Trâm",
+    "fullAddress": "Đường Cây Trâm, Phường 8, Gò Vấp",
+    "district": "Gò Vấp",
+    "ward": "Phường 8",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 50,
+    "minDepth": 30,
+    "depth": 50,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2019
+    ],
+    "elevationM": 4,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_137",
+    "x": 50,
+    "y": 50,
+    "lat": 10.787432,
+    "lng": 106.688735,
+    "label": "Võ Thị Sáu",
+    "fullAddress": "Đường Võ Thị Sáu, Phường Võ Thị Sáu, Quận 3",
+    "district": "Quận 3",
+    "ward": "Phường Võ Thị Sáu",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 50,
+    "minDepth": 15,
+    "depth": 50,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2002
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_138",
+    "x": 50,
+    "y": 50,
+    "lat": 10.752186,
+    "lng": 106.681942,
+    "label": "Cầu Chữ Y",
+    "fullAddress": "Cầu Chữ Y, Phường 8, Quận 8",
+    "district": "Quận 8",
+    "ward": "Phường 8",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 50,
+    "minDepth": 15,
+    "depth": 50,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2002
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_162",
+    "x": 50,
+    "y": 50,
+    "lat": 10.850018,
+    "lng": 106.739694,
+    "label": "Rạch Lùng",
+    "fullAddress": "Đường Rạch Lùng, Phường Linh Đông, TP. Thủ Đức",
+    "district": "TP. Thủ Đức",
+    "ward": "Phường Linh Đông",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 50,
+    "minDepth": 40,
+    "depth": 50,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2006
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_204",
+    "x": 50,
+    "y": 50,
+    "lat": 10.856677,
+    "lng": 106.607808,
+    "label": "Song Hành QL2",
+    "fullAddress": "Đường Song Hành QL2, Phường Tân Hưng Thuận, TP. Thủ Đức",
+    "district": "TP. Thủ Đức",
+    "ward": "Phường Tân Hưng Thuận",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 50,
+    "minDepth": 15,
+    "depth": 50,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2019
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_205",
+    "x": 50,
+    "y": 50,
+    "lat": 10.857392,
+    "lng": 106.606212,
+    "label": "Nguyễn Ảnh Thủ",
+    "fullAddress": "Đường Nguyễn Ảnh Thủ, Phường Trung Mỹ Tây, TP. Thủ Đức",
+    "district": "TP. Thủ Đức",
+    "ward": "Phường Trung Mỹ Tây",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 50,
+    "minDepth": 15,
+    "depth": 50,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2019
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_206",
+    "x": 50,
+    "y": 50,
+    "lat": 10.855827,
+    "lng": 106.605729,
+    "label": "Quốc Lộ 22",
+    "fullAddress": "Đường Quốc Lộ 22, Phường Trung Mỹ Tây, TP. Thủ Đức",
+    "district": "TP. Thủ Đức",
+    "ward": "Phường Trung Mỹ Tây",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 50,
+    "minDepth": 15,
+    "depth": 50,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2019
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_219",
+    "x": 50,
+    "y": 50,
+    "lat": 10.704487,
+    "lng": 106.595433,
+    "label": "Quốc Lộ 1",
+    "fullAddress": "Đường Quốc Lộ 1, Phường Bình Đông, Bình Chánh",
+    "district": "Bình Chánh",
+    "ward": "Phường Bình Đông",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 50,
+    "minDepth": 15,
+    "depth": 50,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2008
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_220",
+    "x": 50,
+    "y": 50,
+    "lat": 10.764242,
+    "lng": 106.698457,
+    "label": "Nguyễn Hữu Hào",
+    "fullAddress": "Đường Nguyễn Hữu Hào, Phường 8, Quận 4",
+    "district": "Quận 4",
+    "ward": "Phường 8",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 50,
+    "minDepth": 30,
+    "depth": 50,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2008
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_221",
+    "x": 50,
+    "y": 50,
+    "lat": 10.754144,
+    "lng": 106.697777,
+    "label": "Tôn Thất Thuyết",
+    "fullAddress": "Đường Tôn Thất Thuyết, Phường 3, Quận 4",
+    "district": "Quận 4",
+    "ward": "Phường 3",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 50,
+    "minDepth": 30,
+    "depth": 50,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2008
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_245",
+    "x": 50,
+    "y": 50,
+    "lat": 10.802591,
+    "lng": 106.709548,
+    "label": "Hàng Xanh",
+    "fullAddress": "Đường Hàng Xanh, Phường 17, Bình Thạnh",
+    "district": "Bình Thạnh",
+    "ward": "Phường 17",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 50,
+    "minDepth": 15,
+    "depth": 50,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2010
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_247",
+    "x": 50,
+    "y": 50,
+    "lat": 10.799402,
+    "lng": 106.723463,
+    "label": "Cau Cầu Sài Gòn",
+    "fullAddress": "Đường Cau Cầu Sài Gòn, Phường 22, Bình Thạnh",
+    "district": "Bình Thạnh",
+    "ward": "Phường 22",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 50,
+    "minDepth": 15,
+    "depth": 50,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2010
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_125",
+    "x": 50,
+    "y": 50,
+    "lat": 10.758392,
+    "lng": 106.660029,
+    "label": "Lý Thường Kiệt",
+    "fullAddress": "Đường Lý Thường Kiệt, Phường 15, Quận 5",
+    "district": "Quận 5",
+    "ward": "Phường 15",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 40,
+    "minDepth": 20,
+    "depth": 40,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2002
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_126",
+    "x": 50,
+    "y": 50,
+    "lat": 10.773337,
+    "lng": 106.703784,
+    "label": "Nguyễn Huệ",
+    "fullAddress": "Đường Nguyễn Huệ, Phường Bến Nghé, Quận 1",
+    "district": "Quận 1",
+    "ward": "Phường Bến Nghé",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 40,
+    "minDepth": 20,
+    "depth": 40,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2002
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_127",
+    "x": 50,
+    "y": 50,
+    "lat": 10.793036,
+    "lng": 106.701129,
+    "label": "Nguyễn Đình Chiểu",
+    "fullAddress": "Đường Nguyễn Đình Chiểu, Phường Đa Kao, Quận 1",
+    "district": "Quận 1",
+    "ward": "Phường Đa Kao",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 40,
+    "minDepth": 20,
+    "depth": 40,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2002
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_172",
+    "x": 50,
+    "y": 50,
+    "lat": 10.708461,
+    "lng": 106.61331,
+    "label": "Nguyễn Ngọc Cung",
+    "fullAddress": "Đường Nguyễn Ngọc Cung, Phường 16, Quận 8",
+    "district": "Quận 8",
+    "ward": "Phường 16",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 40,
+    "minDepth": 20,
+    "depth": 40,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2023
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_242",
+    "x": 50,
+    "y": 50,
+    "lat": 10.760221,
+    "lng": 106.682224,
+    "label": "Lê Hồng Phong",
+    "fullAddress": "Đường Lê Hồng Phong, Phường 4, Quận 5",
+    "district": "Quận 5",
+    "ward": "Phường 4",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 40,
+    "minDepth": 30,
+    "depth": 40,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2010
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_244",
+    "x": 50,
+    "y": 50,
+    "lat": 10.760474,
+    "lng": 106.682217,
+    "label": "Nguyễn Văn Cừ",
+    "fullAddress": "Đường Nguyễn Văn Cừ, Phường 2, Quận 5",
+    "district": "Quận 5",
+    "ward": "Phường 2",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 40,
+    "minDepth": 30,
+    "depth": 40,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2010
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_246",
+    "x": 50,
+    "y": 50,
+    "lat": 10.795269,
+    "lng": 106.688368,
+    "label": "Trần Khánh Dư",
+    "fullAddress": "Đường Trần Khánh Dư, Phường Tân Định, Quận 1",
+    "district": "Quận 1",
+    "ward": "Phường Tân Định",
+    "type": "flood",
+    "severity": "critical",
+    "historyCount": 1,
+    "maxDepth": 40,
+    "minDepth": 30,
+    "depth": 40,
+    "causes": [
+      "Mưa & Triều"
+    ],
+    "primaryCause": "Mưa & Triều",
+    "years": [
+      2010
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_5",
+    "x": 50,
+    "y": 50,
+    "lat": 10.694083,
+    "lng": 106.709577,
+    "label": "Phạm Hữu Lầu",
+    "fullAddress": "Đường Phạm Hữu Lầu, Nhà Bè, Nhà Bè",
+    "district": "Nhà Bè",
+    "ward": "Nhà Bè",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2025
+    ],
+    "elevationM": 1.2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_6",
+    "x": 50,
+    "y": 50,
+    "lat": 10.670955,
+    "lng": 106.714214,
+    "label": "Nguyễn Bình",
+    "fullAddress": "Đường Nguyễn Bình, Xa Hiệp Phước, Nhà Bè",
+    "district": "Nhà Bè",
+    "ward": "Xa Hiệp Phước",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2025
+    ],
+    "elevationM": 1.2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_8",
+    "x": 50,
+    "y": 50,
+    "lat": 10.80045,
+    "lng": 106.729995,
+    "label": "Võ Nguyên Giáp",
+    "fullAddress": "Đường Võ Nguyên Giáp, Phường Thảo Điền, TP. Thủ Đức (Quận 2 cũ)",
+    "district": "TP. Thủ Đức (Quận 2 cũ)",
+    "ward": "Phường Thảo Điền",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2025
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_9",
+    "x": 50,
+    "y": 50,
+    "lat": 10.771248,
+    "lng": 106.709153,
+    "label": "Mai Chí Thọ",
+    "fullAddress": "Đường Mai Chí Thọ, Thủ Thiêm, TP. Thủ Đức (Quận 2 cũ)",
+    "district": "TP. Thủ Đức (Quận 2 cũ)",
+    "ward": "Thủ Thiêm",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2025
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_10",
+    "x": 50,
+    "y": 50,
+    "lat": 10.806955,
+    "lng": 106.679772,
+    "label": "Thich Quang Duc",
+    "fullAddress": "Đường Thich Quang Duc, Phường 5, Phú Nhuận",
+    "district": "Phú Nhuận",
+    "ward": "Phường 5",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2025
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_11",
+    "x": 50,
+    "y": 50,
+    "lat": 11.006055,
+    "lng": 106.640129,
+    "label": "Hồ Văn Cống",
+    "fullAddress": "Đường Hồ Văn Cống, Tương Bình Hiệp, Chánh Hiệp",
+    "district": "Chánh Hiệp",
+    "ward": "Tương Bình Hiệp",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2025
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_12",
+    "x": 50,
+    "y": 50,
+    "lat": 10.399396,
+    "lng": 107.118964,
+    "label": "Hẻm 646 Đ. 30 Tháng 4",
+    "fullAddress": "Đường Hẻm 646 Đ. 30 Tháng 4, Rạch Dừa, Rạch Dừa",
+    "district": "Rạch Dừa",
+    "ward": "Rạch Dừa",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2025
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_13",
+    "x": 50,
+    "y": 50,
+    "lat": 10.396712,
+    "lng": 107.11821,
+    "label": "842 Bình Giã",
+    "fullAddress": "Đường 842 Bình Giã, Rạch Dừa, Rạch Dừa",
+    "district": "Rạch Dừa",
+    "ward": "Rạch Dừa",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2025
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_14",
+    "x": 50,
+    "y": 50,
+    "lat": 10.77088,
+    "lng": 106.706418,
+    "label": "Hầm Thủ Thiên",
+    "fullAddress": "Đường Hầm Thủ Thiên, TP. Thủ Đức (Quận 2 cũ)",
+    "district": "TP. Thủ Đức (Quận 2 cũ)",
+    "ward": "",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2016
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_15",
+    "x": 50,
+    "y": 50,
+    "lat": 10.821716,
+    "lng": 106.650418,
+    "label": "Sân bay",
+    "fullAddress": "Đường Sân bay, Phường Tân Sơn, Tân Bình",
+    "district": "Tân Bình",
+    "ward": "Phường Tân Sơn",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2016
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_21",
+    "x": 50,
+    "y": 50,
+    "lat": 10.810711,
+    "lng": 106.723445,
+    "label": "Phường Thảo Điền",
+    "fullAddress": "Đường Phường Thảo Điền, Thảo Điền, TP. Thủ Đức (Quận 2 cũ)",
+    "district": "TP. Thủ Đức (Quận 2 cũ)",
+    "ward": "Thảo Điền",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2020
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_25",
+    "x": 50,
+    "y": 50,
+    "lat": 10.728992,
+    "lng": 106.610865,
+    "label": "Lê Cơ",
+    "fullAddress": "Đường Lê Cơ, Phường An Lạc, Bình Tân",
+    "district": "Bình Tân",
+    "ward": "Phường An Lạc",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2023
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_26",
+    "x": 50,
+    "y": 50,
+    "lat": 10.748964,
+    "lng": 106.593007,
+    "label": "Quốc lộ 1, đoạn qua Công ty TNHH PouYuen Việt Nam",
+    "fullAddress": "Đường Quốc lộ 1, đoạn qua Công ty TNHH PouYuen Việt Nam, Phường An Lạc, Bình Tân",
+    "district": "Bình Tân",
+    "ward": "Phường An Lạc",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2023
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_28",
+    "x": 50,
+    "y": 50,
+    "lat": 10.843767,
+    "lng": 106.613386,
+    "label": "Ngã tư An Sương",
+    "fullAddress": "Ngã tư An Sương, Tân Thới Nhất, Quận 12",
+    "district": "Quận 12",
+    "ward": "Tân Thới Nhất",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2023
+    ],
+    "elevationM": 4,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_29",
+    "x": 50,
+    "y": 50,
+    "lat": 10.720709,
+    "lng": 106.620599,
+    "label": "Phạm Đức Sơn",
+    "fullAddress": "Đường Phạm Đức Sơn, Phường 16, Quận 8",
+    "district": "Quận 8",
+    "ward": "Phường 16",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2023
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_31",
+    "x": 50,
+    "y": 50,
+    "lat": 10.845121,
+    "lng": 106.655342,
+    "label": "Lê Văn Thọ",
+    "fullAddress": "Đường Lê Văn Thọ, Phường 8, Gò Vấp",
+    "district": "Gò Vấp",
+    "ward": "Phường 8",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2023
+    ],
+    "elevationM": 4,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_33",
+    "x": 50,
+    "y": 50,
+    "lat": 11.158141,
+    "lng": 106.580083,
+    "label": "Phường Long Nguyên",
+    "fullAddress": "Đường Phường Long Nguyên, An Điền, Long Nguyên",
+    "district": "Long Nguyên",
+    "ward": "An Điền",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa & Triều"
+    ],
+    "primaryCause": "Mưa & Triều",
+    "years": [
+      2025
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_42",
+    "x": 50,
+    "y": 50,
+    "lat": 10.746934,
+    "lng": 106.655172,
+    "label": "Phường 13",
+    "fullAddress": "Đường Phường 13, Phường 13, Quận 8",
+    "district": "Quận 8",
+    "ward": "Phường 13",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa & Triều"
+    ],
+    "primaryCause": "Mưa & Triều",
+    "years": [
+      2012
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_43",
+    "x": 50,
+    "y": 50,
+    "lat": 10.749827,
+    "lng": 106.663161,
+    "label": "Tùng Thiện Vương",
+    "fullAddress": "Đường Tùng Thiện Vương, Phường 11, Quận 8",
+    "district": "Quận 8",
+    "ward": "Phường 11",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa & Triều"
+    ],
+    "primaryCause": "Mưa & Triều",
+    "years": [
+      2012
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_44",
+    "x": 50,
+    "y": 50,
+    "lat": 10.747676,
+    "lng": 106.672292,
+    "label": "Hưng Phú Street",
+    "fullAddress": "Đường Hưng Phú Street, Phường Hưng Phú, Quận 8",
+    "district": "Quận 8",
+    "ward": "Phường Hưng Phú",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa & Triều"
+    ],
+    "primaryCause": "Mưa & Triều",
+    "years": [
+      2012
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_45",
+    "x": 50,
+    "y": 50,
+    "lat": 10.743878,
+    "lng": 106.680116,
+    "label": "Tạ Quang Bửu",
+    "fullAddress": "Đường Tạ Quang Bửu, Phường 5, Quận 8",
+    "district": "Quận 8",
+    "ward": "Phường 5",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa & Triều"
+    ],
+    "primaryCause": "Mưa & Triều",
+    "years": [
+      2012
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_50",
+    "x": 50,
+    "y": 50,
+    "lat": 10.765381,
+    "lng": 106.690319,
+    "label": "Trần Hưng Đạo",
+    "fullAddress": "Đường Trần Hưng Đạo, Cô Giang, Quận 1",
+    "district": "Quận 1",
+    "ward": "Cô Giang",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2016
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_51",
+    "x": 50,
+    "y": 50,
+    "lat": 10.804861,
+    "lng": 106.66299,
+    "label": "Phan Đình Giót",
+    "fullAddress": "Đường Phan Đình Giót, Phường 2, Tân Bình",
+    "district": "Tân Bình",
+    "ward": "Phường 2",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2016
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_52",
+    "x": 50,
+    "y": 50,
+    "lat": 10.795884,
+    "lng": 106.641001,
+    "label": "Nguyễn Hồng Đào",
+    "fullAddress": "Đường Nguyễn Hồng Đào, Phường 14, Tân Bình",
+    "district": "Tân Bình",
+    "ward": "Phường 14",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2016
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_54",
+    "x": 50,
+    "y": 50,
+    "lat": 10.83505,
+    "lng": 106.66343,
+    "label": "Quang Trung",
+    "fullAddress": "Đường Quang Trung, Phường 10, Gò Vấp",
+    "district": "Gò Vấp",
+    "ward": "Phường 10",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2016
+    ],
+    "elevationM": 4,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_55",
+    "x": 50,
+    "y": 50,
+    "lat": 10.739808,
+    "lng": 106.668104,
+    "label": "Phạm Hùng",
+    "fullAddress": "Đường Phạm Hùng, Phường 5, Quận 8",
+    "district": "Quận 8",
+    "ward": "Phường 5",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2016
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_56",
+    "x": 50,
+    "y": 50,
+    "lat": 10.807294,
+    "lng": 106.662658,
+    "label": "Trường Sơn",
+    "fullAddress": "Đường Trường Sơn, Phường 2, Tân Bình",
+    "district": "Tân Bình",
+    "ward": "Phường 2",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2016
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_57",
+    "x": 50,
+    "y": 50,
+    "lat": 10.767604,
+    "lng": 106.690366,
+    "label": "Bùi Viện",
+    "fullAddress": "Đường Bùi Viện, Phạm Ngũ Lão, Quận 1",
+    "district": "Quận 1",
+    "ward": "Phạm Ngũ Lão",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2022
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_58",
+    "x": 50,
+    "y": 50,
+    "lat": 10.766159,
+    "lng": 106.688467,
+    "label": "Cống Quỳnh",
+    "fullAddress": "Đường Cống Quỳnh, Nguyễn Cư Trinh, Quận 1",
+    "district": "Quận 1",
+    "ward": "Nguyễn Cư Trinh",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2022
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_61",
+    "x": 50,
+    "y": 50,
+    "lat": 10.807866,
+    "lng": 106.729255,
+    "label": "Phan Đình Phùng",
+    "fullAddress": "Đường Phan Đình Phùng, Phường Thảo Điền, TP. Thủ Đức (Quận 2 cũ)",
+    "district": "TP. Thủ Đức (Quận 2 cũ)",
+    "ward": "Phường Thảo Điền",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2022
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_63",
+    "x": 50,
+    "y": 50,
+    "lat": 10.787562,
+    "lng": 106.707226,
+    "label": "Nguyễn Hữu Cảnh",
+    "fullAddress": "Đường Nguyễn Hữu Cảnh, Bến Nghé, Quận 1",
+    "district": "Quận 1",
+    "ward": "Bến Nghé",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa & Triều"
+    ],
+    "primaryCause": "Mưa & Triều",
+    "years": [
+      2025
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_64",
+    "x": 50,
+    "y": 50,
+    "lat": 10.703306,
+    "lng": 106.736384,
+    "label": "Huỳnh Tấn Phá",
+    "fullAddress": "Đường Huỳnh Tấn Phá, Xã Nhà Bè, Nhà Bè",
+    "district": "Nhà Bè",
+    "ward": "Xã Nhà Bè",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2011
+    ],
+    "elevationM": 1.2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_70",
+    "x": 50,
+    "y": 50,
+    "lat": 10.689263,
+    "lng": 106.681392,
+    "label": "Trường Mầm non Vành Khuyên",
+    "fullAddress": "Đường Trường Mầm non Vành Khuyên, Xã Nhà Bè, Nhà Bè",
+    "district": "Nhà Bè",
+    "ward": "Xã Nhà Bè",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2012
+    ],
+    "elevationM": 1.2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_71",
+    "x": 50,
+    "y": 50,
+    "lat": 10.715061,
+    "lng": 106.623149,
+    "label": "Bến Phú Định",
+    "fullAddress": "Đường Bến Phú Định, Phường 16, Quận 8",
+    "district": "Quận 8",
+    "ward": "Phường 16",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 70,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2012
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_72",
+    "x": 50,
+    "y": 50,
+    "lat": 10.75439,
+    "lng": 106.653392,
+    "label": "Dương Tử Giang",
+    "fullAddress": "Đường Dương Tử Giang, Phường 14, Quận 5",
+    "district": "Quận 5",
+    "ward": "Phường 14",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2012
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_73",
+    "x": 50,
+    "y": 50,
+    "lat": 10.786936,
+    "lng": 106.593036,
+    "label": "Quốc lộ 1",
+    "fullAddress": "Đường Quốc lộ 1, Bình Hưng Hòa A, Bình Tân",
+    "district": "Bình Tân",
+    "ward": "Bình Hưng Hòa A",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2012
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_74",
+    "x": 50,
+    "y": 50,
+    "lat": 10.704397,
+    "lng": 106.593637,
+    "label": "Dương Đình Cúc",
+    "fullAddress": "Đường Dương Đình Cúc, Xã Tân Nhựt, Bình Chánh",
+    "district": "Bình Chánh",
+    "ward": "Xã Tân Nhựt",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2012
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_75",
+    "x": 50,
+    "y": 50,
+    "lat": 10.746161,
+    "lng": 106.652049,
+    "label": "Khu vực bến Bình Đông",
+    "fullAddress": "Đường Khu vực bến Bình Đông, Phường Xóm Củi, Quận 8",
+    "district": "Quận 8",
+    "ward": "Phường Xóm Củi",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2012
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_76",
+    "x": 50,
+    "y": 50,
+    "lat": 10.97839,
+    "lng": 106.649502,
+    "label": "Chợ Thủ Dầu Một",
+    "fullAddress": "Đường Chợ Thủ Dầu Một, Phường Phú Cường, Phường Thủ Dầu Một",
+    "district": "Phường Thủ Dầu Một",
+    "ward": "Phường Phú Cường",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2012
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_77",
+    "x": 50,
+    "y": 50,
+    "lat": 10.910051,
+    "lng": 106.691008,
+    "label": "Lái Thiêu",
+    "fullAddress": "Đường Lái Thiêu, Phường Lái Thiêu, Phường Lái Thiêu",
+    "district": "Phường Lái Thiêu",
+    "ward": "Phường Lái Thiêu",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2012
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_83",
+    "x": 50,
+    "y": 50,
+    "lat": 10.743672,
+    "lng": 106.721415,
+    "label": "Lý Phục Man",
+    "fullAddress": "Đường Lý Phục Man, Phường Bình Thuận, Quận 7",
+    "district": "Quận 7",
+    "ward": "Phường Bình Thuận",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 50,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2011
+    ],
+    "elevationM": 1.2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_84",
+    "x": 50,
+    "y": 50,
+    "lat": 10.738101,
+    "lng": 106.699585,
+    "label": "Số 10",
+    "fullAddress": "Đường Số 10, Phường Tân Phong, Quận 7",
+    "district": "Quận 7",
+    "ward": "Phường Tân Phong",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 50,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2011
+    ],
+    "elevationM": 1.2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_94",
+    "x": 50,
+    "y": 50,
+    "lat": 10.787621,
+    "lng": 106.70388,
+    "label": "Nguyễn Bỉnh Khiêm",
+    "fullAddress": "Đường Nguyễn Bỉnh Khiêm, Phường Bến Nghé, Quận 1",
+    "district": "Quận 1",
+    "ward": "Phường Bến Nghé",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2019
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_95",
+    "x": 50,
+    "y": 50,
+    "lat": 10.735075,
+    "lng": 106.633788,
+    "label": "Mễ Cốc",
+    "fullAddress": "Đường Mễ Cốc, Phường 15, Quận 8",
+    "district": "Quận 8",
+    "ward": "Phường 15",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2019
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_97",
+    "x": 50,
+    "y": 50,
+    "lat": 10.820008,
+    "lng": 106.775633,
+    "label": "Dương Đình Hội",
+    "fullAddress": "Đường Dương Đình Hội, Phường Phước Long B, TP. Thủ Đức",
+    "district": "TP. Thủ Đức",
+    "ward": "Phường Phước Long B",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2024
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_99",
+    "x": 50,
+    "y": 50,
+    "lat": 10.790897,
+    "lng": 106.705554,
+    "label": "Kênh Nhiêu Lộc - Thị Nghè",
+    "fullAddress": "Đường Kênh Nhiêu Lộc - Thị Nghè, Phường Sài Gòn, Bình Thạnh",
+    "district": "Bình Thạnh",
+    "ward": "Phường Sài Gòn",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2008
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_100",
+    "x": 50,
+    "y": 50,
+    "lat": 10.747838,
+    "lng": 106.639328,
+    "label": "Kênh Hàng Bàng",
+    "fullAddress": "Đường Kênh Hàng Bàng, Phường 8, Quận 6",
+    "district": "Quận 6",
+    "ward": "Phường 8",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2008
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_101",
+    "x": 50,
+    "y": 50,
+    "lat": 10.751093,
+    "lng": 106.66303,
+    "label": "Kênh Tàu Hủ",
+    "fullAddress": "Đường Kênh Tàu Hủ, Quận 8",
+    "district": "Quận 8",
+    "ward": "",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2008
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_102",
+    "x": 50,
+    "y": 50,
+    "lat": 10.755352,
+    "lng": 106.686392,
+    "label": "Rạch Bến Nghé",
+    "fullAddress": "Đường Rạch Bến Nghé, Quận 4",
+    "district": "Quận 4",
+    "ward": "",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2008
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_103",
+    "x": 50,
+    "y": 50,
+    "lat": 10.732669,
+    "lng": 106.637781,
+    "label": "Kênh Đôi",
+    "fullAddress": "Đường Kênh Đôi, Quận 8",
+    "district": "Quận 8",
+    "ward": "",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2008
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_104",
+    "x": 50,
+    "y": 50,
+    "lat": 10.753369,
+    "lng": 106.707112,
+    "label": "Kênh Tẻ",
+    "fullAddress": "Đường Kênh Tẻ, Quận 7",
+    "district": "Quận 7",
+    "ward": "",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2008
+    ],
+    "elevationM": 1.2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_105",
+    "x": 50,
+    "y": 50,
+    "lat": 10.755334,
+    "lng": 106.641305,
+    "label": "Cây Gõ",
+    "fullAddress": "Đường Cây Gõ, Phường 9, Quận 11",
+    "district": "Quận 11",
+    "ward": "Phường 9",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2008
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_109",
+    "x": 50,
+    "y": 50,
+    "lat": 10.80322,
+    "lng": 106.721794,
+    "label": "Phường 25",
+    "fullAddress": "Đường Phường 25, Phường 25, Bình Thạnh",
+    "district": "Bình Thạnh",
+    "ward": "Phường 25",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2002
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_110",
+    "x": 50,
+    "y": 50,
+    "lat": 10.823052,
+    "lng": 106.72924,
+    "label": "Phường 26",
+    "fullAddress": "Đường Phường 26, Phường 26, Bình Thạnh",
+    "district": "Bình Thạnh",
+    "ward": "Phường 26",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2002
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_114",
+    "x": 50,
+    "y": 50,
+    "lat": 10.82212,
+    "lng": 106.711626,
+    "label": "Cầu Bình Triệu",
+    "fullAddress": "Cầu Bình Triệu, Phường Hiệp Bình Chánh, TP. Thủ Đức",
+    "district": "TP. Thủ Đức",
+    "ward": "Phường Hiệp Bình Chánh",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2002
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_115",
+    "x": 50,
+    "y": 50,
+    "lat": 10.753635,
+    "lng": 106.480335,
+    "label": "Xã Bình Lợi",
+    "fullAddress": "Đường Xã Bình Lợi, Xã Bình Lợi, Bình Chánh",
+    "district": "Bình Chánh",
+    "ward": "Xã Bình Lợi",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 10,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2002
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_118",
+    "x": 50,
+    "y": 50,
+    "lat": 10.657876,
+    "lng": 106.582963,
+    "label": "Xã Tân Quý Tây, Huyện Bình Chánh, Thành Phố",
+    "fullAddress": "Đường Xã Tân Quý Tây, Huyện Bình Chánh, Thành Phố, Xã Bình Chánh, Bình Chánh",
+    "district": "Bình Chánh",
+    "ward": "Xã Bình Chánh",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 10,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2002
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_119",
+    "x": 50,
+    "y": 50,
+    "lat": 10.649678,
+    "lng": 106.651899,
+    "label": "Xã Quy Đức",
+    "fullAddress": "Đường Xã Quy Đức, Xã Hưng Long, Bình Chánh",
+    "district": "Bình Chánh",
+    "ward": "Xã Hưng Long",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 10,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2002
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_122",
+    "x": 50,
+    "y": 50,
+    "lat": 10.69178,
+    "lng": 106.65177,
+    "label": "Xã Phong Phú",
+    "fullAddress": "Đường Xã Phong Phú, Xã Bình Hưng, Bình Chánh",
+    "district": "Bình Chánh",
+    "ward": "Xã Bình Hưng",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 10,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2002
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_123",
+    "x": 50,
+    "y": 50,
+    "lat": 10.909768,
+    "lng": 106.662078,
+    "label": "Rạch Bà Hồng",
+    "fullAddress": "Đường Rạch Bà Hồng, Xã Đông Thạnh, Hóc Môn",
+    "district": "Hóc Môn",
+    "ward": "Xã Đông Thạnh",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2002
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_129",
+    "x": 50,
+    "y": 50,
+    "lat": 10.888193,
+    "lng": 106.685731,
+    "label": "Thạnh Lộc",
+    "fullAddress": "Đường Thạnh Lộc, Phường Thạnh Lộc, Quận 12",
+    "district": "Quận 12",
+    "ward": "Phường Thạnh Lộc",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa & Triều"
+    ],
+    "primaryCause": "Mưa & Triều",
+    "years": [
+      2002
+    ],
+    "elevationM": 4,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_130",
+    "x": 50,
+    "y": 50,
+    "lat": 10.850358,
+    "lng": 106.676867,
+    "label": "Phường 17",
+    "fullAddress": "Đường Phường 17, Phường 17, Gò Vấp",
+    "district": "Gò Vấp",
+    "ward": "Phường 17",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa & Triều"
+    ],
+    "primaryCause": "Mưa & Triều",
+    "years": [
+      2002
+    ],
+    "elevationM": 4,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_132",
+    "x": 50,
+    "y": 50,
+    "lat": 10.820441,
+    "lng": 106.723302,
+    "label": "Bình Qưới",
+    "fullAddress": "Đường Bình Qưới, Phường 28, Bình Thạnh",
+    "district": "Bình Thạnh",
+    "ward": "Phường 28",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 50,
+    "depth": 30,
+    "causes": [
+      "Mưa & Triều"
+    ],
+    "primaryCause": "Mưa & Triều",
+    "years": [
+      2002
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_139",
+    "x": 50,
+    "y": 50,
+    "lat": 10.789326,
+    "lng": 106.711689,
+    "label": "Rạch Văn Thánh",
+    "fullAddress": "Đường Rạch Văn Thánh, Phường 19, Bình Thạnh",
+    "district": "Bình Thạnh",
+    "ward": "Phường 19",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2007
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_141",
+    "x": 50,
+    "y": 50,
+    "lat": 10.865485,
+    "lng": 106.706756,
+    "label": "Tổ 47 KP3",
+    "fullAddress": "Đường Tổ 47 KP3, Phường An Phú Đông, Quận 12",
+    "district": "Quận 12",
+    "ward": "Phường An Phú Đông",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2007
+    ],
+    "elevationM": 4,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_142",
+    "x": 50,
+    "y": 50,
+    "lat": 10.861066,
+    "lng": 106.707399,
+    "label": "Tổ 46 KP3",
+    "fullAddress": "Đường Tổ 46 KP3, Phường An Phú Đông, Quận 12",
+    "district": "Quận 12",
+    "ward": "Phường An Phú Đông",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2007
+    ],
+    "elevationM": 4,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_143",
+    "x": 50,
+    "y": 50,
+    "lat": 10.811003,
+    "lng": 106.73263,
+    "label": "Số 2",
+    "fullAddress": "Đường Số 2, Phường Thảo Điền, TP. Thủ Đức (Quận 2 cũ)",
+    "district": "TP. Thủ Đức (Quận 2 cũ)",
+    "ward": "Phường Thảo Điền",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2005
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_147",
+    "x": 50,
+    "y": 50,
+    "lat": 10.853262,
+    "lng": 106.719533,
+    "label": "Tiểu học Hiệp Bình Phước",
+    "fullAddress": "Đường Tiểu học Hiệp Bình Phước, Phường Hiệp Bình Phước, TP. Thủ Đức",
+    "district": "TP. Thủ Đức",
+    "ward": "Phường Hiệp Bình Phước",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 100,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2007
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_153",
+    "x": 50,
+    "y": 50,
+    "lat": 10.82538,
+    "lng": 106.731573,
+    "label": "UBND Phường 28 Quận Bình Thạnh",
+    "fullAddress": "Đường UBND Phường 28 Quận Bình Thạnh, Phường 28, Bình Thạnh",
+    "district": "Bình Thạnh",
+    "ward": "Phường 28",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2007
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_157",
+    "x": 50,
+    "y": 50,
+    "lat": 10.596662,
+    "lng": 106.744127,
+    "label": "Thanh Niên Xung Phong",
+    "fullAddress": "Đường Thanh Niên Xung Phong, Xã Hiệp Phước, Nhà Bè",
+    "district": "Nhà Bè",
+    "ward": "Xã Hiệp Phước",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2006
+    ],
+    "elevationM": 1.2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_158",
+    "x": 50,
+    "y": 50,
+    "lat": 10.609976,
+    "lng": 106.755905,
+    "label": "Mương Lớn",
+    "fullAddress": "Đường Mương Lớn, Xã Hiệp Phước, Nhà Bè",
+    "district": "Nhà Bè",
+    "ward": "Xã Hiệp Phước",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2006
+    ],
+    "elevationM": 1.2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_159",
+    "x": 50,
+    "y": 50,
+    "lat": 10.595649,
+    "lng": 106.732752,
+    "label": "Gò Me",
+    "fullAddress": "Đường Gò Me, Xã Hiệp Phước, Nhà Bè",
+    "district": "Nhà Bè",
+    "ward": "Xã Hiệp Phước",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2006
+    ],
+    "elevationM": 1.2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_160",
+    "x": 50,
+    "y": 50,
+    "lat": 10.597437,
+    "lng": 106.721254,
+    "label": "Rạch Mường Đình",
+    "fullAddress": "Đường Rạch Mường Đình, Xã Hiệp Phước, Nhà Bè",
+    "district": "Nhà Bè",
+    "ward": "Xã Hiệp Phước",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2006
+    ],
+    "elevationM": 1.2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_161",
+    "x": 50,
+    "y": 50,
+    "lat": 10.60034,
+    "lng": 106.725221,
+    "label": "Liên Ấp 3-4",
+    "fullAddress": "Đường Liên Ấp 3-4, Xã Hiệp Phước, Nhà Bè",
+    "district": "Nhà Bè",
+    "ward": "Xã Hiệp Phước",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2006
+    ],
+    "elevationM": 1.2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_164",
+    "x": 50,
+    "y": 50,
+    "lat": 10.87406,
+    "lng": 106.726044,
+    "label": "Khu phố 4, phường Bình Chiểu",
+    "fullAddress": "Đường Khu phố 4, phường Bình Chiểu, Phường Bình Chiểu, TP. Thủ Đức",
+    "district": "TP. Thủ Đức",
+    "ward": "Phường Bình Chiểu",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2007
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_165",
+    "x": 50,
+    "y": 50,
+    "lat": 10.859473,
+    "lng": 106.679951,
+    "label": "Phường Thạnh Lộc",
+    "fullAddress": "Đường Phường Thạnh Lộc, Phường Thạnh Lộc, Quận 12",
+    "district": "Quận 12",
+    "ward": "Phường Thạnh Lộc",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa & Triều"
+    ],
+    "primaryCause": "Mưa & Triều",
+    "years": [
+      2012
+    ],
+    "elevationM": 4,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_166",
+    "x": 50,
+    "y": 50,
+    "lat": 10.740693,
+    "lng": 106.635843,
+    "label": "Phạm Văn Chí",
+    "fullAddress": "Đường Phạm Văn Chí, Phường 7, Quận 6",
+    "district": "Quận 6",
+    "ward": "Phường 7",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa & Triều"
+    ],
+    "primaryCause": "Mưa & Triều",
+    "years": [
+      2012
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_167",
+    "x": 50,
+    "y": 50,
+    "lat": 10.755121,
+    "lng": 106.642926,
+    "label": "Hồng Bàng",
+    "fullAddress": "Đường Hồng Bàng, Phường 2, Quận 11",
+    "district": "Quận 11",
+    "ward": "Phường 2",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa & Triều"
+    ],
+    "primaryCause": "Mưa & Triều",
+    "years": [
+      2012
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_168",
+    "x": 50,
+    "y": 50,
+    "lat": 10.803363,
+    "lng": 106.700069,
+    "label": "Vũ Tùng",
+    "fullAddress": "Đường Vũ Tùng, Phường 2, Bình Thạnh",
+    "district": "Bình Thạnh",
+    "ward": "Phường 2",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa & Triều"
+    ],
+    "primaryCause": "Mưa & Triều",
+    "years": [
+      2012
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_169",
+    "x": 50,
+    "y": 50,
+    "lat": 10.799367,
+    "lng": 106.698356,
+    "label": "Nguyễn Xuân Ôn",
+    "fullAddress": "Đường Nguyễn Xuân Ôn, Phường 2, Bình Thạnh",
+    "district": "Bình Thạnh",
+    "ward": "Phường 2",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa & Triều"
+    ],
+    "primaryCause": "Mưa & Triều",
+    "years": [
+      2012
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_171",
+    "x": 50,
+    "y": 50,
+    "lat": 10.791136,
+    "lng": 106.681753,
+    "label": "Nam Kỳ Khởi Nghĩa",
+    "fullAddress": "Đường Nam Kỳ Khởi Nghĩa, Phường Võ Thị Sáu, Quận 3",
+    "district": "Quận 3",
+    "ward": "Phường Võ Thị Sáu",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa & Triều"
+    ],
+    "primaryCause": "Mưa & Triều",
+    "years": [
+      2012
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_174",
+    "x": 50,
+    "y": 50,
+    "lat": 10.946235,
+    "lng": 106.688028,
+    "label": "Phường An Thạnh",
+    "fullAddress": "Đường Phường An Thạnh, Phường An Thạnh, Phường Thuận An",
+    "district": "Phường Thuận An",
+    "ward": "Phường An Thạnh",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2023
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_175",
+    "x": 50,
+    "y": 50,
+    "lat": 10.779578,
+    "lng": 106.703439,
+    "label": "Nguyễn Siêu",
+    "fullAddress": "Đường Nguyễn Siêu, Phường Bến Nghé, Quận 1",
+    "district": "Quận 1",
+    "ward": "Phường Bến Nghé",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2016
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_176",
+    "x": 50,
+    "y": 50,
+    "lat": 10.775377,
+    "lng": 106.675558,
+    "label": "Cao Thắng",
+    "fullAddress": "Đường Cao Thắng, Phường 10, Quận 10",
+    "district": "Quận 10",
+    "ward": "Phường 10",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2016
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_177",
+    "x": 50,
+    "y": 50,
+    "lat": 10.771582,
+    "lng": 106.654932,
+    "label": "Lữ Gia",
+    "fullAddress": "Đường Lữ Gia, Phường 15, Quận 11",
+    "district": "Quận 11",
+    "ward": "Phường 15",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2016
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_178",
+    "x": 50,
+    "y": 50,
+    "lat": 10.780026,
+    "lng": 106.672057,
+    "label": "Hòa Hưng",
+    "fullAddress": "Đường Hòa Hưng, Phường 13, Quận 10",
+    "district": "Quận 10",
+    "ward": "Phường 13",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2016
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_183",
+    "x": 50,
+    "y": 50,
+    "lat": 10.851256,
+    "lng": 106.751712,
+    "label": "Trương Văn Ngư",
+    "fullAddress": "Đường Trương Văn Ngư, Phường Linh Tây, TP. Thủ Đức",
+    "district": "TP. Thủ Đức",
+    "ward": "Phường Linh Tây",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 50,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2026
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_184",
+    "x": 50,
+    "y": 50,
+    "lat": 10.791037,
+    "lng": 106.752593,
+    "label": "Nguyễn Thị Định",
+    "fullAddress": "Đường Nguyễn Thị Định, Phường An Phú, TP. Thủ Đức (Quận 2 cũ)",
+    "district": "TP. Thủ Đức (Quận 2 cũ)",
+    "ward": "Phường An Phú",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa & Triều"
+    ],
+    "primaryCause": "Mưa & Triều",
+    "years": [
+      2018
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_185",
+    "x": 50,
+    "y": 50,
+    "lat": 10.823483,
+    "lng": 106.699915,
+    "label": "Phạm Văn Đồng",
+    "fullAddress": "Đường Phạm Văn Đồng, Phường 13, Bình Thạnh",
+    "district": "Bình Thạnh",
+    "ward": "Phường 13",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2018
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_186",
+    "x": 50,
+    "y": 50,
+    "lat": 10.830492,
+    "lng": 106.766546,
+    "label": "Đỗ Xuân Hợp",
+    "fullAddress": "Đường Đỗ Xuân Hợp, Phường Phước Long B, TP. Thủ Đức (Quận 9 cũ)",
+    "district": "TP. Thủ Đức (Quận 9 cũ)",
+    "ward": "Phường Phước Long B",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2018
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_191",
+    "x": 50,
+    "y": 50,
+    "lat": 10.848173,
+    "lng": 106.72004,
+    "label": "Hiệp Bình",
+    "fullAddress": "Đường Hiệp Bình, Phường Hiệp Bình Phước, TP. Thủ Đức",
+    "district": "TP. Thủ Đức",
+    "ward": "Phường Hiệp Bình Phước",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2024
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_192",
+    "x": 50,
+    "y": 50,
+    "lat": 10.875795,
+    "lng": 106.730123,
+    "label": "Tỉnh Lộ 43",
+    "fullAddress": "Đường Tỉnh Lộ 43, Phường Tam Bình, TP. Thủ Đức",
+    "district": "TP. Thủ Đức",
+    "ward": "Phường Tam Bình",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2024
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_194",
+    "x": 50,
+    "y": 50,
+    "lat": 10.81043,
+    "lng": 106.651218,
+    "label": "Sân bay Tân Sơn Nhất",
+    "fullAddress": "Đường Sân bay Tân Sơn Nhất, Phường 12, Tân Bình",
+    "district": "Tân Bình",
+    "ward": "Phường 12",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2016
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_195",
+    "x": 50,
+    "y": 50,
+    "lat": 10.817643,
+    "lng": 106.729333,
+    "label": "(ĐTCK) Khu biệt thự Thảo Điền",
+    "fullAddress": "Đường (ĐTCK) Khu biệt thự Thảo Điền, Phường Thảo Điền, TP. Thủ Đức (Quận 2 cũ)",
+    "district": "TP. Thủ Đức (Quận 2 cũ)",
+    "ward": "Phường Thảo Điền",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2019
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_196",
+    "x": 50,
+    "y": 50,
+    "lat": 10.816606,
+    "lng": 106.72552,
+    "label": "Biệt thự dân cư trên đường Nguyễn Văn Hương",
+    "fullAddress": "Đường Biệt thự dân cư trên đường Nguyễn Văn Hương, Phường Thảo Điền, TP. Thủ Đức (Quận 2 cũ)",
+    "district": "TP. Thủ Đức (Quận 2 cũ)",
+    "ward": "Phường Thảo Điền",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2019
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_198",
+    "x": 50,
+    "y": 50,
+    "lat": 10.740283,
+    "lng": 106.696049,
+    "label": "Khu phố Him Lam",
+    "fullAddress": "Đường Khu phố Him Lam, Phường Tân Hưng, Quận 7",
+    "district": "Quận 7",
+    "ward": "Phường Tân Hưng",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2019
+    ],
+    "elevationM": 1.2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_199",
+    "x": 50,
+    "y": 50,
+    "lat": 10.734928,
+    "lng": 106.690419,
+    "label": "Khu Dân Cư Trung Sơn",
+    "fullAddress": "Đường Khu Dân Cư Trung Sơn, Xã Bình Hưng, Bình Chánh",
+    "district": "Bình Chánh",
+    "ward": "Xã Bình Hưng",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2019
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_200",
+    "x": 50,
+    "y": 50,
+    "lat": 10.756684,
+    "lng": 106.690576,
+    "label": "Khu Hoàng Diệu",
+    "fullAddress": "Đường Khu Hoàng Diệu, Phường Khánh Hội, Quận 7",
+    "district": "Quận 7",
+    "ward": "Phường Khánh Hội",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2019
+    ],
+    "elevationM": 1.2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_201",
+    "x": 50,
+    "y": 50,
+    "lat": 10.739069,
+    "lng": 106.701481,
+    "label": "Lê Văn Lương",
+    "fullAddress": "Đường Lê Văn Lương, Phường Tân Quy, Quận 7",
+    "district": "Quận 7",
+    "ward": "Phường Tân Quy",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2019
+    ],
+    "elevationM": 1.2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_202",
+    "x": 50,
+    "y": 50,
+    "lat": 10.731176,
+    "lng": 106.739725,
+    "label": "Ðường Gò Ô Môi",
+    "fullAddress": "Đường Ðường Gò Ô Môi, Phường Phú Thuận, Quận 7",
+    "district": "Quận 7",
+    "ward": "Phường Phú Thuận",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2019
+    ],
+    "elevationM": 1.2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_203",
+    "x": 50,
+    "y": 50,
+    "lat": 10.836258,
+    "lng": 106.710975,
+    "label": "Cầu Ông Dầu",
+    "fullAddress": "Cầu Ông Dầu, Phường Hiệp Bình Phước, TP. Thủ Đức",
+    "district": "TP. Thủ Đức",
+    "ward": "Phường Hiệp Bình Phước",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2019
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_207",
+    "x": 50,
+    "y": 50,
+    "lat": 10.790918,
+    "lng": 106.617505,
+    "label": "Tân Hương",
+    "fullAddress": "Đường Tân Hương, Phường Tân Quý, Tân Phú",
+    "district": "Tân Phú",
+    "ward": "Phường Tân Quý",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2019
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_208",
+    "x": 50,
+    "y": 50,
+    "lat": 10.804066,
+    "lng": 106.718161,
+    "label": "Nguyễn Văn Thương",
+    "fullAddress": "Đường Nguyễn Văn Thương, Phường 25, Bình Thạnh",
+    "district": "Bình Thạnh",
+    "ward": "Phường 25",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2019
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_209",
+    "x": 50,
+    "y": 50,
+    "lat": 10.707293,
+    "lng": 106.596192,
+    "label": "Ấp 3 (Quốc Lộ 1)",
+    "fullAddress": "Đường Ấp 3 (Quốc Lộ 1), Xã Tân Nhựt, Bình Chánh",
+    "district": "Bình Chánh",
+    "ward": "Xã Tân Nhựt",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2019
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_210",
+    "x": 50,
+    "y": 50,
+    "lat": 10.815577,
+    "lng": 106.755568,
+    "label": "Cầu Rạch Chiếc",
+    "fullAddress": "Cầu Rạch Chiếc, Phường Phước Long A, TP. Thủ Đức (Quận 9 cũ)",
+    "district": "TP. Thủ Đức (Quận 9 cũ)",
+    "ward": "Phường Phước Long A",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2017
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_211",
+    "x": 50,
+    "y": 50,
+    "lat": 10.716083,
+    "lng": 106.72844,
+    "label": "Nguyễn Lương Bằng",
+    "fullAddress": "Đường Nguyễn Lương Bằng, Phường Tân Phú, Quận 7",
+    "district": "Quận 7",
+    "ward": "Phường Tân Phú",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2025
+    ],
+    "elevationM": 1.2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_212",
+    "x": 50,
+    "y": 50,
+    "lat": 10.712282,
+    "lng": 106.729949,
+    "label": "15B",
+    "fullAddress": "Đường 15B, Phường Phú Mỹ, Quận 7",
+    "district": "Quận 7",
+    "ward": "Phường Phú Mỹ",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2025
+    ],
+    "elevationM": 1.2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_214",
+    "x": 50,
+    "y": 50,
+    "lat": 10.764604,
+    "lng": 106.625184,
+    "label": "Tô Hiệu",
+    "fullAddress": "Đường Tô Hiệu, Phường Tân Thới Hòa, Tân Phú",
+    "district": "Tân Phú",
+    "ward": "Phường Tân Thới Hòa",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2015
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_215",
+    "x": 50,
+    "y": 50,
+    "lat": 10.757999,
+    "lng": 106.630005,
+    "label": "Tân Hòa Đông",
+    "fullAddress": "Đường Tân Hòa Đông, Phường 14, Quận 6",
+    "district": "Quận 6",
+    "ward": "Phường 14",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2015
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_216",
+    "x": 50,
+    "y": 50,
+    "lat": 10.80831,
+    "lng": 106.709812,
+    "label": "Xô Viết Nghệ Tĩnh",
+    "fullAddress": "Đường Xô Viết Nghệ Tĩnh, Phường 25, Bình Tân",
+    "district": "Bình Tân",
+    "ward": "Phường 25",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2008
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_217",
+    "x": 50,
+    "y": 50,
+    "lat": 10.800768,
+    "lng": 106.730835,
+    "label": "Xa Lộ Hà Nội",
+    "fullAddress": "Đường Xa Lộ Hà Nội, Phường Thảo Điền, TP. Thủ Đức (Quận 2 cũ)",
+    "district": "TP. Thủ Đức (Quận 2 cũ)",
+    "ward": "Phường Thảo Điền",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2008
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_218",
+    "x": 50,
+    "y": 50,
+    "lat": 10.810904,
+    "lng": 106.710581,
+    "label": "Mũi tàu Đài Liệt sĩ",
+    "fullAddress": "Đường Mũi tàu Đài Liệt sĩ, Phường 26, Bình Thạnh",
+    "district": "Bình Thạnh",
+    "ward": "Phường 26",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2008
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_222",
+    "x": 50,
+    "y": 50,
+    "lat": 10.852589,
+    "lng": 106.722686,
+    "label": "Khu Phố 4",
+    "fullAddress": "Đường Khu Phố 4, Phường Hiệp Bình Phước, TP. Thủ Đức",
+    "district": "TP. Thủ Đức",
+    "ward": "Phường Hiệp Bình Phước",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2008
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_223",
+    "x": 50,
+    "y": 50,
+    "lat": 10.804235,
+    "lng": 106.729923,
+    "label": "Xuân Thủy",
+    "fullAddress": "Đường Xuân Thủy, Phường Thảo Điền, TP. Thủ Đức (Quận 2 cũ)",
+    "district": "TP. Thủ Đức (Quận 2 cũ)",
+    "ward": "Phường Thảo Điền",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2026
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_224",
+    "x": 50,
+    "y": 50,
+    "lat": 10.778665,
+    "lng": 106.711978,
+    "label": "R12",
+    "fullAddress": "Đường R12, Phường Thủ Thiêm, TP. Thủ Đức (Quận 2 cũ)",
+    "district": "TP. Thủ Đức (Quận 2 cũ)",
+    "ward": "Phường Thủ Thiêm",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2026
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_225",
+    "x": 50,
+    "y": 50,
+    "lat": 10.811889,
+    "lng": 106.70476,
+    "label": "Chu Văn An",
+    "fullAddress": "Đường Chu Văn An, Phường 26, Bình Thạnh",
+    "district": "Bình Thạnh",
+    "ward": "Phường 26",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2025
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_226",
+    "x": 50,
+    "y": 50,
+    "lat": 10.725444,
+    "lng": 106.614161,
+    "label": "Võ Văn Kiệt",
+    "fullAddress": "Đường Võ Văn Kiệt, Phường 16, Quận 8",
+    "district": "Quận 8",
+    "ward": "Phường 16",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2025
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_227",
+    "x": 50,
+    "y": 50,
+    "lat": 10.764041,
+    "lng": 106.602703,
+    "label": "Mã Lò",
+    "fullAddress": "Đường Mã Lò, Phường Bình Trị Đông A, Bình Tân",
+    "district": "Bình Tân",
+    "ward": "Phường Bình Trị Đông A",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2025
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_228",
+    "x": 50,
+    "y": 50,
+    "lat": 10.845977,
+    "lng": 106.630566,
+    "label": "Nguyễn Văn Quá",
+    "fullAddress": "Đường Nguyễn Văn Quá, Phường Đông Hưng Thuận, Quận 12",
+    "district": "Quận 12",
+    "ward": "Phường Đông Hưng Thuận",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 50,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2013
+    ],
+    "elevationM": 4,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_230",
+    "x": 50,
+    "y": 50,
+    "lat": 10.75813,
+    "lng": 106.632603,
+    "label": "Đặng Nguyên Cẩn",
+    "fullAddress": "Đường Đặng Nguyên Cẩn, Phường 14, Quận 6",
+    "district": "Quận 6",
+    "ward": "Phường 14",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2013
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_232",
+    "x": 50,
+    "y": 50,
+    "lat": 10.75423,
+    "lng": 106.631547,
+    "label": "Kinh Dương Vương",
+    "fullAddress": "Đường Kinh Dương Vương, Phường 13, Quận 6",
+    "district": "Quận 6",
+    "ward": "Phường 13",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2013
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_234",
+    "x": 50,
+    "y": 50,
+    "lat": 10.791011,
+    "lng": 106.63838,
+    "label": "Âu Cơ",
+    "fullAddress": "Đường Âu Cơ, Phường 14, Tân Bình",
+    "district": "Tân Bình",
+    "ward": "Phường 14",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2013
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_235",
+    "x": 50,
+    "y": 50,
+    "lat": 10.77717,
+    "lng": 106.647228,
+    "label": "Lạc Long Quân",
+    "fullAddress": "Đường Lạc Long Quân, Phường 10, Tân Bình",
+    "district": "Tân Bình",
+    "ward": "Phường 10",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2013
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_236",
+    "x": 50,
+    "y": 50,
+    "lat": 10.803582,
+    "lng": 106.638302,
+    "label": "Cộng Hoà",
+    "fullAddress": "Đường Cộng Hoà, Phường 13, Tân Bình",
+    "district": "Tân Bình",
+    "ward": "Phường 13",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2013
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_238",
+    "x": 50,
+    "y": 50,
+    "lat": 10.776184,
+    "lng": 106.637108,
+    "label": "Khuông Việt",
+    "fullAddress": "Đường Khuông Việt, Phường Phú Trung, Tân Phú",
+    "district": "Tân Phú",
+    "ward": "Phường Phú Trung",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2013
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_239",
+    "x": 50,
+    "y": 50,
+    "lat": 10.791568,
+    "lng": 106.641656,
+    "label": "Đồng Đen",
+    "fullAddress": "Đường Đồng Đen, Phường 12, Tân Bình",
+    "district": "Tân Bình",
+    "ward": "Phường 12",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2013
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_240",
+    "x": 50,
+    "y": 50,
+    "lat": 10.774548,
+    "lng": 106.700734,
+    "label": "Tôn Thất Thiệp",
+    "fullAddress": "Đường Tôn Thất Thiệp, Phường Bến Nghé, Quận 1",
+    "district": "Quận 1",
+    "ward": "Phường Bến Nghé",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2010
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_241",
+    "x": 50,
+    "y": 50,
+    "lat": 10.773064,
+    "lng": 106.701158,
+    "label": "Tôn Thất Đạm",
+    "fullAddress": "Đường Tôn Thất Đạm, Phường Nguyễn Thái Bình, Quận 1",
+    "district": "Quận 1",
+    "ward": "Phường Nguyễn Thái Bình",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2010
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_248",
+    "x": 50,
+    "y": 50,
+    "lat": 10.725683,
+    "lng": 106.594263,
+    "label": "Trần Đại Nghĩa",
+    "fullAddress": "Đường Trần Đại Nghĩa, Xã Tân Nhựt, Bình Chánh",
+    "district": "Bình Chánh",
+    "ward": "Xã Tân Nhựt",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2010
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_249",
+    "x": 50,
+    "y": 50,
+    "lat": 10.806726,
+    "lng": 106.707739,
+    "label": "Đinh Bộ Lĩn",
+    "fullAddress": "Đường Đinh Bộ Lĩn, Phường 24, Bình Thạnh",
+    "district": "Bình Thạnh",
+    "ward": "Phường 24",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa & Triều"
+    ],
+    "primaryCause": "Mưa & Triều",
+    "years": [
+      2010
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_250",
+    "x": 50,
+    "y": 50,
+    "lat": 10.788892,
+    "lng": 106.690166,
+    "label": "Võ Thị Sáu - Dinh Tien Hoang",
+    "fullAddress": "Đường Võ Thị Sáu - Dinh Tien Hoang, Phường Tân Định, Quận 1",
+    "district": "Quận 1",
+    "ward": "Phường Tân Định",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 30,
+    "minDepth": 15,
+    "depth": 30,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2010
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_187",
+    "x": 50,
+    "y": 50,
+    "lat": 10.852199,
+    "lng": 106.749877,
+    "label": "Phạm Văn Đồng",
+    "fullAddress": "Đường Phạm Văn Đồng, Phường Linh Tây, TP. Thủ Đức (Quận 2 cũ)",
+    "district": "TP. Thủ Đức (Quận 2 cũ)",
+    "ward": "Phường Linh Tây",
+    "type": "flood",
+    "severity": "high",
+    "historyCount": 1,
+    "maxDepth": 25,
+    "minDepth": 15,
+    "depth": 25,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2019
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  },
+  {
+    "id": "ird_124",
+    "x": 50,
+    "y": 50,
+    "lat": 11.023301,
+    "lng": 106.588736,
+    "label": "Rạch Cây Điệp",
+    "fullAddress": "Đường Rạch Cây Điệp, Xã Bình Mỹ, Huyện Củ Chi",
+    "district": "Huyện Củ Chi",
+    "ward": "Xã Bình Mỹ",
+    "type": "flood",
+    "severity": "medium",
+    "historyCount": 1,
+    "maxDepth": 20,
+    "minDepth": 15,
+    "depth": 20,
+    "causes": [
+      "Triều cường"
+    ],
+    "primaryCause": "Triều cường",
+    "years": [
+      2002
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 999
+  },
+  {
+    "id": "ird_188",
+    "x": 50,
+    "y": 50,
+    "lat": 10.826648,
+    "lng": 106.767175,
+    "label": "Đỗ Xuân Hợp",
+    "fullAddress": "Đường Đỗ Xuân Hợp, Phường Phước Long B, TP. Thủ Đức (Quận 2 cũ)",
+    "district": "TP. Thủ Đức (Quận 2 cũ)",
+    "ward": "Phường Phước Long B",
+    "type": "flood",
+    "severity": "medium",
+    "historyCount": 1,
+    "maxDepth": 20,
+    "minDepth": 15,
+    "depth": 20,
+    "causes": [
+      "Mưa lớn"
+    ],
+    "primaryCause": "Mưa lớn",
+    "years": [
+      2019
+    ],
+    "elevationM": 2,
+    "rainfallThresholdMm": 45
+  }
+]
