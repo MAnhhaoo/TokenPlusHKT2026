@@ -22,11 +22,11 @@ lang: vi
 
 **Giá trị cốt lõi:** “Giúp chọn tuyến *ít nguy cơ ngập hơn* dựa trên bằng chứng hiện có” thay vì “cam kết tránh được mọi đường đang ngập”.
 
-**Mục tiêu Hackathon:** Có web/PWA và APK Android chạy được trên máy thật; có luồng end-to-end hoạt động thật, chỉ rõ ML tạo điểm từ dữ liệu gì và vì sao, benchmark so với GIS-MCDA, triển khai cloud, CI/test và bằng chứng demo.
+**Mục tiêu Hackathon:** Có web/PWA chạy được trên trình duyệt máy tính và điện thoại; có luồng end-to-end hoạt động thật, chỉ rõ ML tạo điểm từ dữ liệu gì và vì sao, benchmark so với GIS-MCDA, triển khai cloud, CI/test và bằng chứng demo.
 
 ## 2. Nguồn yêu cầu, phạm vi và các giả định
 
-**Nguồn A — kiến trúc mẫu do nhóm cung cấp.** Monorepo `pnpm-workspace` gồm `fe/user`, `fe/admin`, `be`; React + TypeScript, Vite, Capacitor Android/PWA, MapLibre, NestJS/REST/SSE, PostgreSQL/TypeORM, Google Maps/Routes/Places, OSRM, Open-Meteo, các module báo cáo và lộ trình né ngập. Đây là *kiến trúc tham khảo*, không phải bằng chứng hệ thống đã tích hợp xong.
+**Nguồn A — kiến trúc mẫu do nhóm cung cấp.** Monorepo `pnpm-workspace` gồm `fe/user`, `fe/admin`, `be`; React + TypeScript, Vite, MapLibre, NestJS/REST/SSE, PostgreSQL/TypeORM, Google Maps/Routes/Places, OSRM, Open-Meteo, các module báo cáo và lộ trình né ngập. Đây là *kiến trúc tham khảo*, không phải bằng chứng hệ thống đã tích hợp xong.
 
 **Nguồn B — tiêu chí chính thức BTC.** 8 nhóm, 100 điểm: sáng tạo 10; thực tiễn 10; dữ liệu & AI 20; cấu trúc/chất lượng triển khai 20; cộng đồng 10; AI tiết kiệm chi phí 10; AWS/GCP 10; teamwork, thuyết trình và demo 10.
 
@@ -43,14 +43,14 @@ lang: vi
 - **G1 — Hành trình thực dụng:** Người dùng nhập điểm đi/đến, chọn xe máy/ô tô và xem ít nhất hai tuyến *nếu routing provider trả về tuyến hợp lệ*; mỗi tuyến có độ dài, ETA (nếu provider cung cấp), điểm phơi nhiễm nguy cơ, mức bao phủ dữ liệu.
 - **G2 — AI có bằng chứng:** Bản đồ và tuyến đường sử dụng điểm nguy cơ tương đối có `model_version`, `data_version`; so sánh LR Primary với MCDA Baseline bằng đánh giá held-out phù hợp Presence–Background.
 - **G3 — Minh bạch và an toàn:** Phân biệt “độ nhạy cảm ngập lịch sử”, “báo cáo chưa xác minh”, “bản ghi đã xác minh” và “dữ liệu thời tiết”; không tuyên bố đường an toàn.
-- **G4 — Demo live & cloud:** FE/PWA + APK Android + API truy cập qua HTTPS, có logs/health, tối thiểu một workflow CI kiểm tra build/lint/test, có phương án dự phòng khi API ngoài lỗi.
+- **G4 — Demo live & cloud:** FE/PWA + API truy cập qua HTTPS, có logs/health, tối thiểu một workflow CI kiểm tra build/lint/test, có phương án dự phòng khi API ngoài lỗi.
 - **G5 — Cộng đồng:** Cho gửi phản ánh ngập và có hàng đợi duyệt; hiển thị nguồn và trạng thái xác minh.
 
 ### 3.2. Không nằm trong MVP (Out of scope)
 
 - Dự báo đường ngập chính xác trong 30/60/90 phút, độ sâu ngập cm theo giờ; mô hình triều động chưa được kiểm định.
 - Tự động cam kết tránh toàn bộ đường ngập; không cho phép tuyên bố “tuyến an toàn tuyệt đối”.
-- Native iOS và phát hành Play Store. **Đóng gói APK Android (Capacitor) là hạng mục thực hiện trong 24 giờ Hackathon**, song song web/PWA; không chờ sau cuộc thi.
+- Ứng dụng di động native (iOS / Android) và phát hành App Store / Play Store.
 - Tự động thay đổi điều hướng theo từng giây, hướng dẫn rẽ hẻm nâng cao, kết nối cảm biến vật lý, chatbot AI quyết định an toàn.
 - Kinh doanh dữ liệu/dùng thương mại bộ dữ liệu IRD/FABDEM khi chưa rà soát quyền sử dụng.
 
@@ -87,7 +87,7 @@ lang: vi
 
 | Mức | Chức năng | Quyết định |
 |---|---|---|
-| **P0 – bắt buộc** | Bản đồ mobile-first, tìm địa chỉ/điểm GPS, chọn phương tiện, tuyến đường + so sánh phơi nhiễm nguy cơ, điểm đường và nguồn dữ liệu, disclaimer, Cloud Run public, logs/health, **đóng gói APK Android bằng Capacitor và chạy trên thiết bị thật**, demo | Phải hoàn thành |
+| **P0 – bắt buộc** | Bản đồ mobile-first, tìm địa chỉ/điểm GPS, chọn phương tiện, tuyến đường + so sánh phơi nhiễm nguy cơ, điểm đường và nguồn dữ liệu, disclaimer, Cloud Run public, logs/health, demo | Phải hoàn thành |
 | **P0 – tối thiểu** | Gửi báo cáo và trang admin duyệt đơn giản *nếu phụ thuộc hạ tầng đã sẵn sàng*; nếu không, demo lưu báo cáo `pending` và đặt admin P1 | Không đánh đổi route core |
 | **P1 – nếu còn thời gian** | Full admin dashboard, CSV export, Postgres lưu report/audit, SSE refresh thông tin đã duyệt, filter tầng dữ liệu, tối ưu UX | Tăng điểm cộng đồng/BE |
 | **P1 – chứng cứ kỹ thuật** | W&B dashboard, model benchmark/MCDA, spatial bias audit, bài đo latency/cost, CI/CD deploy tự động | Có thể song song |
@@ -113,7 +113,6 @@ lang: vi
 | FR-12 | P1 | Xuất thống kê CSV của admin | CSV có time range, trạng thái, source; không lộ PII |
 | FR-13 | P2 | Mốc dự báo +30/+60/+90, triều và độ sâu ngập | Chỉ triển khai khi có nguồn nhãn thời gian, kiểm định độc lập và phương án cảnh báo an toàn |
 | FR-14 | P2 | Điều hướng hẻm nâng cao | Có kiểm tra hình học/luật giao thông và thiết bị thực tế trước phát hành |
-| FR-15 | P0 | Đóng gói Android APK trong Hackathon bằng Capacitor | Có APK debug install được trên ít nhất 1 Android thật; mở app, GPS xin quyền, bản đồ/routing gọi HTTPS backend, hoạt động trở lại sau khi mở lại; ảnh/video demo và log build |
 
 ### 6.1. Quy tắc chọn tuyến có xét nguy cơ
 
@@ -134,7 +133,7 @@ Trạng thái: `pending` → `verified` / `rejected` / `expired`. Báo cáo đan
 ### 7.1. Kiến trúc logic
 
 ```text
-          [Người dùng Web/PWA + Android APK]
+          [Người dùng Web/PWA]
                     |  HTTPS
              [fe/user: React + MapLibre]
                     |
@@ -153,7 +152,7 @@ Trạng thái: `pending` → `verified` / `rejected` / `expired`. Báo cáo đan
            [fe/admin: React]  (P1)
 ```
 
-**Monorepo sản phẩm:** `fe/user` (React 19 + TypeScript 5.7 + Vite + MapLibre + Tailwind 4/CSS tokens + Capacitor Android P0 (đóng gói trong cuộc thi)), `fe/admin` (React/Vite/Tailwind/Lucide), `be` (NestJS 11, TypeORM, REST, SSE), `shared/contracts` (API schema/types), `infra` (Cloud Run/CI), `docs`. Có thể quản lý qua `pnpm-workspace`. **Repository Python ML riêng** `hcmc-road-flood-ml` vì training/GIS là pipeline offline với dependency khác; tích hợp bằng artifacts versioned thay vì nhúng PyTorch vào API định tuyến.
+**Monorepo sản phẩm:** `fe/user` (React 19 + TypeScript 5.7 + Vite + MapLibre + Tailwind 4/CSS tokens), `fe/admin` (React/Vite/Tailwind/Lucide), `be` (NestJS 11, TypeORM, REST, SSE), `shared/contracts` (API schema/types), `infra` (Cloud Run/CI), `docs`. Có thể quản lý qua `pnpm-workspace`. **Repository Python ML riêng** `hcmc-road-flood-ml` vì training/GIS là pipeline offline với dependency khác; tích hợp bằng artifacts versioned thay vì nhúng PyTorch vào API định tuyến.
 
 **Database:** PostgreSQL 16 + TypeORM theo kiến trúc mẫu, ưu tiên các bảng `FloodReport`, `ReportReview`, `RoadScoreVersion`, `WeatherSnapshot` và `AuditLog`; `CommunityUser` chỉ khi có đăng nhập. Các entities mở rộng của mẫu (`MapPoint`, `ForecastSlot`, `RouteOption`, `FloodHistory`) là thiết kế dài hạn, không phải mọi bảng đều bắt buộc được tạo trong 24h. Nếu cần truy vấn không gian hiệu quả, xem xét PostGIS sau khi kiểm tra hạ tầng.
 
@@ -249,8 +248,8 @@ Trạng thái: `pending` → `verified` / `rejected` / `expired`. Báo cáo đan
 |---|---|---|
 | Thành viên 1 — GIS/Data | Input datasets, road segments, score coverage, GeoJSON | data card, mapping QC, GeoJSON và manifest |
 | Thành viên 2 — ML/Evaluation | LR Primary, MCDA, spatial evaluation, bias, W&B | model/eval artifacts, model card, chart đúng nghĩa |
-| Thành viên 3 — FE/Product | `fe/user`, map/routing UI, mobile responsive, Capacitor Android | Demo UX và APK chạy trên thiết bị thật, các trạng thái no-data/error |
-| Thành viên 4 — BE/DevOps/QA | NestJS API, storage/reports, Cloud Run, CI, observability, hỗ trợ Android build, pitch | HTTPS public, API contract, tests, APK verification, demo checklist |
+| Thành viên 3 — FE/Product | `fe/user`, map/routing UI, mobile responsive | Demo UX và các trạng thái no-data/error |
+| Thành viên 4 — BE/DevOps/QA | NestJS API, storage/reports, Cloud Run, CI, observability, pitch | HTTPS public, API contract, tests, demo checklist |
 
 **Quản lý:** README hướng dẫn; `docs/PRD.md` (tài liệu này), `docs/SYSTEM_DESIGN.md`, `docs/API_SPEC.md`, `docs/DATA_CARD.md`, `docs/MODEL_CARD.md`, `docs/AI_SAFETY.md`, `docs/DEMO_SCRIPT.md`, `docs/COMPETITOR_ANALYSIS.md`, `docs/ROADMAP.md`; GitHub Issues/Project với owner, priority, acceptance criterion, trạng thái, PR liên kết và milestone. GitHub Spec Kit là **khuyến khích**, không phải điều kiện bắt buộc theo kỳ vọng BTC đã cung cấp.
 
@@ -260,37 +259,9 @@ Trạng thái: `pending` → `verified` / `rejected` / `expired`. Báo cáo đan
 |---|---|---|
 | 0–3h | Chốt user flow, API schema, dataset snapshot và acceptance P0 | Ai phụ trách gì, issue/board, baseline chạy |
 | 3–9h | Map/route core, API route scoring, ML exports | FE gọi được API thật, data version đúng |
-| 9–15h | Reports/admin tối thiểu, deploy Cloud Run, CI/tests; **khởi tạo Capacitor/Android + sync web assets** | URL HTTPS, health/logs, Android project build được |
-| 15–21h | Tích hợp, **build APK và test trên Android thật**, kiểm thử điển hình/biên, profiling, cost, bias/evaluation | APK cài/mở lại được; web và app cùng gọi API HTTPS |
-| 21–24h | Freeze, tập pitch **demo Android APK + web**, backup APK/artifacts, demo checklist | Không thay đổi lớn gây regression |
-
-### 11.4. Android APK là sản phẩm phải thực hiện trong 24 giờ Hackathon
-
-**Phạm vi:** dùng `fe/user` React/Vite đang có làm cùng codebase với web/PWA; Capacitor 8 chỉ đóng gói web vào Android WebView và kết nối native plugins khi cần. **Không xây một ứng dụng Android thứ hai từ đầu** và không chuyển ML training lên điện thoại. Web/API vẫn chạy HTTPS Cloud Run; ML scores đã tính trước ở server/storage.
-
-**Tiêu chí nghiệm thu FR-15:** (a) build `fe/user` tạo thư mục `dist/` hợp lệ; (b) Android project được khởi tạo và đồng bộ web assets; (c) Android Studio build APK debug; (d) APK cài trên ít nhất một máy Android thật; (e) app mở không blank screen, bản đồ hiện, xin quyền GPS đúng cách, có nhập thủ công khi từ chối quyền, so sánh route gọi HTTPS API, cảnh báo nguy cơ đúng nghĩa; (f) cài lại/khởi động lại được; (g) lưu APK, video/ảnh kiểm thử và build log làm bằng chứng. **Không yêu cầu Play Store hoặc signed release APK** cho MVP.
-
-**Thiết bị và môi trường:** Máy Windows + Node.js >=22, pnpm, Android Studio >=2025.2.1, Android SDK và điện thoại Android thật (USB debugging) hoặc emulator đủ tài nguyên. Có thể kiểm tra cài công cụ trước cuộc thi; phần build/package/test APK chính thực hiện trong cuộc thi.
-
-**Luồng thực hiện** (chạy từ thư mục frontend `fe/user`, lệnh `pnpm exec cap ...` chỉ khi đã cài CLI):
-
-```bash
-pnpm install
-pnpm --filter ./fe/user build
-cd fe/user
-pnpm add @capacitor/core @capacitor/android
-pnpm add -D @capacitor/cli
-pnpm exec cap init
-pnpm exec cap add android
-pnpm exec cap sync android
-pnpm exec cap open android
-```
-
-Tại bước `cap init`, đặt `appId` duy nhất, kiểm tra `webDir` trỏ đến `dist`. Sau mỗi lần thay web code: **build → `cap sync android` → run/build lại**. Trong Android Studio: chọn thiết bị, chạy thử; Build APK(s) cho bản debug hoặc thực hiện bằng Gradle và lưu tệp APK đúng đường dẫn output thực tế. **Không đặt Cloud API secrets hoặc W&B keys trong APK**; Google API keys phải giới hạn đúng ứng dụng/điều kiện và dịch vụ.
-
-**Các tình huống phải test:** từ chối GPS; mất mạng; backend timeout; bản đồ trống; Android back gesture; safe-area/status bar; deep link nếu có; app resume; mất quyền vị trí; API keys không lộ; không dùng HTTP cleartext nếu backend HTTPS. Nếu Android build lỗi sát giờ, ưu tiên giữ web demo live và báo trạng thái APK trung thực.
-
-**Phân công:** Thành viên 3 làm Capacitor/Android UX, Thành viên 4 hỗ trợ Android Studio/SDK, build + smoke test + lưu APK, Thành viên 1/2 bảo đảm GeoJSON và model data endpoint ổn định.
+| 9–15h | Reports/admin tối thiểu, deploy Cloud Run, CI/tests | URL HTTPS, health/logs |
+| 15–21h | Tích hợp, kiểm thử điển hình/biên, profiling, cost, bias/evaluation | Web gọi API HTTPS ổn định |
+| 21–24h | Freeze, tập pitch demo web, backup artifacts, demo checklist | Không thay đổi lớn gây regression |
 
 ## 12. Điểm mới, so sánh giải pháp và phát triển sau cuộc thi
 
@@ -307,7 +278,7 @@ Tại bước `cap init`, đặt `appId` duy nhất, kiểm tra `webDir` trỏ �
 ### 12.2. Roadmap
 
 - **Sau 1 tháng:** hoàn thiện Postgres/PostGIS, verified crowdsourcing, monitoring, đánh giá người dùng trên tuyến thực tế, phân quyền admin và quy trình review.
-- **1–3 tháng:** thu thập nhãn theo thời điểm, hợp tác nguồn mưa/triều/cảm biến, nghiên cứu định tuyến có thông tin ngập được xác minh, tối ưu và phát hành Android chính thức nếu kết quả thử nghiệm APK trong Hackathon đạt.
+- **1–3 tháng:** thu thập nhãn theo thời điểm, hợp tác nguồn mưa/triều/cảm biến, nghiên cứu định tuyến có thông tin ngập được xác minh, tối ưu hiệu năng web/PWA.
 - **3–6 tháng:** kiểm định prospective với đối tác, đào tạo mô hình theo thời gian *chỉ sau khi có nhãn phù hợp*, nghiên cứu luận văn/portfolio và kiểm tra điều kiện giấy phép trước thương mại hóa.
 
 ## 13. Ma trận đối chiếu tiêu chí BGK (100 điểm)
@@ -328,8 +299,7 @@ Tại bước `cap init`, đặt `appId` duy nhất, kiểm tra `webDir` trỏ �
 
 ## 14. Definition of Done (DoD) và tiêu chí nghiệm thu cuối
 
-- [ ] FE chạy ở điện thoại, có bản đồ road susceptibility và legend rõ; không dùng màu xanh để khẳng định an toàn.
-- [ ] **Trong Hackathon:** Android APK được build từ `fe/user` bằng Capacitor; cài và chạy trên thiết bị Android thật, GPS/cấp quyền/bản đồ/API HTTPS hoạt động, APK debug được lưu làm artifact. Không bắt buộc phát hành Play Store.
+- [ ] FE chạy ở điện thoại và máy tính, có bản đồ road susceptibility và legend rõ; không dùng màu xanh để khẳng định an toàn.
 - [ ] Điểm đi/đến, chọn phương tiện và lấy tuyến thật hoạt động; có test trường hợp provider chỉ trả 1 tuyến.
 - [ ] API so sánh lộ trình trả length, ETA nếu có, risk exposure, data coverage và giải thích; không có số đo bị bịa.
 - [ ] Score của mỗi đoạn hiển thị theo `model_version`, `data_version`, `generated_at`, `score_status`; no-data có trạng thái riêng.
@@ -348,7 +318,6 @@ Tại bước `cap init`, đặt `appId` duy nhất, kiểm tra `webDir` trỏ �
 3. Nhóm đã provision PostgreSQL/Cloud SQL hay chỉ dùng storage snapshot cho demo? Tính năng gửi report cần persistence nào?
 4. Có thực sự có dữ liệu báo ngập cập nhật với timestamp/nguồn kiểm chứng không? Nếu chưa, bỏ nhãn Realtime AI và “an toàn”.
 5. Credits GCP thực tế áp dụng cho dịch vụ nào, đến ngày nào, hạn mức bao nhiêu? GDP $5 Antigravity là hạn mức riêng cần xác nhận.
-6. Android SDK, Android Studio và điện thoại test đã sẵn sàng chưa? Mục tiêu là APK debug trong cuộc thi; Play Store là giai đoạn sau.
 
 ---
 

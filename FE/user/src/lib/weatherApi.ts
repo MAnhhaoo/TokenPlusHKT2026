@@ -43,6 +43,8 @@ export interface DetailedWeatherData {
   sunsetTime: string;
   uvIndex: number;
   pressureHpa: number;
+  currentRainMm?: number;
+  minutely15Slots?: [number, number, number, number];
   theme: "sunny" | "rainy" | "cloudy" | "night";
   hourly: HourlyForecastItem[];
   daily: DailyForecastItem[];
@@ -164,208 +166,39 @@ function formatDayLabel(dateStr: string, index: number): string {
   }
 }
 
+const INIT_VN_HOUR = Number(
+  new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Asia/Ho_Chi_Minh",
+    hour: "2-digit",
+    hour12: false,
+  }).format(new Date()),
+);
+const INIT_IS_DAY = INIT_VN_HOUR >= 6 && INIT_VN_HOUR < 18;
+
 export const DEFAULT_HCMC_WEATHER: DetailedWeatherData = {
   live: false,
-  locationName: "Hồ Chí Minh",
+  locationName: "TP. Hồ Chí Minh",
   coords: [106.7009, 10.7769],
-  updatedAt: "Vừa xong",
-  tempC: 27,
-  apparentTempC: 33,
-  tempMax: 34,
-  tempMin: 26,
-  weatherCode: 2,
-  condition: "Ít mây",
-  narrative:
-    "Hôm nay, nhiệt độ cảm nhận khoảng 33°. Điều kiện thuận lợi cho các hoạt động ngoài trời.",
-  humidityPercent: 87,
-  windSpeedKmh: 4,
-  windDirectionText: "Đông Nam",
-  sunriseTime: "05:45",
-  sunsetTime: "17:28",
-  uvIndex: 6,
-  pressureHpa: 1011,
-  theme: "sunny",
-  hourly: [
-    {
-      time: "Bây giờ",
-      hourNum: 22,
-      tempC: 27,
-      weatherCode: 61,
-      condition: "Có mưa",
-      precipProb: 22,
-      rainMm: 0.6,
-      isDay: false,
-    },
-    {
-      time: "23:00",
-      hourNum: 23,
-      tempC: 27,
-      weatherCode: 2,
-      condition: "Ít mây",
-      precipProb: 16,
-      rainMm: 0,
-      isDay: false,
-    },
-    {
-      time: "00:00",
-      hourNum: 0,
-      tempC: 26,
-      weatherCode: 1,
-      condition: "Quang mây",
-      precipProb: 8,
-      rainMm: 0,
-      isDay: false,
-    },
-    {
-      time: "01:00",
-      hourNum: 1,
-      tempC: 26,
-      weatherCode: 1,
-      condition: "Quang mây",
-      precipProb: 2,
-      rainMm: 0,
-      isDay: false,
-    },
-    {
-      time: "02:00",
-      hourNum: 2,
-      tempC: 25,
-      weatherCode: 2,
-      condition: "Ít mây",
-      precipProb: 1,
-      rainMm: 0,
-      isDay: false,
-    },
-    {
-      time: "03:00",
-      hourNum: 3,
-      tempC: 25,
-      weatherCode: 1,
-      condition: "Quang mây",
-      precipProb: 1,
-      rainMm: 0,
-      isDay: false,
-    },
-    {
-      time: "04:00",
-      hourNum: 4,
-      tempC: 25,
-      weatherCode: 1,
-      condition: "Quang mây",
-      precipProb: 2,
-      rainMm: 0,
-      isDay: false,
-    },
-    {
-      time: "05:00",
-      hourNum: 5,
-      tempC: 25,
-      weatherCode: 2,
-      condition: "Ít mây",
-      precipProb: 1,
-      rainMm: 0,
-      isDay: true,
-    },
-    {
-      time: "06:00",
-      hourNum: 6,
-      tempC: 26,
-      weatherCode: 1,
-      condition: "Trời nắng",
-      precipProb: 0,
-      rainMm: 0,
-      isDay: true,
-    },
-    {
-      time: "07:00",
-      hourNum: 7,
-      tempC: 28,
-      weatherCode: 1,
-      condition: "Trời nắng",
-      precipProb: 0,
-      rainMm: 0,
-      isDay: true,
-    },
-  ],
-  daily: [
-    {
-      dayLabel: "Hôm Nay",
-      date: "2026-11-04",
-      weatherCode: 80,
-      condition: "Mưa rào",
-      conditionBadge: "Có mưa",
-      tempMin: 26,
-      tempMax: 34,
-      precipSum: 14,
-      precipProb: 75,
-    },
-    {
-      dayLabel: "Thứ 5",
-      date: "2026-11-05",
-      weatherCode: 61,
-      condition: "Mưa nhỏ",
-      conditionBadge: "Có mưa",
-      tempMin: 25,
-      tempMax: 34,
-      precipSum: 8,
-      precipProb: 65,
-    },
-    {
-      dayLabel: "Thứ 6",
-      date: "2026-11-06",
-      weatherCode: 61,
-      condition: "Mưa vừa",
-      conditionBadge: "Có mưa",
-      tempMin: 25,
-      tempMax: 33,
-      precipSum: 10,
-      precipProb: 70,
-    },
-    {
-      dayLabel: "Thứ 7",
-      date: "2026-11-07",
-      weatherCode: 61,
-      condition: "Mưa dông",
-      conditionBadge: "Có mưa",
-      tempMin: 25,
-      tempMax: 32,
-      precipSum: 12,
-      precipProb: 80,
-    },
-    {
-      dayLabel: "CN",
-      date: "2026-11-08",
-      weatherCode: 61,
-      condition: "Mưa vừa",
-      conditionBadge: "Có mưa",
-      tempMin: 24,
-      tempMax: 32,
-      precipSum: 9,
-      precipProb: 65,
-    },
-    {
-      dayLabel: "Thứ 2",
-      date: "2026-11-09",
-      weatherCode: 61,
-      condition: "Mưa nhỏ",
-      conditionBadge: "Có mưa",
-      tempMin: 24,
-      tempMax: 32,
-      precipSum: 6,
-      precipProb: 55,
-    },
-    {
-      dayLabel: "Thứ 3",
-      date: "2026-11-10",
-      weatherCode: 61,
-      condition: "Mưa dông",
-      conditionBadge: "Có mưa",
-      tempMin: 24,
-      tempMax: 32,
-      precipSum: 15,
-      precipProb: 85,
-    },
-  ],
+  updatedAt: "",
+  tempC: 0,
+  apparentTempC: 0,
+  tempMax: 0,
+  tempMin: 0,
+  weatherCode: 0,
+  condition: "Đang tải dữ liệu thời tiết…",
+  narrative: "Đang đồng bộ dữ liệu thời tiết thực tế từ Open-Meteo…",
+  humidityPercent: 0,
+  windSpeedKmh: 0,
+  windDirectionText: "—",
+  sunriseTime: "—",
+  sunsetTime: "—",
+  uvIndex: 0,
+  pressureHpa: 0,
+  currentRainMm: 0,
+  minutely15Slots: [0, 0, 0, 0],
+  theme: INIT_IS_DAY ? "sunny" : "night",
+  hourly: [],
+  daily: [],
 };
 
 /**
@@ -376,7 +209,7 @@ export async function fetchFullRealWeather(
   lng = 106.7009,
   locationName = "Hồ Chí Minh",
 ): Promise<DetailedWeatherData> {
-  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,weather_code,wind_speed_10m,wind_direction_10m,surface_pressure,is_day&hourly=temperature_2m,relative_humidity_2m,precipitation_probability,precipitation,rain,weather_code,is_day&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,uv_index_max,precipitation_sum,precipitation_probability_max&timezone=Asia%2FBangkok`;
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,weather_code,wind_speed_10m,wind_direction_10m,surface_pressure,is_day&minutely_15=precipitation,rain&hourly=temperature_2m,relative_humidity_2m,precipitation_probability,precipitation,rain,weather_code,is_day&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,uv_index_max,precipitation_sum,precipitation_probability_max&timezone=Asia%2FBangkok`;
 
   try {
     const res = await fetch(url);
@@ -384,8 +217,8 @@ export async function fetchFullRealWeather(
     const data = await res.json();
 
     const current = data.current ?? {};
-    const tempC = Math.round(Number(current.temperature_2m ?? 27));
-    const apparentTempC = Math.round(Number(current.apparent_temperature ?? tempC + 4));
+    const tempC = Math.round(Number(current.temperature_2m ?? 0));
+    const apparentTempC = Math.round(Number(current.apparent_temperature ?? tempC));
     const weatherCode = Number(current.weather_code ?? 2);
     const isDay = Number(current.is_day ?? 1) === 1;
     const rainMm = Number(current.rain ?? current.precipitation ?? 0);
@@ -393,6 +226,18 @@ export async function fetchFullRealWeather(
     const windSpeedKmh = Math.round(Number(current.wind_speed_10m ?? 8));
     const windDirectionText = getWindDirectionText(Number(current.wind_direction_10m ?? 120));
     const pressureHpa = Math.round(Number(current.surface_pressure ?? 1012));
+
+    const min15Data = data.minutely_15 ?? {};
+    const min15Times: string[] = min15Data.time ?? [];
+    const min15Rain: number[] = min15Data.rain ?? min15Data.precipitation ?? [];
+    const curTimeStr = String(current.time ?? "");
+    const mIdx = Math.max(0, curTimeStr ? min15Times.findIndex((t) => t === curTimeStr) : 0);
+    const minutely15Slots: [number, number, number, number] = [
+      Math.round(rainMm * 10) / 10,
+      Math.round(Number(min15Rain[mIdx + 2] ?? 0) * 10) / 10,
+      Math.round(Number(min15Rain[mIdx + 4] ?? 0) * 10) / 10,
+      Math.round(Number(min15Rain[mIdx + 6] ?? 0) * 10) / 10,
+    ];
 
     const decoded = decodeWmoWeather(weatherCode, isDay, rainMm);
 
@@ -456,15 +301,15 @@ export async function fetchFullRealWeather(
       .map((t, idx) => {
         const globalIdx = startIdx + idx;
         const hourStr = t.slice(11, 16) || `${(Number(nowIsoHour) + idx) % 24}:00`;
-        const code = Number(hourlyCodes[globalIdx] ?? weatherCode);
-        const dayFlag = Number(hourlyIsDay[globalIdx] ?? (isDay ? 1 : 0)) === 1;
-        const rMm = Number(hourlyRain[globalIdx] ?? 0);
+        const code = idx === 0 ? weatherCode : Number(hourlyCodes[globalIdx] ?? weatherCode);
+        const dayFlag = idx === 0 ? isDay : Number(hourlyIsDay[globalIdx] ?? (isDay ? 1 : 0)) === 1;
+        const rMm = idx === 0 ? rainMm : Number(hourlyRain[globalIdx] ?? 0);
         const dec = decodeWmoWeather(code, dayFlag, rMm);
 
         return {
           time: idx === 0 ? "Bây giờ" : hourStr,
           hourNum: Number(hourStr.slice(0, 2)) || 0,
-          tempC: Math.round(Number(hourlyTemps[globalIdx] ?? tempC)),
+          tempC: idx === 0 ? tempC : Math.round(Number(hourlyTemps[globalIdx] ?? tempC)),
           weatherCode: code,
           condition: dec.condition,
           precipProb: Math.round(Number(hourlyProb[globalIdx] ?? 10)),
@@ -506,11 +351,78 @@ export async function fetchFullRealWeather(
       sunsetTime,
       uvIndex,
       pressureHpa,
+      currentRainMm: Math.round(rainMm * 10) / 10,
+      minutely15Slots,
       theme: decoded.theme,
       hourly: hourlyItems,
       daily: dailyItems,
     };
   } catch {
+    try {
+      const apiBase = "/api";
+      const beRes = await fetch(
+        `${apiBase}/weather/current?lat=${lat}&lng=${lng}&locationName=${encodeURIComponent(locationName)}`,
+      );
+      if (beRes.ok) {
+        const snap = await beRes.json();
+        const vnHour = Number(
+          new Intl.DateTimeFormat("en-GB", {
+            timeZone: "Asia/Ho_Chi_Minh",
+            hour: "2-digit",
+            hour12: false,
+          }).format(new Date()),
+        );
+        const isDay = vnHour >= 6 && vnHour < 18;
+        const rainMm = Number(snap.currentRainMm ?? 0);
+        const code = rainMm >= 15 ? 80 : rainMm >= 4 ? 61 : rainMm > 0 ? 51 : 2;
+        const decoded = decodeWmoWeather(code, isDay, rainMm);
+        const tempC = Math.round(Number(snap.temperatureC ?? 0));
+        const apparentTempC = tempC;
+        const beHourly: HourlyForecastItem[] = Array.isArray(snap.hourlyForecast)
+          ? snap.hourlyForecast.map((h: any, idx: number) => {
+              const hStr = String(h.time ?? `${(vnHour + idx) % 24}:00`);
+              const hNum = Number(hStr.slice(0, 2)) || (vnHour + idx) % 24;
+              const hDay = hNum >= 6 && hNum < 18;
+              const hRain = Number(h.rainMm ?? 0);
+              const hCode = hRain >= 15 ? 80 : hRain >= 4 ? 61 : hRain > 0 ? 51 : 2;
+              const hDec = decodeWmoWeather(hCode, hDay, hRain);
+              return {
+                time: idx === 0 ? "Bây giờ" : hStr,
+                hourNum: hNum,
+                tempC: Math.round(Number(h.temperatureC ?? tempC)),
+                weatherCode: hCode,
+                condition: hDec.condition,
+                precipProb: Math.round(Number(h.precipitationProbability ?? 20)),
+                rainMm: hRain,
+                isDay: hDay,
+              };
+            })
+          : DEFAULT_HCMC_WEATHER.hourly;
+
+        return {
+          ...DEFAULT_HCMC_WEATHER,
+          live: true,
+          locationName: snap.locationName || locationName,
+          coords: [Number(snap.lng ?? lng), Number(snap.lat ?? lat)],
+          updatedAt: new Intl.DateTimeFormat("vi-VN", {
+            timeZone: "Asia/Ho_Chi_Minh",
+            hour: "2-digit",
+            minute: "2-digit",
+          }).format(new Date()),
+          tempC,
+          apparentTempC,
+          weatherCode: code,
+          condition: snap.weatherCondition || decoded.condition,
+          humidityPercent: Math.round(Number(snap.humidityPercent ?? 80)),
+          windSpeedKmh: Math.round(Number(snap.windSpeedKmh ?? 8)),
+          theme: decoded.theme,
+          hourly: beHourly,
+        };
+      }
+    } catch {
+      // ignore backend fallback error
+    }
+
     return {
       ...DEFAULT_HCMC_WEATHER,
       locationName,

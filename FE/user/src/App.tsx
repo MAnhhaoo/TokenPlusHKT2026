@@ -97,16 +97,21 @@ function App() {
   });
   const [navigationSteps, setNavigationSteps] = useState<NavigationStep[]>([]);
   const [weather, setWeather] = useState<WeatherSnapshot | null>(null);
-  const [isLiveBackend, setIsLiveBackend] = useState(false);
   const [rerouteNotice, setRerouteNotice] = useState<string | null>(null);
 
   // Tự động chẩn đoán và cập nhật điểm ngập theo thời tiết thực và mốc dự báo được chọn
+  const mapQueryStateRef = useRef<{ slotRain: number; mapMode: "realtime" | "history" }>({
+    slotRain: 0,
+    mapMode: "realtime",
+  });
+
   useEffect(() => {
     let active = true;
     const currentSlot = forecasts[forecastIndex] ?? forecasts[0];
     const slotRain = currentSlot
       ? Number.parseFloat(currentSlot.rain) || 0
       : (weather?.currentRainMm ?? 0);
+    mapQueryStateRef.current = { slotRain, mapMode };
 
     async function updatePoints() {
       const pts = await fetchMapPointsApi(slotRain, mapMode);
@@ -133,7 +138,6 @@ function App() {
       if (forecastRes.slots.length > 0) setForecasts(forecastRes.slots);
       if (pointsRes.length > 0) setFloodPoints(pointsRes);
       setActiveAlerts(alertsRes);
-      setIsLiveBackend(Boolean(weatherSnap) || forecastRes.live);
     }
     loadFromBackend();
 
@@ -142,10 +146,10 @@ function App() {
         if (!active) return;
         if (snapshot) setWeather(snapshot);
         if (slots && slots.length > 0) setForecasts(slots);
-        setIsLiveBackend(true);
       },
       onRouteRecomputeNeeded: async () => {
-        const pointsRes = await fetchMapPointsApi();
+        const { slotRain, mapMode: currentMode } = mapQueryStateRef.current;
+        const pointsRes = await fetchMapPointsApi(slotRain, currentMode);
         if (!active) return;
         setFloodPoints(pointsRes);
       },
@@ -581,12 +585,6 @@ function App() {
               </span>
               Báo cáo
             </button>
-
-            <span className="demo-label">
-              {isLiveBackend
-                ? "Dữ liệu trực tuyến · PostgreSQL & Open-Meteo"
-                : "Đang đồng bộ Backend…"}
-            </span>
           </section>
 
           {!isNavigating && (
@@ -630,7 +628,10 @@ function App() {
 
       <ReportModal
         onClose={() => setReportOpen(false)}
-        onReportCreated={() => {
+        onReportCreated={async (newPoint) => {
+          if (newPoint) {
+            setFloodPoints((prev) => [newPoint, ...prev.filter((p) => p.id !== newPoint.id)]);
+          }
           if (currentUser) {
             const updated: CommunityUserProfile = {
               ...currentUser,
@@ -638,6 +639,13 @@ function App() {
             };
             setCurrentUser(updated);
             saveAuthSession(updated);
+          }
+          const { slotRain, mapMode: currentMode } = mapQueryStateRef.current;
+          const pts = await fetchMapPointsApi(slotRain, currentMode);
+          if (pts.length > 0 || newPoint) {
+            setFloodPoints(
+              newPoint && !pts.some((p) => p.id === newPoint.id) ? [newPoint, ...pts] : pts,
+            );
           }
         }}
         open={reportOpen}

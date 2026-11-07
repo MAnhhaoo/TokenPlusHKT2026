@@ -133,8 +133,12 @@ export class ReportsService {
       district = district || geo.district;
     }
 
-    const count = await this.reportRepo.count();
-    const nextId = `RP-${2420 + count}`;
+    const existingIds = await this.reportRepo.find({ select: ["id"] });
+    const maxReportNum = existingIds.reduce((max, row) => {
+      const m = /^RP-(\d+)$/.exec(row.id);
+      return m ? Math.max(max, Number.parseInt(m[1], 10)) : max;
+    }, 2419);
+    const nextId = `RP-${maxReportNum + 1}`;
 
     const depthBySeverity: Record<string, number> = {
       low: 12,
@@ -143,17 +147,21 @@ export class ReportsService {
       critical: 45,
     };
     let reportedDepth =
-      dto.reportedDepth ?? depthBySeverity[dto.severity] ?? 24;
-    let aiDepth = Math.max(8, reportedDepth - 2);
-    let aiConfidence = dto.photoUrl ? 94 : 88;
+      dto.reportedDepth && dto.reportedDepth > 0
+        ? dto.reportedDepth
+        : (depthBySeverity[dto.severity] ?? 24);
+    let aiDepth =
+      dto.aiDepth && dto.aiDepth > 0 ? dto.aiDepth : reportedDepth;
+    let aiConfidence =
+      dto.aiConfidence && dto.aiConfidence > 0 ? dto.aiConfidence : 0;
     let aiSummary = dto.aiSummary;
     let recommendation = dto.recommendation;
     let visual =
       dto.visual ?? (dto.reportType === "drain" ? "drain" : "street");
     let detectedSeverity = dto.severity;
 
-    // Tự động phân tích ảnh hiện trường bằng Google Gemini Multimodal nếu có đính kèm ảnh
-    if (dto.photoUrl) {
+    // Tự động phân tích ảnh hiện trường bằng Google Gemini Multimodal nếu có đính kèm ảnh và chưa phân tích trước đó
+    if (dto.photoUrl && !aiSummary) {
       try {
         const visionResult = await this.geminiVisionService.analyzeImage(
           dto.photoUrl,
@@ -166,7 +174,9 @@ export class ReportsService {
           if (!aiSummary) aiSummary = visionResult.aiSummary;
           if (!recommendation) recommendation = visionResult.recommendation;
           visual = visionResult.visual;
-          if (!dto.reportedDepth) reportedDepth = visionResult.estimatedDepthCm;
+          if (!dto.reportedDepth && visionResult.estimatedDepthCm > 0) {
+            reportedDepth = visionResult.estimatedDepthCm;
+          }
           if (!dto.severity || dto.severity === "medium") {
             detectedSeverity = visionResult.severity;
           }
@@ -211,7 +221,7 @@ export class ReportsService {
       status: "verified",
       priority: dto.reportType === "drain" ? "Cống tắc" : "Trục đường chính",
       coordinates: dto.coordinates || `${lat.toFixed(4)}, ${lng.toFixed(4)}`,
-      historyCount: 6,
+      historyCount: 1,
       visual,
       photoUrl: dto.photoUrl,
       reporterId: dto.reporterId,
@@ -221,9 +231,8 @@ export class ReportsService {
 
     const saved = await this.reportRepo.save(report);
 
-    const pointCount = await this.mapPointRepo.count();
     const newPoint = this.mapPointRepo.create({
-      id: `p${pointCount + 1}`,
+      id: `p_${saved.id}`,
       x: 50,
       y: 50,
       lat,
@@ -234,9 +243,9 @@ export class ReportsService {
       severity: normalizedSeverity,
       label: location,
       district,
-      rainfall: 58,
+      rainfall: 0,
       depth: reportedDepth,
-      historyCount: 6,
+      historyCount: 1,
       linkedReportId: saved.id,
     });
     const savedPoint = await this.mapPointRepo.save(newPoint);
@@ -263,7 +272,7 @@ export class ReportsService {
       updatedMapPoint: savedPoint,
     });
 
-    return saved;
+    return Object.assign(saved, { mapPoint: savedPoint });
   }
 
   /**

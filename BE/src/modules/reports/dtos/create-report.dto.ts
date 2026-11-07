@@ -46,6 +46,18 @@ export class CreateReportDto {
   @IsNumber()
   reportedDepth?: number;
 
+  @ApiPropertyOptional({ example: 24 })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  aiDepth?: number;
+
+  @ApiPropertyOptional({ example: 91 })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  aiConfidence?: number;
+
   @ApiPropertyOptional({ example: 10.7790693 })
   @IsOptional()
   @Type(() => Number)

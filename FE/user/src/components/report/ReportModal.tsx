@@ -10,7 +10,7 @@ import {
   searchPlacesApi,
   type FloodAiAnalysis,
 } from "@/lib/api";
-import type { ReportType, RouteEndpoint, Severity } from "@/types";
+import type { MapFloodPoint, ReportType, RouteEndpoint, Severity } from "@/types";
 
 function compressImageToDataUrl(file: File): Promise<string> {
   return new Promise((resolve) => {
@@ -63,7 +63,7 @@ function ReportModal({
   open: boolean;
   onClose: () => void;
   reporterId?: string;
-  onReportCreated?: () => void;
+  onReportCreated?: (point?: MapFloodPoint) => void;
 }) {
   const [type, setType] = useState<ReportType>("flood");
   const [severity, setSeverity] = useState<Severity>("medium");
@@ -199,21 +199,50 @@ function ReportModal({
     setSubmitting(true);
     setSubmitError(null);
     try {
-      const rawLoc = locationText.trim() || "Nguyễn Hữu Cảnh, Bình Thạnh";
+      let resolvedCoords = coords;
+      let resolvedDistrict = selectedDistrict;
+      const trimmedLoc = locationText.trim();
+      if (trimmedLoc && locSuggestions.length > 0) {
+        const matched = locSuggestions[0];
+        if (matched?.coords) {
+          resolvedCoords = matched.coords;
+          if (matched.district) resolvedDistrict = matched.district;
+        }
+      } else if (trimmedLoc && typeof searchPlacesApi === "function") {
+        try {
+          const found = await searchPlacesApi(trimmedLoc);
+          if (found?.[0]?.coords) {
+            resolvedCoords = found[0].coords;
+            if (found[0].district) resolvedDistrict = found[0].district;
+          }
+        } catch {
+          // keep current coords
+        }
+      }
+
+      const rawLoc = trimmedLoc || "Nguyễn Hữu Cảnh, Bình Thạnh";
       const cleanLocation = rawLoc.split(/[·,]/)[0].trim() || rawLoc;
+      const defaultDepth = severity === "high" ? 35 : severity === "low" ? 12 : 24;
+      const reportedDepth =
+        aiAnalysis?.estimatedDepthCm && aiAnalysis.estimatedDepthCm > 0
+          ? aiAnalysis.estimatedDepthCm
+          : defaultDepth;
       const created = await createCitizenReport({
         reportType: type,
         severity,
         photoUrl: photoDataUrl || photoName || undefined,
         location: cleanLocation,
-        district: selectedDistrict,
+        district: resolvedDistrict,
         description: description.trim() || aiAnalysis?.aiSummary || undefined,
-        lat: coords[1],
-        lng: coords[0],
+        lat: resolvedCoords[1],
+        lng: resolvedCoords[0],
         reporterId,
         aiSummary: aiAnalysis?.aiSummary,
         recommendation: aiAnalysis?.recommendation,
-        reportedDepth: aiAnalysis?.estimatedDepthCm,
+        reportedDepth,
+        aiDepth: aiAnalysis?.estimatedDepthCm,
+        aiConfidence: aiAnalysis?.confidence,
+        visual: aiAnalysis?.visual,
       });
       if (!created) {
         setSubmitError("Không thể gửi báo cáo. Vui lòng thử lại.");
@@ -221,7 +250,18 @@ function ReportModal({
       }
       setCreatedReportId(created.id);
       setSubmitted(true);
-      onReportCreated?.();
+      const createdPoint: MapFloodPoint = created.mapPoint ?? {
+        id: `p_${created.id}`,
+        lat: resolvedCoords[1],
+        lng: resolvedCoords[0],
+        label: cleanLocation,
+        district: resolvedDistrict,
+        type: "flood",
+        severity: severity === "high" ? "critical" : "medium",
+        depth: created.aiDepth && created.aiDepth > 0 ? created.aiDepth : reportedDepth,
+        rainfall: 0,
+      };
+      onReportCreated?.(createdPoint);
     } catch {
       setSubmitError("Không thể gửi báo cáo. Vui lòng thử lại.");
     } finally {

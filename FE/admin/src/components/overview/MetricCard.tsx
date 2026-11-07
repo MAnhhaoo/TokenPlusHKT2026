@@ -15,9 +15,10 @@ function MetricCard({
   meta: ReactNode
   data: number[]
 }) {
-  const max = Math.max(...data)
+  const max = Math.max(...data, 1)
+  const divisor = Math.max(data.length - 1, 1)
   const points = data
-    .map((v, i) => `${i * (92 / (data.length - 1)) + 4},${38 - (v / max) * 26}`)
+    .map((v, i) => `${i * (92 / divisor) + 4},${38 - (v / max) * 26}`)
     .join(" ")
   return (
     <section className="metric-card">

@@ -42,7 +42,6 @@ Runner chạy tuần tự, tiếp tục sau một stage lỗi để thu đủ b�
 - [TEST_CASES.md](TEST_CASES.md): phạm vi và ma trận ca kiểm thử.
 - [TEST_REPORT.md](TEST_REPORT.md): baseline, kết quả và lỗi đã tái hiện.
 - [BE_RESULTS.md](BE_RESULTS.md), [FE_RESULTS.md](FE_RESULTS.md), [ML_RESULTS.md](ML_RESULTS.md): bằng chứng theo phân hệ.
-- [ANDROID_CASES.md](ANDROID_CASES.md): checklist thiết bị, chưa chạy trên máy/emulator.
 
 Với test lỗi đã biết, chạy riêng tên test từ báo cáo để tái hiện. Không dùng `skip`, đổi assertion theo hành vi sai hoặc mock chính logic đang kiểm tra để báo xanh.
 

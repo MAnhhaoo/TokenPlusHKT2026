@@ -258,7 +258,9 @@ function ReportsPage({
                     <td data-label="Mực nước AI">
                       <strong>{report.aiDepth} cm</strong>
                       <span className="cell-note">
-                        AI tin cậy {report.aiConfidence}%
+                        {report.aiConfidence > 0
+                          ? `AI tin cậy ${report.aiConfidence}%`
+                          : "Người dân khai báo"}
                       </span>
                     </td>
                     <td data-label="Thời gian">

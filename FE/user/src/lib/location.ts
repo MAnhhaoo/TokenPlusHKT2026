@@ -1,6 +1,3 @@
-import { Capacitor } from "@capacitor/core";
-import { Geolocation } from "@capacitor/geolocation";
-
 export type UserGeoLocation = {
   latitude: number;
   longitude: number;
@@ -8,37 +5,17 @@ export type UserGeoLocation = {
 };
 
 export async function getUserLocation(): Promise<UserGeoLocation> {
-  // 0. Nếu chạy trên App Native Android, ưu tiên gọi thẳng cảm biến GPS phần cứng qua Capacitor
-  if (typeof window !== "undefined" && Capacitor.isNativePlatform()) {
-    try {
-      let perm = await Geolocation.checkPermissions();
-      if (perm.location !== "granted") {
-        perm = await Geolocation.requestPermissions();
-      }
-      if (perm.location === "granted") {
-        const pos = await Geolocation.getCurrentPosition({
-          enableHighAccuracy: true,
-          timeout: 10000,
-        });
-        return {
-          latitude: pos.coords.latitude,
-          longitude: pos.coords.longitude,
-          isIpFallback: false,
-        };
-      }
-    } catch (err) {
-      console.warn("Capacitor native GPS lookup error, falling back:", err);
-    }
-  }
   const fallbackIp = async (): Promise<UserGeoLocation> => {
     try {
-      const res = await fetch("https://ipwho.is/");
+      const res = await fetch("https://get.geojs.io/v1/ip/geo.json", {
+        signal: AbortSignal.timeout(3000),
+      });
       if (res.ok) {
         const data = await res.json();
-        if (data && data.success && data.latitude && data.longitude) {
+        if (data && data.latitude && data.longitude) {
           return {
-            latitude: Number(data.latitude),
-            longitude: Number(data.longitude),
+            latitude: parseFloat(data.latitude),
+            longitude: parseFloat(data.longitude),
             isIpFallback: true,
           };
         }
@@ -48,19 +25,21 @@ export async function getUserLocation(): Promise<UserGeoLocation> {
     }
 
     try {
-      const res2 = await fetch("https://get.geojs.io/v1/ip/geo.json");
+      const res2 = await fetch("https://ipwho.is/", {
+        signal: AbortSignal.timeout(3000),
+      });
       if (res2.ok) {
         const data2 = await res2.json();
-        if (data2 && data2.latitude && data2.longitude) {
+        if (data2 && data2.success && data2.latitude && data2.longitude) {
           return {
-            latitude: parseFloat(data2.latitude),
-            longitude: parseFloat(data2.longitude),
+            latitude: Number(data2.latitude),
+            longitude: Number(data2.longitude),
             isIpFallback: true,
           };
         }
       }
     } catch {
-      // try default HCM center
+      // fallback to default HCMC center
     }
 
     return {
@@ -80,21 +59,74 @@ export async function getUserLocation(): Promise<UserGeoLocation> {
     return fallbackIp();
   }
 
-  return new Promise<UserGeoLocation>((resolve) => {
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        resolve({
-          latitude: pos.coords.latitude,
-          longitude: pos.coords.longitude,
-          isIpFallback: false,
-        });
-      },
-      async (err) => {
-        console.warn("GPS lookup denied or unavailable, switching to IP Geolocation:", err);
-        const ipLoc = await fallbackIp();
-        resolve(ipLoc);
-      },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 },
-    );
-  });
+  // Nếu người dùng đã chặn quyền vị trí trong trình duyệt thì chuyển thẳng sang fallback
+  try {
+    if (navigator.permissions?.query) {
+      const permStatus = await navigator.permissions.query({ name: "geolocation" });
+      if (permStatus.state === "denied") {
+        return fallbackIp();
+      }
+    }
+  } catch {
+    // ignore permissions API error
+  }
+
+  const requestBrowserPosition = (
+    highAccuracy: boolean,
+    timeoutMs: number,
+  ): Promise<GeolocationPosition> =>
+    new Promise((resolve, reject) => {
+      let settled = false;
+      const timer = setTimeout(() => {
+        if (settled) return;
+        settled = true;
+        reject(new Error("Geolocation timeout"));
+      }, timeoutMs + 1500);
+
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timer);
+          resolve(pos);
+        },
+        (err) => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timer);
+          reject(err);
+        },
+        { enableHighAccuracy: highAccuracy, timeout: timeoutMs, maximumAge: 0 },
+      );
+    });
+
+  // Bước 1: Thử lấy tọa độ độ chính xác cao (GPS / Wi-Fi triangulation)
+  try {
+    const pos = await requestBrowserPosition(true, 7000);
+    const isCoarseIp = (pos.coords.accuracy ?? 0) > 3000;
+    return {
+      latitude: pos.coords.latitude,
+      longitude: pos.coords.longitude,
+      isIpFallback: isCoarseIp,
+    };
+  } catch (err: any) {
+    // Nếu người dùng bấm Block (PERMISSION_DENIED = 1), không gọi lại lần 2
+    if (err && err.code === 1) {
+      return fallbackIp();
+    }
+  }
+
+  // Bước 2: Trên máy tính bàn / laptop không có chip GPS, thử lại với enableHighAccuracy: false (Wi-Fi/Network Location)
+  try {
+    const pos = await requestBrowserPosition(false, 5000);
+    const isCoarseIp = (pos.coords.accuracy ?? 0) > 3000;
+    return {
+      latitude: pos.coords.latitude,
+      longitude: pos.coords.longitude,
+      isIpFallback: isCoarseIp,
+    };
+  } catch (err) {
+    console.warn("GPS lookup denied or unavailable, switching to IP Geolocation:", err);
+    return fallbackIp();
+  }
 }

@@ -28,53 +28,50 @@ export class GeminiVisionService {
     imageDataUrlOrBase64: string,
     location?: string,
     userDescription?: string,
-  ): Promise<FloodImageAnalysisResult> {
+  ): Promise<FloodImageAnalysisResult | null> {
     const apiKey = process.env.GEMINI_API_KEY?.trim();
     const primaryModel =
-      process.env.GEMINI_MODEL?.trim() || "gemini-3.5-flash-lite";
+      process.env.GEMINI_MODEL?.trim() || "gemini-2.5-flash";
 
     if (
-      apiKey &&
-      apiKey.length > 5 &&
-      this.isBase64Image(imageDataUrlOrBase64)
+      !apiKey ||
+      apiKey.length <= 5 ||
+      !this.isBase64Image(imageDataUrlOrBase64)
     ) {
-      const candidateModels = [
-        primaryModel,
-        "gemini-3.5-flash-lite",
-        "gemini-3.8-flash",
-        "gemini-flash-latest",
-      ];
-      const uniqueModels = Array.from(new Set(candidateModels));
+      return null;
+    }
 
-      for (const model of uniqueModels) {
-        try {
-          const geminiResult = await this.callGeminiVisionApi(
-            apiKey,
-            model,
-            imageDataUrlOrBase64,
-            location,
-            userDescription,
-          );
-          if (geminiResult) {
-            return {
-              ...geminiResult,
-              provider: "Google Gemini 1.5 Flash Vision",
-            };
-          }
-        } catch (err: any) {
-          this.logger.warn(
-            `Gọi Gemini Vision API với ${model} thất bại (${err?.response?.status || err?.message}). Thử mô hình kế tiếp...`,
-          );
+    const candidateModels = [
+      primaryModel,
+      "gemini-2.5-flash",
+      "gemini-2.0-flash",
+      "gemini-1.5-flash",
+    ];
+    const uniqueModels = Array.from(new Set(candidateModels));
+
+    for (const model of uniqueModels) {
+      try {
+        const geminiResult = await this.callGeminiVisionApi(
+          apiKey,
+          model,
+          imageDataUrlOrBase64,
+          location,
+          userDescription,
+        );
+        if (geminiResult) {
+          return {
+            ...geminiResult,
+            provider: "Google Gemini 1.5 Flash Vision",
+          };
         }
+      } catch (err: any) {
+        this.logger.warn(
+          `Gọi Gemini Vision API với ${model} thất bại (${err?.response?.status || err?.message}). Thử mô hình kế tiếp...`,
+        );
       }
     }
 
-    // Heuristic Fallback Engine
-    return this.fallbackHeuristicAnalysis(
-      imageDataUrlOrBase64,
-      location,
-      userDescription,
-    );
+    return null;
   }
 
   /**
@@ -204,101 +201,6 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON (Không dùng Markdown, k
       this.logger.error("Lỗi parse JSON phản hồi từ Gemini API:", parseErr);
       return null;
     }
-  }
-
-  /**
-   * Bộ xử lý dự phòng phân tích bối cảnh ảnh và siêu dữ liệu (Heuristic Vision Engine).
-   */
-  private fallbackHeuristicAnalysis(
-    imageData: string,
-    location?: string,
-    userDescription?: string,
-  ): FloodImageAnalysisResult {
-    const text =
-      `${location || ""} ${userDescription || ""} ${imageData}`.toLowerCase();
-
-    const isDrain =
-      text.includes("cống") ||
-      text.includes("rác") ||
-      text.includes("tắc") ||
-      text.includes("hố ga") ||
-      text.includes("miệng cống") ||
-      text.includes("drain");
-
-    const isCritical =
-      text.includes("sâu") ||
-      text.includes("nửa bánh") ||
-      text.includes("chết máy") ||
-      text.includes("nước tràn") ||
-      text.includes("nguy hiểm") ||
-      text.includes("lút") ||
-      text.includes("pô xe");
-
-    const isRaining =
-      text.includes("mưa") ||
-      text.includes("rào") ||
-      text.includes("dông") ||
-      text.includes("sấm") ||
-      text.includes("đen kịt");
-
-    const isNight =
-      text.includes("tối") ||
-      text.includes("đêm") ||
-      new Date().getHours() >= 19 ||
-      new Date().getHours() <= 5;
-
-    let estimatedDepthCm = 24;
-    let severity: "critical" | "high" | "medium" | "low" = "medium";
-
-    if (isCritical) {
-      estimatedDepthCm = 38;
-      severity = "critical";
-    } else if (isDrain) {
-      estimatedDepthCm = 18;
-      severity = "high";
-    }
-
-    const reportType = isDrain ? "drain" : "flood";
-    const visual = isDrain
-      ? "drain"
-      : isCritical
-        ? "traffic"
-        : isNight
-          ? "night"
-          : "street";
-
-    const weatherCondition = isRaining
-      ? "Trời đang mưa to"
-      : "Trời nhiều mây, độ ẩm cao";
-
-    const drainStatus = isDrain
-      ? "Rác thải che phủ miệng cống thoát nước"
-      : "Cống thoát nước đang hoạt động tối đa";
-
-    const aiSummary = isDrain
-      ? `Phát hiện miệng cống bị bít nghẹt bởi rác và lá cây. Nước ứ đọng xung quanh khoảng ${estimatedDepthCm} cm.`
-      : `Phát hiện mực nước ngập mặt đường ước tính ~${estimatedDepthCm} cm. Mặt đường ngập rộng khiến phương tiện di chuyển chậm.`;
-
-    const recommendation =
-      severity === "critical"
-        ? "Mực nước tiệm cận ống xả xe máy. Khuyến nghị người dân không đi vào đoạn đường này và chuyển sang tuyến tránh."
-        : severity === "high"
-          ? "Nước ngập qua mắt cá chân. Hạn chế tăng ga đột ngột và quan sát các hố ga trũng."
-          : "Phương tiện có thể lưu thông nhưng cần giữ khoảng cách an toàn và đi giữa tim đường.";
-
-    return {
-      hasFlooding: true,
-      estimatedDepthCm,
-      reportType,
-      severity,
-      weatherCondition,
-      drainStatus,
-      visual,
-      confidence: 91,
-      aiSummary,
-      recommendation,
-      provider: "SaigonDrain AI Vision Engine",
-    };
   }
 
   private isBase64Image(str: string): boolean {
