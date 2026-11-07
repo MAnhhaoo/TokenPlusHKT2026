@@ -1,124 +1,88 @@
-# Google Cloud CI/CD setup
+# Google Cloud CI/CD
 
-This repository is being migrated from the earlier SaigonDrain project in small steps. The workflows validate migrated packages under `BE/`, `FE/user/`, `FE/admin/`, and the existing lowercase `ml/` package; uppercase `ML/` is also recognized during migration. Empty placeholder directories are not treated as passing application checks.
+The pipeline currently covers only the NestJS API in `BE/` and the public user frontend in `FE/user/`. Admin, ML, and pull request preview deployments are outside this stage.
 
-## Pipeline behavior
+## Pipeline
 
-| Event | Result |
+| Event | Behavior |
 | --- | --- |
-| Pull request to `master` | Run CI for changed application packages. Same-repository frontend PRs can publish a seven-day Firebase preview when `GCP_PREVIEW_ENABLED=true`. Fork PRs never receive Google credentials. |
-| Push to `master` | Run full validation on migrated packages. When staging is configured, compute deployable changes since the last successful staging deployment and deploy the affected services to the `staging` environment. |
-| Published GitHub release | Run full validation, deploy the release commit to staging, then deploy that same source revision to production only when `GCP_DEPLOY_PRODUCTION=true` and the `production` Environment gate allows it. |
-| No migrated application source | Report that application checks or deployment were skipped; do not report the repository as application-validated. |
+| Pull request to `master` | Run build, typecheck, lint or format, and tests for changed BE and/or FE/user packages. Workflow changes run regression checks for every migrated package. |
+| Push to `master` | Validate every migrated BE and FE/user package. If staging is enabled, deploy changed services to Cloud Run and/or Firebase Hosting. |
+| Published release | Validate all migrated packages, deploy that release revision to staging, then deploy the same revision to production when the protected production Environment allows it. |
 
-Staging and production use separate GitHub concurrency groups. Deploys to the same environment queue without canceling a deployment already in progress. After acquiring the staging concurrency lock, a staging push checks the current `master` SHA, skips if superseded, computes deployable service scope from the last successfully deployed staging SHA (so changes from superseded or replaced runs are carried forward), and records the new staging SHA only after all selected services deploy successfully; a production deploy checks the latest published release before deploying.
+Deployment is disabled until `GCP_DEPLOY_STAGING` and `GCP_DEPLOY_PRODUCTION` are configured. The staging workflow records a successful revision only after all selected services deploy. It carries changes forward from the last successful staging revision, and superseded push runs skip themselves so the latest run can deploy the accumulated change set.
 
-The deploy workflow runs from the default branch after CI completes. For PR previews it reads only validated frontend booleans from the artifact, takes the PR number from the trusted `workflow_run` event, and downloads static build output; it rejects symbolic links and does not check out or execute PR workflow code. The trusted workflow uses the Firebase configuration from `master`. GitHub documents that `workflow_run` workflows can access secrets and write tokens even when the preceding workflow cannot, and warns against running untrusted code on this event; keep this trust boundary intact. See [GitHub's `workflow_run` security guidance](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#workflow_run).
+The API is private by default on Cloud Run. `GCP_API_PUBLIC=true` enables unauthenticated Cloud Run access; use it only after application-level authentication is implemented and reviewed. With the API private, browser requests from Firebase Hosting need a separate authentication/connectivity design. CORS and API authentication are application concerns and are not configured by this pipeline.
 
 ## GitHub configuration
 
-Create the `staging`, `production`, and `preview` Environments in repository settings. Set the variables below at the indicated scope. Values are GitHub Actions **variables**, not secrets; do not put private keys in them.
+Create `staging` and `production` Environments. Require reviewer approval for `production`. Configure these repository variables only after the corresponding Google Cloud resources and WIF identities are ready:
 
-### Repository variables
-
-| Variable | Value | Effect |
+| Repository variable | Value | Purpose |
 | --- | --- | --- |
-| `GCP_PREVIEW_ENABLED` | `true` | Allows same-repository frontend PR artifacts to be deployed to temporary preview channels. Set to `false` or remove it to disable previews. |
-| `GCP_DEPLOY_STAGING` | `true` | Enables automatic staging deploys after a successful full CI run on `master` and before release production deploys. |
-| `GCP_DEPLOY_PRODUCTION` | `true` | Enables production deploys for published releases. The production Environment should require reviewer approval. |
+| `GCP_DEPLOY_STAGING` | `true` | Enable staging after successful validation on `master`. |
+| `GCP_DEPLOY_PRODUCTION` | `true` | Enable release deployment after staging succeeds. |
 
-Only the exact string `true` enables a switch. Leave a switch unset until its environment and Google Cloud identity are ready.
+Configure environment variables separately for staging and production:
 
-### Environment variables
+| Environment variable | Required for | Notes |
+| --- | --- | --- |
+| `GCP_PROJECT_ID` | Every deploy | Google Cloud project ID. |
+| `GCP_REGION` | Cloud Run | Example: `asia-southeast1`. |
+| `GCP_WORKLOAD_IDENTITY_PROVIDER` | Every deploy | Full WIF provider resource name. |
+| `GCP_DEPLOY_SERVICE_ACCOUNT` | Every deploy | GitHub Actions deployer identity. |
+| `GCP_RUNTIME_SERVICE_ACCOUNT` | API deploy | Cloud Run runtime identity. |
+| `GCP_API_PUBLIC` | Optional API deploy | Set to `true` only after the API has its own authentication. Unset keeps Cloud Run private. |
+| `CLOUD_RUN_API_SERVICE` | Optional API deploy | Defaults to `saigondrain-api`. |
+| `VITE_API_BASE_URL` | User frontend deploy when API is not deployed in the same run | API URL baked into the Vite build. |
+| `FIREBASE_PROJECT_ID` | User frontend deploy | Firebase project ID. |
+| `FIREBASE_USER_SITE_ID` | User frontend deploy | Firebase Hosting site ID for target `user`. |
 
-Configure staging and production independently. The preview Environment needs only the identity and Firebase variables listed in the right column. Service names may be set at each environment or omitted to use the defaults.
+## Google Cloud setup
 
-| Variable | Staging / production | Preview | Required when |
-| --- | --- | --- | --- |
-| `GCP_PROJECT_ID` | Google Cloud project ID | Same project ID | Every deploy job |
-| `GCP_REGION` | Cloud Run region, e.g. `asia-southeast1` | — | Staging / production job |
-| `GCP_WORKLOAD_IDENTITY_PROVIDER` | Full provider resource name: `projects/PROJECT_NUMBER/locations/global/workloadIdentityPools/POOL/providers/PROVIDER` | Same format | Every deploy job |
-| `GCP_DEPLOY_SERVICE_ACCOUNT` | Service account email used by GitHub Actions | Preview should use a Firebase-only service account | Every deploy job |
-| `GCP_RUNTIME_SERVICE_ACCOUNT` | Runtime service account email for Cloud Run | — | API or ML serving deploy |
-| `GCP_API_PUBLIC` | `true` to allow unauthenticated requests; unset or any other value keeps the API private | — | Optional; API deploy |
-| `VITE_API_BASE_URL` | Existing API URL used when a frontend changes without the API changing in the same deployment | — | Frontend deploy if the API is not deployed in that run |
-| `FIREBASE_PROJECT_ID` | Firebase project ID | Firebase project ID | Firebase Hosting deploy |
-| `FIREBASE_USER_SITE_ID` | Hosting site ID for the user app | Same site ID | User frontend deploy/preview |
-| `FIREBASE_ADMIN_SITE_ID` | Hosting site ID for the admin app | Same site ID | Admin frontend deploy/preview |
-| `CLOUD_RUN_API_SERVICE` | Optional Cloud Run API service name; default `saigondrain-api` | — | Optional |
-| `CLOUD_RUN_ML_SERVICE` | Optional Cloud Run ML service name; default `saigondrain-ml` | — | Optional |
+Create the Google Cloud project, Cloud Run service, Firebase project/site, deployer and runtime service accounts, and WIF provider before enabling deployment. This workflow does not create cloud resources or store service-account keys.
 
-Use separate GCP projects for staging and production when feasible. If using one project, keep separate environment variables, service accounts, Cloud Run service names, and Firebase sites so each deployment target is explicit.
+Enable the APIs needed by the selected service:
 
-## Google Cloud preparation
+- Cloud Run: `run.googleapis.com`.
+- Cloud Build: `cloudbuild.googleapis.com`.
+- Artifact Registry: `artifactregistry.googleapis.com`.
+- Firebase Hosting: `firebasehosting.googleapis.com`.
+- Firebase Management: `firebase.googleapis.com` when adding Firebase to an existing project or managing Firebase resources.
 
-An administrator should create the Firebase project and Hosting sites, service accounts, Workload Identity Federation provider, and IAM bindings before enabling the GitHub switches. This workflow does not create those resources.
-
-Enable the APIs needed by the configured targets:
-
-- Cloud Run API: `run.googleapis.com`.
-- Cloud Build API: `cloudbuild.googleapis.com` (used by Cloud Run source builds).
-- Artifact Registry API: `artifactregistry.googleapis.com` (Cloud Run source builds store built images here).
-- Firebase Hosting API: `firebasehosting.googleapis.com`.
-- Firebase Management API: `firebase.googleapis.com` when adding Firebase to an existing Google Cloud project or managing Firebase resources.
-
-Cloud Run source deployment uses buildpacks and Cloud Build. The GitHub deployer needs `roles/run.sourceDeveloper` and `roles/serviceusage.serviceUsageConsumer`, plus `roles/iam.serviceAccountUser` on the runtime identity. Grant the Cloud Build service account `roles/run.builder` as required by the project setup. See [Cloud Run source deployment roles and setup](https://docs.cloud.google.com/run/docs/deploying-source-code).
-
-For Firebase Hosting deployment, grant the deployer `roles/firebasehosting.admin` and `roles/serviceusage.apiKeysViewer` on the Firebase project. Keep this separate from the runtime service account. Preview should use a Firebase-only service account. See [Firebase Hosting IAM roles](https://firebase.google.com/docs/projects/iam/roles-predefined-product).
-
-The API is deployed privately by default. Set `GCP_API_PUBLIC=true` only if the API implements its own application-level authentication and is intended to accept unauthenticated Cloud Run requests. Frontend origins, CORS, and API authentication still need to be configured in the application.
+For Cloud Run source deploys, grant the deployer `roles/run.sourceDeveloper` and `roles/serviceusage.serviceUsageConsumer`, plus `roles/iam.serviceAccountUser` on the runtime account. Grant the Cloud Build service account `roles/run.builder` where required. For Hosting, grant the deployer `roles/firebasehosting.admin` and `roles/serviceusage.apiKeysViewer`. Keep the runtime account separate from the GitHub deployer. See [Cloud Run source deployment setup](https://docs.cloud.google.com/run/docs/deploying-source-code) and [Firebase Hosting IAM roles](https://firebase.google.com/docs/projects/iam/roles-predefined-product).
 
 ## Workload Identity Federation
 
-Use GitHub's OIDC provider `https://token.actions.githubusercontent.com` and Workload Identity Federation (WIF) to exchange short-lived credentials. Do not create or upload a service-account JSON key. Follow Google's [deployment-pipeline WIF guide](https://docs.cloud.google.com/iam/docs/workload-identity-federation-with-deployment-pipelines) and the [Google auth action guidance](https://github.com/google-github-actions/auth).
+Use GitHub's OIDC provider `https://token.actions.githubusercontent.com` and short-lived Workload Identity Federation credentials. Do not create or upload a service-account JSON key. Follow Google's [WIF deployment-pipeline guide](https://docs.cloud.google.com/iam/docs/workload-identity-federation-with-deployment-pipelines) and the [Google auth action guidance](https://github.com/google-github-actions/auth).
 
 1. Create a Workload Identity Pool and OIDC provider for GitHub Actions.
-2. Configure the issuer URL above and map at least:
+2. Map the GitHub repository ID, ref, workflow reference, event name, and Environment claims.
+3. Restrict the provider to this repository and `.github/workflows/deploy.yml`. Allow `master` pushes and release tags for staging; allow release tags only for production.
+4. Allow the matching federated principal to impersonate the deploy service account with `roles/iam.workloadIdentityUser`.
+5. Put the provider resource name and deployer service-account email in each GitHub Environment.
 
-   ```text
-   google.subject=assertion.sub
-   attribute.repository_id=assertion.repository_id
-   attribute.ref=assertion.ref
-   attribute.workflow_ref=assertion.workflow_ref
-   attribute.event_name=assertion.event_name
-   attribute.environment=assertion.environment
-   ```
+## User frontend hosting
 
-3. Restrict the provider condition to this repository's immutable numeric `repository_id`, the trusted workflow `MAnhhaoo/TokenPlusHKT2026/.github/workflows/deploy.yml`, and the allowed refs and GitHub Environments. For staging, permit `refs/heads/master` on `push` and release tags (`refs/tags/*`) on `release`, because releases deploy to staging first. For production, permit release tags only. For previews, permit only the `preview` Environment and the `workflow_run` event. Do not grant access based only on a repository name or branch supplied by an untrusted PR.
-4. Allow the matching federated principal to impersonate the deploy service account with `roles/iam.workloadIdentityUser`. Bind separate staging, production, and preview service accounts or use separate narrowly scoped bindings where practical.
-5. Put the provider resource name and service-account email in that GitHub Environment's variables.
+[`firebase.json`](../../firebase.json) defines one Hosting target:
 
-The identity used for Cloud Run deploys needs access to the project and runtime service account described above. The runtime service account should contain only permissions the running API or inference service needs; it is distinct from the GitHub deployer identity.
-
-## Firebase Hosting sites and builds
-
-[`firebase.json`](../../firebase.json) defines two named Hosting targets:
-
-| Target | Site ID variable | Build directory |
+| Target | Environment variable | Build output |
 | --- | --- | --- |
 | `user` | `FIREBASE_USER_SITE_ID` | `FE/user/dist` |
-| `admin` | `FIREBASE_ADMIN_SITE_ID` | `FE/admin/dist` |
 
-Create one Firebase Hosting site for each app and record its site ID in both staging and production environments (and preview if previews are enabled). The workflows run `firebase target:apply` for the selected environment; `.firebaserc` is generated at deploy time and ignored so one environment's site mapping cannot be committed over another's. Firebase documents [multi-site targets](https://firebase.google.com/docs/hosting/multisites).
+The workflow runs `firebase target:apply hosting user` for the selected environment. `.firebaserc` is generated during deployment and ignored by Git. The frontend must build to `dist/`; the workflow installs dependencies from the package lock or the root frozen pnpm lockfile and injects `VITE_API_BASE_URL` before building.
 
-Frontend packages must build successfully and write static output to their declared `dist` directory. The workflow supports the current standalone npm package with its `package-lock.json` and future pnpm workspace packages with a frozen root lockfile. It sets `VITE_API_BASE_URL` before Vite builds. When the API deploys in the same run, the new Cloud Run URL is used; otherwise, set the environment's `VITE_API_BASE_URL` to the API URL that frontend should call.
+## Application requirements
 
-Same-repository PR previews use the `hosting-user` / `hosting-admin` artifacts from CI and deploy to a channel named `pr-N` that expires after seven days. Fork PRs never upload preview artifacts or receive OIDC credentials. Configure the `preview` Environment variables and WIF binding before setting `GCP_PREVIEW_ENABLED=true`.
-
-## Application source contracts
-
-- **API:** `BE/` must become a runnable Node package with a start command that listens on the Cloud Run-provided `PORT`. CI supports a standalone npm package or the locked pnpm workspace. It requires `build` and `typecheck`, plus either `lint` or `format` and either `test` or `test:smoke`.
-- **User/admin frontend:** `FE/user/` and `FE/admin/` must build to `dist/`. The current admin app uses npm, checks formatting on changed frontend source files, and runs `test:smoke` against a local Vite preview; future packages may use the pnpm workspace and standard `lint`/`test` scripts.
-- **ML:** the current package is lowercase `ml/`; uppercase `ML/` is recognized as a migration alias. Each Python package must provide `pyproject.toml` and `uv.lock`. CI runs `uv lock --check`, `uv sync --locked --group dev`, Ruff lint/format checks for Python source and scripts, and pytest on Ubuntu and Windows. Interactive notebooks are excluded from Ruff checks; training code, notebooks, and datasets are never deployed. A Cloud Run inference service is deployed only when the changed package contains `ml/serving/Dockerfile` or `ML/serving/Dockerfile`; serving services remain private.
+- **API:** `BE/` must contain a Node package with locked dependencies, `build`, `typecheck`, a lint or format script, a test or smoke-test script, and a Cloud Run entrypoint that listens on the provided `PORT`.
+- **User frontend:** `FE/user/` must contain a locked package with `build`, `typecheck`, a lint or format script, and a test or smoke-test script. The build must write static assets to `FE/user/dist`.
+- **API access:** the current pipeline keeps Cloud Run private unless explicitly configured otherwise. Configure application auth and CORS before making API endpoints publicly reachable or connecting a public browser client.
 
 ## Enablement checklist
 
-1. Migrate a runnable package from the old SaigonDrain repository into the matching directory in this repository.
-2. Add required package manifests, frozen lockfiles, and build/typecheck/lint/test scripts. Keep the API's auth and configuration requirements explicit.
-3. Create the Google Cloud and Firebase resources, enable their APIs, and grant the least-privilege IAM roles above.
-4. Create the GitHub Environments and their variables. Add required reviewers and branch/tag rules to `production` before enabling production.
-5. Confirm that the WIF provider conditions match the repository ID, trusted deploy workflow, ref, event, and Environment.
-6. Set `GCP_DEPLOY_STAGING=true` after staging is ready. Enable previews with `GCP_PREVIEW_ENABLED=true` only after the preview identity and site variables are ready. Set `GCP_DEPLOY_PRODUCTION=true` only after the production Environment gate and variables are ready.
-7. Confirm that a package change runs its checks and that the deployment summary names the expected target. A release is required to run the production path.
-
-At the time this workflow foundation is added, `FE/admin/` and `ml/` already contain application code, while `BE/` and `FE/user/` are still placeholders. No Google Cloud resources or GitHub Environment variables have been created for this repository, so deployment stays gated until environment setup is complete.
+1. Merge runnable BE and FE/user packages with frozen lockfiles and required scripts.
+2. Create Cloud Run, Firebase Hosting, service-account, and WIF resources with least-privilege IAM.
+3. Create the `staging` and `production` GitHub Environments, with required production reviewers.
+4. Configure environment variables and verify the WIF claim conditions.
+5. Set `GCP_DEPLOY_STAGING=true` after staging is ready. Set `GCP_DEPLOY_PRODUCTION=true` only after the production gate and variables are ready.
+6. Confirm a PR reports the BE/FE user build, typecheck, style, and test jobs, and a release follows the staging then production path.

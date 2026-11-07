@@ -1,41 +1,41 @@
-# Google Cloud CI/CD Design
+# Google Cloud CI/CD design
 
-## Intent
+**Status:** Approved for the initial migration stage.
 
-Move SaigonDrain forward without restarting: migrate working parts into `MAnhhaoo/TokenPlusHKT2026` in reviewable increments, and make each migrated part pass automated checks before it can deploy.
+## Goal
 
-## Current state
+Set up a GitHub Actions pipeline for the application packages being moved into this repository now: the NestJS backend at `BE/` and the user React frontend at `FE/user/`.
 
-- The target repository now has a standalone npm/Vite admin frontend under `FE/admin/` and a lowercase Python ML research package under `ml/`, including `uv.lock` and tests. `BE/` and `FE/user/` are still placeholders, and this branch adds the first CI/deploy workflows.
-- The earlier SaigonDrain repository remains the source for gradual migration; CI must accommodate the target repository's current npm and uv lockfiles while allowing future pnpm workspace packages.
-- The target repository's default branch is `master`.
+## Scope
 
-## Approaches
+- On pull requests to `master`, build, typecheck, lint or format, and test changed BE and/or FE/user packages.
+- On pushes to `master`, validate all migrated BE and FE/user packages; deploy changed services to staging only when the staging environment is configured.
+- On published releases, validate all migrated packages, deploy the release revision to staging, then deploy the same revision to production through the protected production Environment.
+- Authenticate GitHub Actions to Google Cloud with Workload Identity Federation.
+- Host FE/user on Firebase Hosting and BE on Cloud Run.
+- Keep Cloud Run private by default. Public access requires a later application-authentication decision.
 
-1. **Cloud Run for API/ML and Firebase Hosting for frontends — selected.** This matches the existing NestJS API and static Vite builds, and keeps frontend hosting separate from backend runtime.
-2. **Cloud Run for all services.** This uses one deployment platform but requires separate frontend containers and additional container configuration.
+## Deferred
 
-## Proposed flow
+- FE/admin CI and deployment.
+- ML checks and deployment.
+- Firebase Hosting pull request previews.
+- API authentication/CORS changes and public browser access to Cloud Run.
+- Creation of Google Cloud resources or automatic provisioning of GitHub Environments.
 
-- Pull requests to `master`: run build, typecheck, style/lint checks, and tests for changed migrated packages. Support package-local npm and workspace pnpm locks; use the admin app's format check and browser smoke test where standard lint/test scripts are absent. A workflow must report missing runnable packages as not ready; it must not present an empty/no-op run as successful validation.
-- Pull requests: publish Firebase Hosting preview channels after Firebase project/site configuration is available.
-- Merge to `master`: deploy migrated API and serving ML services to Cloud Run staging, and the user/admin frontends to Firebase Hosting staging.
-- Version release: after CI passes and the protected production environment is approved, deploy the same source revision to production.
-- GitHub Actions authenticates to Google Cloud with Workload Identity Federation. Long-lived service-account keys are not stored in GitHub.
-- Run the existing `ml/` package checks on Ubuntu and Windows. Deploy ML to Cloud Run only if it has an HTTP inference service; training code, notebooks, and datasets stay out of the serving deployment.
+## Constraints
 
-## Scope and limits
+- Empty placeholder directories are not successful application validation.
+- CI must fail when a changed package lacks a manifest, lockfile, or required script.
+- Deployment remains disabled until repository switches, Environment variables, WIF, and cloud resources are configured.
+- Staging tracks the last successful deployment and carries forward changes from superseded pushes.
+- Production runs only after the release revision completed staging and the protected Environment gate allows it.
 
-This design covers the pipeline foundation and its activation path; it does not copy the entire source repository or create Google Cloud resources. Existing `FE/admin/` and `ml/` packages provide CI targets; Cloud Run and Firebase deployment waits for deployable services and owner-provided environment configuration. The Google Cloud project, region, Workload Identity provider/service account, Firebase project and Hosting site IDs, and runtime secrets must be supplied before deployment can run.
+## Acceptance criteria
 
-## Review focus
-
-- A missing package or test command must not make CI look green while no application code was checked.
-- Secrets and cloud credentials must not be committed to the repository.
-- Production must receive only a revision that passed CI and staging verification.
-- ML training artifacts must not be deployed as an online inference service.
-
-## Remaining owner configuration
-
-- The user approved Cloud Run for API/ML, Firebase Hosting for the frontend, and the staged rollout above.
-- For real deployment, create the Google Cloud and Firebase project/site configuration and GitHub Environment protections/variables; workflow files use gated variables until then.
+1. A PR changing BE or FE/user runs build, typecheck, style, and test checks for the affected package.
+2. A PR changing workflow files runs regression checks for every migrated BE/FE user package.
+3. Master pushes run full validation and deploy changed packages to staging only when enabled.
+4. A published release follows staging first and deploys the same revision to production only when enabled and approved.
+5. Google Cloud authentication uses WIF; deploy jobs do not store long-lived service-account keys.
+6. Admin, ML, and PR preview jobs are absent from this initial scope.
