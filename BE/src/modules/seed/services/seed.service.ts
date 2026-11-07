@@ -66,8 +66,8 @@ export class SeedService implements OnApplicationBootstrap {
           : "Cơ sở dữ liệu đang trống — đang khởi tạo dữ liệu chuẩn lần đầu...",
       );
       if (forceSeed) {
-        await this.mapPointRepo.clear();
-        await this.forecastRepo.clear();
+        await this.mapPointRepo.delete({});
+        await this.forecastRepo.delete({});
       }
       await this.seedAll();
       this.logger.log(
@@ -88,13 +88,13 @@ export class SeedService implements OnApplicationBootstrap {
         "Chức năng khôi phục dữ liệu mẫu bị vô hiệu hóa trên môi trường production.",
       );
     }
-    await this.reportRepo.clear();
-    await this.alertRepo.clear();
-    await this.mapPointRepo.clear();
-    await this.userRepo.clear();
-    await this.forecastRepo.clear();
-    await this.routeRepo.clear();
-    await this.trendRepo.clear();
+    await this.reportRepo.delete({});
+    await this.alertRepo.delete({});
+    await this.mapPointRepo.delete({});
+    await this.userRepo.delete({});
+    await this.forecastRepo.delete({});
+    await this.routeRepo.delete({});
+    await this.trendRepo.delete({});
     await this.seedAll();
 
     return {
