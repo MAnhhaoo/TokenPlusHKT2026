@@ -30,27 +30,38 @@ export class GeminiVisionService {
     userDescription?: string,
   ): Promise<FloodImageAnalysisResult> {
     const apiKey = process.env.GEMINI_API_KEY?.trim();
-    const model = process.env.GEMINI_MODEL?.trim() || "gemini-1.5-flash";
+    const primaryModel =
+      process.env.GEMINI_MODEL?.trim() || "gemini-3.5-flash-lite";
 
     if (apiKey && apiKey.length > 5 && this.isBase64Image(imageDataUrlOrBase64)) {
-      try {
-        const geminiResult = await this.callGeminiVisionApi(
-          apiKey,
-          model,
-          imageDataUrlOrBase64,
-          location,
-          userDescription,
-        );
-        if (geminiResult) {
-          return {
-            ...geminiResult,
-            provider: "Google Gemini 1.5 Flash Vision",
-          };
+      const candidateModels = [
+        primaryModel,
+        "gemini-3.5-flash-lite",
+        "gemini-3.8-flash",
+        "gemini-flash-latest",
+      ];
+      const uniqueModels = Array.from(new Set(candidateModels));
+
+      for (const model of uniqueModels) {
+        try {
+          const geminiResult = await this.callGeminiVisionApi(
+            apiKey,
+            model,
+            imageDataUrlOrBase64,
+            location,
+            userDescription,
+          );
+          if (geminiResult) {
+            return {
+              ...geminiResult,
+              provider: "Google Gemini 1.5 Flash Vision",
+            };
+          }
+        } catch (err: any) {
+          this.logger.warn(
+            `Gọi Gemini Vision API với ${model} thất bại (${err?.response?.status || err?.message}). Thử mô hình kế tiếp...`,
+          );
         }
-      } catch (err: any) {
-        this.logger.warn(
-          `Gọi Gemini Vision API thất bại (${err?.message}). Chuyển sang SaigonDrain AI Vision Engine...`,
-        );
       }
     }
 
@@ -140,8 +151,11 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON (Không dùng Markdown, k
     };
 
     const response = await axios.post(endpoint, requestBody, {
-      timeout: 12000,
-      headers: { "Content-Type": "application/json" },
+      timeout: 15000,
+      headers: {
+        "Content-Type": "application/json",
+        "x-goog-api-key": apiKey,
+      },
     });
 
     const candidates = response.data?.candidates;
