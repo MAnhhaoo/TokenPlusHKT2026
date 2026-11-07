@@ -481,3 +481,43 @@ def test_geopackage_output_keeps_native_and_normalized_casefolded_fields(tmp_pat
     restored = gpd.read_file(path, layer="observations")
     assert restored.source_id.tolist() == ["normalized-1"]
     assert restored.native_Source_id.tolist() == ["native-1"]
+
+
+def test_partial_pipeline_does_not_claim_full_completion(synthetic_pipeline):
+    from flood_ml.pipeline import run_pipeline
+
+    settings, context = synthetic_pipeline
+    result = run_pipeline(settings, context, stages=["features"])
+    assert result["pipeline_status"] == "partial"
+    assert result["evaluation_status"] == "not_run"
+    assert "features" in result["stages"]
+    assert "evaluation" not in result["stages"]
+    assert not (context.reports_dir / "pipeline_complete.json").exists()
+    assert not (context.reports_dir / ".pipeline.lock").exists()
+
+
+@pytest.mark.parametrize("stages", [["roads", "roads"], ["unknown"]])
+def test_invalid_stage_plan_preserves_existing_completion(synthetic_pipeline, stages):
+    from flood_ml.pipeline import run_pipeline
+
+    settings, context = synthetic_pipeline
+    marker = context.reports_dir / "pipeline_complete.json"
+    marker.write_text('{"status":"existing"}')
+    before = marker.read_bytes()
+    with pytest.raises(PipelineError):
+        run_pipeline(settings, context, stages=stages)
+    assert marker.read_bytes() == before
+    assert not (context.reports_dir / ".pipeline.lock").exists()
+
+
+def test_corrupt_stage_marker_rebuilds_outputs(synthetic_pipeline):
+    from flood_ml.pipeline import run_pipeline
+
+    settings, context = synthetic_pipeline
+    run_pipeline(settings, context, stages=["roads"])
+    marker = context.reports_dir / "stages/roads.json"
+    marker.write_text("{broken-json")
+    result = run_pipeline(settings, context, stages=["roads"])
+    assert not result["stages"]["roads"]["reused"]
+    assert json.loads(marker.read_text())["status"] == "complete"
+    assert not (context.reports_dir / ".pipeline.lock").exists()

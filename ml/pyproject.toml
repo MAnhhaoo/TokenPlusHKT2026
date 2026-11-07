@@ -14,7 +14,16 @@ dependencies = [
 ]
 
 [dependency-groups]
-dev = ["pytest>=8.3", "ruff>=0.9"]
+dev = [{ include-group = "test" }, "ruff>=0.9"]
+test = ["pytest>=8.3", "torch>=2.6"]
+
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/flood_ml"]

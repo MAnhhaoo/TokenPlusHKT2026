@@ -17,7 +17,11 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "test:unit": "jest --runInBand",
+    "test:http": "jest --config test/jest-http.json --runInBand",
+    "test:baseline": "jest --runInBand --runTestsByPath src/modules/reports/reports.service.spec.ts src/modules/weather/weather.service.spec.ts src/modules/journey/journey.service.spec.ts",
+    "test:db": "jest --config test/jest-db.json --runInBand"
   },
   "dependencies": {
     "@nestjs/axios": "^4.0.0",
@@ -71,7 +75,9 @@
     "testEnvironment": "node",
     "moduleNameMapper": {
       "^@/(.*)$": "<rootDir>/$1"
-    }
+    },
+    "setupFilesAfterEnv": [
+      "<rootDir>/../test/offline.setup.ts"
+    ]
   }
 }
-
