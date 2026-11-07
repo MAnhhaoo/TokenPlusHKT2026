@@ -1,7 +1,7 @@
 import { Entity, PrimaryColumn, Column, UpdateDateColumn } from "typeorm";
 import { ApiProperty } from "@nestjs/swagger";
 
-export type MapPointType = "flood" | "pending" | "risk" | "sensor";
+export type MapPointType = "flood" | "pending" | "risk" | "sensor" | "history";
 export type PointSeverity = "critical" | "high" | "medium";
 
 @Entity("map_points")

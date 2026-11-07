@@ -15,6 +15,7 @@ import { AnalyzeImageDto } from "../dtos/analyze-image.dto";
 import { QueryReportDto } from "../dtos/query-report.dto";
 import { MapService } from "../../map/services/map.service";
 import { RealtimeService } from "../../realtime/services/realtime.service";
+import { WeatherService } from "../../weather/services/weather.service";
 import { GeminiVisionService } from "./gemini-vision.service";
 
 @Injectable()
@@ -30,6 +31,7 @@ export class ReportsService {
     private readonly alertRepo: Repository<AreaAlertEntity>,
     private readonly mapService: MapService,
     private readonly geminiVisionService: GeminiVisionService,
+    @Optional() private readonly weatherService?: WeatherService,
     @Optional() private readonly realtimeService?: RealtimeService,
   ) {}
 
@@ -71,6 +73,134 @@ export class ReportsService {
   }
 
   /**
+   * Tính toán và tự động gia hạn thời gian rút nước theo lượng mưa thời gian thực.
+   * Nếu đã tới thời điểm dự kiến (ví dụ 1h) mà trời vẫn còn mưa thì tự động tính lại và kéo dài tiếp.
+   */
+  private evaluateDynamicReportRecession(
+    report: FloodReportEntity,
+    cityRainMm: number,
+    districtRainMap: Map<string, number>,
+  ) {
+    const now = Date.now();
+
+    // 1. Cập nhật số phút trôi qua thực tế
+    if (report.createdAt) {
+      report.minutesAgo = Math.max(
+        1,
+        Math.round((now - new Date(report.createdAt).getTime()) / 60000),
+      );
+    }
+
+    // 2. Tra cứu lượng mưa thực tế tại quận của báo cáo
+    const cleanDist = (report.district || "").toLowerCase().trim();
+    let currentRain = cityRainMm;
+    if (districtRainMap.has(cleanDist)) {
+      currentRain = districtRainMap.get(cleanDist)!;
+    } else {
+      for (const [distKey, rVal] of districtRainMap.entries()) {
+        if (cleanDist.includes(distKey) || distKey.includes(cleanDist)) {
+          currentRain = rVal;
+          break;
+        }
+      }
+    }
+
+    const drainageRate = report.drainageRateCmPerMin || 0.65;
+    const initialDepth = report.reportedDepth || report.aiDepth || 24;
+
+    // 3. Phân tích thời điểm kết thúc dự kiến đã lưu
+    let clearTimestamp = 0;
+    if (report.estimatedClearAt && report.estimatedClearAt.includes(":")) {
+      const match = /^(\d{1,2}):(\d{2})/.exec(report.estimatedClearAt.trim());
+      if (match) {
+        const [_, h, m] = match;
+        const baseDate = report.createdAt
+          ? new Date(report.createdAt)
+          : new Date();
+        const d = new Date(baseDate);
+        d.setHours(Number(h), Number(m), 0, 0);
+        if (d.getTime() < baseDate.getTime() - 60000) {
+          d.setDate(d.getDate() + 1);
+        }
+        clearTimestamp = d.getTime();
+      }
+    }
+
+    if (!clearTimestamp && report.estimatedDurationMin && report.createdAt) {
+      clearTimestamp =
+        new Date(report.createdAt).getTime() +
+        report.estimatedDurationMin * 60000;
+    }
+
+    // 4. KIỂM TRA THỜI GIAN THỰC TẾ:
+    // Nếu đã tới hoặc qua thời gian dự kiến (clearTimestamp <= now)
+    if (clearTimestamp && now >= clearTimestamp) {
+      if (currentRain > 0.5) {
+        // TRỜI VẪN TIẾP TỤC MƯA THEO THỜI GIAN THỰC:
+        // Nước mưa liên tục bổ sung nên không thể rút theo dự kiến cũ.
+        // Tự động tính toán lại và kéo dài tiếp!
+        const additionalMinutes = Math.max(
+          30,
+          Math.round((currentRain * 12) / drainageRate),
+        );
+        const newClearDate = new Date(now + additionalMinutes * 60000);
+        const clearHourStr = String(newClearDate.getHours()).padStart(2, "0");
+        const clearMinStr = String(newClearDate.getMinutes()).padStart(2, "0");
+        const newClearAt = `${clearHourStr}:${clearMinStr}, ${String(
+          newClearDate.getDate(),
+        ).padStart(2, "0")}/${String(newClearDate.getMonth() + 1).padStart(2, "0")}/${newClearDate.getFullYear()}`;
+
+        report.estimatedDurationMin = additionalMinutes;
+        report.estimatedClearAt = newClearAt;
+        if (!report.description?.includes("Tự động gia hạn")) {
+          report.description = `${report.description || ""} (Đang tiếp tục mưa ${currentRain.toFixed(1)}mm/h, AI tự động gia hạn thời gian rút nước thêm ~${additionalMinutes} phút).`.trim();
+        }
+      } else {
+        // TRỜI ĐÃ TẠNH MƯA: Tính toán lượng nước đã tiêu thoát theo tốc độ cống
+        const elapsedMinutes = Math.max(
+          0,
+          (now -
+            (report.createdAt
+              ? new Date(report.createdAt).getTime()
+              : now)) /
+            60000,
+        );
+        const recededDepth = Math.max(
+          0,
+          Math.round(initialDepth - drainageRate * elapsedMinutes),
+        );
+        if (recededDepth <= 2) {
+          report.estimatedDurationMin = 0;
+          report.estimatedClearAt = "Đã rút hết nước";
+          report.reportedDepth = 0;
+          report.aiDepth = 0;
+        } else {
+          const remainingMins = Math.max(
+            5,
+            Math.ceil(recededDepth / drainageRate),
+          );
+          report.estimatedDurationMin = remainingMins;
+          const newClearDate = new Date(now + remainingMins * 60000);
+          const clearHourStr = String(newClearDate.getHours()).padStart(2, "0");
+          const clearMinStr = String(newClearDate.getMinutes()).padStart(2, "0");
+          report.estimatedClearAt = `${clearHourStr}:${clearMinStr}, ${String(
+            newClearDate.getDate(),
+          ).padStart(2, "0")}/${String(newClearDate.getMonth() + 1).padStart(2, "0")}/${newClearDate.getFullYear()}`;
+          report.reportedDepth = recededDepth;
+          report.aiDepth = recededDepth;
+        }
+      }
+    } else if (clearTimestamp && now < clearTimestamp) {
+      // Chưa tới giờ kết thúc: Cập nhật số phút còn lại thực tế
+      const remainingMinutes = Math.max(
+        1,
+        Math.round((clearTimestamp - now) / 60000),
+      );
+      report.estimatedDurationMin = remainingMinutes;
+    }
+  }
+
+  /**
    * Truy vấn danh sách báo cáo ngập theo bộ lọc trạng thái, mức độ và quận/huyện.
    */
   async findAll(query: QueryReportDto): Promise<FloodReportEntity[]> {
@@ -79,10 +209,31 @@ export class ReportsService {
     if (query.severity) where.severity = query.severity;
     if (query.district) where.district = query.district;
 
-    return this.reportRepo.find({
+    const reports = await this.reportRepo.find({
       where,
-      order: { minutesAgo: "ASC", createdAt: "DESC" },
+      order: { createdAt: "DESC" },
     });
+
+    let cityRainMm = 0;
+    let districtRainMap = new Map<string, number>();
+    if (this.weatherService) {
+      try {
+        const [weather, rainMap] = await Promise.all([
+          this.weatherService.getCurrentWeather(),
+          this.weatherService.getRealtimeDistrictRainMap(),
+        ]);
+        cityRainMm = Number(weather?.currentRainMm ?? 0);
+        districtRainMap = rainMap;
+      } catch {
+        // Bỏ qua lỗi thời tiết
+      }
+    }
+
+    for (const report of reports) {
+      this.evaluateDynamicReportRecession(report, cityRainMm, districtRainMap);
+    }
+
+    return reports;
   }
 
   /**
@@ -93,6 +244,23 @@ export class ReportsService {
     if (!report) {
       throw new NotFoundException(`Không tìm thấy báo cáo ${id}`);
     }
+
+    let cityRainMm = 0;
+    let districtRainMap = new Map<string, number>();
+    if (this.weatherService) {
+      try {
+        const [weather, rainMap] = await Promise.all([
+          this.weatherService.getCurrentWeather(),
+          this.weatherService.getRealtimeDistrictRainMap(),
+        ]);
+        cityRainMm = Number(weather?.currentRainMm ?? 0);
+        districtRainMap = rainMap;
+      } catch {
+        // Bỏ qua
+      }
+    }
+
+    this.evaluateDynamicReportRecession(report, cityRainMm, districtRainMap);
 
     const sameDistrictPending = await this.reportRepo.find({
       where: { district: report.district, status: "pending" },
@@ -548,7 +716,7 @@ export class ReportsService {
           where: { linkedReportId: id },
         });
 
-        if (report.status === "rejected") {
+        if (report.status === "rejected" || report.status === "pending") {
           report.status = "verified";
           report.rejectReason = undefined;
           if (point) {

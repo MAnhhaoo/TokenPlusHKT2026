@@ -146,7 +146,7 @@ function OverviewPage({
     <div className="page-stack">
       <FloodStatusHero
         activeAlertCount={activeAlerts.length}
-        onViewAlerts={() => onNavigate("alerts")}
+        onViewAlerts={() => onNavigate("reports")}
         onViewMap={() => onNavigate("map")}
         pendingCount={verifiedCount}
         weather={weather}
@@ -186,7 +186,7 @@ function OverviewPage({
         <section className="panel overview-alerts">
           <SectionHeader
             action={
-              <Button variant="ghost" onClick={() => onNavigate("alerts")}>
+              <Button variant="ghost" onClick={() => onNavigate("reports")}>
                 Xem tất cả <span>→</span>
               </Button>
             }

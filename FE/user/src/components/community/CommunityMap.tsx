@@ -4,6 +4,7 @@ import type { Map as LibreMap } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import maplibreWorkerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?url";
 import { GOOGLE_MAP_TILE_URLS, type GoogleMapLayerType } from "@/lib/googleMaps";
+import { getUserLocation } from "@/lib/location";
 import Icon from "@/components/ui/Icon";
 import type { CommunityReport } from "@/types";
 
@@ -256,6 +257,10 @@ export default function CommunityMap({
     }
   }, [selectedReportId, reports]);
 
+  const [isLocating, setIsLocating] = useState(false);
+  const [gpsToast, setGpsToast] = useState<string | null>(null);
+  const userMarkerRef = useRef<maplibregl.Marker | null>(null);
+
   const handleZoomIn = () => mapRef.current?.zoomIn();
   const handleZoomOut = () => mapRef.current?.zoomOut();
   const handleRecenter = () => {
@@ -268,9 +273,57 @@ export default function CommunityMap({
     });
   };
 
+  const handleGetLocation = async () => {
+    setIsLocating(true);
+    try {
+      const { latitude, longitude, isIpFallback } = await getUserLocation();
+      const map = mapRef.current;
+      if (map) {
+        if (!userMarkerRef.current) {
+          const el = document.createElement("div");
+          el.className = "community-user-gps-marker";
+          el.innerHTML = `
+            <span class="user-gps-pulse"></span>
+            <span class="user-gps-dot"></span>
+          `;
+          userMarkerRef.current = new maplibregl.Marker({ element: el })
+            .setLngLat([longitude, latitude])
+            .addTo(map);
+        } else {
+          userMarkerRef.current.setLngLat([longitude, latitude]);
+        }
+
+        map.flyTo({
+          center: [longitude, latitude],
+          zoom: 15.2,
+          duration: 900,
+          essential: true,
+        });
+
+        setGpsToast(
+          isIpFallback
+            ? "Đã xác định vị trí mạng của bạn"
+            : "Đã định vị thành công vị trí GPS của bạn"
+        );
+        setTimeout(() => setGpsToast(null), 3500);
+      }
+    } catch {
+      handleRecenter();
+    } finally {
+      setIsLocating(false);
+    }
+  };
+
   return (
     <div className="community-map-wrapper">
       <div ref={containerRef} className="community-map-canvas" />
+
+      {gpsToast && (
+        <div className="community-map-toast">
+          <Icon name="check" size={15} />
+          <span>{gpsToast}</span>
+        </div>
+      )}
 
       {/* Floating Map Controls */}
       <div className="community-map-controls">
@@ -293,9 +346,17 @@ export default function CommunityMap({
           </button>
           <button
             type="button"
+            className={`community-ctrl-btn ${isLocating ? "is-locating" : ""}`}
+            onClick={handleGetLocation}
+            title="Định vị vị trí hiện tại của bạn"
+          >
+            <Icon name="location" size={17} />
+          </button>
+          <button
+            type="button"
             className="community-ctrl-btn"
             onClick={handleRecenter}
-            title="Về trung tâm TP.HCM"
+            title="Về toàn cảnh TP.HCM"
           >
             <Icon name="location" size={17} />
           </button>

@@ -87,13 +87,7 @@ function Sidebar({
       page: "reports",
       count: pendingCount,
     },
-    {
-      label: "Cảnh báo khu vực",
-      icon: AlertTriangle,
-      page: "alerts",
-      count: activeAlertCount,
-    },
-    { label: "Người dùng", icon: Users, page: "users" },
+        { label: "Người dùng", icon: Users, page: "users" },
     { label: "Phân tích dữ liệu", icon: BarChart3, page: "analytics" },
   ]
 

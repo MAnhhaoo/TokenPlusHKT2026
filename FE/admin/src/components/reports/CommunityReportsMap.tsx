@@ -354,12 +354,16 @@ export default function CommunityReportsMap({
                 <span style={{ color: "var(--ink-soft)" }}>Lịch sử: </span>
                 <strong>{selectedReport.historyCount || 5} lần</strong>
               </div>
-              {selectedReport.estimatedDurationMin && (
+              {selectedReport.estimatedClearAt === "Đã rút hết nước" || selectedReport.estimatedDurationMin === 0 ? (
+                <div style={{ gridColumn: "span 2" }}>
+                  <span style={{ color: "#10b981", fontWeight: 700 }}>✓ Nước đã rút hết hoàn toàn</span>
+                </div>
+              ) : selectedReport.estimatedDurationMin ? (
                 <div style={{ gridColumn: "span 2" }}>
                   <span style={{ color: "var(--teal)", fontWeight: 600 }}>Dự kiến nước rút: </span>
                   <strong>~{selectedReport.estimatedDurationMin} phút</strong> ({selectedReport.estimatedClearAt?.split(",")[0] || ""})
                 </div>
-              )}
+              ) : null}
             </div>
 
             {selectedReport.aiSummary && (
@@ -378,6 +382,23 @@ export default function CommunityReportsMap({
                 >
                   <Unlock size={14} /> Mở khóa điểm ngập
                 </Button>
+              ) : selectedReport.status === "pending" ? (
+                <>
+                  <Button
+                    variant="primary"
+                    onClick={() => onToggleLock(selectedReport)}
+                    style={{ flex: 1 }}
+                  >
+                    <Sparkles size={14} /> Duyệt & Mở
+                  </Button>
+                  <Button
+                    variant="danger"
+                    onClick={() => onReview(selectedReport)}
+                    style={{ flex: 1 }}
+                  >
+                    <Lock size={14} /> Khóa
+                  </Button>
+                </>
               ) : (
                 <Button
                   variant="danger"

@@ -903,6 +903,8 @@ function MapCanvas({
     }
     floodMarkersRef.current = [];
 
+    const map = mapRef.current;
+    if (!ready || !map) return;
 
     for (const pt of floodPoints) {
       if (pt.type !== "flood" && pt.type !== "pending" && pt.type !== "risk") continue;
