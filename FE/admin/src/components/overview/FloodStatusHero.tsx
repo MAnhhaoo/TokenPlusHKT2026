@@ -1,4 +1,4 @@
-import { BellRing, CloudRain, Map, Sparkles } from "lucide-react"
+import { CloudRain, Droplets, Map, Sparkles } from "lucide-react"
 import Button from "@/components/ui/Button"
 import StatusPill from "@/components/ui/StatusPill"
 import WaterGauge from "@/components/ui/WaterGauge"
@@ -6,15 +6,13 @@ import type { WeatherSnapshot } from "@/types"
 
 function FloodStatusHero({
   pendingCount,
-  activeAlertCount,
   onViewMap,
-  onViewAlerts,
+  onViewReports,
   weather,
 }: {
   pendingCount: number
-  activeAlertCount: number
   onViewMap: () => void
-  onViewAlerts: () => void
+  onViewReports: () => void
   weather?: WeatherSnapshot | null
 }) {
   const rainValue = weather ? Math.round(weather.currentRainMm) : 0
@@ -48,16 +46,16 @@ function FloodStatusHero({
           <Button onClick={onViewMap}>
             <Map size={16} /> Xem trên bản đồ
           </Button>
-          <Button variant="secondary" onClick={onViewAlerts}>
-            <BellRing size={16} /> Xem cảnh báo
+          <Button variant="secondary" onClick={onViewReports}>
+            <Droplets size={16} /> Báo cáo cộng đồng
           </Button>
         </div>
         <div className="hero-chips">
           <StatusPill tone="safe" icon={<Sparkles size={13} />}>
             {pendingCount} báo cáo AI tự động duyệt
           </StatusPill>
-          <StatusPill tone="danger">
-            {activeAlertCount} cảnh báo đang phát
+          <StatusPill tone="neutral">
+            Giám sát 250 điểm GIS IRD
           </StatusPill>
           <StatusPill tone={isRaining ? "watch" : "safe"}>
             {isRaining ? "Đang có mưa" : "Đường khô ráo"}
