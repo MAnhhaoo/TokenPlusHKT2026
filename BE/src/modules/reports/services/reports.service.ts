@@ -273,7 +273,8 @@ export class ReportsService {
     const vnHour = new Date(
       now.toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" }),
     ).getHours();
-    const isTidePeak = (vnHour >= 16 && vnHour <= 19) || (vnHour >= 4 && vnHour <= 7);
+    const isTidePeak =
+      (vnHour >= 16 && vnHour <= 19) || (vnHour >= 4 && vnHour <= 7);
     const cleanDist = (district || "").toLowerCase();
     const isRiverside =
       elevationM <= 1.6 &&
@@ -290,12 +291,17 @@ export class ReportsService {
 
     estimatedDurationMin = Math.max(15, estimatedDurationMin);
 
-    const clearDate = new Date(now.getTime() + estimatedDurationMin * 60 * 1000);
+    const clearDate = new Date(
+      now.getTime() + estimatedDurationMin * 60 * 1000,
+    );
     const clearHourStr = String(clearDate.getHours()).padStart(2, "0");
     const clearMinStr = String(clearDate.getMinutes()).padStart(2, "0");
     const estimatedClearAt = `${clearHourStr}:${clearMinStr}, ${String(
       clearDate.getDate(),
-    ).padStart(2, "0")}/${String(clearDate.getMonth() + 1).padStart(2, "0")}/${clearDate.getFullYear()}`;
+    ).padStart(
+      2,
+      "0",
+    )}/${String(clearDate.getMonth() + 1).padStart(2, "0")}/${clearDate.getFullYear()}`;
 
     const clearNotice = ` Dự kiến nước rút hết sau ~${estimatedDurationMin} phút (khoảng ${clearHourStr}:${clearMinStr}).`;
     if (aiSummary && !aiSummary.includes("Dự kiến nước rút")) {

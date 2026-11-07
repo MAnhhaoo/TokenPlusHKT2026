@@ -13,7 +13,12 @@ describe("Isolated PostgreSQL report transactions", () => {
     username: "saigondrain_test",
     password: "local_test_only",
     database: "saigondrain_isolated_test",
-    entities: [FloodReportEntity, MapPointEntity, CommunityUserEntity, AreaAlertEntity],
+    entities: [
+      FloodReportEntity,
+      MapPointEntity,
+      CommunityUserEntity,
+      AreaAlertEntity,
+    ],
     synchronize: true,
     dropSchema: true,
     connectTimeoutMS: 2000,

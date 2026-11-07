@@ -61,6 +61,10 @@ function MapCanvas({
   const userRealGpsRef = useRef<[number, number] | null>(null);
   const navStepIndexRef = useRef<number>(navStepIndex);
   navStepIndexRef.current = navStepIndex;
+  const prevNavStepIndexRef = useRef<number>(navStepIndex);
+  const prevStepForwardTriggerRef = useRef<number>(stepForwardTrigger);
+  const manualStepOverrideRef = useRef<boolean>(false);
+  const lastAnchorGpsRef = useRef<[number, number] | null>(null);
   const onStepChangeRef = useRef(onStepChange);
   onStepChangeRef.current = onStepChange;
   const onProgressUpdateRef = useRef(onProgressUpdate);
@@ -518,6 +522,10 @@ function MapCanvas({
         watchIdRef.current = null;
       }
       progressDistanceRef.current = 0;
+      prevNavStepIndexRef.current = 0;
+      prevStepForwardTriggerRef.current = 0;
+      manualStepOverrideRef.current = false;
+      lastAnchorGpsRef.current = null;
 
       puckMarkerRef.current?.remove();
       puckMarkerRef.current = null;
@@ -572,14 +580,14 @@ function MapCanvas({
     }
 
     const stepCount = Math.max(1, navigationSteps.length);
-    const stepMilestones: number[] = [];
-    let stepDistAccum = 0;
+    const rawStepLengths: number[] = [];
+    let rawTotalStepMeters = 0;
     for (let s = 0; s < navigationSteps.length; s++) {
       const step = navigationSteps[s];
       let meters = 0;
-      if (typeof step.distanceMeters === "number" && step.distanceMeters > 0) {
+      if (typeof step?.distanceMeters === "number" && step.distanceMeters > 0) {
         meters = step.distanceMeters;
-      } else if (typeof step.distance === "string") {
+      } else if (typeof step?.distance === "string") {
         const cleaned = step.distance.replace(",", ".");
         const match = cleaned.match(/([\d.]+)/);
         if (match) {
@@ -590,9 +598,63 @@ function MapCanvas({
       if (meters <= 10) {
         meters = totalRouteMeters / stepCount;
       }
-      stepDistAccum += meters;
-      stepMilestones.push(Math.min(totalRouteMeters, stepDistAccum));
+      rawStepLengths.push(meters);
+      rawTotalStepMeters += meters;
     }
+
+    const scaleFactor = rawTotalStepMeters > 0 ? totalRouteMeters / rawTotalStepMeters : 1;
+
+    // Tìm khoảng cách dọc theo tuyến đường cho từng bước hướng dẫn (ưu tiên tọa độ ngã rẽ thật từ OSRM/Google)
+    const stepStartDistances: number[] = [];
+    let fallbackAccum = 0;
+    for (let s = 0; s < navigationSteps.length; s++) {
+      if (s === 0) {
+        stepStartDistances.push(0);
+        fallbackAccum += rawStepLengths[0] * scaleFactor;
+        continue;
+      }
+      const stepCoords = navigationSteps[s]?.coords;
+      const minAllowedDist = stepStartDistances[s - 1] + 5;
+      let matchedDist: number | null = null;
+
+      if (
+        Array.isArray(stepCoords) &&
+        stepCoords.length === 2 &&
+        typeof stepCoords[0] === "number" &&
+        typeof stepCoords[1] === "number"
+      ) {
+        let bestDistToPoly = Infinity;
+        let running = 0;
+        for (let i = 0; i < coords.length - 1; i++) {
+          const segDist = segmentDistances[i];
+          if (running + segDist >= minAllowedDist) {
+            const a = coords[i] as [number, number];
+            const b = coords[i + 1] as [number, number];
+            const proj = projectPointToSegment([stepCoords[0], stepCoords[1]], a, b);
+            const candidateAlong = running + segDist * proj.t;
+            if (candidateAlong >= minAllowedDist) {
+              const d = getDistanceMeters([stepCoords[0], stepCoords[1]], proj.point);
+              if (d < bestDistToPoly && d <= 120) {
+                bestDistToPoly = d;
+                matchedDist = candidateAlong;
+              }
+            }
+          }
+          running += segDist;
+        }
+      }
+
+      const startDist =
+        matchedDist !== null
+          ? Math.min(totalRouteMeters, matchedDist)
+          : Math.min(totalRouteMeters, Math.max(minAllowedDist, fallbackAccum));
+      stepStartDistances.push(startDist);
+      fallbackAccum = startDist + rawStepLengths[s] * scaleFactor;
+    }
+
+    const stepMilestones: number[] = stepStartDistances.map((_, s) =>
+      s < stepStartDistances.length - 1 ? stepStartDistances[s + 1] : totalRouteMeters,
+    );
 
     // Khởi tạo Navigation Puck nếu chưa có
     if (!puckMarkerRef.current) {
@@ -620,9 +682,10 @@ function MapCanvas({
       distAlongRoute: number,
       deviceHeading?: number | null,
       deviceSpeed?: number | null,
+      allowAutoStepAdvance = true,
     ) => {
       progressDistanceRef.current = distAlongRoute;
-      const lookPoint = getPointAtDistance(distAlongRoute + 16);
+      const lookPoint = getPointAtDistance(Math.min(totalRouteMeters, distAlongRoute + 18));
       const roadBearing =
         typeof deviceHeading === "number" && !isNaN(deviceHeading) && deviceHeading > 0
           ? deviceHeading
@@ -638,7 +701,7 @@ function MapCanvas({
         }
       }
 
-      // Camera 3D bám sát theo vị trí người dùng
+      // Camera 3D bám sát theo vị trí người dùng / bước dẫn đường đang chọn
       map.easeTo({
         center: userPoint,
         zoom: 17.8,
@@ -649,15 +712,19 @@ function MapCanvas({
       });
 
       // Khoảng cách tới ngã rẽ tiếp theo
-      const curStepIdx = navStepIndexRef.current;
+      let curStepIdx = navStepIndexRef.current;
       const targetTurnDist = stepMilestones[curStepIdx] ?? totalRouteMeters;
-      const distToTurnM = Math.max(0, Math.round(targetTurnDist - distAlongRoute));
+      let distToTurnM = Math.max(0, Math.round(targetTurnDist - distAlongRoute));
 
-      // Nếu người dùng đã đi tới ngã rẽ (<= 25m): tự động chuyển sang bước rẽ kế tiếp!
-      if (distToTurnM <= 25 && curStepIdx < navigationSteps.length - 1) {
+      // Khi người dùng di chuyển thực tế qua mốc rẽ: tự động chuyển sang bước kế tiếp
+      if (allowAutoStepAdvance && distToTurnM <= 15 && curStepIdx < navigationSteps.length - 1) {
         const nextStepIdx = curStepIdx + 1;
+        curStepIdx = nextStepIdx;
         navStepIndexRef.current = nextStepIdx;
+        prevNavStepIndexRef.current = nextStepIdx;
         onStepChangeRef.current?.(nextStepIdx);
+        const nextTurnDist = stepMilestones[nextStepIdx] ?? totalRouteMeters;
+        distToTurnM = Math.max(0, Math.round(nextTurnDist - distAlongRoute));
       }
 
       const remainingKmM = Math.max(0, Math.round(totalRouteMeters - distAlongRoute));
@@ -682,6 +749,21 @@ function MapCanvas({
     ) => {
       if (!watchActive) return;
       userRealGpsRef.current = [rawLng, rawLat];
+
+      if (!lastAnchorGpsRef.current) {
+        lastAnchorGpsRef.current = [rawLng, rawLat];
+      } else {
+        const movedFromAnchor = getDistanceMeters(lastAnchorGpsRef.current, [rawLng, rawLat]);
+        // Nếu người dùng vừa bấm nút "< Trước" / "Tiếp >" / "Đi tới 50m" trong khi đang ngồi yên một chỗ (GPS dịch chuyển < 15m),
+        // không để tín hiệu GPS đứng yên kéo ngược mũi tên về lại vạch xuất phát!
+        if (manualStepOverrideRef.current && movedFromAnchor < 15) {
+          return;
+        }
+        if (movedFromAnchor >= 15) {
+          manualStepOverrideRef.current = false;
+          lastAnchorGpsRef.current = [rawLng, rawLat];
+        }
+      }
 
       // Tìm điểm chiếu gần nhất trên tuyến đường (Map Matching)
       let minDistanceToRoad = Infinity;
@@ -760,15 +842,35 @@ function MapCanvas({
         }
       }
     }
-    // Hiển thị vị trí ban đầu hoặc bước đi thử nghiệm
-    if (stepForwardTrigger > 0) {
+    // Đồng bộ vị trí xe & camera khi người dùng bấm nút "< Trước", "Tiếp >", hoặc "Đi tới 50m"
+    if (prevNavStepIndexRef.current !== navStepIndex) {
+      prevNavStepIndexRef.current = navStepIndex;
+      manualStepOverrideRef.current = true;
+      const stepDist = stepStartDistances[navStepIndex] ?? 0;
+      const stepPoint = getPointAtDistance(stepDist);
+      updatePositionOnRoute(stepPoint, stepDist, null, 0, false);
+    } else if (stepForwardTrigger > 0 && prevStepForwardTriggerRef.current !== stepForwardTrigger) {
+      prevStepForwardTriggerRef.current = stepForwardTrigger;
+      manualStepOverrideRef.current = true;
       const nextDist = Math.min(totalRouteMeters, progressDistanceRef.current + 50);
+      let matchedStepIdx = 0;
+      for (let s = stepStartDistances.length - 1; s >= 0; s--) {
+        if (nextDist >= stepStartDistances[s] - 5) {
+          matchedStepIdx = s;
+          break;
+        }
+      }
+      if (matchedStepIdx !== navStepIndexRef.current) {
+        navStepIndexRef.current = matchedStepIdx;
+        prevNavStepIndexRef.current = matchedStepIdx;
+        onStepChangeRef.current?.(matchedStepIdx);
+      }
       const nextPoint = getPointAtDistance(nextDist);
-      updatePositionOnRoute(nextPoint, nextDist, null, 6.9);
+      updatePositionOnRoute(nextPoint, nextDist, null, 6.9, false);
     } else {
       const initialDist = progressDistanceRef.current;
       const initialPoint = getPointAtDistance(initialDist);
-      updatePositionOnRoute(initialPoint, initialDist, null, 0);
+      updatePositionOnRoute(initialPoint, initialDist, null, 0, false);
     }
 
     return () => {
@@ -788,19 +890,19 @@ function MapCanvas({
     routeVersion,
     recenterTrigger,
     stepForwardTrigger,
+    navStepIndex,
     navigationSteps.length,
     origin?.isCurrentLocation,
   ]);
 
-  // Hiển thị các điểm ngập và cảnh báo lên bản đồ ngay khi khởi tạo (không cần chờ tile tải xong)
+  // Ẩn các nhãn điểm ngập (.libre-flood-marker) trên giao diện bản đồ
+  // (Dữ liệu floodPoints vẫn được giữ ngầm để thuật toán tìm đường tự động né ngập)
   useEffect(() => {
-    const map = mapRef.current;
-    if (!map) return;
-
     for (const m of floodMarkersRef.current) {
       m.remove();
     }
     floodMarkersRef.current = [];
+
 
     for (const pt of floodPoints) {
       if (pt.type !== "flood" && pt.type !== "pending" && pt.type !== "risk") continue;
@@ -948,32 +1050,8 @@ function MapCanvas({
         ref={containerRef}
       />
 
-      {/* Nhóm điều khiển bản đồ: Kiểu Google Maps & Chế độ Realtime / 250 Điểm IRD */}
+      {/* Nhóm điều khiển bản đồ: Kiểu Google Maps */}
       <div className="map-controls-group">
-        <button
-          type="button"
-          className={`map-mode-toggle-btn ${mapMode === "history" ? "is-history" : "is-realtime"}`}
-          onClick={onToggleMapMode}
-          title={
-            mapMode === "realtime"
-              ? "Đang ở chế độ: Chẩn đoán Real-time theo thời tiết thực (Bấm để xem 250 điểm lịch sử)"
-              : "Đang xem: 250 Điểm đen ngập lụt IRD 2002-2026 (Bấm để về Real-time)"
-          }
-          aria-label="Chuyển chế độ xem bản đồ ngập"
-        >
-          {mapMode === "history" ? (
-            <>
-              <span className="mode-badge-icon">📚</span>
-              <span>250 Điểm IRD</span>
-            </>
-          ) : (
-            <>
-              <span className="mode-live-dot" />
-              <span>Realtime AI</span>
-            </>
-          )}
-        </button>
-
         <div className="map-layer-control-wrap" ref={layerMenuRef}>
           <button
             type="button"
