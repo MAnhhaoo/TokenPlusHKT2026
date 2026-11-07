@@ -115,6 +115,11 @@ jobs:
       GCP_DEPLOY_SERVICE_ACCOUNT: ${{ vars.GCP_DEPLOY_SERVICE_ACCOUNT }}
       GCP_RUNTIME_SERVICE_ACCOUNT: ${{ vars.GCP_RUNTIME_SERVICE_ACCOUNT }}
       GCP_API_PUBLIC: ${{ vars.GCP_API_PUBLIC }}
+      GCP_SQL_INSTANCE_CONNECTION_NAME: ${{ vars.GCP_SQL_INSTANCE_CONNECTION_NAME }}
+      DB_DATABASE: ${{ vars.DB_DATABASE }}
+      DB_USERNAME: ${{ vars.DB_USERNAME }}
+      DB_PASSWORD_SECRET_NAME: ${{ vars.DB_PASSWORD_SECRET_NAME }}
+      DB_SYNCHRONIZE: ${{ vars.DB_SYNCHRONIZE }}
       VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
       FIREBASE_PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
       FIREBASE_USER_SITE_ID: ${{ vars.FIREBASE_USER_SITE_ID }}
@@ -244,7 +249,9 @@ jobs:
         run: |
           set -euo pipefail
           required=(GCP_PROJECT_ID GCP_REGION GCP_WORKLOAD_IDENTITY_PROVIDER GCP_DEPLOY_SERVICE_ACCOUNT)
-          if [[ "$BACKEND_CHANGED" == true ]]; then required+=(GCP_RUNTIME_SERVICE_ACCOUNT); fi
+          if [[ "$BACKEND_CHANGED" == true ]]; then
+            required+=(GCP_RUNTIME_SERVICE_ACCOUNT GCP_SQL_INSTANCE_CONNECTION_NAME DB_DATABASE DB_USERNAME DB_PASSWORD_SECRET_NAME DB_SYNCHRONIZE)
+          fi
           if [[ "$USER_CHANGED" == true ]]; then required+=(FIREBASE_PROJECT_ID FIREBASE_USER_SITE_ID); fi
           for name in "${required[@]}"; do
             if [[ -z "${!name:-}" ]]; then
@@ -252,6 +259,23 @@ jobs:
               exit 1
             fi
           done
+          if [[ "$BACKEND_CHANGED" == true && "$DB_SYNCHRONIZE" != true && "$DB_SYNCHRONIZE" != false ]]; then
+            echo '::error title=Staging not configured::DB_SYNCHRONIZE must be explicitly true or false in the staging GitHub Environment.'
+            exit 1
+          fi
+          if [[ "$BACKEND_CHANGED" == true ]]; then
+            if [[ "$GCP_SQL_INSTANCE_CONNECTION_NAME" != *:*:* ]]; then
+              echo '::error title=Staging not configured::GCP_SQL_INSTANCE_CONNECTION_NAME must use project:region:instance format.'
+              exit 1
+            fi
+            sql_project="${GCP_SQL_INSTANCE_CONNECTION_NAME%%:*}"
+            sql_region="${GCP_SQL_INSTANCE_CONNECTION_NAME#*:}"
+            sql_region="${sql_region%%:*}"
+            if [[ "$sql_project" != "$GCP_PROJECT_ID" || "$sql_region" != "$GCP_REGION" ]]; then
+              echo '::error title=Staging not configured::Cloud SQL project and region must match GCP_PROJECT_ID and GCP_REGION.'
+              exit 1
+            fi
+          fi
 
       - name: Authenticate to Google Cloud with Workload Identity Federation
         if: steps.staging_revision.outputs.current == 'true' && steps.staging_revision.outputs.any_deployable == 'true'
@@ -290,8 +314,19 @@ jobs:
           source: ./BE
           project_id: ${{ vars.GCP_PROJECT_ID }}
           region: ${{ vars.GCP_REGION }}
+          env_vars: |-
+            DB_TYPE=postgres
+            DB_HOST=/cloudsql/${{ vars.GCP_SQL_INSTANCE_CONNECTION_NAME }}
+            DB_PORT=5432
+            DB_USERNAME=${{ vars.DB_USERNAME }}
+            DB_DATABASE=${{ vars.DB_DATABASE }}
+            DB_SYNCHRONIZE=${{ vars.DB_SYNCHRONIZE }}
+          secrets: |-
+            DB_PASSWORD=${{ vars.DB_PASSWORD_SECRET_NAME }}:latest
           flags: >-
             --service-account=${{ vars.GCP_RUNTIME_SERVICE_ACCOUNT }}
+            --add-cloudsql-instances=${{ vars.GCP_SQL_INSTANCE_CONNECTION_NAME }}
+            --remove-env-vars=DATABASE_URL
             --${{ vars.GCP_API_PUBLIC == 'true' && 'allow-unauthenticated' || 'no-allow-unauthenticated' }}
             --command=node
             --args=dist/main.js
@@ -420,6 +455,11 @@ jobs:
       GCP_DEPLOY_SERVICE_ACCOUNT: ${{ vars.GCP_DEPLOY_SERVICE_ACCOUNT }}
       GCP_RUNTIME_SERVICE_ACCOUNT: ${{ vars.GCP_RUNTIME_SERVICE_ACCOUNT }}
       GCP_API_PUBLIC: ${{ vars.GCP_API_PUBLIC }}
+      GCP_SQL_INSTANCE_CONNECTION_NAME: ${{ vars.GCP_SQL_INSTANCE_CONNECTION_NAME }}
+      DB_DATABASE: ${{ vars.DB_DATABASE }}
+      DB_USERNAME: ${{ vars.DB_USERNAME }}
+      DB_PASSWORD_SECRET_NAME: ${{ vars.DB_PASSWORD_SECRET_NAME }}
+      DB_SYNCHRONIZE: ${{ vars.DB_SYNCHRONIZE }}
       VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
       FIREBASE_PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
       FIREBASE_USER_SITE_ID: ${{ vars.FIREBASE_USER_SITE_ID }}
@@ -462,7 +502,9 @@ jobs:
         run: |
           set -euo pipefail
           required=(GCP_PROJECT_ID GCP_REGION GCP_WORKLOAD_IDENTITY_PROVIDER GCP_DEPLOY_SERVICE_ACCOUNT)
-          if [[ "$BACKEND_CHANGED" == true ]]; then required+=(GCP_RUNTIME_SERVICE_ACCOUNT); fi
+          if [[ "$BACKEND_CHANGED" == true ]]; then
+            required+=(GCP_RUNTIME_SERVICE_ACCOUNT GCP_SQL_INSTANCE_CONNECTION_NAME DB_DATABASE DB_USERNAME DB_PASSWORD_SECRET_NAME DB_SYNCHRONIZE)
+          fi
           if [[ "$USER_CHANGED" == true ]]; then required+=(FIREBASE_PROJECT_ID FIREBASE_USER_SITE_ID); fi
           for name in "${required[@]}"; do
             if [[ -z "${!name:-}" ]]; then
@@ -470,6 +512,31 @@ jobs:
               exit 1
             fi
           done
+          if [[ "$BACKEND_CHANGED" == true && "$DB_SYNCHRONIZE" != false ]]; then
+            echo '::error title=Production not configured::DB_SYNCHRONIZE must be false in the production GitHub Environment.'
+            exit 1
+          fi
+          if [[ "$BACKEND_CHANGED" == true && "$GCP_SQL_INSTANCE_CONNECTION_NAME" == "tokenplus2026-514007:asia-southeast1:saigondrain-pg-trial" ]]; then
+            echo '::error title=Production not configured::The 30-day staging trial instance cannot be used by production.'
+            exit 1
+          fi
+          if [[ "$BACKEND_CHANGED" == true && "$DB_PASSWORD_SECRET_NAME" == "saigondrain-db-password" ]]; then
+            echo '::error title=Production not configured::Production must use its own Secret Manager database-password secret.'
+            exit 1
+          fi
+          if [[ "$BACKEND_CHANGED" == true ]]; then
+            if [[ "$GCP_SQL_INSTANCE_CONNECTION_NAME" != *:*:* ]]; then
+              echo '::error title=Production not configured::GCP_SQL_INSTANCE_CONNECTION_NAME must use project:region:instance format.'
+              exit 1
+            fi
+            sql_project="${GCP_SQL_INSTANCE_CONNECTION_NAME%%:*}"
+            sql_region="${GCP_SQL_INSTANCE_CONNECTION_NAME#*:}"
+            sql_region="${sql_region%%:*}"
+            if [[ "$sql_project" != "$GCP_PROJECT_ID" || "$sql_region" != "$GCP_REGION" ]]; then
+              echo '::error title=Production not configured::Cloud SQL project and region must match GCP_PROJECT_ID and GCP_REGION.'
+              exit 1
+            fi
+          fi
 
       - name: Authenticate to Google Cloud with Workload Identity Federation
         if: steps.release_revision.outputs.current == 'true'
@@ -488,8 +555,19 @@ jobs:
           source: ./BE
           project_id: ${{ vars.GCP_PROJECT_ID }}
           region: ${{ vars.GCP_REGION }}
+          env_vars: |-
+            DB_TYPE=postgres
+            DB_HOST=/cloudsql/${{ vars.GCP_SQL_INSTANCE_CONNECTION_NAME }}
+            DB_PORT=5432
+            DB_USERNAME=${{ vars.DB_USERNAME }}
+            DB_DATABASE=${{ vars.DB_DATABASE }}
+            DB_SYNCHRONIZE=${{ vars.DB_SYNCHRONIZE }}
+          secrets: |-
+            DB_PASSWORD=${{ vars.DB_PASSWORD_SECRET_NAME }}:latest
           flags: >-
             --service-account=${{ vars.GCP_RUNTIME_SERVICE_ACCOUNT }}
+            --add-cloudsql-instances=${{ vars.GCP_SQL_INSTANCE_CONNECTION_NAME }}
+            --remove-env-vars=DATABASE_URL
             --${{ vars.GCP_API_PUBLIC == 'true' && 'allow-unauthenticated' || 'no-allow-unauthenticated' }}
             --command=node
             --args=dist/main.js
