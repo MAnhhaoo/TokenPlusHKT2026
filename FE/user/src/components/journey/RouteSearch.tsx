@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState } from "react";
 import Icon from "@/components/ui/Icon";
 import { matchDynamicPlacePool, reverseGeocodeApi, searchPlacesApi } from "@/lib/api";
@@ -73,44 +72,6 @@ function RouteSearch({
         };
         onSelectOrigin(place);
         setOriginText(label);
-        setActiveField(null);
-        setSuggestions([]);
-      }
-    } finally {
-      setGpsLoading(false);
-    }
-  };
-
-  const handleGetDestGps = async () => {
-    setGpsLoading(true);
-    try {
-      const { latitude, longitude, isIpFallback } = await getUserLocation();
-      const locationLabel = isIpFallback ? "Vị trí gần đúng" : "Vị trí của bạn";
-      try {
-        const geo = await reverseGeocodeApi(latitude, longitude);
-        const street =
-          geo.location || (geo.district ? `${geo.district}, TP.HCM` : "Vị trí của bạn");
-        const label = `${locationLabel} · ${street}`;
-        const place: RouteEndpoint = {
-          label,
-          address: geo.location,
-          district: geo.district,
-          coords: [longitude, latitude],
-          isCurrentLocation: !isIpFallback,
-        };
-        onSelectDestination(place);
-        setDestText(label);
-        setActiveField(null);
-        setSuggestions([]);
-      } catch {
-        const label = `${locationLabel} (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`;
-        const place: RouteEndpoint = {
-          label,
-          coords: [longitude, latitude],
-          isCurrentLocation: !isIpFallback,
-        };
-        onSelectDestination(place);
-        setDestText(label);
         setActiveField(null);
         setSuggestions([]);
       }
@@ -391,22 +352,6 @@ function RouteSearch({
                 type="button"
               >
                 <Icon name="close" size={13} />
-              </button>
-              <button
-                aria-label="Lấy vị trí GPS hiện tại làm điểm đến"
-                className={`search-gps-btn ${gpsLoading ? "is-loading" : ""}`}
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleGetDestGps();
-                }}
-                title="Lấy vị trí GPS của bạn làm điểm đến"
-                type="button"
-              >
-                {gpsLoading ? (
-                  <span className="search-gps-spinner" />
-                ) : (
-                  <Icon name="location" size={15} />
-                )}
               </button>
             </div>
           </div>
