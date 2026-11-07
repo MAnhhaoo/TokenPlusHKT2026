@@ -28,7 +28,8 @@ Set up a GitHub Actions pipeline for the application packages being moved into t
 - Empty placeholder directories are not successful application validation.
 - CI must fail when a changed package lacks a manifest, lockfile, or required script.
 - Deployment remains disabled until repository switches, Environment variables, WIF, and cloud resources are configured.
-- Staging tracks the last successful deployment and carries forward changes from superseded pushes.
+- Staging tracks the last successful deployment and carries forward changes from superseded pushes. An attempt without a linked completion marker forces all current BE and FE/user packages to redeploy on the next staging run.
+- Release staging and production must skip a release superseded by a later published non-prerelease release.
 - Production runs only after the release revision completed staging and the protected Environment gate allows it.
 
 ## Acceptance criteria
@@ -37,5 +38,6 @@ Set up a GitHub Actions pipeline for the application packages being moved into t
 2. A PR changing workflow files runs regression checks for every migrated BE/FE user package.
 3. Master pushes run full validation and deploy changed packages to staging only when enabled.
 4. A published release follows staging first and deploys the same revision to production only when enabled and approved.
-5. Google Cloud authentication uses WIF; deploy jobs do not store long-lived service-account keys.
-6. Admin, ML, and PR preview jobs are absent from this initial scope.
+5. An incomplete staging attempt causes the next eligible staging run to redeploy all current BE and FE/user packages.
+6. Google Cloud authentication uses WIF; deploy jobs do not store long-lived service-account keys.
+7. Admin, ML, and PR preview jobs are absent from this initial scope.

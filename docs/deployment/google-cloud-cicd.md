@@ -10,7 +10,7 @@ The pipeline currently covers only the NestJS API in `BE/` and the public user f
 | Push to `master` | Validate every migrated BE and FE/user package. If staging is enabled, deploy changed services to Cloud Run and/or Firebase Hosting. |
 | Published release | Validate all migrated packages, deploy that release revision to staging, then deploy the same revision to production when the protected production Environment allows it. |
 
-Deployment is disabled until `GCP_DEPLOY_STAGING` and `GCP_DEPLOY_PRODUCTION` are configured. The staging workflow records a successful revision only after all selected services deploy. It carries changes forward from the last successful staging revision, and superseded push runs skip themselves so the latest run can deploy the accumulated change set.
+Deployment is disabled until `GCP_DEPLOY_STAGING` and `GCP_DEPLOY_PRODUCTION` are configured. The staging workflow records an attempt before deploying and records a successful revision only after all selected services deploy. If a run stops before its completion marker, the next staging run automatically redeploys all current BE and FE/user packages. It also carries changes forward from the last successful staging revision, and superseded push runs skip themselves so the latest run can deploy the accumulated change set.
 
 <!-- coderabbit-ai-generated:v1 -->
 
@@ -18,9 +18,9 @@ Deployment is disabled until `GCP_DEPLOY_STAGING` and `GCP_DEPLOY_PRODUCTION` ar
 
 At the workflow level, the concurrency group is keyed by the release tag or push commit SHA. GitHub allows one running and one pending run per group; a new run replaces an older pending run without canceling the active run.
 
-Staging and production jobs use separate repository-wide concurrency groups with `queue: max`. Each group allows one running job and up to 100 pending jobs; further jobs are canceled when the queue is full. A push does not replace a pending release staging job. If a release's staging job is canceled, production cannot deploy that release. Before rerunning canceled staging or production jobs, confirm the release is still the latest release; if it has been superseded, use the latest release's workflow instead. After addressing a staging cancellation, rerun all jobs in the release workflow. Production also requires the release to remain the latest release and pass its Environment gate.
+Staging and production jobs use separate repository-wide concurrency groups with `queue: max`. Each group allows one running job and up to 100 pending jobs; further jobs are canceled when the queue is full. A push does not replace a pending release staging job. If a release's staging job is canceled, production cannot deploy that release. Before rerunning canceled staging or production jobs, confirm the release is still the latest published non-prerelease release; if it has been superseded, use the latest release's workflow instead. After addressing a staging cancellation, rerun all jobs in the release workflow. Production also requires the release to remain the latest published non-prerelease release and pass its Environment gate.
 
-After the release workflow finishes, if `master` is newer than the release revision, restore staging to the latest `master` revision: rerun all jobs in the latest `master` push workflow and verify the deployed services. If release staging failed partway through, the recorded staging revision may not reflect partial deployments; redeploy affected services at the latest `master` revision as needed.
+After the release workflow finishes, if `master` is newer than the release revision, restore staging to the latest `master` revision: rerun all jobs in the latest `master` push workflow and verify the deployed services. An incomplete staging attempt is detected automatically, and that run forces a full BE and FE/user redeploy. GitHub only allows workflow runs to be rerun within 30 days; if the latest `master` push is older, create and merge an empty commit to `master` through the repository's normal branch-protection process to trigger a fresh staging run.
 
 <!-- /coderabbit-ai-generated:v1 -->
 

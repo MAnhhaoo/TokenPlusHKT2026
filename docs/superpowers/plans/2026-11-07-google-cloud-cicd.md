@@ -11,6 +11,7 @@
 - [x] Add release staging followed by protected production deployment of the same revision.
 - [x] Use Workload Identity Federation and keep the Cloud Run API private by default.
 - [x] Track successful staging revisions so skipped or superseded pushes are included by the next deploy.
+- [x] Track incomplete staging attempts and force BE + FE/user reconciliation on the next staging run; only the latest published release may deploy.
 - [x] Remove Admin, ML, and Firebase PR preview jobs from this stage.
 - [x] Document required Google Cloud, Firebase, WIF, and GitHub Environment setup.
 

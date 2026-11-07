@@ -140,26 +140,54 @@ jobs:
               current=false
               echo "Staging deploy skipped: $GITHUB_SHA was superseded by $latest_sha on master." >> "$GITHUB_STEP_SUMMARY"
             fi
+          elif [[ "$GITHUB_EVENT_NAME" == release ]]; then
+            release_tag="$(jq -r '.release.tag_name' "$GITHUB_EVENT_PATH")"
+            latest_release="$(
+              gh api --paginate "repos/${GITHUB_REPOSITORY}/releases?per_page=100" \
+                --jq '.[] | select(.draft == false and .prerelease == false and .published_at != null) | [.published_at, .id, .tag_name] | @tsv' \
+                | LC_ALL=C sort -t $'\t' -k1,1r -k2,2nr \
+                | sed -n '1p'
+            )"
+            latest_tag="${latest_release##*$'\t'}"
+            [[ -n "$latest_tag" ]] || { echo 'No published release was returned by the GitHub API.' >&2; exit 1; }
+            if [[ "$latest_tag" != "$release_tag" ]]; then
+              current=false
+              echo "Staging deploy skipped: release $release_tag was superseded by $latest_tag." >> "$GITHUB_STEP_SUMMARY"
+            fi
           fi
 
           backend=false
           user=false
           any_deployable=false
           staged_sha=''
+          force_full=false
           if [[ "$current" == true ]]; then
             if [[ "$GITHUB_EVENT_NAME" == release ]]; then
               changed_files="$(git ls-files | grep -vE '(^|/)\.gitkeep$' || true)"
             else
               deployments_file="$RUNNER_TEMP/staging-deployments.json"
-              gh api "repos/${GITHUB_REPOSITORY}/deployments?environment=staging&task=staging-complete&per_page=1" > "$deployments_file"
-              last_deployed_sha="$(jq -r '.[0].sha // empty' "$deployments_file")"
+              attempts_file="$RUNNER_TEMP/staging-attempts.json"
+              gh api "repos/${GITHUB_REPOSITORY}/deployments?environment=staging&task=staging-complete&per_page=100" > "$deployments_file"
+              gh api "repos/${GITHUB_REPOSITORY}/deployments?environment=staging&task=staging-attempt&per_page=100" > "$attempts_file"
+              last_deployed_sha="$(jq -r 'max_by(.id).sha // empty' "$deployments_file")"
+              latest_attempt_id="$(jq -r 'max_by(.id).id // empty' "$attempts_file")"
+              completed_attempt_id="$(jq -r 'max_by(.id).payload.staging_attempt_id // empty' "$deployments_file")"
+              if [[ -n "$latest_attempt_id" && "$latest_attempt_id" != "$completed_attempt_id" ]]; then
+                force_full=true
+                echo 'An earlier staging attempt did not reach its completion marker; this run will redeploy all current BE and FE/user packages.' >> "$GITHUB_STEP_SUMMARY"
+              fi
               if [[ -n "$last_deployed_sha" ]]; then
                 if ! git cat-file -e "${last_deployed_sha}^{commit}" 2>/dev/null; then
                   echo "Recorded staging commit $last_deployed_sha is missing from repository history." >&2
                   exit 1
                 fi
-                changed_files="$(git diff --name-only "$last_deployed_sha" "$GITHUB_SHA")"
+                if [[ "$force_full" == true ]]; then
+                  changed_files="$(git ls-files | grep -vE '(^|/)\.gitkeep$' || true)"
+                else
+                  changed_files="$(git diff --name-only "$last_deployed_sha" "$GITHUB_SHA")"
+                fi
               else
+                force_full=true
                 changed_files="$(git ls-files | grep -vE '(^|/)\.gitkeep$' || true)"
               fi
             fi
@@ -179,6 +207,10 @@ jobs:
 
             has_changed_source BE && backend=true || true
             has_changed_source FE/user && user=true || true
+            if [[ "$force_full" == true ]]; then
+              has_source_files BE && backend=true || true
+              has_source_files FE/user && user=true || true
+            fi
             if grep -Eq '^(package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml)$' <<<"$changed_files"; then
               has_source_files BE && backend=true || true
               has_source_files FE/user && user=true || true
@@ -196,6 +228,7 @@ jobs:
 
           {
             echo "current=$current"
+            echo "force_full=$force_full"
             echo "backend=$backend"
             echo "user=$user"
             echo "any_deployable=$any_deployable"
@@ -227,6 +260,26 @@ jobs:
           project_id: ${{ vars.GCP_PROJECT_ID }}
           workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ vars.GCP_DEPLOY_SERVICE_ACCOUNT }}
+
+      - name: Record staging attempt
+        id: staging_attempt
+        if: steps.staging_revision.outputs.current == 'true' && steps.staging_revision.outputs.any_deployable == 'true'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BACKEND_CHANGED: ${{ steps.staging_revision.outputs.backend }}
+          USER_CHANGED: ${{ steps.staging_revision.outputs.user }}
+        run: |
+          set -euo pipefail
+          attempt_id="$(jq -n \
+            --arg ref "$GITHUB_SHA" \
+            --arg backend "$BACKEND_CHANGED" \
+            --arg user "$USER_CHANGED" \
+            '{ref:$ref, environment:"staging", task:"staging-attempt", auto_merge:false, required_contexts:[], description:"BE and FE/user staging attempt", payload:{backend_changed:($backend=="true"),user_changed:($user=="true")}}' \
+            | gh api "repos/${GITHUB_REPOSITORY}/deployments" --method POST --input - --jq .id)"
+          jq -n '{state:"in_progress",environment:"staging",description:"BE and FE/user staging deployment is in progress"}' \
+            | gh api "repos/${GITHUB_REPOSITORY}/deployments/${attempt_id}/statuses" --method POST --input - >/dev/null
+          echo "id=$attempt_id" >> "$GITHUB_OUTPUT"
 
       - name: Deploy API to Cloud Run from BE
         id: deploy_api
@@ -310,16 +363,29 @@ jobs:
         if: steps.staging_revision.outputs.current == 'true' && steps.staging_revision.outputs.user == 'true'
         run: curl --fail --silent --show-error --retry 3 "https://${FIREBASE_USER_SITE_ID}.web.app/" >/dev/null
 
+      - name: Mark staging attempt successful
+        if: steps.staging_revision.outputs.current == 'true' && steps.staging_revision.outputs.any_deployable == 'true'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ATTEMPT_ID: ${{ steps.staging_attempt.outputs.id }}
+        run: |
+          set -euo pipefail
+          jq -n '{state:"success",environment:"staging",description:"All selected BE and FE/user services deployed successfully"}' \
+            | gh api "repos/${GITHUB_REPOSITORY}/deployments/${ATTEMPT_ID}/statuses" --method POST --input - >/dev/null
+
       - name: Record successful staging deployment SHA
         if: steps.staging_revision.outputs.current == 'true' && steps.staging_revision.outputs.any_deployable == 'true'
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
+          ATTEMPT_ID: ${{ steps.staging_attempt.outputs.id }}
         run: |
           set -euo pipefail
           deployment_id="$(jq -n \
             --arg ref "$GITHUB_SHA" \
-            '{ref:$ref, environment:"staging", task:"staging-complete", auto_merge:false, required_contexts:[], description:"BE and FE/user staging deploy completed", payload:{staging_complete:true}}' \
+            --arg attempt_id "$ATTEMPT_ID" \
+            '{ref:$ref, environment:"staging", task:"staging-complete", auto_merge:false, required_contexts:[], description:"BE and FE/user staging deploy completed", payload:{staging_complete:true,staging_attempt_id:$attempt_id}}' \
             | gh api "repos/${GITHUB_REPOSITORY}/deployments" --method POST --input - --jq .id)"
           jq -n '{state:"success", environment:"staging", description:"All selected BE and FE/user services deployed successfully"}' \
             | gh api "repos/${GITHUB_REPOSITORY}/deployments/${deployment_id}/statuses" --method POST --input - >/dev/null
@@ -372,7 +438,14 @@ jobs:
         run: |
           set -euo pipefail
           release_tag="$(jq -r '.release.tag_name' "$GITHUB_EVENT_PATH")"
-          latest_tag="$(gh api "repos/${GITHUB_REPOSITORY}/releases?per_page=100" --jq '[.[] | select(.draft == false) | .tag_name][0] // empty')"
+          latest_release="$(
+            gh api --paginate "repos/${GITHUB_REPOSITORY}/releases?per_page=100" \
+              --jq '.[] | select(.draft == false and .prerelease == false and .published_at != null) | [.published_at, .id, .tag_name] | @tsv' \
+              | LC_ALL=C sort -t $'\t' -k1,1r -k2,2nr \
+              | sed -n '1p'
+          )"
+          latest_tag="${latest_release##*$'\t'}"
+          [[ -n "$latest_tag" ]] || { echo 'No published release was returned by the GitHub API.' >&2; exit 1; }
           if [[ "$latest_tag" != "$release_tag" ]]; then
             echo "Production deploy skipped: $release_tag was superseded by $latest_tag." >> "$GITHUB_STEP_SUMMARY"
             echo 'current=false' >> "$GITHUB_OUTPUT"
