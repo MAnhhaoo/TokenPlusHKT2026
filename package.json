@@ -17,6 +17,7 @@
     "build:be": "pnpm --filter saigondrain-be build",
     "preview:user": "pnpm --filter @saigondrain/user preview",
     "preview:admin": "pnpm --filter @saigondrain/admin preview",
-    "typecheck": "pnpm -r run typecheck"
+    "typecheck": "pnpm -r run typecheck",
+    "test:system": "node scripts/test-system.mjs"
   }
 }

@@ -20,3 +20,10 @@ __pycache__/
 .ruff_cache/
 /*.docx
 !docs/*.docx
+
+# Google Workload Identity Federation credential files generated in CI.
+gha-creds-*.json
+
+# Firebase target mappings are created per GitHub Environment during deploy.
+.firebaserc
+firebase-debug.log

@@ -1,0 +1,608 @@
+name: Deploy
+
+on:
+  push:
+    branches: [master]
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-${{ github.event.release.tag_name || github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  deployment-scope:
+    name: Detect BE and FE/user changes
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.detect.outputs.backend }}
+      user: ${{ steps.detect.outputs.user }}
+      any_application: ${{ steps.detect.outputs.any_application }}
+    steps:
+      - name: Checkout repository history
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Identify changed packages
+        id: detect
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$GITHUB_EVENT_NAME" == release ]]; then
+            changed_files="$(git ls-files | grep -vE '(^|/)\.gitkeep$' || true)"
+          else
+            before="$(jq -r '.before' "$GITHUB_EVENT_PATH")"
+            if [[ "$before" =~ ^0+$ ]]; then
+              changed_files="$(git ls-files | grep -vE '(^|/)\.gitkeep$' || true)"
+            else
+              changed_files="$(git diff --name-only "$before" "$GITHUB_SHA")"
+            fi
+          fi
+
+          has_source_files() {
+            git ls-files "$1" | grep -qvE '(^|/)\.gitkeep$'
+          }
+          has_changed_source() {
+            local directory="$1"
+            while IFS= read -r file; do
+              if [[ "$file" == "$directory/"* && "${file##*/}" != .gitkeep ]]; then
+                return 0
+              fi
+            done <<<"$changed_files"
+            return 1
+          }
+
+          backend=false
+          user=false
+          has_changed_source BE && backend=true || true
+          has_changed_source FE/user && user=true || true
+          if grep -Eq '^(package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml)$' <<<"$changed_files"; then
+            has_source_files BE && backend=true || true
+            has_source_files FE/user && user=true || true
+          fi
+          if grep -qx 'firebase.json' <<<"$changed_files"; then
+            [[ -f FE/user/package.json ]] && user=true || true
+          fi
+
+          any_application=false
+          [[ "$backend" == true || "$user" == true ]] && any_application=true
+          {
+            echo "backend=$backend"
+            echo "user=$user"
+            echo "any_application=$any_application"
+          } >> "$GITHUB_OUTPUT"
+
+  validate:
+    name: Validate migrated packages
+    needs: deployment-scope
+    permissions:
+      contents: read
+    uses: ./.github/workflows/ci.yml
+    with:
+      full_validation: true
+
+  deploy-staging:
+    name: Deploy staging
+    if: >-
+      (github.event_name == 'push' || github.event_name == 'release') &&
+      needs.validate.result == 'success' &&
+      needs.validate.outputs.any_application == 'true' &&
+      vars.GCP_DEPLOY_STAGING == 'true'
+    runs-on: ubuntu-latest
+    environment: staging
+    concurrency:
+      group: deploy-staging-${{ github.repository }}
+      cancel-in-progress: false
+      queue: max
+    permissions:
+      contents: read
+      deployments: write
+      id-token: write
+    needs: [deployment-scope, validate]
+    outputs:
+      staged_sha: ${{ steps.staging_revision.outputs.staged_sha }}
+      current: ${{ steps.staging_revision.outputs.current }}
+      any_deployable: ${{ steps.staging_revision.outputs.any_deployable }}
+    env:
+      GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+      GCP_REGION: ${{ vars.GCP_REGION }}
+      GCP_WORKLOAD_IDENTITY_PROVIDER: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+      GCP_DEPLOY_SERVICE_ACCOUNT: ${{ vars.GCP_DEPLOY_SERVICE_ACCOUNT }}
+      GCP_RUNTIME_SERVICE_ACCOUNT: ${{ vars.GCP_RUNTIME_SERVICE_ACCOUNT }}
+      GCP_API_PUBLIC: ${{ vars.GCP_API_PUBLIC }}
+      VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
+      FIREBASE_PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
+      FIREBASE_USER_SITE_ID: ${{ vars.FIREBASE_USER_SITE_ID }}
+    steps:
+      - name: Checkout exact validated revision
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Skip superseded pushes and compute cumulative staging scope
+        id: staging_revision
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          current=true
+          if [[ "$GITHUB_EVENT_NAME" == push ]]; then
+            latest_sha="$(gh api "repos/${GITHUB_REPOSITORY}/commits/master" --jq .sha)"
+            if [[ "$latest_sha" != "$GITHUB_SHA" ]]; then
+              current=false
+              echo "Staging deploy skipped: $GITHUB_SHA was superseded by $latest_sha on master." >> "$GITHUB_STEP_SUMMARY"
+            fi
+          elif [[ "$GITHUB_EVENT_NAME" == release ]]; then
+            release_tag="$(jq -r '.release.tag_name' "$GITHUB_EVENT_PATH")"
+            latest_release="$(
+              gh api --paginate "repos/${GITHUB_REPOSITORY}/releases?per_page=100" \
+                --jq '.[] | select(.draft == false and .prerelease == false and .published_at != null) | [.published_at, .id, .tag_name] | @tsv' \
+                | LC_ALL=C sort -t $'\t' -k1,1r -k2,2nr \
+                | sed -n '1p'
+            )"
+            latest_tag="${latest_release##*$'\t'}"
+            [[ -n "$latest_tag" ]] || { echo 'No published release was returned by the GitHub API.' >&2; exit 1; }
+            if [[ "$latest_tag" != "$release_tag" ]]; then
+              current=false
+              echo "Staging deploy skipped: release $release_tag was superseded by $latest_tag." >> "$GITHUB_STEP_SUMMARY"
+            fi
+          fi
+
+          backend=false
+          user=false
+          any_deployable=false
+          staged_sha=''
+          force_full=false
+          if [[ "$current" == true ]]; then
+            if [[ "$GITHUB_EVENT_NAME" == release ]]; then
+              changed_files="$(git ls-files | grep -vE '(^|/)\.gitkeep$' || true)"
+            else
+              deployments_file="$RUNNER_TEMP/staging-deployments.json"
+              attempts_file="$RUNNER_TEMP/staging-attempts.json"
+              gh api "repos/${GITHUB_REPOSITORY}/deployments?environment=staging&task=staging-complete&per_page=100" > "$deployments_file"
+              gh api "repos/${GITHUB_REPOSITORY}/deployments?environment=staging&task=staging-attempt&per_page=100" > "$attempts_file"
+              last_deployed_sha="$(jq -r 'max_by(.id).sha // empty' "$deployments_file")"
+              latest_attempt_id="$(jq -r 'max_by(.id).id // empty' "$attempts_file")"
+              completed_attempt_id="$(jq -r 'max_by(.id).payload.staging_attempt_id // empty' "$deployments_file")"
+              if [[ -n "$latest_attempt_id" && "$latest_attempt_id" != "$completed_attempt_id" ]]; then
+                force_full=true
+                echo 'An earlier staging attempt did not reach its completion marker; this run will redeploy all current BE and FE/user packages.' >> "$GITHUB_STEP_SUMMARY"
+              fi
+              if [[ -n "$last_deployed_sha" ]]; then
+                if ! git cat-file -e "${last_deployed_sha}^{commit}" 2>/dev/null; then
+                  echo "Recorded staging commit $last_deployed_sha is missing from repository history." >&2
+                  exit 1
+                fi
+                if [[ "$force_full" == true ]]; then
+                  changed_files="$(git ls-files | grep -vE '(^|/)\.gitkeep$' || true)"
+                else
+                  changed_files="$(git diff --name-only "$last_deployed_sha" "$GITHUB_SHA")"
+                fi
+              else
+                force_full=true
+                changed_files="$(git ls-files | grep -vE '(^|/)\.gitkeep$' || true)"
+              fi
+            fi
+
+            has_source_files() {
+              git ls-files "$1" | grep -qvE '(^|/)\.gitkeep$'
+            }
+            has_changed_source() {
+              local directory="$1"
+              while IFS= read -r file; do
+                if [[ "$file" == "$directory/"* && "${file##*/}" != .gitkeep ]]; then
+                  return 0
+                fi
+              done <<<"$changed_files"
+              return 1
+            }
+
+            has_changed_source BE && backend=true || true
+            has_changed_source FE/user && user=true || true
+            if [[ "$force_full" == true ]]; then
+              has_source_files BE && backend=true || true
+              has_source_files FE/user && user=true || true
+            fi
+            if grep -Eq '^(package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml)$' <<<"$changed_files"; then
+              has_source_files BE && backend=true || true
+              has_source_files FE/user && user=true || true
+            fi
+            if grep -qx 'firebase.json' <<<"$changed_files"; then
+              [[ -f FE/user/package.json ]] && user=true || true
+            fi
+            [[ "$backend" == true || "$user" == true ]] && any_deployable=true
+            if [[ "$any_deployable" == true ]]; then
+              staged_sha="$GITHUB_SHA"
+            else
+              echo 'No BE or FE/user source changed since the last successful staging deployment; no services were deployed.' >> "$GITHUB_STEP_SUMMARY"
+            fi
+          fi
+
+          {
+            echo "current=$current"
+            echo "force_full=$force_full"
+            echo "backend=$backend"
+            echo "user=$user"
+            echo "any_deployable=$any_deployable"
+            echo "staged_sha=$staged_sha"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Validate Google Cloud deployment variables
+        if: steps.staging_revision.outputs.current == 'true' && steps.staging_revision.outputs.any_deployable == 'true'
+        shell: bash
+        env:
+          BACKEND_CHANGED: ${{ steps.staging_revision.outputs.backend }}
+          USER_CHANGED: ${{ steps.staging_revision.outputs.user }}
+        run: |
+          set -euo pipefail
+          required=(GCP_PROJECT_ID GCP_REGION GCP_WORKLOAD_IDENTITY_PROVIDER GCP_DEPLOY_SERVICE_ACCOUNT)
+          if [[ "$BACKEND_CHANGED" == true ]]; then required+=(GCP_RUNTIME_SERVICE_ACCOUNT); fi
+          if [[ "$USER_CHANGED" == true ]]; then required+=(FIREBASE_PROJECT_ID FIREBASE_USER_SITE_ID); fi
+          for name in "${required[@]}"; do
+            if [[ -z "${!name:-}" ]]; then
+              echo "::error title=Staging not configured::$name is required in the staging GitHub Environment."
+              exit 1
+            fi
+          done
+
+      - name: Authenticate to Google Cloud with Workload Identity Federation
+        if: steps.staging_revision.outputs.current == 'true' && steps.staging_revision.outputs.any_deployable == 'true'
+        uses: google-github-actions/auth@v3
+        with:
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SERVICE_ACCOUNT }}
+
+      - name: Record staging attempt
+        id: staging_attempt
+        if: steps.staging_revision.outputs.current == 'true' && steps.staging_revision.outputs.any_deployable == 'true'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BACKEND_CHANGED: ${{ steps.staging_revision.outputs.backend }}
+          USER_CHANGED: ${{ steps.staging_revision.outputs.user }}
+        run: |
+          set -euo pipefail
+          attempt_id="$(jq -n \
+            --arg ref "$GITHUB_SHA" \
+            --arg backend "$BACKEND_CHANGED" \
+            --arg user "$USER_CHANGED" \
+            '{ref:$ref, environment:"staging", task:"staging-attempt", auto_merge:false, required_contexts:[], description:"BE and FE/user staging attempt", payload:{backend_changed:($backend=="true"),user_changed:($user=="true")}}' \
+            | gh api "repos/${GITHUB_REPOSITORY}/deployments" --method POST --input - --jq .id)"
+          jq -n '{state:"in_progress",environment:"staging",description:"BE and FE/user staging deployment is in progress"}' \
+            | gh api "repos/${GITHUB_REPOSITORY}/deployments/${attempt_id}/statuses" --method POST --input - >/dev/null
+          echo "id=$attempt_id" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy API to Cloud Run from BE
+        id: deploy_api
+        if: steps.staging_revision.outputs.current == 'true' && steps.staging_revision.outputs.backend == 'true'
+        uses: google-github-actions/deploy-cloudrun@v3
+        with:
+          service: ${{ vars.CLOUD_RUN_API_SERVICE || 'saigondrain-api' }}
+          source: ./BE
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+          region: ${{ vars.GCP_REGION }}
+          flags: >-
+            --service-account=${{ vars.GCP_RUNTIME_SERVICE_ACCOUNT }}
+            --${{ vars.GCP_API_PUBLIC == 'true' && 'allow-unauthenticated' || 'no-allow-unauthenticated' }}
+            --command=node
+            --args=dist/main.js
+
+      - name: Setup Node.js for user frontend
+        if: steps.staging_revision.outputs.current == 'true' && steps.staging_revision.outputs.user == 'true'
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22.23.4
+
+      - name: Setup pnpm for user frontend
+        if: steps.staging_revision.outputs.current == 'true' && steps.staging_revision.outputs.user == 'true'
+        uses: pnpm/action-setup@v6.1.0
+        with:
+          version: 12.15.0
+
+      - name: Install locked user frontend dependencies
+        if: steps.staging_revision.outputs.current == 'true' && steps.staging_revision.outputs.user == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -f FE/user/package-lock.json ]]; then
+            (cd FE/user && npm ci)
+          else
+            pnpm install --frozen-lockfile
+          fi
+
+      - name: Export API URL for Vite
+        if: steps.staging_revision.outputs.current == 'true' && steps.staging_revision.outputs.user == 'true'
+        shell: bash
+        env:
+          DEPLOYED_API_URL: ${{ steps.deploy_api.outputs.url }}
+          CONFIGURED_API_URL: ${{ vars.VITE_API_BASE_URL }}
+        run: |
+          set -euo pipefail
+          api_url="$DEPLOYED_API_URL"
+          if [[ -z "$api_url" ]]; then api_url="$CONFIGURED_API_URL"; fi
+          if [[ -z "$api_url" ]]; then
+            echo '::error title=Vite API URL missing::Deploy the API first or set VITE_API_BASE_URL in the staging GitHub Environment.'
+            exit 1
+          fi
+          echo "VITE_API_BASE_URL=$api_url" >> "$GITHUB_ENV"
+
+      - name: Build user frontend
+        if: steps.staging_revision.outputs.current == 'true' && steps.staging_revision.outputs.user == 'true'
+        working-directory: FE/user
+        shell: bash
+        run: |
+          if [[ -f package-lock.json ]]; then npm run build; else pnpm run build; fi
+
+      - name: Setup Node.js for Firebase CLI
+        if: steps.staging_revision.outputs.current == 'true' && steps.staging_revision.outputs.user == 'true'
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24.22.2
+
+      - name: Install Firebase CLI
+        if: steps.staging_revision.outputs.current == 'true' && steps.staging_revision.outputs.user == 'true'
+        run: npm install --global firebase-tools@15.34.2
+
+      - name: Deploy user Firebase Hosting site
+        if: steps.staging_revision.outputs.current == 'true' && steps.staging_revision.outputs.user == 'true'
+        run: |
+          set -euo pipefail
+          firebase target:apply hosting user "$FIREBASE_USER_SITE_ID" --project "$FIREBASE_PROJECT_ID"
+          firebase deploy --project "$FIREBASE_PROJECT_ID" --only hosting:user --non-interactive
+
+      - name: Verify live user frontend
+        if: steps.staging_revision.outputs.current == 'true' && steps.staging_revision.outputs.user == 'true'
+        run: curl --fail --silent --show-error --retry 3 "https://${FIREBASE_USER_SITE_ID}.web.app/" >/dev/null
+
+      - name: Mark staging attempt successful
+        if: steps.staging_revision.outputs.current == 'true' && steps.staging_revision.outputs.any_deployable == 'true'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ATTEMPT_ID: ${{ steps.staging_attempt.outputs.id }}
+        run: |
+          set -euo pipefail
+          jq -n '{state:"success",environment:"staging",description:"All selected BE and FE/user services deployed successfully"}' \
+            | gh api "repos/${GITHUB_REPOSITORY}/deployments/${ATTEMPT_ID}/statuses" --method POST --input - >/dev/null
+
+      - name: Record successful staging deployment SHA
+        if: steps.staging_revision.outputs.current == 'true' && steps.staging_revision.outputs.any_deployable == 'true'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ATTEMPT_ID: ${{ steps.staging_attempt.outputs.id }}
+        run: |
+          set -euo pipefail
+          deployment_id="$(jq -n \
+            --arg ref "$GITHUB_SHA" \
+            --arg attempt_id "$ATTEMPT_ID" \
+            '{ref:$ref, environment:"staging", task:"staging-complete", auto_merge:false, required_contexts:[], description:"BE and FE/user staging deploy completed", payload:{staging_complete:true,staging_attempt_id:$attempt_id}}' \
+            | gh api "repos/${GITHUB_REPOSITORY}/deployments" --method POST --input - --jq .id)"
+          jq -n '{state:"success", environment:"staging", description:"All selected BE and FE/user services deployed successfully"}' \
+            | gh api "repos/${GITHUB_REPOSITORY}/deployments/${deployment_id}/statuses" --method POST --input - >/dev/null
+
+      - name: Summarize staging deployment
+        if: steps.staging_revision.outputs.current == 'true' && steps.staging_revision.outputs.any_deployable == 'true'
+        run: echo 'Staging deploy completed for the changed BE and/or FE/user packages.' >> "$GITHUB_STEP_SUMMARY"
+
+  deploy-production:
+    name: Deploy production
+    if: >-
+      github.event_name == 'release' &&
+      needs.deploy-staging.result == 'success' &&
+      needs.deploy-staging.outputs.staged_sha == github.sha &&
+      vars.GCP_DEPLOY_PRODUCTION == 'true'
+    runs-on: ubuntu-latest
+    environment: production
+    concurrency:
+      group: deploy-production-${{ github.repository }}
+      cancel-in-progress: false
+      queue: max
+    permissions:
+      contents: read
+      id-token: write
+    needs: [deployment-scope, validate, deploy-staging]
+    outputs:
+      current: ${{ steps.release_revision.outputs.current }}
+    env:
+      GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+      GCP_REGION: ${{ vars.GCP_REGION }}
+      GCP_WORKLOAD_IDENTITY_PROVIDER: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+      GCP_DEPLOY_SERVICE_ACCOUNT: ${{ vars.GCP_DEPLOY_SERVICE_ACCOUNT }}
+      GCP_RUNTIME_SERVICE_ACCOUNT: ${{ vars.GCP_RUNTIME_SERVICE_ACCOUNT }}
+      GCP_API_PUBLIC: ${{ vars.GCP_API_PUBLIC }}
+      VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
+      FIREBASE_PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
+      FIREBASE_USER_SITE_ID: ${{ vars.FIREBASE_USER_SITE_ID }}
+    steps:
+      - name: Checkout release revision
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Check that this is still the latest release
+        id: release_revision
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          release_tag="$(jq -r '.release.tag_name' "$GITHUB_EVENT_PATH")"
+          latest_release="$(
+            gh api --paginate "repos/${GITHUB_REPOSITORY}/releases?per_page=100" \
+              --jq '.[] | select(.draft == false and .prerelease == false and .published_at != null) | [.published_at, .id, .tag_name] | @tsv' \
+              | LC_ALL=C sort -t $'\t' -k1,1r -k2,2nr \
+              | sed -n '1p'
+          )"
+          latest_tag="${latest_release##*$'\t'}"
+          [[ -n "$latest_tag" ]] || { echo 'No published release was returned by the GitHub API.' >&2; exit 1; }
+          if [[ "$latest_tag" != "$release_tag" ]]; then
+            echo "Production deploy skipped: $release_tag was superseded by $latest_tag." >> "$GITHUB_STEP_SUMMARY"
+            echo 'current=false' >> "$GITHUB_OUTPUT"
+          else
+            echo 'current=true' >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Validate Google Cloud deployment variables
+        if: steps.release_revision.outputs.current == 'true'
+        shell: bash
+        env:
+          BACKEND_CHANGED: ${{ needs.deployment-scope.outputs.backend }}
+          USER_CHANGED: ${{ needs.deployment-scope.outputs.user }}
+        run: |
+          set -euo pipefail
+          required=(GCP_PROJECT_ID GCP_REGION GCP_WORKLOAD_IDENTITY_PROVIDER GCP_DEPLOY_SERVICE_ACCOUNT)
+          if [[ "$BACKEND_CHANGED" == true ]]; then required+=(GCP_RUNTIME_SERVICE_ACCOUNT); fi
+          if [[ "$USER_CHANGED" == true ]]; then required+=(FIREBASE_PROJECT_ID FIREBASE_USER_SITE_ID); fi
+          for name in "${required[@]}"; do
+            if [[ -z "${!name:-}" ]]; then
+              echo "::error title=Production not configured::$name is required in the production GitHub Environment."
+              exit 1
+            fi
+          done
+
+      - name: Authenticate to Google Cloud with Workload Identity Federation
+        if: steps.release_revision.outputs.current == 'true'
+        uses: google-github-actions/auth@v3
+        with:
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SERVICE_ACCOUNT }}
+
+      - name: Deploy API to Cloud Run from BE
+        id: deploy_api
+        if: steps.release_revision.outputs.current == 'true' && needs.deployment-scope.outputs.backend == 'true'
+        uses: google-github-actions/deploy-cloudrun@v3
+        with:
+          service: ${{ vars.CLOUD_RUN_API_SERVICE || 'saigondrain-api' }}
+          source: ./BE
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+          region: ${{ vars.GCP_REGION }}
+          flags: >-
+            --service-account=${{ vars.GCP_RUNTIME_SERVICE_ACCOUNT }}
+            --${{ vars.GCP_API_PUBLIC == 'true' && 'allow-unauthenticated' || 'no-allow-unauthenticated' }}
+            --command=node
+            --args=dist/main.js
+
+      - name: Setup Node.js for user frontend
+        if: steps.release_revision.outputs.current == 'true' && needs.deployment-scope.outputs.user == 'true'
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22.23.4
+
+      - name: Setup pnpm for user frontend
+        if: steps.release_revision.outputs.current == 'true' && needs.deployment-scope.outputs.user == 'true'
+        uses: pnpm/action-setup@v6.1.0
+        with:
+          version: 12.15.0
+
+      - name: Install locked user frontend dependencies
+        if: steps.release_revision.outputs.current == 'true' && needs.deployment-scope.outputs.user == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -f FE/user/package-lock.json ]]; then
+            (cd FE/user && npm ci)
+          else
+            pnpm install --frozen-lockfile
+          fi
+
+      - name: Export API URL for Vite
+        if: steps.release_revision.outputs.current == 'true' && needs.deployment-scope.outputs.user == 'true'
+        shell: bash
+        env:
+          DEPLOYED_API_URL: ${{ steps.deploy_api.outputs.url }}
+          CONFIGURED_API_URL: ${{ vars.VITE_API_BASE_URL }}
+        run: |
+          set -euo pipefail
+          api_url="$DEPLOYED_API_URL"
+          if [[ -z "$api_url" ]]; then api_url="$CONFIGURED_API_URL"; fi
+          if [[ -z "$api_url" ]]; then
+            echo '::error title=Vite API URL missing::Deploy the API first or set VITE_API_BASE_URL in the production GitHub Environment.'
+            exit 1
+          fi
+          echo "VITE_API_BASE_URL=$api_url" >> "$GITHUB_ENV"
+
+      - name: Build user frontend
+        if: steps.release_revision.outputs.current == 'true' && needs.deployment-scope.outputs.user == 'true'
+        working-directory: FE/user
+        shell: bash
+        run: |
+          if [[ -f package-lock.json ]]; then npm run build; else pnpm run build; fi
+
+      - name: Setup Node.js for Firebase CLI
+        if: steps.release_revision.outputs.current == 'true' && needs.deployment-scope.outputs.user == 'true'
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24.22.2
+
+      - name: Install Firebase CLI
+        if: steps.release_revision.outputs.current == 'true' && needs.deployment-scope.outputs.user == 'true'
+        run: npm install --global firebase-tools@15.34.2
+
+      - name: Deploy user Firebase Hosting site
+        if: steps.release_revision.outputs.current == 'true' && needs.deployment-scope.outputs.user == 'true'
+        run: |
+          set -euo pipefail
+          firebase target:apply hosting user "$FIREBASE_USER_SITE_ID" --project "$FIREBASE_PROJECT_ID"
+          firebase deploy --project "$FIREBASE_PROJECT_ID" --only hosting:user --non-interactive
+
+      - name: Verify live user frontend
+        if: steps.release_revision.outputs.current == 'true' && needs.deployment-scope.outputs.user == 'true'
+        run: curl --fail --silent --show-error --retry 3 "https://${FIREBASE_USER_SITE_ID}.web.app/" >/dev/null
+
+      - name: Summarize production deployment
+        if: steps.release_revision.outputs.current == 'true'
+        run: echo 'Production deploy completed for the release revision after the production Environment gate.' >> "$GITHUB_STEP_SUMMARY"
+
+  deploy-status:
+    name: Deployment status
+    if: always() && (github.event_name == 'push' || github.event_name == 'release')
+    runs-on: ubuntu-latest
+    needs: [deployment-scope, validate, deploy-staging, deploy-production]
+    steps:
+      - name: Explain CI/CD result
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          APP_AVAILABLE: ${{ needs.validate.outputs.any_application }}
+          VALIDATE_RESULT: ${{ needs.validate.result }}
+          STAGING_RESULT: ${{ needs.deploy-staging.result }}
+          STAGING_CURRENT: ${{ needs.deploy-staging.outputs.current }}
+          STAGING_DEPLOYABLE: ${{ needs.deploy-staging.outputs.any_deployable }}
+          PRODUCTION_RESULT: ${{ needs.deploy-production.result }}
+          PRODUCTION_CURRENT: ${{ needs.deploy-production.outputs.current }}
+          STAGING_ENABLED: ${{ vars.GCP_DEPLOY_STAGING }}
+          PRODUCTION_ENABLED: ${{ vars.GCP_DEPLOY_PRODUCTION }}
+        run: |
+          set -euo pipefail
+          if [[ "$VALIDATE_RESULT" == failure || "$VALIDATE_RESULT" == cancelled || "$STAGING_RESULT" == failure || "$STAGING_RESULT" == cancelled || "$PRODUCTION_RESULT" == failure || "$PRODUCTION_RESULT" == cancelled ]]; then
+            echo 'CI/CD failed. See the failed validation or deployment job for details.' >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          if [[ "$APP_AVAILABLE" != true ]]; then
+            echo 'No BE or FE/user package is available yet. This workflow did not validate or deploy application code.' >> "$GITHUB_STEP_SUMMARY"
+          elif [[ "$STAGING_ENABLED" != true ]]; then
+            echo 'CI completed. Staging is disabled; production deployment requires a successful staging deployment first.' >> "$GITHUB_STEP_SUMMARY"
+          elif [[ "$STAGING_RESULT" == success && "$STAGING_CURRENT" != true ]]; then
+            echo 'This staging run was superseded by a newer revision and skipped.' >> "$GITHUB_STEP_SUMMARY"
+          elif [[ "$STAGING_RESULT" == success && "$STAGING_DEPLOYABLE" != true ]]; then
+            echo 'CI completed. No BE or FE/user source changed since staging; no deploy was needed.' >> "$GITHUB_STEP_SUMMARY"
+          elif [[ "$STAGING_RESULT" == success && "$EVENT_NAME" == release && "$PRODUCTION_ENABLED" != true ]]; then
+            echo 'Staging completed. Production is disabled; set GCP_DEPLOY_PRODUCTION=true after configuring the protected production Environment.' >> "$GITHUB_STEP_SUMMARY"
+          elif [[ "$STAGING_RESULT" == success && "$EVENT_NAME" == push ]]; then
+            echo 'CI and staging deployment completed for BE and/or FE/user.' >> "$GITHUB_STEP_SUMMARY"
+          elif [[ "$PRODUCTION_RESULT" == success && "$PRODUCTION_CURRENT" != true ]]; then
+            echo 'Production deploy was skipped because a newer release is available.' >> "$GITHUB_STEP_SUMMARY"
+          elif [[ "$PRODUCTION_RESULT" == success ]]; then
+            echo 'CI, staging, and production deployment completed for the release.' >> "$GITHUB_STEP_SUMMARY"
+          fi

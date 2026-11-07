@@ -33,7 +33,11 @@ export class GeminiVisionService {
     const primaryModel =
       process.env.GEMINI_MODEL?.trim() || "gemini-3.5-flash-lite";
 
-    if (apiKey && apiKey.length > 5 && this.isBase64Image(imageDataUrlOrBase64)) {
+    if (
+      apiKey &&
+      apiKey.length > 5 &&
+      this.isBase64Image(imageDataUrlOrBase64)
+    ) {
       const candidateModels = [
         primaryModel,
         "gemini-3.5-flash-lite",
@@ -165,14 +169,19 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON (Không dùng Markdown, k
     if (!rawText) return null;
 
     try {
-      const cleanJson = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
+      const cleanJson = rawText
+        .replace(/```json/g, "")
+        .replace(/```/g, "")
+        .trim();
       const parsed = JSON.parse(cleanJson);
 
       return {
         hasFlooding: Boolean(parsed.hasFlooding ?? true),
         estimatedDepthCm: Number(parsed.estimatedDepthCm ?? 25),
         reportType: parsed.reportType === "drain" ? "drain" : "flood",
-        severity: ["critical", "high", "medium", "low"].includes(parsed.severity)
+        severity: ["critical", "high", "medium", "low"].includes(
+          parsed.severity,
+        )
           ? parsed.severity
           : "medium",
         weatherCondition: String(parsed.weatherCondition || "Trời đang có mưa"),
@@ -205,7 +214,8 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON (Không dùng Markdown, k
     location?: string,
     userDescription?: string,
   ): FloodImageAnalysisResult {
-    const text = `${location || ""} ${userDescription || ""} ${imageData}`.toLowerCase();
+    const text =
+      `${location || ""} ${userDescription || ""} ${imageData}`.toLowerCase();
 
     const isDrain =
       text.includes("cống") ||
@@ -292,10 +302,16 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON (Không dùng Markdown, k
   }
 
   private isBase64Image(str: string): boolean {
-    return str.startsWith("data:image/") || (str.length > 100 && !str.startsWith("http"));
+    return (
+      str.startsWith("data:image/") ||
+      (str.length > 100 && !str.startsWith("http"))
+    );
   }
 
-  private extractBase64(dataUrl: string): { mimeType: string; base64Data: string } {
+  private extractBase64(dataUrl: string): {
+    mimeType: string;
+    base64Data: string;
+  } {
     if (dataUrl.startsWith("data:")) {
       const match = dataUrl.match(/^data:([^;]+);base64,(.+)$/);
       if (match) {

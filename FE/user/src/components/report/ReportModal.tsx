@@ -457,7 +457,8 @@ function ReportModal({
               <div className="ai-result-card">
                 <div className="ai-result-header">
                   <span className="ai-badge">
-                    <Icon name="check" size={13} /> Gemini Vision AI ({aiAnalysis.confidence}% tin cậy)
+                    <Icon name="check" size={13} /> Gemini Vision AI ({aiAnalysis.confidence}% tin
+                    cậy)
                   </span>
                   <span className={`ai-severity-tag ${aiAnalysis.severity}`}>
                     {aiAnalysis.severity === "critical"

@@ -2378,8 +2378,13 @@ h3 {
 }
 
 @keyframes pulse-glow {
-  0%, 100% { opacity: 0.95; }
-  50% { opacity: 0.65; }
+  0%,
+  100% {
+    opacity: 0.95;
+  }
+  50% {
+    opacity: 0.65;
+  }
 }
 
 .ai-spin-icon {

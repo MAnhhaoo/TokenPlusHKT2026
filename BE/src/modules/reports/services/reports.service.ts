@@ -148,7 +148,8 @@ export class ReportsService {
     let aiConfidence = dto.photoUrl ? 94 : 88;
     let aiSummary = dto.aiSummary;
     let recommendation = dto.recommendation;
-    let visual = dto.visual ?? (dto.reportType === "drain" ? "drain" : "street");
+    let visual =
+      dto.visual ?? (dto.reportType === "drain" ? "drain" : "street");
     let detectedSeverity = dto.severity;
 
     // Tự động phân tích ảnh hiện trường bằng Google Gemini Multimodal nếu có đính kèm ảnh

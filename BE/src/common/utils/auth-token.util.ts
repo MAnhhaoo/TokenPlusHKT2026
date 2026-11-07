@@ -44,8 +44,12 @@ export function verifyPassword(raw: string, stored?: string | null): boolean {
   }
 
   if (stored.includes(":")) {
-    const [saltHex, keyHex] = stored.split(":");
-    if (!saltHex || !keyHex) {
+    const [saltHex, keyHex, extra] = stored.split(":");
+    if (
+      extra !== undefined ||
+      !/^[0-9a-f]{32}$/i.test(saltHex) ||
+      !/^[0-9a-f]{128}$/i.test(keyHex)
+    ) {
       return false;
     }
     const expected = Buffer.from(keyHex, "hex");
