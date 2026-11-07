@@ -31,8 +31,8 @@ export class ReportsService {
     private readonly alertRepo: Repository<AreaAlertEntity>,
     private readonly mapService: MapService,
     private readonly geminiVisionService: GeminiVisionService,
-    @Optional() private readonly weatherService?: WeatherService,
     @Optional() private readonly realtimeService?: RealtimeService,
+    @Optional() private readonly weatherService?: WeatherService,
   ) {}
 
   /**
