@@ -13,7 +13,6 @@ from scipy.stats import spearmanr
 from sklearn.metrics import roc_auc_score
 
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
 
 
 def run_audit(processed_dir: Path, run_out_dir: Path, run_id: str) -> dict:
@@ -209,9 +208,7 @@ def run_audit(processed_dir: Path, run_out_dir: Path, run_id: str) -> dict:
                 "Hệ số Reporting Bias (so với TB)": round(
                     obs_rate / max(overall_pos_rate, 1e-6), 2
                 ),
-                "Điểm MLP TB": round(
-                    float(grp["flood_susceptibility_prob"].mean()), 4
-                ),
+                "Điểm MLP TB": round(float(grp["flood_susceptibility_prob"].mean()), 4),
                 "Điểm MCDA TB (0-100)": round(float(grp["score"].mean()), 2),
                 "Tỷ lệ vào Top-10% Nguy cơ (MLP %)": round(mlp_top10_rate * 100, 2),
                 "Tỷ lệ vào Top-10% Nguy cơ (MCDA %)": round(mcda_top10_rate * 100, 2),
@@ -238,10 +235,13 @@ def main() -> int:
     parser.add_argument("--run-id", default="local_audit")
     args = parser.parse_args()
     report = run_audit(args.processed_dir, args.run_out_dir, args.run_id)
-    print(json.dumps(report["risk_ranking_accuracy_holdout"], indent=2, ensure_ascii=False))
+    print(
+        json.dumps(
+            report["risk_ranking_accuracy_holdout"], indent=2, ensure_ascii=False
+        )
+    )
     return 0
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

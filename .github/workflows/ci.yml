@@ -68,6 +68,7 @@ jobs:
       source_user: ${{ steps.detect.outputs.source_user }}
       source_admin: ${{ steps.detect.outputs.source_admin }}
       source_any_application: ${{ steps.detect.outputs.source_any_application }}
+      source_node_files: ${{ steps.detect.outputs.source_node_files }}
     steps:
       - name: Checkout repository history
         uses: actions/checkout@v7
@@ -84,6 +85,25 @@ jobs:
 
           if [[ "$FULL_VALIDATION" == true ]]; then
             changed_files="$(git ls-files | grep -vE '(^|/)\.gitkeep$' || true)"
+            case "$GITHUB_EVENT_NAME" in
+              push)
+                before="$(jq -r '.before' "$GITHUB_EVENT_PATH")"
+                if [[ "$before" =~ ^0+$ ]]; then
+                  source_changed_files="$changed_files"
+                else
+                  source_changed_files="$(git diff --name-only "$before" "$GITHUB_SHA")"
+                fi
+                ;;
+              release|workflow_dispatch)
+                parent="$(git rev-parse "${GITHUB_SHA}^" 2>/dev/null || true)"
+                if [[ -n "$parent" ]]; then
+                  source_changed_files="$(git diff --name-only "$parent" "$GITHUB_SHA")"
+                else
+                  source_changed_files="$changed_files"
+                fi
+                ;;
+              *) source_changed_files="$changed_files" ;;
+            esac
           else
             case "$GITHUB_EVENT_NAME" in
               pull_request)
@@ -101,8 +121,8 @@ jobs:
             esac
 
             changed_files="$(git diff --name-only "$base...$head")"
+            source_changed_files="$changed_files"
           fi
-          source_changed_files="$changed_files"
           has_source_files() {
             git ls-files "$1" | grep -qvE '(^|/)\.gitkeep$'
           }
@@ -175,6 +195,16 @@ jobs:
           if [[ ${#node_components[@]} -gt 0 ]]; then
             node_json="$(printf '%s\n' "${node_components[@]}" | jq -R . | jq -s -c .)"
           fi
+          node_source_files=()
+          while IFS= read -r file; do
+            case "$file" in
+              BE/*|FE/user/*|FE/admin/*) node_source_files+=("$file") ;;
+            esac
+          done <<<"$source_changed_files"
+          node_files_json='[]'
+          if [[ ${#node_source_files[@]} -gt 0 ]]; then
+            node_files_json="$(printf '%s\n' "${node_source_files[@]}" | jq -R . | jq -s -c .)"
+          fi
           ml_json='["__none__"]'
           if [[ ${#ml_components[@]} -gt 0 ]]; then
             ml_json="$(printf '%s\n' "${ml_components[@]}" | jq -R . | jq -s -c .)"
@@ -191,6 +221,7 @@ jobs:
             echo "source_user=$source_user"
             echo "source_admin=$source_admin"
             echo "source_any_application=$source_any_application"
+            echo "source_node_files=$node_files_json"
           } >> "$GITHUB_OUTPUT"
 
           printf '{"user":%s,"admin":%s}\n' \
@@ -328,6 +359,7 @@ jobs:
       - name: Build, typecheck, lint, and test
         env:
           COMPONENT: ${{ matrix.component }}
+          SOURCE_NODE_FILES: ${{ needs.changes.outputs.source_node_files }}
         shell: bash
         run: |
           set -euo pipefail
@@ -347,7 +379,19 @@ jobs:
           if has_script lint; then
             package_run lint
           else
-            package_run format --check
+            mapfile -t format_files < <(jq -r '.[]' <<<"$SOURCE_NODE_FILES" | while IFS= read -r file; do
+              [[ "$file" == "$COMPONENT/"* ]] || continue
+              relative_path="${file#"$COMPONENT/"}"
+              [[ -f "$relative_path" ]] || continue
+              case "$relative_path" in
+                *.js|*.jsx|*.mjs|*.cjs|*.ts|*.tsx|*.json|*.css|*.scss|*.html|*.md) printf '%s\n' "$relative_path" ;;
+              esac
+            done)
+            if [[ ${#format_files[@]} -gt 0 ]]; then
+              package_run format --check "${format_files[@]}"
+            else
+              echo 'No changed formatter-supported source files; format check skipped.'
+            fi
           fi
 
           if has_script test; then

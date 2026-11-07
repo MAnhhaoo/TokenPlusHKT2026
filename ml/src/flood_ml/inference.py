@@ -9,7 +9,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 import torch
-import torch.nn as nn
+from torch import nn
 
 
 class FloodSusceptibilityNet(nn.Module):
@@ -61,9 +61,7 @@ class FloodSusceptibilityPredictor:
         if not ckpt_path.is_file():
             ckpt_path = self.bundle_dir / "best_model_a100.pt"
 
-        checkpoint = torch.load(
-            ckpt_path, map_location=self.device, weights_only=False
-        )
+        checkpoint = torch.load(ckpt_path, map_location=self.device, weights_only=False)
 
         if prep_path.is_file():
             self.prep_config = json.loads(prep_path.read_text(encoding="utf-8"))
@@ -79,7 +77,10 @@ class FloodSusceptibilityPredictor:
             self.model_config = json.loads(cfg_path.read_text(encoding="utf-8"))
         else:
             self.model_config = {
-                "architecture": {"in_features": len(self.prep_config["feature_columns"]), "hidden_dim": 64},
+                "architecture": {
+                    "in_features": len(self.prep_config["feature_columns"]),
+                    "hidden_dim": 64,
+                },
                 "thresholds": {"default": 0.5, "top_10_pct": 0.45, "top_5_pct": 0.52},
             }
 
@@ -147,4 +148,3 @@ class FloodSusceptibilityPredictor:
             "flood_susceptibility_prob": float(res["flood_susceptibility_prob"]),
             "risk_tier": str(res["risk_tier"]),
         }
-

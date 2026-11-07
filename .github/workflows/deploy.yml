@@ -328,6 +328,9 @@ jobs:
       vars.GCP_DEPLOY_STAGING == 'true'
     runs-on: ubuntu-latest
     environment: staging
+    concurrency:
+      group: deploy-staging-${{ github.repository }}
+      cancel-in-progress: false
     permissions:
       contents: read
       id-token: write
@@ -350,7 +353,25 @@ jobs:
           ref: ${{ github.sha }}
           persist-credentials: false
 
+      - name: Skip superseded staging pushes
+        id: staging_revision
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          current=true
+          if [[ "$GITHUB_EVENT_NAME" == push ]]; then
+            latest_sha="$(gh api "repos/${GITHUB_REPOSITORY}/commits/master" --jq .sha)"
+            if [[ "$latest_sha" != "$GITHUB_SHA" ]]; then
+              current=false
+              echo "Staging deploy skipped: $GITHUB_SHA was superseded by $latest_sha on master." >> "$GITHUB_STEP_SUMMARY"
+            fi
+          fi
+          echo "current=$current" >> "$GITHUB_OUTPUT"
+
       - name: Validate Google Cloud deployment variables
+        if: steps.staging_revision.outputs.current == 'true'
         shell: bash
         env:
           BACKEND_CHANGED: ${{ needs.deployment-scope.outputs.backend }}
@@ -376,6 +397,7 @@ jobs:
           done
 
       - name: Authenticate to Google Cloud with Workload Identity Federation
+        if: steps.staging_revision.outputs.current == 'true'
         uses: google-github-actions/auth@v3
         with:
           project_id: ${{ vars.GCP_PROJECT_ID }}
@@ -384,7 +406,7 @@ jobs:
 
       - name: Deploy API to Cloud Run from BE
         id: deploy_api
-        if: needs.deployment-scope.outputs.backend == 'true'
+        if: steps.staging_revision.outputs.current == 'true' && needs.deployment-scope.outputs.backend == 'true'
         uses: google-github-actions/deploy-cloudrun@v3
         with:
           service: ${{ vars.CLOUD_RUN_API_SERVICE || 'saigondrain-api' }}
@@ -396,7 +418,7 @@ jobs:
             --${{ vars.GCP_API_PUBLIC == 'true' && 'allow-unauthenticated' || 'no-allow-unauthenticated' }}
 
       - name: Deploy serving ML service to Cloud Run
-        if: needs.deployment-scope.outputs.ml_serving == 'true'
+        if: steps.staging_revision.outputs.current == 'true' && needs.deployment-scope.outputs.ml_serving == 'true'
         uses: google-github-actions/deploy-cloudrun@v3
         with:
           service: ${{ vars.CLOUD_RUN_ML_SERVICE || 'saigondrain-ml' }}
@@ -406,23 +428,23 @@ jobs:
           flags: --service-account=${{ vars.GCP_RUNTIME_SERVICE_ACCOUNT }} --no-allow-unauthenticated
 
       - name: Report training-only ML package
-        if: needs.deployment-scope.outputs.ml == 'true' && needs.deployment-scope.outputs.ml_serving != 'true'
+        if: steps.staging_revision.outputs.current == 'true' && needs.deployment-scope.outputs.ml == 'true' && needs.deployment-scope.outputs.ml_serving != 'true'
         run: echo 'ML package contains no ML/serving/Dockerfile entrypoint; training code was not deployed.' >> "$GITHUB_STEP_SUMMARY"
 
       - name: Setup Node.js for frontend build
-        if: needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true'
+        if: steps.staging_revision.outputs.current == 'true' && (needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true')
         uses: actions/setup-node@v7
         with:
           node-version: 22.23.4
 
       - name: Setup pnpm for frontend build
-        if: needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true'
+        if: steps.staging_revision.outputs.current == 'true' && (needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true')
         uses: pnpm/action-setup@v6.1.0
         with:
           version: 12.15.0
 
       - name: Install locked frontend dependencies
-        if: needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true'
+        if: steps.staging_revision.outputs.current == 'true' && (needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true')
         shell: bash
         env:
           USER_CHANGED: ${{ needs.deployment-scope.outputs.user }}
@@ -439,7 +461,7 @@ jobs:
           if [[ "$need_pnpm" == true ]]; then pnpm install --frozen-lockfile; fi
 
       - name: Export API URL for Vite
-        if: needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true'
+        if: steps.staging_revision.outputs.current == 'true' && (needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true')
         shell: bash
         env:
           DEPLOYED_API_URL: ${{ steps.deploy_api.outputs.url }}
@@ -455,31 +477,31 @@ jobs:
           echo "VITE_API_BASE_URL=$api_url" >> "$GITHUB_ENV"
 
       - name: Build user frontend
-        if: needs.deployment-scope.outputs.user == 'true'
+        if: steps.staging_revision.outputs.current == 'true' && needs.deployment-scope.outputs.user == 'true'
         working-directory: FE/user
         shell: bash
         run: |
           if [[ -f package-lock.json ]]; then npm run build; else pnpm run build; fi
 
       - name: Build admin frontend
-        if: needs.deployment-scope.outputs.admin == 'true'
+        if: steps.staging_revision.outputs.current == 'true' && needs.deployment-scope.outputs.admin == 'true'
         working-directory: FE/admin
         shell: bash
         run: |
           if [[ -f package-lock.json ]]; then npm run build; else pnpm run build; fi
 
       - name: Setup Node.js for Firebase CLI
-        if: needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true'
+        if: steps.staging_revision.outputs.current == 'true' && (needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true')
         uses: actions/setup-node@v7
         with:
           node-version: 24.22.2
 
       - name: Install Firebase CLI
-        if: needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true'
+        if: steps.staging_revision.outputs.current == 'true' && (needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true')
         run: npm install --global firebase-tools@15.34.2
 
       - name: Deploy changed Firebase Hosting sites
-        if: needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true'
+        if: steps.staging_revision.outputs.current == 'true' && (needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true')
         shell: bash
         env:
           USER_CHANGED: ${{ needs.deployment-scope.outputs.user }}
@@ -498,7 +520,7 @@ jobs:
           firebase deploy --project "$FIREBASE_PROJECT_ID" --only "$(IFS=,; echo "${targets[*]}")" --non-interactive
 
       - name: Verify live Firebase Hosting roots
-        if: needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true'
+        if: steps.staging_revision.outputs.current == 'true' && (needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true')
         shell: bash
         env:
           USER_CHANGED: ${{ needs.deployment-scope.outputs.user }}
@@ -509,6 +531,7 @@ jobs:
           if [[ "$ADMIN_CHANGED" == true ]]; then curl --fail --silent --show-error --retry 3 "https://${FIREBASE_ADMIN_SITE_ID}.web.app/" >/dev/null; fi
 
       - name: Summarize staging deployment
+        if: steps.staging_revision.outputs.current == 'true'
         run: echo 'Staging deploy steps completed for the changed, migrated services.' >> "$GITHUB_STEP_SUMMARY"
 
   production-not-configured:
@@ -532,6 +555,9 @@ jobs:
       vars.GCP_DEPLOY_PRODUCTION == 'true'
     runs-on: ubuntu-latest
     environment: production
+    concurrency:
+      group: deploy-production-${{ github.repository }}
+      cancel-in-progress: false
     permissions:
       contents: read
       id-token: write
@@ -554,7 +580,23 @@ jobs:
           ref: ${{ github.sha }}
           persist-credentials: false
 
+      - name: Skip superseded production releases
+        id: production_revision
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          latest_tag="$(gh api "repos/${GITHUB_REPOSITORY}/releases?per_page=100" --jq '[.[] | select(.draft == false)] | max_by(.published_at) | .tag_name')"
+          current=true
+          if [[ "$latest_tag" != "$GITHUB_REF_NAME" ]]; then
+            current=false
+            echo "Production deploy skipped: release $GITHUB_REF_NAME was superseded by $latest_tag." >> "$GITHUB_STEP_SUMMARY"
+          fi
+          echo "current=$current" >> "$GITHUB_OUTPUT"
+
       - name: Validate Google Cloud deployment variables
+        if: steps.production_revision.outputs.current == 'true'
         shell: bash
         env:
           BACKEND_CHANGED: ${{ needs.deployment-scope.outputs.backend }}
@@ -576,6 +618,7 @@ jobs:
           done
 
       - name: Authenticate to Google Cloud with Workload Identity Federation
+        if: steps.production_revision.outputs.current == 'true'
         uses: google-github-actions/auth@v3
         with:
           project_id: ${{ vars.GCP_PROJECT_ID }}
@@ -584,7 +627,7 @@ jobs:
 
       - name: Deploy API to Cloud Run from BE
         id: deploy_api
-        if: needs.deployment-scope.outputs.backend == 'true'
+        if: steps.production_revision.outputs.current == 'true' && needs.deployment-scope.outputs.backend == 'true'
         uses: google-github-actions/deploy-cloudrun@v3
         with:
           service: ${{ vars.CLOUD_RUN_API_SERVICE || 'saigondrain-api' }}
@@ -596,7 +639,7 @@ jobs:
             --${{ vars.GCP_API_PUBLIC == 'true' && 'allow-unauthenticated' || 'no-allow-unauthenticated' }}
 
       - name: Deploy serving ML service to Cloud Run
-        if: needs.deployment-scope.outputs.ml_serving == 'true'
+        if: steps.production_revision.outputs.current == 'true' && needs.deployment-scope.outputs.ml_serving == 'true'
         uses: google-github-actions/deploy-cloudrun@v3
         with:
           service: ${{ vars.CLOUD_RUN_ML_SERVICE || 'saigondrain-ml' }}
@@ -606,19 +649,19 @@ jobs:
           flags: --service-account=${{ vars.GCP_RUNTIME_SERVICE_ACCOUNT }} --no-allow-unauthenticated
 
       - name: Setup Node.js for frontend build
-        if: needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true'
+        if: steps.production_revision.outputs.current == 'true' && (needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true')
         uses: actions/setup-node@v7
         with:
           node-version: 22.23.4
 
       - name: Setup pnpm for frontend build
-        if: needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true'
+        if: steps.production_revision.outputs.current == 'true' && (needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true')
         uses: pnpm/action-setup@v6.1.0
         with:
           version: 12.15.0
 
       - name: Install locked frontend dependencies
-        if: needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true'
+        if: steps.production_revision.outputs.current == 'true' && (needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true')
         shell: bash
         env:
           USER_CHANGED: ${{ needs.deployment-scope.outputs.user }}
@@ -635,7 +678,7 @@ jobs:
           if [[ "$need_pnpm" == true ]]; then pnpm install --frozen-lockfile; fi
 
       - name: Export API URL for Vite
-        if: needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true'
+        if: steps.production_revision.outputs.current == 'true' && (needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true')
         shell: bash
         env:
           DEPLOYED_API_URL: ${{ steps.deploy_api.outputs.url }}
@@ -651,31 +694,31 @@ jobs:
           echo "VITE_API_BASE_URL=$api_url" >> "$GITHUB_ENV"
 
       - name: Build user frontend
-        if: needs.deployment-scope.outputs.user == 'true'
+        if: steps.production_revision.outputs.current == 'true' && needs.deployment-scope.outputs.user == 'true'
         working-directory: FE/user
         shell: bash
         run: |
           if [[ -f package-lock.json ]]; then npm run build; else pnpm run build; fi
 
       - name: Build admin frontend
-        if: needs.deployment-scope.outputs.admin == 'true'
+        if: steps.production_revision.outputs.current == 'true' && needs.deployment-scope.outputs.admin == 'true'
         working-directory: FE/admin
         shell: bash
         run: |
           if [[ -f package-lock.json ]]; then npm run build; else pnpm run build; fi
 
       - name: Setup Node.js for Firebase CLI
-        if: needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true'
+        if: steps.production_revision.outputs.current == 'true' && (needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true')
         uses: actions/setup-node@v7
         with:
           node-version: 24.22.2
 
       - name: Install Firebase CLI
-        if: needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true'
+        if: steps.production_revision.outputs.current == 'true' && (needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true')
         run: npm install --global firebase-tools@15.34.2
 
       - name: Deploy changed Firebase Hosting sites
-        if: needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true'
+        if: steps.production_revision.outputs.current == 'true' && (needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true')
         shell: bash
         env:
           USER_CHANGED: ${{ needs.deployment-scope.outputs.user }}
@@ -694,7 +737,7 @@ jobs:
           firebase deploy --project "$FIREBASE_PROJECT_ID" --only "$(IFS=,; echo "${targets[*]}")" --non-interactive
 
       - name: Verify live Firebase Hosting roots
-        if: needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true'
+        if: steps.production_revision.outputs.current == 'true' && (needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true')
         shell: bash
         env:
           USER_CHANGED: ${{ needs.deployment-scope.outputs.user }}
@@ -705,4 +748,5 @@ jobs:
           if [[ "$ADMIN_CHANGED" == true ]]; then curl --fail --silent --show-error --retry 3 "https://${FIREBASE_ADMIN_SITE_ID}.web.app/" >/dev/null; fi
 
       - name: Summarize production deployment
+        if: steps.production_revision.outputs.current == 'true'
         run: echo 'Production deploy steps completed for the same source revision that passed CI and staging.' >> "$GITHUB_STEP_SUMMARY"

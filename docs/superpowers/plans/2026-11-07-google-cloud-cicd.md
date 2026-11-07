@@ -24,6 +24,8 @@
 - A workflow-only PR must not imply application source changed; it should run regression checks for migrated packages already present in the merge commit.
 - A changed component missing its package manifest or matching npm/pnpm/uv lockfile must produce an actionable failure.
 - Missing GCP/Firebase configuration must be visible as deploy-not-configured; it must never be reported as a successful deployment.
+- Deploy jobs to the same environment must not overlap or be canceled mid-deploy; staging and production remain independent.
+- A queued staging push or production release must skip if a newer revision becomes current before it reaches the deployment lock.
 - Fork pull requests must not receive Google Cloud credentials or deploy privileges.
 - User/admin frontends must build to the Firebase Hosting directories declared in `firebase.json`.
 

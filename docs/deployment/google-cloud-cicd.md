@@ -11,6 +11,8 @@ This repository is being migrated from the earlier SaigonDrain project in small 
 | Published GitHub release | Run full validation, deploy the release commit to staging, then deploy that same source revision to production only when `GCP_DEPLOY_PRODUCTION=true` and the `production` Environment gate allows it. |
 | No migrated application source | Report that application checks or deployment were skipped; do not report the repository as application-validated. |
 
+Staging and production use separate GitHub concurrency groups. Deploys to the same environment queue without canceling a deployment already in progress. A staging push checks the current `master` SHA after it reaches the queue and skips if superseded; a production deploy does the same against the latest published release.
+
 The deploy workflow runs from the default branch after CI completes. For PR previews it reads only validated frontend booleans from the artifact, takes the PR number from the trusted `workflow_run` event, and downloads static build output; it rejects symbolic links and does not check out or execute PR workflow code. The trusted workflow uses the Firebase configuration from `master`. GitHub documents that `workflow_run` workflows can access secrets and write tokens even when the preceding workflow cannot, and warns against running untrusted code on this event; keep this trust boundary intact. See [GitHub's `workflow_run` security guidance](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#workflow_run).
 
 ## GitHub configuration
@@ -106,8 +108,8 @@ Same-repository PR previews use the `hosting-user` / `hosting-admin` artifacts f
 ## Application source contracts
 
 - **API:** `BE/` must become a runnable Node package with a start command that listens on the Cloud Run-provided `PORT`. CI supports a standalone npm package or the locked pnpm workspace. It requires `build` and `typecheck`, plus either `lint` or `format` and either `test` or `test:smoke`.
-- **User/admin frontend:** `FE/user/` and `FE/admin/` must build to `dist/`. The current admin app uses npm, `format` as its style check, and `test:smoke` against a local Vite preview; future packages may use the pnpm workspace and standard `lint`/`test` scripts.
-- **ML:** the current package is lowercase `ml/`; uppercase `ML/` is recognized as a migration alias. Each Python package must provide `pyproject.toml` and `uv.lock`. CI runs `uv lock --check`, `uv sync --locked --group dev`, Ruff lint/format checks, and pytest on Ubuntu and Windows. Training code, notebooks, and datasets are never deployed. A Cloud Run inference service is deployed only when the changed package contains `ml/serving/Dockerfile` or `ML/serving/Dockerfile`; serving services remain private.
+- **User/admin frontend:** `FE/user/` and `FE/admin/` must build to `dist/`. The current admin app uses npm, checks formatting on changed frontend source files, and runs `test:smoke` against a local Vite preview; future packages may use the pnpm workspace and standard `lint`/`test` scripts.
+- **ML:** the current package is lowercase `ml/`; uppercase `ML/` is recognized as a migration alias. Each Python package must provide `pyproject.toml` and `uv.lock`. CI runs `uv lock --check`, `uv sync --locked --group dev`, Ruff lint/format checks for Python source and scripts, and pytest on Ubuntu and Windows. Interactive notebooks are excluded from Ruff checks; training code, notebooks, and datasets are never deployed. A Cloud Run inference service is deployed only when the changed package contains `ml/serving/Dockerfile` or `ML/serving/Dockerfile`; serving services remain private.
 
 ## Enablement checklist
 
