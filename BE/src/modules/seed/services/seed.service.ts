@@ -58,8 +58,8 @@ export class SeedService implements OnApplicationBootstrap {
           : "Cơ sở dữ liệu bản đồ đang trống — đang khởi tạo 250 điểm thực nghiệm IRD...",
       );
       if (forceSeed) {
-        await this.mapPointRepo.delete({});
-        await this.forecastRepo.delete({});
+        await this.mapPointRepo.createQueryBuilder().delete().execute();
+        await this.forecastRepo.createQueryBuilder().delete().execute();
       }
       await this.seedAll();
       this.logger.log(
@@ -80,13 +80,13 @@ export class SeedService implements OnApplicationBootstrap {
         "Chức năng khôi phục dữ liệu mẫu bị vô hiệu hóa trên môi trường production.",
       );
     }
-    await this.reportRepo.delete({});
-    await this.alertRepo.delete({});
-    await this.mapPointRepo.delete({});
-    await this.userRepo.delete({});
-    await this.forecastRepo.delete({});
-    await this.routeRepo.delete({});
-    await this.trendRepo.delete({});
+    await this.reportRepo.createQueryBuilder().delete().execute();
+    await this.alertRepo.createQueryBuilder().delete().execute();
+    await this.mapPointRepo.createQueryBuilder().delete().execute();
+    await this.userRepo.createQueryBuilder().delete().execute();
+    await this.forecastRepo.createQueryBuilder().delete().execute();
+    await this.routeRepo.createQueryBuilder().delete().execute();
+    await this.trendRepo.createQueryBuilder().delete().execute();
     await this.seedAll();
 
     return {
@@ -96,7 +96,7 @@ export class SeedService implements OnApplicationBootstrap {
   }
 
   /**
-   * Nạp 250 điểm đen ngập lụt IRD, cảm biến đo mưa và khung dự báo thời tiết.
+   * Nạp 250 điểm đen ngập lụt IRD và khung dự báo thời tiết khởi tạo bằng 0.
    */
   private async seedAll() {
     let mapPoints: Partial<MapPointEntity>[] = [];
@@ -119,9 +119,9 @@ export class SeedService implements OnApplicationBootstrap {
           severity: h.severity as any,
           label: h.label,
           district: h.district,
-          rainfall: h.rainfallThresholdMm || 50,
-          depth: h.depth || 25,
-          historyCount: h.historyCount || 5,
+          rainfall: h.rainfallThresholdMm ?? 0,
+          depth: h.depth ?? 0,
+          historyCount: h.historyCount ?? 1,
         }));
         this.logger.log(
           `Đã nạp thành công ${mapPoints.length} điểm ngập lịch sử khoa học IRD (2002-2026) vào PostgreSQL!`,
@@ -131,59 +131,9 @@ export class SeedService implements OnApplicationBootstrap {
       this.logger.warn(`Lỗi đọc file hcmc_flood_hotspots.json: ${e}`);
     }
 
-    if (mapPoints.length === 0) {
-      mapPoints = [
-        {
-          id: "p1",
-          x: 60,
-          y: 42,
-          lat: 10.7934,
-          lng: 106.7185,
-          elevationM: 1.6,
-          type: "flood",
-          severity: "critical",
-          label: "Nguyễn Hữu Cảnh",
-          district: "Bình Thạnh",
-          rainfall: 82,
-          depth: 45,
-          historyCount: 21,
-        },
-        {
-          id: "p2",
-          x: 73,
-          y: 35,
-          lat: 10.8038,
-          lng: 106.7329,
-          elevationM: 1.9,
-          type: "flood",
-          severity: "high",
-          label: "Quốc Hương",
-          district: "TP. Thủ Đức",
-          rainfall: 68,
-          depth: 30,
-          historyCount: 17,
-        },
-      ];
+    if (mapPoints.length > 0) {
+      await this.mapPointRepo.save(mapPoints);
     }
-
-    // Bổ sung cảm biến đô thị mẫu phục vụ quan trắc
-    mapPoints.push({
-      id: "sensor_q4",
-      x: 53,
-      y: 59,
-      lat: 10.7578,
-      lng: 106.7012,
-      elevationM: 2.2,
-      type: "sensor",
-      severity: "medium",
-      label: "Trạm cảm biến Quận 4",
-      district: "Quận 4",
-      rainfall: 0,
-      depth: 0,
-      historyCount: 4,
-    });
-
-    await this.mapPointRepo.save(mapPoints);
 
     const forecasts: ForecastSlotEntity[] = [
       {
@@ -225,60 +175,27 @@ export class SeedService implements OnApplicationBootstrap {
     ];
     await this.forecastRepo.save(forecasts);
 
-    const routes: RouteOptionEntity[] = [
-      {
-        id: "safe",
-        name: "Tuyến đề xuất",
-        time: "—",
-        distance: "—",
-        badge: "Tối ưu",
-        detail:
-          "Lộ trình được hệ thống tự động tính toán qua OSRM và né các điểm ngập theo thời gian thực.",
-        waypoints: [
-          [106.6836363, 10.7790693],
-          [106.6817595, 10.7597031],
-        ],
-        navigationSteps: [],
-      },
-      {
-        id: "balanced",
-        name: "Tuyến dự phòng",
-        time: "—",
-        distance: "—",
-        badge: "Dự phòng",
-        detail:
-          "Lộ trình thay thế né các vùng trũng cục bộ khi lộ trình chính phát sinh sự cố.",
-        waypoints: [
-          [106.6836363, 10.7790693],
-          [106.689, 10.769],
-          [106.6817595, 10.7597031],
-        ],
-        navigationSteps: [],
-      },
-    ];
-    await this.routeRepo.save(routes);
-
     const trends: TrendSeriesEntity[] = [
       {
         rangeKey: "24h",
         labels: ["00:00", "04:00", "08:00", "12:00", "16:00", "20:00"],
         reports: [0, 0, 0, 0, 0, 0],
         rain: [0, 0, 0, 0, 0, 0],
-        insight: "Hệ thống đang tích lũy dữ liệu chuỗi thời gian thực tế.",
+        insight: "Dữ liệu thực tế từ hệ thống quan trắc và báo cáo cộng đồng.",
       },
       {
         rangeKey: "7d",
         labels: ["T2", "T3", "T4", "T5", "T6", "T7", "CN"],
         reports: [0, 0, 0, 0, 0, 0, 0],
         rain: [0, 0, 0, 0, 0, 0, 0],
-        insight: "Hệ thống đang tích lũy dữ liệu chuỗi thời gian thực tế.",
+        insight: "Dữ liệu thực tế từ hệ thống quan trắc và báo cáo cộng đồng.",
       },
       {
         rangeKey: "30d",
         labels: ["Tuần 1", "Tuần 2", "Tuần 3", "Tuần 4"],
         reports: [0, 0, 0, 0],
         rain: [0, 0, 0, 0],
-        insight: "Hệ thống đang tích lũy dữ liệu chuỗi thời gian thực tế.",
+        insight: "Dữ liệu thực tế từ hệ thống quan trắc và báo cáo cộng đồng.",
       },
     ];
     await this.trendRepo.save(trends);

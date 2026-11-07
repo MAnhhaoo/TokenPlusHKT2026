@@ -18,7 +18,6 @@ Mỗi bảng liên kết bên dưới chứa ID, ưu tiên, tiền điều kiệ
 | BE — token, guard, báo cáo, cảnh báo, định tuyến/provider | [BE_CASES.md](BE_CASES.md) | Jest unit + Supertest HTTP + PostgreSQL integration | Mock HTTP provider; DB test riêng |
 | Admin và user web | [FE_CASES.md](FE_CASES.md) | Playwright browser, API/SSE/địa điểm/GPS fixture | Không cần BE hoặc provider thật |
 | ML — preprocessing/inference/pipeline | [ML_CASES.md](ML_CASES.md) | pytest unit/integration với dữ liệu nhỏ | CPU, model tổng hợp, không training đầy đủ |
-| Android Capacitor | [ANDROID_CASES.md](ANDROID_CASES.md) | Checklist native thủ công | Thiết bị/emulator và backend test riêng |
 
 ## Luồng liên phân hệ cần kiểm soát
 

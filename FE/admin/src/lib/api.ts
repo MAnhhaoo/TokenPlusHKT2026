@@ -52,16 +52,7 @@ export async function fetchCurrentWeatherApi(): Promise<WeatherSnapshot | null> 
     // ignore
   }
 
-  return {
-    provider: "Open-Meteo",
-    locationName: "TP. Hồ Chí Minh",
-    temperatureC: 28,
-    humidityPercent: 78,
-    windSpeedKmh: 10,
-    currentRainMm: 0,
-    weatherCondition: "Trời quang mây",
-    floodRiskLevel: "Thấp",
-  }
+  return null
 }
 
 export async function syncWeatherForecastsApi(): Promise<boolean> {
@@ -82,359 +73,71 @@ export function buildRealtimeAdminMapPoints(
 ): MapPoint[] {
   const result: MapPoint[] = []
   const currentRainMm = weather?.currentRainMm ?? 0
+  const seenIds = new Set<string>()
 
-  // 1. SENSORS (Trạm đo mưa và quan trắc khí tượng thời gian thực)
-  const rainSensors: MapPoint[] = [
-    {
-      id: "sensor_tan_son_nhat",
-      x: 48,
-      y: 35,
-      lat: 10.8188,
-      lng: 106.6519,
-      label: "Trạm Radar Tân Sơn Nhất",
-      district: "Tân Bình",
-      type: "sensor",
-      severity:
-        currentRainMm >= 30
-          ? "critical"
-          : currentRainMm >= 15
-            ? "high"
-            : "medium",
-      rainfall: currentRainMm,
-      depth: 0,
-      historyCount: 0,
-      elevationM: 4.5,
-    },
-    {
-      id: "sensor_mac_dinh_chi",
-      x: 52,
-      y: 42,
-      lat: 10.7874,
-      lng: 106.7011,
-      label: "Trạm Khí tượng Mạc Đĩnh Chi",
-      district: "Quận 1",
-      type: "sensor",
-      severity:
-        currentRainMm >= 30
-          ? "critical"
-          : currentRainMm >= 15
-            ? "high"
-            : "medium",
-      rainfall: currentRainMm,
-      depth: 0,
-      historyCount: 0,
-      elevationM: 3.2,
-    },
-    {
-      id: "sensor_an_phu",
-      x: 60,
-      y: 40,
-      lat: 10.8016,
-      lng: 106.7455,
-      label: "Trạm Thủy văn An Phú",
-      district: "TP. Thủ Đức",
-      type: "sensor",
-      severity:
-        currentRainMm >= 30
-          ? "critical"
-          : currentRainMm >= 15
-            ? "high"
-            : "medium",
-      rainfall: currentRainMm,
-      depth: 0,
-      historyCount: 0,
-      elevationM: 2.1,
-    },
-    {
-      id: "sensor_phu_an",
-      x: 55,
-      y: 38,
-      lat: 10.7963,
-      lng: 106.7118,
-      label: "Trạm Thủy văn Phú An",
-      district: "Bình Thạnh",
-      type: "sensor",
-      severity:
-        currentRainMm >= 30
-          ? "critical"
-          : currentRainMm >= 15
-            ? "high"
-            : "medium",
-      rainfall: currentRainMm,
-      depth: 0,
-      historyCount: 0,
-      elevationM: 1.5,
-    },
-    {
-      id: "sensor_nha_be",
-      x: 62,
-      y: 65,
-      lat: 10.6558,
-      lng: 106.7389,
-      label: "Trạm Thủy triều Nhà Bè",
-      district: "Nhà Bè",
-      type: "sensor",
-      severity:
-        currentRainMm >= 30
-          ? "critical"
-          : currentRainMm >= 15
-            ? "high"
-            : "medium",
-      rainfall: currentRainMm,
-      depth: 0,
-      historyCount: 0,
-      elevationM: 1.2,
-    },
-    {
-      id: "sensor_binh_tan",
-      x: 35,
-      y: 48,
-      lat: 10.7483,
-      lng: 106.6022,
-      label: "Trạm Khí tượng Bình Tân",
-      district: "Bình Tân",
-      type: "sensor",
-      severity:
-        currentRainMm >= 30
-          ? "critical"
-          : currentRainMm >= 15
-            ? "high"
-            : "medium",
-      rainfall: currentRainMm,
-      depth: 0,
-      historyCount: 0,
-      elevationM: 3.0,
-    },
-    {
-      id: "sensor_go_vap",
-      x: 45,
-      y: 30,
-      lat: 10.8354,
-      lng: 106.6667,
-      label: "Trạm Thoát nước Gò Vấp",
-      district: "Gò Vấp",
-      type: "sensor",
-      severity:
-        currentRainMm >= 30
-          ? "critical"
-          : currentRainMm >= 15
-            ? "high"
-            : "medium",
-      rainfall: currentRainMm,
-      depth: 0,
-      historyCount: 0,
-      elevationM: 3.8,
-    },
-    {
-      id: "sensor_hoc_mon",
-      x: 38,
-      y: 22,
-      lat: 10.8856,
-      lng: 106.5911,
-      label: "Trạm Khí tượng Hóc Môn",
-      district: "Hóc Môn",
-      type: "sensor",
-      severity:
-        currentRainMm >= 30
-          ? "critical"
-          : currentRainMm >= 15
-            ? "high"
-            : "medium",
-      rainfall: currentRainMm,
-      depth: 0,
-      historyCount: 0,
-      elevationM: 4.2,
-    },
-    {
-      id: "sensor_q7",
-      x: 58,
-      y: 55,
-      lat: 10.7328,
-      lng: 106.7289,
-      label: "Trạm Quan trắc Triều Huỳnh Tấn Phát",
-      district: "Quận 7",
-      type: "sensor",
-      severity:
-        currentRainMm >= 30
-          ? "critical"
-          : currentRainMm >= 15
-            ? "high"
-            : "medium",
-      rainfall: currentRainMm,
-      depth: 0,
-      historyCount: 0,
-      elevationM: 1.4,
-    },
-    {
-      id: "sensor_q8",
-      x: 45,
-      y: 52,
-      lat: 10.7501,
-      lng: 106.6567,
-      label: "Trạm Thủy văn Cầu Chà Và",
-      district: "Quận 8",
-      type: "sensor",
-      severity:
-        currentRainMm >= 30
-          ? "critical"
-          : currentRainMm >= 15
-            ? "high"
-            : "medium",
-      rainfall: currentRainMm,
-      depth: 0,
-      historyCount: 0,
-      elevationM: 1.6,
-    },
-    {
-      id: "sensor_binh_chanh",
-      x: 32,
-      y: 60,
-      lat: 10.6872,
-      lng: 106.5833,
-      label: "Trạm Thoát nước Tân Túc",
-      district: "Bình Chánh",
-      type: "sensor",
-      severity:
-        currentRainMm >= 30
-          ? "critical"
-          : currentRainMm >= 15
-            ? "high"
-            : "medium",
-      rainfall: currentRainMm,
-      depth: 0,
-      historyCount: 0,
-      elevationM: 1.8,
-    },
-    {
-      id: "sensor_can_gio",
-      x: 75,
-      y: 80,
-      lat: 10.4114,
-      lng: 106.9556,
-      label: "Trạm Hải văn Cần Giờ",
-      district: "Cần Giờ",
-      type: "sensor",
-      severity:
-        currentRainMm >= 30
-          ? "critical"
-          : currentRainMm >= 15
-            ? "high"
-            : "medium",
-      rainfall: currentRainMm,
-      depth: 0,
-      historyCount: 0,
-      elevationM: 1.1,
-    },
-  ]
-  result.push(...rainSensors)
+  // 1. Điểm giám sát thực tế từ PostgreSQL (/api/map/points)
+  if (Array.isArray(rawPoints)) {
+    for (const pt of rawPoints) {
+      if (!pt?.id || seenIds.has(pt.id)) continue
+      seenIds.add(pt.id)
+      result.push(pt)
+    }
+  }
 
-  // 2. ACTIVE LIVE FLOOD POINTS (Ngập hiện tại)
-  // Lấy các báo cáo hiện trường thực tế từ người dân (chưa bị từ chối)
+  // 2. Báo cáo hiện trường thực tế từ người dân (chưa bị từ chối)
   if (reports && reports.length > 0) {
     for (const r of reports) {
       if (r.status === "rejected") continue
       if (!r.coordinates) continue
+      if (result.some((pt) => pt.linkedReportId === r.id)) continue
       const parts = r.coordinates.split(",").map((s) => parseFloat(s.trim()))
       if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+        const ptId = `flood_rpt_${r.id}`
+        if (seenIds.has(ptId)) continue
+        seenIds.add(ptId)
         result.push({
-          id: `flood_rpt_${r.id}`,
+          id: ptId,
           x: 50,
           y: 50,
           lat: parts[0],
           lng: parts[1],
           label: r.location,
           district: r.district,
-          type: "flood",
+          type: r.status === "pending" ? "pending" : "flood",
           severity: r.severity,
-          depth: r.aiDepth || r.reportedDepth || 20,
+          depth: r.aiDepth ?? r.reportedDepth ?? 0,
           rainfall: currentRainMm,
-          historyCount: r.historyCount || 5,
+          historyCount: r.historyCount ?? 1,
           linkedReportId: r.id,
         })
       }
     }
   }
 
-  // 3. 250 ĐIỂM ĐEN LỊCH SỬ IRD (2002–2026) -> Lớp 'history'
-  // Và 4. CÁC ĐIỂM CÓ NGUY CƠ CAO -> Lớp 'risk'
+  // 3. 250 ĐIỂM ĐEN LỊCH SỬ IRD (2002–2026) -> Lớp 'history' (Dữ liệu thật từ GPKG IRD)
   const sourceHotspots = defaultHotspots as any[]
-  const vnHour = new Date().getHours()
-  const isTideHour =
-    (vnHour >= 16 && vnHour <= 19) || (vnHour >= 4 && vnHour <= 7)
 
   for (const h of sourceHotspots) {
-    // Luôn đưa vào lớp Lịch sử ngập ('history')
+    const histId = `hist_${h.id}`
+    if (seenIds.has(histId)) continue
+    seenIds.add(histId)
     result.push({
-      id: `hist_${h.id}`,
-      x: h.x || 50,
-      y: h.y || 50,
+      id: histId,
+      x: 50,
+      y: 50,
       lat: h.lat,
       lng: h.lng,
       label: h.label,
       district: h.district,
       type: "history",
-      severity: h.severity || "high",
-      depth: h.maxDepth || h.depth || 30,
-      maxDepth: h.maxDepth || h.depth || 30,
-      historyCount: h.historyCount || 8,
-      rainfall: h.rainfallThresholdMm || 45,
+      severity: h.severity || "medium",
+      depth: h.maxDepth ?? h.depth ?? 0,
+      maxDepth: h.maxDepth ?? h.depth ?? 0,
+      historyCount: h.historyCount ?? 1,
+      rainfall: 0,
       causes: h.causes,
       years: h.years,
-      elevationM: h.elevationM || 2.0,
     })
-
-    // Điểm có nguy cơ cao (trũng thấp <= 1.8m hoặc ngưỡng mưa <= 35mm hoặc số lần ngập >= 12)
-    const isHighVulnerability =
-      (h.elevationM && h.elevationM <= 1.8) ||
-      (h.rainfallThresholdMm && h.rainfallThresholdMm <= 35) ||
-      (h.historyCount && h.historyCount >= 12)
-
-    if (isHighVulnerability) {
-      result.push({
-        id: `risk_${h.id}`,
-        x: h.x || 50,
-        y: h.y || 50,
-        lat: h.lat,
-        lng: h.lng,
-        label: h.label,
-        district: h.district,
-        type: "risk",
-        severity: h.severity || "high",
-        depth: 0,
-        maxDepth: h.maxDepth || h.depth || 30,
-        historyCount: h.historyCount || 8,
-        rainfall: h.rainfallThresholdMm || 35,
-        elevationM: h.elevationM || 1.8,
-        causes: h.causes,
-      })
-    }
-
-    // Nếu thời tiết ĐANG CÓ MƯA LỚN THẬT SỰ (>= 25mm) hoặc giờ triều cường ven sông trũng thấp:
-    if (
-      (currentRainMm >= 25 &&
-        currentRainMm >= (h.rainfallThresholdMm || 45)) ||
-      (isTideHour &&
-        h.elevationM <= 1.4 &&
-        (h.district?.includes("7") ||
-          h.district?.includes("Nhà Bè") ||
-          h.district?.includes("Bình Thạnh")))
-    ) {
-      result.push({
-        id: `flood_live_${h.id}`,
-        x: h.x || 50,
-        y: h.y || 50,
-        lat: h.lat,
-        lng: h.lng,
-        label: h.label,
-        district: h.district,
-        type: "flood",
-        severity: h.severity || "high",
-        depth: Math.min(h.maxDepth || 60, Math.round(currentRainMm * 0.8)),
-        rainfall: currentRainMm,
-        historyCount: h.historyCount || 8,
-        elevationM: h.elevationM || 2.0,
-      })
-    }
   }
 
   return result

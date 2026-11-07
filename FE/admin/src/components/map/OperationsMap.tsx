@@ -308,7 +308,7 @@ function OperationsMap({
               <small className="marker-badge">
                 {point.label}
                 {point.type === "history"
-                  ? ` · Lịch sử ${point.historyCount} lần (Max ${point.maxDepth || point.depth || 30}cm)`
+                  ? ` · Lịch sử ${point.historyCount} lần${point.maxDepth || point.depth ? ` (Max ${point.maxDepth || point.depth}cm)` : ""}`
                   : point.type === "risk"
                     ? ` · Nguy cơ ${severityLabel(point.severity)}`
                     : point.type === "sensor"
@@ -373,7 +373,12 @@ function OperationsMap({
                     <b>{selected.historyCount} lần</b>Số lần ngập
                   </span>
                   <span>
-                    <b>{selected.maxDepth || selected.depth || 30} cm</b>Đỉnh ngập kỷ lục
+                    <b>
+                      {selected.maxDepth || selected.depth
+                        ? `${selected.maxDepth || selected.depth} cm`
+                        : "Chưa ghi nhận"}
+                    </b>
+                    Đỉnh ngập kỷ lục
                   </span>
                   <span>
                     <b>{selected.elevationM || 2.0} m</b>Cao độ địa hình

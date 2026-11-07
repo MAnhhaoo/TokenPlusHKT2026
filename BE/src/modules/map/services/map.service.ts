@@ -128,8 +128,12 @@ export class MapService {
         continue;
       }
 
-      if (point.linkedReportId || point.type === "pending") {
+      if (point.type === "pending" || Boolean(point.linkedReportId)) {
+        const isActiveReportPoint =
+          point.type === "pending" ||
+          (point.type === "flood" && (point.depth || 0) > 0);
         if (
+          isActiveReportPoint &&
           (activeLayers.includes("flood") || activeLayers.includes("risk")) &&
           (!query.severity ||
             query.severity === "all" ||
@@ -149,7 +153,10 @@ export class MapService {
         } else {
           // Khớp mờ tên quận
           for (const [distKey, rVal] of districtRainMap.entries()) {
-            if (cleanDistrict.includes(distKey) || distKey.includes(cleanDistrict)) {
+            if (
+              cleanDistrict.includes(distKey) ||
+              distKey.includes(cleanDistrict)
+            ) {
               localRain = rVal;
               break;
             }
@@ -166,12 +173,12 @@ export class MapService {
         elevation <= 1.4
           ? 1.45
           : elevation <= 1.8
-            ? 1.30
+            ? 1.3
             : elevation <= 2.5
               ? 1.15
               : elevation <= 4.0
-                ? 1.00
-                : 0.80;
+                ? 1.0
+                : 0.8;
 
       // 2. Hệ số tổn thương tần suất ngập lịch sử (Historical Vulnerability Factor)
       const histCount = point.historyCount || 5;
@@ -206,7 +213,8 @@ export class MapService {
       const isAtRisk =
         !isRainFlooded &&
         !isTideFlooded &&
-        ((localRain >= 3 && effectiveRain >= threshold * 0.65) || tideDepth >= 10);
+        ((localRain >= 3 && effectiveRain >= threshold * 0.65) ||
+          tideDepth >= 10);
 
       // Nếu không có mưa và không triều cường: ĐƯỜNG KHÔ RÁO HOÀN TOÀN
       if (!isRainFlooded && !isTideFlooded && !isAtRisk) {
@@ -274,6 +282,65 @@ export class MapService {
         type: calculatedType,
         severity,
       });
+    }
+
+    if (
+      typeof this.reportRepo?.find === "function" &&
+      (activeLayers.includes("flood") || activeLayers.includes("risk"))
+    ) {
+      try {
+        const verifiedReports = await this.reportRepo.find({
+          where: { status: "verified" },
+        });
+        for (const r of verifiedReports) {
+          if (dynamicPoints.some((p) => p.linkedReportId === r.id)) continue;
+          if (!r.coordinates) continue;
+          const parts = r.coordinates
+            .split(",")
+            .map((s) => Number.parseFloat(s.trim()));
+          if (
+            parts.length !== 2 ||
+            Number.isNaN(parts[0]) ||
+            Number.isNaN(parts[1])
+          ) {
+            continue;
+          }
+          const depth = r.reportedDepth || r.aiDepth || 24;
+          if (depth <= 0) continue;
+          const severity: PointSeverity =
+            r.severity === "critical" ||
+            r.severity === "high" ||
+            r.severity === "medium"
+              ? r.severity
+              : "medium";
+          if (
+            query.severity &&
+            query.severity !== "all" &&
+            severity !== query.severity
+          ) {
+            continue;
+          }
+          dynamicPoints.push({
+            id: `p_${r.id}`,
+            x: 50,
+            y: 50,
+            lat: parts[0],
+            lng: parts[1],
+            elevationM: 2.5,
+            type: "flood",
+            severity,
+            label: r.location,
+            district: r.district,
+            rainfall: cityRainMm ?? 0,
+            depth,
+            historyCount: r.historyCount || 1,
+            linkedReportId: r.id,
+            updatedAt: new Date(),
+          });
+        }
+      } catch {
+        // Bỏ qua nếu không truy vấn được bảng báo cáo
+      }
     }
 
     return dynamicPoints;
@@ -518,6 +585,40 @@ export class MapService {
       "NOMINATIM_BASE_URL",
       "https://nominatim.openstreetmap.org",
     );
+    const hcmDistricts: Array<{ name: string; lat: number; lng: number }> = [
+      { name: "Quận 1", lat: 10.7756, lng: 106.7004 },
+      { name: "Quận 3", lat: 10.7844, lng: 106.6844 },
+      { name: "Quận 4", lat: 10.7578, lng: 106.7013 },
+      { name: "Quận 5", lat: 10.754, lng: 106.6634 },
+      { name: "Quận 6", lat: 10.7481, lng: 106.6352 },
+      { name: "Quận 7", lat: 10.734, lng: 106.7218 },
+      { name: "Quận 8", lat: 10.7241, lng: 106.6286 },
+      { name: "Quận 10", lat: 10.7716, lng: 106.6672 },
+      { name: "Quận 11", lat: 10.763, lng: 106.6502 },
+      { name: "Quận 12", lat: 10.8672, lng: 106.6413 },
+      { name: "Bình Thạnh", lat: 10.8106, lng: 106.7091 },
+      { name: "Gò Vấp", lat: 10.8387, lng: 106.6653 },
+      { name: "Phú Nhuận", lat: 10.7992, lng: 106.6803 },
+      { name: "Tân Bình", lat: 10.8015, lng: 106.6526 },
+      { name: "Tân Phú", lat: 10.7901, lng: 106.628 },
+      { name: "Bình Tân", lat: 10.7653, lng: 106.6047 },
+      { name: "TP. Thủ Đức", lat: 10.8494, lng: 106.7717 },
+      { name: "Nhà Bè", lat: 10.6953, lng: 106.7287 },
+      { name: "Bình Chánh", lat: 10.6874, lng: 106.5938 },
+      { name: "Hóc Môn", lat: 10.8839, lng: 106.5934 },
+      { name: "Củ Chi", lat: 10.9731, lng: 106.4938 },
+      { name: "Cần Giờ", lat: 10.4114, lng: 106.8642 },
+    ];
+    let fallbackDistrict = "Quận 1";
+    let minD = Infinity;
+    for (const d of hcmDistricts) {
+      const dist = (d.lat - lat) ** 2 + (d.lng - lng) ** 2;
+      if (dist < minD) {
+        minD = dist;
+        fallbackDistrict = d.name;
+      }
+    }
+
     try {
       const response = await firstValueFrom(
         this.httpService.get(`${nominatimBase}/reverse`, {
@@ -530,20 +631,28 @@ export class MapService {
           headers: {
             "User-Agent": "SaigonDrainAI-Hackathon/1.0",
           },
-          timeout: 4500,
+          timeout: 3500,
         }),
       );
       const addr = response.data?.address ?? {};
-      const location =
-        [addr.house_number, addr.road].filter(Boolean).join(" ") ||
-        response.data?.name ||
-        "105 Bà Huyện Thanh Quan";
+      const road = [addr.house_number, addr.road]
+        .filter(Boolean)
+        .join(" ")
+        .trim();
+      const ward = addr.suburb || addr.quarter || addr.neighbourhood || "";
+      const rawDistrict =
+        addr.city_district || addr.district || addr.county || "";
       const district =
-        addr.suburb ||
-        addr.city_district ||
-        addr.county ||
-        addr.city ||
-        "Quận 3";
+        !rawDistrict ||
+        rawDistrict === "Thành phố Hồ Chí Minh" ||
+        rawDistrict.toLowerCase().startsWith("phường") ||
+        rawDistrict.toLowerCase().startsWith("xã")
+          ? fallbackDistrict
+          : rawDistrict;
+      const location =
+        [road, ward].filter(Boolean).join(", ") ||
+        response.data?.name ||
+        `${district}, TP. Hồ Chí Minh`;
 
       return {
         lat,
@@ -554,12 +663,17 @@ export class MapService {
           response.data?.display_name || `${location}, ${district}, TP.HCM`,
       };
     } catch {
+      const isNearSguCs1 =
+        Math.abs(lat - 10.779) < 0.005 && Math.abs(lng - 106.6836) < 0.005;
+      const location = isNearSguCs1
+        ? "105 Bà Huyện Thanh Quan"
+        : `${fallbackDistrict}, TP. Hồ Chí Minh`;
       return {
         lat,
         lng,
-        location: "105 Bà Huyện Thanh Quan",
-        district: "Quận 3",
-        displayName: "105 Bà Huyện Thanh Quan, Quận 3, TP. Hồ Chí Minh",
+        location,
+        district: isNearSguCs1 ? "Quận 3" : fallbackDistrict,
+        displayName: `${location}, ${isNearSguCs1 ? "Quận 3" : fallbackDistrict}, TP. Hồ Chí Minh`,
       };
     }
   }
@@ -585,43 +699,32 @@ export class MapService {
   }
 
   /**
-   * Tính toán và trả về chỉ số nhạy cảm ngập lụt theo mô hình MCDA & Machine Learning
-   * dựa trên 5 đặc trưng GIS chuẩn: elevation_median_m, relative_elevation_m, slope_mean_deg, dist_water_m, builtup_ratio_250m
+   * Tính toán chỉ số nhạy cảm ngập lụt thực tế từ dữ liệu quan trắc lịch sử IRD và cao độ thực tế (elevationM, historyCount, depth).
    */
   async getMlSusceptibility() {
     const points = await this.mapPointRepo.find();
 
     const evaluated = points.map((p) => {
-      const elev = p.elevationM || 2.0;
-      const distWater = Math.max(20, Math.min(1000, 150 + (elev - 1.0) * 120));
-      const slope = Math.max(0.2, Math.min(5.0, 0.4 + elev * 0.3));
-      const builtup = 0.85;
-      const relElev = elev - 2.5;
+      const elev = typeof p.elevationM === "number" ? p.elevationM : null;
+      const historyCount = p.historyCount || 0;
+      const depth = p.depth || 0;
 
-      const normElev = Math.max(0, Math.min(1, (elev - 0.5) / 4.0));
-      const sElev = 1.0 - normElev;
-      const sWater = Math.max(0, Math.min(1, 1.0 - distWater / 1000));
-      const sSlope = Math.max(0, Math.min(1, 1.0 - slope / 5.0));
-      const sBuiltup = builtup;
-      const sRel = Math.max(0, Math.min(1, 1.0 - (relElev + 2.0) / 4.0));
+      const sElev =
+        elev !== null ? Math.max(0, Math.min(1, 1.0 - (elev - 0.5) / 4.0)) : 0;
+      const sHistory = Math.max(0, Math.min(1, historyCount / 10));
+      const sDepth = Math.max(0, Math.min(1, depth / 60));
 
       const score = Number(
-        (
-          0.35 * sElev +
-          0.25 * sRel +
-          0.15 * sWater +
-          0.15 * sSlope +
-          0.1 * sBuiltup
-        ).toFixed(3),
+        (0.4 * sElev + 0.35 * sHistory + 0.25 * sDepth).toFixed(3),
       );
 
       const riskTier =
         score >= 0.75
-          ? "Rất cao (Top 5%)"
+          ? "Rất cao"
           : score >= 0.55
-            ? "Cao (Top 10%)"
+            ? "Cao"
             : score >= 0.35
-              ? "Trung bình (Top 20%)"
+              ? "Trung bình"
               : "Thấp";
 
       return {
@@ -631,25 +734,22 @@ export class MapService {
         lat: p.lat,
         lng: p.lng,
         elevationMedianM: elev,
-        relativeElevationM: Number(relElev.toFixed(2)),
-        slopeMeanDeg: Number(slope.toFixed(2)),
-        distWaterM: Math.round(distWater),
-        builtupRatio250m: builtup,
+        historyCount,
+        depthCm: depth,
         susceptibilityScore: score,
         riskTier,
-        primaryHazard: elev <= 1.5 ? "Triều cường & Mưa lớn" : "Mưa cục bộ",
+        primaryHazard:
+          elev !== null && elev <= 1.5 ? "Triều cường & Mưa lớn" : "Mưa lớn",
       };
     });
 
     return {
       modelVersion: "2.0.0",
-      algorithm: "MCDA-LightGBM-PU-Ensemble",
+      algorithm: "IRD-Empirical-Observation-Score",
       featureSpec: {
         elevation_median_m: "lower_is_higher_risk",
-        relative_elevation_m: "lower_is_higher_risk",
-        slope_mean_deg: "lower_is_higher_risk",
-        dist_water_m: "lower_is_higher_risk",
-        builtup_ratio_250m: "higher_is_higher_risk",
+        history_count: "higher_is_higher_risk",
+        depth_cm: "higher_is_higher_risk",
       },
       totalPointsEvaluated: evaluated.length,
       segments: evaluated,

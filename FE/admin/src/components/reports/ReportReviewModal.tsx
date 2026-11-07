@@ -177,7 +177,11 @@ function ReportReviewModal({
               <span>
                 <Sparkles size={16} /> Kết quả phân tích AI
               </span>
-              <strong>{report.aiConfidence}% tin cậy</strong>
+              <strong>
+                {report.aiConfidence > 0
+                  ? `${report.aiConfidence}% tin cậy`
+                  : "Báo cáo trực tiếp (không kèm ảnh AI)"}
+              </strong>
             </div>
             <div className="ai-stats">
               <span>

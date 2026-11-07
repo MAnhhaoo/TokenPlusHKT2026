@@ -71,6 +71,10 @@ function OverviewPage({
     (report) => report.status !== "rejected",
   ).length
 
+  const trendReports = trendsData?.[trendRange]?.reports?.length
+    ? trendsData[trendRange].reports
+    : [0, totalReports]
+
   const metrics = useMemo(
     () => [
       {
@@ -83,6 +87,7 @@ function OverviewPage({
             <span className="trend-up">Realtime</span> cập nhật tự động
           </>
         ),
+        data: trendReports,
       },
       {
         icon: <TriangleAlert size={20} />,
@@ -131,6 +136,7 @@ function OverviewPage({
       alertAreasCount,
       criticalPointsCount,
       highRiskCount,
+      trendReports,
       verifiedCount,
       totalReports,
     ],

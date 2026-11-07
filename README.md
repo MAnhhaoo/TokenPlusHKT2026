@@ -5,7 +5,6 @@
 [![NestJS](https://img.shields.io/badge/NestJS-11.0-ea2845.svg)](https://nestjs.com/)
 [![React](https://img.shields.io/badge/React-19.0-61dafb.svg)](https://react.dev/)
 [![Python](https://img.shields.io/badge/Python-3.12-3776ab.svg)](https://www.python.org/)
-[![Capacitor](https://img.shields.io/badge/Capacitor-Android%20Native-119eff.svg)](https://capacitorjs.com/)
 
 ---
 
@@ -24,7 +23,7 @@ TokenPlus/
 ├── dataset/
 │   └── HCMC_floods/            # Bộ dữ liệu không gian & lịch sử ngập TP.HCM (IRD 250 điểm)
 ├── FE/
-│   ├── user/                   # Ứng dụng di động Người dùng (React 19, MapLibre GL, Android Native)
+│   ├── user/                   # Ứng dụng Web Người dùng (React 19, MapLibre GL)
 │   └── admin/                  # Trung tâm điều hành & Kiểm duyệt Đô thị (React 19, Lucide)
 ├── BE/
 │   ├── src/                    # Máy chủ NestJS 11, TypeORM, OSRM/Google Maps, Open-Meteo, Gemini Vision
@@ -40,8 +39,7 @@ TokenPlus/
 
 | Tầng Hệ thống | Công nghệ / Thư viện | Vai trò & Trách nhiệm trong Dự án |
 |---|---|---|
-| **Frontend User** | **React 19, Vite 8, Tailwind CSS v4, MapLibre GL** | Giao diện di động, bản đồ số vector 3D, điều hướng GPS trực tiếp, cảnh báo mực nước |
-| **Mobile Native** | **Capacitor 8 (Android Native)** | Đóng gói mã nguồn web thành ứng dụng Android native, hỗ trợ cảm biến vị trí GPS |
+| **Frontend User** | **React 19, Vite 8, Tailwind CSS v4, MapLibre GL** | Giao diện bản đồ số vector 3D, điều hướng GPS trực tiếp, cảnh báo mực nước |
 | **Frontend Admin**| **React 19, TypeScript, Tailwind CSS v4, Lucide** | Bảng điều khiển quản trị, biểu đồ phân tích xu hướng ngập, kiểm duyệt phản ánh người dân |
 | **Backend API**   | **NestJS 11, RxJS, TypeORM** | Cổng API tập trung, thuật toán định tuyến tránh ngập, đồng bộ dữ liệu thời tiết & triều cường |
 | **Cơ sở Dữ liệu** | **PostgreSQL 16** | Quản lý bảng dữ liệu điểm ngập, báo cáo hiện trường, người dùng, lịch sử hành trình |
@@ -66,8 +64,6 @@ TokenPlus/
    - Tự động tính toán lượng mưa hiệu dụng thời gian thực từ Open-Meteo đối chiếu với 250 điểm IRD, cao độ $K_{\text{topo}}$, tần suất $K_{\text{hist}}$ và chu kỳ triều cường sông Sài Gòn.
 6. **Google Gemini Multimodal Vision API:**
    - Phân tích ảnh chụp hiện trường do người dân gửi về, tự động đo lường độ sâu ngập, phát hiện cống tắc và tự động duyệt đưa lên bản đồ cộng đồng.
-7. **Ứng dụng Di động Android Hoàn chỉnh:**
-   - Sẵn sàng mở trong Android Studio hoặc build qua Gradle để xuất bản APK.
 
 ---
 
@@ -81,7 +77,6 @@ Chỉ cần nhấp đúp chuột vào các file script chuẩn bị sẵn tại 
 - **`start-backend.bat`**: Khởi động máy chủ NestJS API tại `http://localhost:3000` (Swagger: `http://localhost:3000/api/docs`).
 - **`start-user.bat`**: Khởi động Ứng dụng Người dùng tại `http://localhost:5173`.
 - **`start-admin.bat`**: Khởi động Trang Quản trị tại `http://localhost:5174`.
-- **`sync-android.bat`**: Tự động build và đồng bộ mã nguồn sang dự án Android Studio.
 
 ---
 
@@ -109,19 +104,6 @@ pnpm dev
 pnpm dev:user    # http://localhost:5173
 pnpm dev:admin   # http://localhost:5174
 ```
-
----
-
-### 4.3. Đóng gói Ứng dụng Di động Android
-
-```bash
-cd FE/user
-pnpm run build
-pnpm exec cap sync android
-pnpm exec cap open android
-```
-Sau khi Android Studio mở dự án:
-Chọn menu: **Build** $\rightarrow$ **Build Bundle(s) / APK(s)** $\rightarrow$ **Build APK(s)** để xuất file cài đặt `.apk`.
 
 ---
 

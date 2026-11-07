@@ -14,15 +14,11 @@
     "test:regressions": "node tests/review-regressions.mjs"
   },
   "dependencies": {
-    "@capacitor/core": "^8.6.0",
-    "@capacitor/geolocation": "^8.2.4",
     "maplibre-gl": "^6.14.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "@capacitor/android": "^8.6.0",
-    "@capacitor/cli": "^8.6.0",
     "@tailwindcss/vite": "^4.0.0",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",

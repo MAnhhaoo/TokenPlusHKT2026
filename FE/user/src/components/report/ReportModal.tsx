@@ -11,7 +11,7 @@ import {
   type FloodAiAnalysis,
 } from "@/lib/api";
 import { processAndAnalyzeImageFile } from "@/lib/visionAnalysis";
-import type { ReportType, RouteEndpoint, Severity } from "@/types";
+import type { MapFloodPoint, ReportType, RouteEndpoint, Severity } from "@/types";
 
 function ReportModal({
   open,
@@ -22,7 +22,7 @@ function ReportModal({
   open: boolean;
   onClose: () => void;
   reporterId?: string;
-  onReportCreated?: () => void;
+  onReportCreated?: (point?: MapFloodPoint) => void;
 }) {
   const [type, setType] = useState<ReportType>("flood");
   const [severity, setSeverity] = useState<Severity>("medium");
@@ -177,10 +177,36 @@ function ReportModal({
     setSubmitting(true);
     setSubmitError(null);
     try {
-      const rawLoc = locationText.trim() || "Nguyễn Hữu Cảnh, Bình Thạnh";
-      const cleanLocation = rawLoc.split(/[·,]/)[0].trim() || rawLoc;
+      let resolvedCoords = coords;
+      let resolvedDistrict = selectedDistrict;
+      const trimmedLoc = locationText.trim();
+      if (trimmedLoc && locSuggestions.length > 0) {
+        const matched = locSuggestions[0];
+        if (matched?.coords) {
+          resolvedCoords = matched.coords;
+          if (matched.district) resolvedDistrict = matched.district;
+        }
+      } else if (trimmedLoc && typeof searchPlacesApi === "function") {
+        try {
+          const found = await searchPlacesApi(trimmedLoc);
+          if (found?.[0]?.coords) {
+            resolvedCoords = found[0].coords;
+            if (found[0].district) resolvedDistrict = found[0].district;
+          }
+        } catch {
+          // keep current coords
+        }
+      }
 
-      let submitCoords = coords;
+      const rawLoc = trimmedLoc || "Nguyễn Hữu Cảnh, Bình Thạnh";
+      const cleanLocation = rawLoc.split(/[·,]/)[0].trim() || rawLoc;
+      const defaultDepth = severity === "high" ? 35 : severity === "low" ? 12 : 24;
+      const reportedDepth =
+        aiAnalysis?.estimatedDepthCm && aiAnalysis.estimatedDepthCm > 0
+          ? aiAnalysis.estimatedDepthCm
+          : defaultDepth;
+
+      let submitCoords = resolvedCoords;
       if (hasCustomLocation && rawLoc) {
         const matches = matchDynamicPlacePool(rawLoc);
         if (matches.length > 0) {
@@ -193,14 +219,17 @@ function ReportModal({
         severity,
         photoUrl: photoDataUrl || photoName || undefined,
         location: cleanLocation,
-        district: selectedDistrict,
+        district: resolvedDistrict,
         description: description.trim() || aiAnalysis?.aiSummary || undefined,
         lat: submitCoords[1],
         lng: submitCoords[0],
         reporterId,
         aiSummary: aiAnalysis?.aiSummary,
         recommendation: aiAnalysis?.recommendation,
-        reportedDepth: aiAnalysis?.estimatedDepthCm,
+        reportedDepth,
+        aiDepth: aiAnalysis?.estimatedDepthCm,
+        aiConfidence: aiAnalysis?.confidence,
+        visual: aiAnalysis?.visual,
       });
       if (!created) {
         setSubmitError("Không thể gửi báo cáo. Vui lòng thử lại.");
@@ -208,7 +237,18 @@ function ReportModal({
       }
       setCreatedReportId(created.id);
       setSubmitted(true);
-      onReportCreated?.();
+      const createdPoint: MapFloodPoint = created.mapPoint ?? {
+        id: `p_${created.id}`,
+        lat: resolvedCoords[1],
+        lng: resolvedCoords[0],
+        label: cleanLocation,
+        district: resolvedDistrict,
+        type: "flood",
+        severity: severity === "high" ? "critical" : "medium",
+        depth: created.aiDepth && created.aiDepth > 0 ? created.aiDepth : reportedDepth,
+        rainfall: 0,
+      };
+      onReportCreated?.(createdPoint);
     } catch {
       setSubmitError("Không thể gửi báo cáo. Vui lòng thử lại.");
     } finally {
@@ -260,7 +300,8 @@ function ReportModal({
             <h2 id="report-title">Báo cáo đã xuất hiện trên bản đồ cộng đồng!</h2>
             <p id="report-description">
               Hệ thống AI Gemini đã phân tích ảnh và tự động xác thực báo cáo tại{" "}
-              <strong>{locationText.trim() || "khu vực bạn chọn"}</strong>. Báo cáo đã lập tức hiển thị công khai trên bản đồ thời gian thực để cảnh báo cho người dân.
+              <strong>{locationText.trim() || "khu vực bạn chọn"}</strong>. Báo cáo đã lập tức hiển
+              thị công khai trên bản đồ thời gian thực để cảnh báo cho người dân.
             </p>
             <button className="primary-modal-button" onClick={closeModal} type="button">
               Quay lại bản đồ

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { getUserLocation } from "@/lib/location";
-import { reverseGeocodeApi } from "@/lib/api";
+import { reverseGeocodeApi, subscribeUserRealtime } from "@/lib/api";
 import {
   DEFAULT_HCMC_WEATHER,
   type DetailedWeatherData,
@@ -383,35 +383,72 @@ function WeatherPage({
   const [showDropdown, setShowDropdown] = useState(false);
   const searchWrapRef = useRef<HTMLDivElement>(null);
 
-  // Tải thời tiết thực tế từ Open-Meteo khi mở tab
+  const currentTargetRef = useRef<{ lat: number; lng: number; name: string }>({
+    lat: 10.7769,
+    lng: 106.7009,
+    name: "TP. Hồ Chí Minh",
+  });
+  const userSelectedRef = useRef(false);
+
+  // Tải thời tiết thực tế tức thì khi mở tab + đồng bộ Realtime SSE & chu kỳ 60 giây
   useEffect(() => {
     let active = true;
-    async function loadInitial() {
-      setLoading(true);
-      try {
-        const { latitude, longitude } = await getUserLocation();
-        const geo = await reverseGeocodeApi(latitude, longitude);
-        const locationLabel = geo.district
-          ? `${geo.district}, TP.HCM`
-          : geo.location || "Hồ Chí Minh";
-        const res = await fetchFullRealWeather(latitude, longitude, locationLabel);
-        if (active) {
-          setData(res);
-          onThemeChange?.(res.theme);
-          setLoading(false);
-        }
-      } catch {
-        const res = await fetchFullRealWeather(10.7769, 106.7009, "Hồ Chí Minh");
-        if (active) {
-          setData(res);
-          onThemeChange?.(res.theme);
-          setLoading(false);
-        }
+
+    async function refreshCurrentTarget() {
+      const { lat, lng, name } = currentTargetRef.current;
+      const res = await fetchFullRealWeather(lat, lng, name);
+      if (active) {
+        setData(res);
+        onThemeChange?.(res.theme);
+        setLoading(false);
       }
     }
+
+    async function loadInitial() {
+      setLoading(true);
+      // 1. Lấy ngay thời tiết thực của TP.HCM trong < 300ms (không bị chặn bởi popup chờ quyền GPS)
+      await refreshCurrentTarget();
+
+      // 2. Chạy ngầm định vị GPS thực tế (chỉ cập nhật tự động nếu có tín hiệu GPS/Wi-Fi thực, không lấy tọa độ trạm nhà mạng IP)
+      try {
+        const { latitude, longitude, isIpFallback } = await getUserLocation();
+        if (!active || userSelectedRef.current || isIpFallback) return;
+        const geo = await reverseGeocodeApi(latitude, longitude);
+        if (!active || userSelectedRef.current) return;
+        const locationLabel = geo.district
+          ? `${geo.district}, TP.HCM`
+          : geo.location || "TP. Hồ Chí Minh";
+        currentTargetRef.current = {
+          lat: latitude,
+          lng: longitude,
+          name: locationLabel,
+        };
+        const res = await fetchFullRealWeather(latitude, longitude, locationLabel);
+        if (active && !userSelectedRef.current) {
+          setData(res);
+          onThemeChange?.(res.theme);
+        }
+      } catch {
+        // Giữ dữ liệu thực của TP.HCM đã nạp ở bước 1
+      }
+    }
+
     loadInitial();
+
+    const unsubscribe = subscribeUserRealtime({
+      onWeatherUpdated: () => {
+        void refreshCurrentTarget();
+      },
+    });
+
+    const intervalId = window.setInterval(() => {
+      void refreshCurrentTarget();
+    }, 60_000);
+
     return () => {
       active = false;
+      unsubscribe();
+      window.clearInterval(intervalId);
     };
   }, []);
 
@@ -447,6 +484,8 @@ function WeatherPage({
 
   // Chọn một địa điểm tìm được
   async function handleSelectLocation(loc: { name: string; lat: number; lng: number }) {
+    userSelectedRef.current = true;
+    currentTargetRef.current = { lat: loc.lat, lng: loc.lng, name: loc.name };
     setShowDropdown(false);
     setSearchQuery("");
     setLoading(true);
@@ -463,8 +502,10 @@ function WeatherPage({
       const { latitude, longitude } = await getUserLocation();
       const geo = await reverseGeocodeApi(latitude, longitude);
       const locationLabel =
-        geo.location || (geo.district ? `${geo.district}, TP.HCM` : "Hồ Chí Minh");
+        geo.location || (geo.district ? `${geo.district}, TP.HCM` : "TP. Hồ Chí Minh");
 
+      userSelectedRef.current = false;
+      currentTargetRef.current = { lat: latitude, lng: longitude, name: locationLabel };
       const fresh = await fetchFullRealWeather(latitude, longitude, locationLabel);
       setData(fresh);
       onThemeChange?.(fresh.theme);
@@ -584,11 +625,11 @@ function WeatherPage({
               <strong>{data.locationName}</strong>
               <span className="dot-divider">|</span>
               <span className="live-status">
-                {loading
+                {loading && !data.live
                   ? "Đang đồng bộ…"
                   : !data.live
                     ? "Thời tiết không khả dụng · dữ liệu mẫu"
-                    : data.updatedAt || "Vừa xong"}
+                    : `Cập nhật ${data.updatedAt || "Vừa xong"} · Thời gian thực`}
               </span>
             </div>
 

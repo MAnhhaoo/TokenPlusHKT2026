@@ -541,19 +541,67 @@ export async function fetchMapPointsApi(
   if (mode) query.set("mode", mode);
 
   try {
-    const res = await fetch(`${API_BASE}/map/points?${query.toString()}`);
-    if (res.ok) {
-      const data = await res.json();
+    const [pointsRes, reportsRes] = await Promise.all([
+      fetch(`${API_BASE}/map/points?${query.toString()}`),
+      mode === "realtime"
+        ? fetch(`${API_BASE}/reports?status=verified`).catch(() => null)
+        : Promise.resolve(null),
+    ]);
+    if (pointsRes.ok) {
+      const data = await pointsRes.json();
       if (Array.isArray(data)) {
+        const merged: MapFloodPoint[] = [...(data as MapFloodPoint[])];
+        if (reportsRes && reportsRes.ok) {
+          try {
+            const reports = await reportsRes.json();
+            if (Array.isArray(reports)) {
+              for (const r of reports) {
+                if (!r || r.status !== "verified" || !r.coordinates) continue;
+                const alreadyIncluded = merged.some(
+                  (pt) =>
+                    (pt as any).linkedReportId === r.id ||
+                    pt.id === `p_${r.id}` ||
+                    (Math.abs(pt.lat - Number(r.coordinates.split(",")[0])) < 0.0002 &&
+                      Math.abs(pt.lng - Number(r.coordinates.split(",")[1])) < 0.0002),
+                );
+                if (alreadyIncluded) continue;
+                const parts = String(r.coordinates)
+                  .split(",")
+                  .map((s) => Number.parseFloat(s.trim()));
+                if (parts.length !== 2 || Number.isNaN(parts[0]) || Number.isNaN(parts[1])) {
+                  continue;
+                }
+                const depth = Number(r.reportedDepth || r.aiDepth || 24);
+                if (depth <= 0) continue;
+                merged.push({
+                  id: `p_${r.id}`,
+                  lat: parts[0],
+                  lng: parts[1],
+                  label: r.location || "Điểm báo cáo cộng đồng",
+                  district: r.district || "TP. Hồ Chí Minh",
+                  type: "flood",
+                  severity:
+                    r.severity === "critical" || r.severity === "high" || r.severity === "medium"
+                      ? r.severity
+                      : "medium",
+                  depth,
+                  rainfall: rainMm ?? 0,
+                });
+              }
+            }
+          } catch {
+            // ignore report merge error
+          }
+        }
         registerDynamicPlaces(
-          data.map((pt) => ({
+          merged.map((pt) => ({
             label: pt.district ? `${pt.label} · ${pt.district}` : pt.label,
             address: `${pt.label}, ${pt.district || "TP. Hồ Chí Minh"}`,
             district: pt.district || "TP. Hồ Chí Minh",
             coords: [pt.lng, pt.lat],
           })),
         );
-        return data as MapFloodPoint[];
+        return merged;
       }
     }
   } catch {
@@ -583,22 +631,20 @@ export async function fetchMapPointsApi(
       district: h.district,
       type: "flood",
       severity: h.severity,
-      depth: h.depth || 25,
-      rainfall: h.rainfallThresholdMm || 50,
+      depth: h.depth ?? 0,
+      rainfall: 0,
+      historyCount: h.historyCount ?? 1,
     }));
   }
 
   // 2. Chế độ chẩn đoán thời gian thực theo lượng mưa thực tế (Thuật toán Thủy văn & Địa hình thực tế)
   const actualRain = rainMm ?? 0;
-  const vnDate = new Date(
-    new Date().toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" }),
-  );
+  const vnDate = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" }));
   const vnHour = vnDate.getHours();
   const vnMinute = vnDate.getMinutes();
   const timeDecimal = vnHour + vnMinute / 60;
   const isTidePeak =
-    (timeDecimal >= 16.5 && timeDecimal <= 19.5) ||
-    (timeDecimal >= 4.5 && timeDecimal <= 7.5);
+    (timeDecimal >= 16.5 && timeDecimal <= 19.5) || (timeDecimal >= 4.5 && timeDecimal <= 7.5);
 
   // Nếu trời khô ráo (mưa < 3mm) và ngoài giờ triều cường: ĐƯỜNG KHÔ RÁO HOÀN TOÀN!
   if (actualRain < 3 && !isTidePeak) {
@@ -613,12 +659,12 @@ export async function fetchMapPointsApi(
       elevation <= 1.4
         ? 1.45
         : elevation <= 1.8
-          ? 1.30
+          ? 1.3
           : elevation <= 2.5
             ? 1.15
             : elevation <= 4.0
-              ? 1.00
-              : 0.80;
+              ? 1.0
+              : 0.8;
 
     const histCount = h.historyCount || 5;
     const histFactor = 1 + Math.min(0.35, histCount * 0.015);
@@ -638,8 +684,7 @@ export async function fetchMapPointsApi(
 
     if (isTidePeak && isRiversideLowland) {
       const tidePeakHeight =
-        (timeDecimal >= 17 && timeDecimal <= 18.5) ||
-        (timeDecimal >= 5 && timeDecimal <= 6.5)
+        (timeDecimal >= 17 && timeDecimal <= 18.5) || (timeDecimal >= 5 && timeDecimal <= 6.5)
           ? 1.68
           : 1.58;
       tideDepth = Math.max(0, Math.round((tidePeakHeight - elevation) * 70));
@@ -672,8 +717,7 @@ export async function fetchMapPointsApi(
       dynamicDepth = 0;
     }
 
-    const severity =
-      dynamicDepth >= 35 ? "critical" : dynamicDepth >= 20 ? "high" : "medium";
+    const severity = dynamicDepth >= 35 ? "critical" : dynamicDepth >= 20 ? "high" : "medium";
 
     predictedPoints.push({
       id: h.id,
@@ -704,20 +748,16 @@ export async function fetchCurrentWeather(): Promise<WeatherSnapshot | null> {
   try {
     const real = await fetchFullRealWeather(10.7769, 106.7009, "Hồ Chí Minh");
     if (!real.live) throw new Error("Weather unavailable");
+    const rainNow = real.currentRainMm ?? 0;
     return {
       provider: "Open-Meteo",
       locationName: real.locationName,
       temperatureC: real.tempC,
       humidityPercent: real.humidityPercent,
       windSpeedKmh: real.windSpeedKmh,
-      currentRainMm: real.hourly[0]?.rainMm ?? 0,
+      currentRainMm: rainNow,
       weatherCondition: real.condition,
-      floodRiskLevel:
-        (real.hourly[0]?.rainMm ?? 0) > 15
-          ? "Cao"
-          : (real.hourly[0]?.rainMm ?? 0) > 5
-            ? "Trung bình"
-            : "Thấp",
+      floodRiskLevel: rainNow > 15 ? "Cao" : rainNow > 5 ? "Trung bình" : "Thấp",
     };
   } catch {
     return null;
@@ -759,17 +799,17 @@ export async function fetchForecastSlots(): Promise<{
     // ignore backend error
   }
 
-  // Fallback: Gọi trực tiếp Open-Meteo API thời gian thực trên client
+  // Fallback: Gọi trực tiếp Open-Meteo API thời gian thực trên client (dùng minutely_15 thực tế, không nội suy)
   try {
     const real = await fetchFullRealWeather(10.7769, 106.7009, "Hồ Chí Minh");
     if (!real.live) throw new Error("Weather unavailable");
     const hourly = real.hourly || [];
-    const nowRain = Math.round((hourly[0]?.rainMm ?? 0) * 10) / 10;
-    const slot30Rain =
-      Math.round(((hourly[0]?.rainMm ?? 0) * 0.5 + (hourly[1]?.rainMm ?? 0) * 0.5) * 10) / 10;
-    const slot60Rain = Math.round((hourly[1]?.rainMm ?? 0) * 10) / 10;
-    const slot90Rain =
-      Math.round(((hourly[1]?.rainMm ?? 0) * 0.5 + (hourly[2]?.rainMm ?? 0) * 0.5) * 10) / 10;
+    const [nowRain, slot30Rain, slot60Rain, slot90Rain] = real.minutely15Slots ?? [
+      Math.round((real.currentRainMm ?? hourly[0]?.rainMm ?? 0) * 10) / 10,
+      Math.round((hourly[1]?.rainMm ?? 0) * 10) / 10,
+      Math.round((hourly[2]?.rainMm ?? 0) * 10) / 10,
+      Math.round((hourly[3]?.rainMm ?? 0) * 10) / 10,
+    ];
 
     const calcRisk = (rain: number): { risk: string; zone: 0 | 1 | 2 } => {
       if (rain >= 45) return { risk: "Rất cao", zone: 2 };
@@ -1033,19 +1073,11 @@ export async function fetchJourneyRoutes(
             coordinates: secCoords,
           };
         } else {
-          // Khi OSRM chỉ có 1 đường, tạo tuyến dự phòng nhánh phụ với km và thời gian phân biệt rõ ràng
-          const altMinutes = durationMinutes + Math.max(3, Math.round(durationMinutes * 0.18));
-          const altKmNum = (parseFloat(distanceKm.replace(",", ".")) * 1.14 + 0.4).toFixed(1);
-          const altKm = altKmNum.replace(".", ",");
-
           balancedRoute = {
+            ...safeRoute,
             id: "balanced",
             name: `Tuyến dự phòng (${modeLabel})`,
-            time: `${altMinutes} phút`,
-            distance: `${altKm} km`,
-            badge: "Dự phòng đường phụ",
-            detail: `Lộ trình vòng qua đường phụ né ngập (${altKm} km, khoảng ${altMinutes} phút).`,
-            coordinates: [],
+            badge: "Dự phòng",
           };
         }
 
@@ -1115,10 +1147,7 @@ export async function analyzeReportImageApi(payload: {
 
   const text = `${payload.location || ""} ${payload.description || ""}`.toLowerCase();
   const isDrain =
-    text.includes("cống") ||
-    text.includes("rác") ||
-    text.includes("miệng") ||
-    absHash % 7 === 0;
+    text.includes("cống") || text.includes("rác") || text.includes("miệng") || absHash % 7 === 0;
 
   const isCritical =
     text.includes("nguy hiểm") ||
@@ -1175,12 +1204,20 @@ export async function createCitizenReport(payload: {
   district?: string;
   description?: string;
   reportedDepth?: number;
+  aiDepth?: number;
+  aiConfidence?: number;
+  visual?: "street" | "drain" | "traffic" | "night";
   lat?: number;
   lng?: number;
   reporterId?: string;
   aiSummary?: string;
   recommendation?: string;
-}): Promise<{ id: string; aiDepth?: number; aiConfidence?: number } | null> {
+}): Promise<{
+  id: string;
+  aiDepth?: number;
+  aiConfidence?: number;
+  mapPoint?: MapFloodPoint;
+} | null> {
   try {
     const res = await fetch(`${API_BASE}/reports`, {
       method: "POST",
@@ -1245,55 +1282,78 @@ export async function reverseGeocodeApi(
   lat: number,
   lng: number,
 ): Promise<{ location: string; district: string; coords: [number, number] }> {
-  try {
-    const googleRes = await reverseGeocodeWithGoogle(lat, lng);
-    if (googleRes && googleRes.location) {
-      return googleRes;
-    }
-  } catch {
-    // ignore
-  }
-
   const fallbackDistrict = getClosestHcmDistrict(lat, lng);
 
+  // 1. Ưu tiên ArcGIS Reverse Geocoding trực tiếp từ trình duyệt (Nhanh < 250ms, chính xác từng số nhà & hẻm TP.HCM)
   try {
-    const res = await fetch(`${API_BASE}/map/geocode/reverse?lat=${lat}&lng=${lng}`);
-    if (res.ok) {
-      const data = await res.json();
-      if (data?.location) {
-        return {
-          location: data.location,
-          district: data.district || fallbackDistrict,
-          coords: [lng, lat],
-        };
+    const arcRes = await fetch(
+      `https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/reverseGeocode?location=${lng},${lat}&f=json&langCode=vi`,
+      { signal: AbortSignal.timeout(2500) },
+    );
+    if (arcRes.ok) {
+      const arcData = await arcRes.json();
+      const addr = arcData?.address;
+      if (addr) {
+        const street = (addr.Address || addr.Street || addr.Match_addr?.split(",")[0] || "").trim();
+        const ward = (addr.Neighborhood || addr.Sector || "").trim();
+        const rawDist = (addr.District || addr.City || addr.Subregion || "").trim();
+        const district =
+          !rawDist ||
+          rawDist === "Hồ Chí Minh" ||
+          rawDist === "Thành phố Hồ Chí Minh" ||
+          rawDist.toLowerCase().startsWith("phường")
+            ? fallbackDistrict
+            : rawDist;
+        const parts = [street, ward, district].filter(
+          (p, i, arr) => Boolean(p) && arr.indexOf(p) === i,
+        );
+        if (parts.length > 0) {
+          return {
+            location: parts.slice(0, 2).join(", "),
+            district,
+            coords: [lng, lat],
+          };
+        }
       }
     }
   } catch {
-    // ignore
+    // ignore and try Nominatim
   }
 
+  // 2. Dự phòng Nominatim OpenStreetMap trực tiếp
   try {
     const nomRes = await fetch(
       `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`,
-      { headers: { "Accept-Language": "vi" } },
+      {
+        headers: { "Accept-Language": "vi" },
+        signal: AbortSignal.timeout(2500),
+      },
     );
     if (nomRes.ok) {
       const data = await nomRes.json();
       const addr = data.address || {};
-      const road = addr.road || "";
+      const road = [addr.house_number, addr.road].filter(Boolean).join(" ").trim();
       const ward = addr.suburb || addr.quarter || addr.neighbourhood || "";
-      let district = addr.city_district || addr.county || addr.district || "";
-      if (!district || district === "Thành phố Hồ Chí Minh" || district === "TP.HCM") {
+      let district = addr.city_district || addr.district || addr.county || "";
+      if (
+        !district ||
+        district === "Thành phố Hồ Chí Minh" ||
+        district === "TP.HCM" ||
+        district.toLowerCase().startsWith("phường") ||
+        district.toLowerCase().startsWith("xã")
+      ) {
         district = fallbackDistrict;
       }
 
       let location = "";
-      if (ward && district) {
-        location = road ? `${road}, ${ward}, ${district}` : `${ward}, ${district}`;
-      } else if (district) {
-        location = road ? `${road}, ${district}` : `${district}, TP.HCM`;
+      if (road && ward) {
+        location = `${road}, ${ward}`;
+      } else if (road) {
+        location = road;
+      } else if (ward) {
+        location = `${ward}, ${district}`;
       } else {
-        location = `${fallbackDistrict}, TP.HCM`;
+        location = `${district}, TP.HCM`;
       }
 
       return {
@@ -1301,6 +1361,29 @@ export async function reverseGeocodeApi(
         district,
         coords: [lng, lat],
       };
+    }
+  } catch {
+    // ignore and try Backend
+  }
+
+  // 3. Dự phòng gọi qua Backend /api/map/geocode/reverse
+  try {
+    const res = await fetch(`${API_BASE}/map/geocode/reverse?lat=${lat}&lng=${lng}`, {
+      signal: AbortSignal.timeout(3000),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      const isNearSguCs1 = Math.abs(lat - 10.779) < 0.005 && Math.abs(lng - 106.6836) < 0.005;
+      if (data?.location && (data.location !== "105 Bà Huyện Thanh Quan" || isNearSguCs1)) {
+        const rawDist = String(data.district || "");
+        const district =
+          !rawDist || rawDist.toLowerCase().startsWith("phường") ? fallbackDistrict : rawDist;
+        return {
+          location: data.location,
+          district,
+          coords: [lng, lat],
+        };
+      }
     }
   } catch {
     // ignore
@@ -1503,7 +1586,13 @@ export function subscribeUserRealtime(handlers: {
     }
   });
 
-  for (const evt of ["report.approved", "alert.created", "alert.ended"]) {
+  for (const evt of [
+    "report.created",
+    "report.approved",
+    "report.rejected",
+    "alert.created",
+    "alert.ended",
+  ]) {
     es.addEventListener(evt, () => {
       handlers.onRouteRecomputeNeeded?.();
     });
