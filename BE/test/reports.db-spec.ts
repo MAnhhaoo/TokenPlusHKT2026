@@ -30,6 +30,7 @@ describe("Isolated PostgreSQL report transactions", () => {
           district: "Test district",
         }),
       } as any,
+      { analyzeImage: jest.fn().mockResolvedValue(null) } as any,
     );
   }, 10000);
   afterAll(async () => {

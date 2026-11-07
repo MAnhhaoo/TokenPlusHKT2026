@@ -28,6 +28,7 @@ describe("Report lifecycle contracts", () => {
           .fn()
           .mockResolvedValue({ location: "Street", district: "District" }),
       } as any,
+      { analyzeImage: jest.fn().mockResolvedValue(null) } as any,
       events,
     );
   });

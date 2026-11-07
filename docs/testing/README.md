@@ -1,6 +1,6 @@
 # Chạy kiểm thử local
 
-Chỉ thay đổi test, fixture, dependency kiểm thử, lệnh chạy và tài liệu. Không sửa nghiệp vụ; các regression đỏ được giữ để tái hiện lỗi. Bộ kiểm thử được bàn giao qua nhánh `codex/system-test-cases`; các kết quả bên dưới được đo trên mốc nguồn đã ghi trong báo cáo.
+Chỉ thay đổi test, fixture, dependency kiểm thử, lệnh chạy và tài liệu. Các regression ghi nhận lỗi bằng assertion thật; bản sửa CI có sửa ba lỗi BE tương ứng và được ghi riêng trong TEST_REPORT. Những regression admin/ML còn lại vẫn được giữ. Bộ kiểm thử được bàn giao qua nhánh `codex/system-test-cases`; các kết quả bên dưới được đo trên mốc nguồn đã ghi trong báo cáo.
 
 ## Chuẩn bị
 

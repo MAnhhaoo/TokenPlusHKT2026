@@ -89,7 +89,8 @@ export class CreateReportDto {
   aiSummary?: string;
 
   @ApiPropertyOptional({
-    example: "Xe máy nên chuyển sang làn giữa tim đường hoặc chọn lộ trình thay thế.",
+    example:
+      "Xe máy nên chuyển sang làn giữa tim đường hoặc chọn lộ trình thay thế.",
   })
   @IsOptional()
   @IsString()

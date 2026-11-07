@@ -1,10 +1,12 @@
 # Báo cáo kiểm thử toàn hệ thống — 07/11/2026
 
+> Các số liệu tại mốc 38d9d49 là snapshot khảo sát ban đầu. Bản sửa CI sau khi đồng bộ master được ghi riêng ở cuối, không dùng số liệu cũ để kết luận mã hiện tại.
+
 ## Mốc và phạm vi
 
 - Nguồn: `origin/master` tại `38d9d490805d835f2ce12dcfc473bb711df69b13`.
 - Nhánh local: `codex/system-test-cases`; worktree `C:/Users/admin/Desktop/TokenPlus-system-tests`.
-- Không sửa mã nghiệp vụ hoặc API/schema. Chỉ test, fixture, dependency/lệnh chạy kiểm thử và tài liệu.
+- Phạm vi khảo sát ban đầu chỉ bổ sung test và tài liệu. Sau yêu cầu sửa CI, ba lỗi BE được sửa có regression chứng minh; xem mục cập nhật cuối.
 - Workspace gốc giữ nguyên các thay đổi `pnpm-workspace.yaml` và `pnpm-lock.yaml`.
 - Khảo sát source/config/test theo BE, admin, user, Android và ML; đối chiếu PRD/API_SPEC/SYSTEM_DESIGN/AI_SAFETY. Đã khảo sát entrypoint/module/component/API client/DTO/entity, test, cấu hình, notebook và pipeline ML theo phân hệ. Dataset/model binary chỉ đối chiếu manifest và schema, không chạy với dữ liệu nghiên cứu thật.
 
@@ -72,3 +74,26 @@ Các lỗi frontend/ML và bằng chứng chi tiết được ghi trong [FE_RESU
 Ma trận tổng: [TEST_CASES.md](TEST_CASES.md). Chi tiết BE/FE/ML có các bảng ID, dữ liệu, bước chạy, expected và tên test. Lệnh tổng hợp trả exit 1 khi có regression fail, exit 2 khi chỉ thiếu môi trường; BLOCKED/NOT RUN luôn được trình bày riêng.
 
 Kiểm tra bàn giao: diff không thay đổi source nghiệp vụ; `git diff --cached --check` đạt. SHA-256 của hai file pnpm đang sửa ở workspace gốc trùng trước/sau. Browser harness dừng server theo process tree và chờ exit; không còn listener kiểm thử ở 5273/5274.
+
+## Cập nhật sửa CI PR #16
+
+Đồng bộ `master` tại `a77a268` vào nhánh PR trước khi sửa để kiểm tra đúng mã merge của Actions.
+
+- CI BE ban đầu dừng tại `npm ci`: lockfile tạo bằng npm 11 thiếu nested optional peer `webpack@5.112.2` mà npm 10.9.9 trên runner yêu cầu. Tái tạo lock bằng đúng npm 10; `npm ci --dry-run --ignore-scripts --workspaces=false` đạt, không nới frozen/clean install.
+- CI user dừng tại oxfmt: format đúng các file được báo (ReportModal, index.css, browser harness/tests); các test BE/source mới từ master cũng được format theo Prettier hiện có. Không vô hiệu lint/format.
+- Sửa ba lỗi BE đã được test chứng minh: citizen token bị chặn trên operator action; hash salt/key sai định dạng bị từ chối; điểm ngập động chỉ hiện khi lớp flood được bật. Không đổi assertion để che lỗi.
+- Cập nhật mock Gemini dependency trong constructor của report unit/DB fixtures theo master, giữ nguyên event assertions; không gọi Gemini thật.
+
+Xác minh local sau sửa:
+
+| Bộ | Kết quả |
+|---|---|
+| BE build / typecheck / lint | Đạt |
+| BE unit | 41/41 đạt, 13 suite |
+| BE HTTP | 7/7 đạt |
+| User build / typecheck / oxfmt check | Đạt |
+| User build smoke + VM regressions | Đạt |
+| User browser system | 8/8 đạt |
+| Diff check / review độc lập | Đạt, không phát hiện vấn đề quan trọng |
+
+Đây là bản sửa các job CI BE/FE-user hiện hành. Các regression admin/ML và ca PostgreSQL/Android chưa được xử lý trong bản sửa CI này; không khẳng định `npm run test:system` toàn repo đã xanh. Bảng kết quả lịch sử ở trên được giữ để đối chiếu.
