@@ -1,0 +1,357 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - '.github/workflows/**'
+      - 'BE/**'
+      - 'FE/user/**'
+      - 'FE/admin/**'
+      - 'ML/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - 'firebase.json'
+  workflow_call:
+    outputs:
+      backend:
+        description: Whether a migrated backend package is present.
+        value: ${{ jobs.changes.outputs.backend }}
+      user:
+        description: Whether a migrated user frontend package is present.
+        value: ${{ jobs.changes.outputs.user }}
+      admin:
+        description: Whether a migrated admin frontend package is present.
+        value: ${{ jobs.changes.outputs.admin }}
+      ml:
+        description: Whether a migrated ML package is present.
+        value: ${{ jobs.changes.outputs.ml }}
+      any_application:
+        description: Whether any application package is present.
+        value: ${{ jobs.changes.outputs.any_application }}
+    inputs:
+      full_validation:
+        description: Validate every migrated application package before deployment.
+        required: false
+        type: boolean
+        default: false
+  workflow_dispatch:
+    inputs:
+      full_validation:
+        description: Validate every migrated application package on this branch.
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  changes:
+    name: Detect migrated packages
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.detect.outputs.backend }}
+      user: ${{ steps.detect.outputs.user }}
+      admin: ${{ steps.detect.outputs.admin }}
+      ml: ${{ steps.detect.outputs.ml }}
+      any_application: ${{ steps.detect.outputs.any_application }}
+      any_node: ${{ steps.detect.outputs.any_node }}
+      node_components: ${{ steps.detect.outputs.node_components }}
+    steps:
+      - name: Checkout repository history
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Identify changed application paths
+        id: detect
+        shell: bash
+        env:
+          FULL_VALIDATION: ${{ inputs.full_validation }}
+        run: |
+          set -euo pipefail
+
+          if [[ "$FULL_VALIDATION" == true ]]; then
+            changed_files="$(git ls-files | grep -vE '(^|/)\.gitkeep$' || true)"
+          else
+            case "$GITHUB_EVENT_NAME" in
+              pull_request)
+                base="$(jq -r '.pull_request.base.sha' "$GITHUB_EVENT_PATH")"
+                head="$(jq -r '.pull_request.head.sha' "$GITHUB_EVENT_PATH")"
+                ;;
+              workflow_dispatch)
+                head="$GITHUB_SHA"
+                base="$(git rev-parse "${head}^" 2>/dev/null || git rev-list --max-parents=0 "$head" | tail -n 1)"
+                ;;
+              *)
+                echo "Unsupported event without full_validation: $GITHUB_EVENT_NAME" >&2
+                exit 1
+                ;;
+            esac
+
+            changed_files="$(git diff --name-only "$base" "$head")"
+          fi
+          has_source_files() {
+            git ls-files "$1" | grep -qvE '(^|/)\.gitkeep$'
+          }
+
+          backend=false
+          user=false
+          admin=false
+          ml=false
+
+          if grep -qE '^BE/.+' <<<"$changed_files" && grep -qvE '^BE/.*/?\.gitkeep$|^BE/\.gitkeep$' <<<"$changed_files"; then backend=true; fi
+          if grep -qE '^FE/user/.+' <<<"$changed_files" && grep -qvE '^FE/user/.*/?\.gitkeep$' <<<"$changed_files"; then user=true; fi
+          if grep -qE '^FE/admin/.+' <<<"$changed_files" && grep -qvE '^FE/admin/.*/?\.gitkeep$' <<<"$changed_files"; then admin=true; fi
+          if grep -qE '^ML/.+' <<<"$changed_files" && grep -qvE '^ML/.*/?\.gitkeep$|^ML/\.gitkeep$' <<<"$changed_files"; then ml=true; fi
+
+          # A shared pnpm manifest or lockfile affects every migrated Node package.
+          if grep -Eq '^(package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml)$' <<<"$changed_files"; then
+            has_source_files BE && backend=true || true
+            has_source_files FE/user && user=true || true
+            has_source_files FE/admin && admin=true || true
+          fi
+
+          any_node=false
+          any_application=false
+          node_components=()
+          [[ "$backend" == true ]] && node_components+=(BE)
+          [[ "$user" == true ]] && node_components+=(FE/user)
+          [[ "$admin" == true ]] && node_components+=(FE/admin)
+          [[ ${#node_components[@]} -gt 0 ]] && any_node=true
+          [[ "$backend" == true || "$user" == true || "$admin" == true || "$ml" == true ]] && any_application=true
+
+          node_json='["__none__"]'
+          if [[ ${#node_components[@]} -gt 0 ]]; then
+            node_json="$(printf '%s\n' "${node_components[@]}" | jq -R . | jq -s -c .)"
+          fi
+          {
+            echo "backend=$backend"
+            echo "user=$user"
+            echo "admin=$admin"
+            echo "ml=$ml"
+            echo "any_node=$any_node"
+            echo "any_application=$any_application"
+            echo "node_components=$node_json"
+          } >> "$GITHUB_OUTPUT"
+
+          printf '{"backend":%s,"user":%s,"admin":%s,"ml":%s,"any_application":%s}\n' \
+            "$backend" "$user" "$admin" "$ml" "$any_application" > "$RUNNER_TEMP/ci-scope.json"
+
+      - name: Upload CI scope for trusted preview workflow
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && vars.GCP_PREVIEW_ENABLED == 'true'
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: ci-scope
+          path: ${{ runner.temp }}/ci-scope.json
+          if-no-files-found: error
+          retention-days: 1
+
+  preflight:
+    name: Package readiness
+    runs-on: ubuntu-latest
+    needs: changes
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Explain which checks can run
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${{ needs.changes.outputs.any_application }}" != "true" ]]; then
+            {
+              echo '## CI readiness'
+              echo
+              echo 'No application source path changed. Build, typecheck, lint, and test were not run; this workflow run does not validate application code.'
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'Application code changed; validating required package manifests and scripts.'
+          fi
+
+          for component in BE FE/user FE/admin; do
+            if ! git ls-files "$component" | grep -qvE '(^|/)\.gitkeep$'; then
+              echo "::notice title=Not migrated::$component has no tracked application source yet."
+            fi
+          done
+          if [[ ! -f ML/pyproject.toml ]]; then
+            echo '::notice title=Not migrated::ML has no pyproject.toml yet.'
+          fi
+
+      - name: Require runnable Node packages for changed Node paths
+        if: needs.changes.outputs.any_node == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in package.json pnpm-lock.yaml pnpm-workspace.yaml; do
+            if [[ ! -f "$file" ]]; then
+              echo "::error title=Missing workspace file::$file is required for the changed Node package(s)."
+              exit 1
+            fi
+          done
+
+          node - package.json <<'NODE'
+          const fs = require('node:fs');
+          const pkg = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+          if (pkg.packageManager !== 'pnpm@12.15.0') {
+            console.error(`package.json must declare packageManager: pnpm@12.15.0 (found ${pkg.packageManager ?? 'none'}).`);
+            process.exit(1);
+          }
+          NODE
+
+          components='${{ needs.changes.outputs.node_components }}'
+          while IFS= read -r component; do
+            [[ -n "$component" ]] || continue
+            manifest="$component/package.json"
+            if [[ ! -f "$manifest" ]]; then
+              echo "::error title=Missing package manifest::$component changed but $manifest is missing."
+              exit 1
+            fi
+            node - "$manifest" "$component" <<'NODE'
+          const fs = require('node:fs');
+          const [manifest, component] = process.argv.slice(2);
+          const pkg = JSON.parse(fs.readFileSync(manifest, 'utf8'));
+          const required = ['build', 'typecheck', 'lint', 'test'];
+          const missing = required.filter((name) => !pkg.scripts?.[name]);
+          if (missing.length) {
+            console.error(`${component}/package.json is missing required scripts: ${missing.join(', ')}.`);
+            process.exit(1);
+          }
+          NODE
+          done < <(jq -r '.[]' <<<"$components")
+
+      - name: Require runnable ML package for changed ML paths
+        if: needs.changes.outputs.ml == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in ML/pyproject.toml ML/uv.lock; do
+            if [[ ! -f "$file" ]]; then
+              echo "::error title=Missing ML package file::$file is required because ML source changed."
+              exit 1
+            fi
+          done
+
+  node-checks:
+    name: Node checks (${{ matrix.component }})
+    runs-on: ubuntu-latest
+    needs: [changes, preflight]
+    if: needs.preflight.result == 'success' && needs.changes.outputs.any_node == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        component: ${{ fromJSON(needs.changes.outputs.node_components) }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22.23.4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6.1.0
+        with:
+          version: 12.15.0
+          cache: true
+          cache_dependency_path: pnpm-lock.yaml
+
+      - name: Install locked workspace dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build, typecheck, lint, and test
+        working-directory: ${{ matrix.component }}
+        run: |
+          pnpm run build
+          pnpm run typecheck
+          pnpm run lint
+          pnpm run test
+
+      - name: Upload frontend preview artifact
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && vars.GCP_PREVIEW_ENABLED == 'true' && (matrix.component == 'FE/user' || matrix.component == 'FE/admin')
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: hosting-${{ matrix.component == 'FE/user' && 'user' || 'admin' }}
+          path: ${{ matrix.component }}/dist
+          if-no-files-found: error
+          retention-days: 1
+
+  ml-checks:
+    name: ML checks
+    runs-on: ubuntu-latest
+    needs: [changes, preflight]
+    if: needs.preflight.result == 'success' && needs.changes.outputs.ml == 'true'
+    defaults:
+      run:
+        working-directory: ML
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v10.3.3
+        with:
+          version: 0.13.5
+
+      - name: Install frozen ML dependencies
+        run: uv sync --frozen --group dev
+
+      - name: Lint ML package
+        run: uv run ruff check
+
+      - name: Test ML package
+        run: uv run pytest
+
+  ci-summary:
+    name: CI result
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [changes, preflight, node-checks, ml-checks]
+    steps:
+      - name: Report validation status
+        env:
+          CHANGES_RESULT: ${{ needs.changes.result }}
+          PREFLIGHT_RESULT: ${{ needs.preflight.result }}
+          NODE_RESULT: ${{ needs.node-checks.result }}
+          ML_RESULT: ${{ needs.ml-checks.result }}
+          APPLICATION_CHANGED: ${{ needs.changes.outputs.any_application }}
+          FRONTEND_CHANGED: ${{ needs.changes.outputs.user == 'true' || needs.changes.outputs.admin == 'true' }}
+          PREVIEW_ENABLED: ${{ vars.GCP_PREVIEW_ENABLED }}
+          EVENT_NAME: ${{ github.event_name }}
+          REPOSITORY: ${{ github.repository }}
+          PR_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+        run: |
+          set -euo pipefail
+          if [[ "$CHANGES_RESULT" != success || "$PREFLIGHT_RESULT" != success || "$NODE_RESULT" == failure || "$NODE_RESULT" == cancelled || "$ML_RESULT" == failure || "$ML_RESULT" == cancelled ]]; then
+            echo 'CI validation failed. See the failed package job for details.' >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+
+          if [[ "$EVENT_NAME" == pull_request && "$FRONTEND_CHANGED" == true ]]; then
+            if [[ "$PR_REPOSITORY" != "$REPOSITORY" ]]; then
+              echo 'Firebase PR preview is disabled for fork pull requests; no cloud credentials were used.' >> "$GITHUB_STEP_SUMMARY"
+            elif [[ "$PREVIEW_ENABLED" != true ]]; then
+              echo 'Firebase PR preview is not configured; no cloud credentials were used.' >> "$GITHUB_STEP_SUMMARY"
+            else
+              echo 'A trusted deploy workflow will publish the frontend artifact to a temporary Firebase preview channel.' >> "$GITHUB_STEP_SUMMARY"
+            fi
+          fi
+
+          if [[ "$APPLICATION_CHANGED" != true ]]; then
+            echo 'No application source changed; application checks were skipped, so this run is not an application validation.' >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          echo 'All checks for changed application packages completed successfully.' >> "$GITHUB_STEP_SUMMARY"

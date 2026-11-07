@@ -31,8 +31,8 @@
 
 ## File Layout
 
-- Create `.github/workflows/ci.yml` for PR and `master` checks of migrated code.
-- Create `.github/workflows/deploy.yml` for Firebase preview/staging and release-gated production deployment.
+- Create `.github/workflows/ci.yml` for PR checks and reusable full validation.
+- Create `.github/workflows/deploy.yml` to publish trusted Firebase PR previews, call full validation on `master`/release, then deploy staging and release-gated production.
 - Create `firebase.json` for the two Hosting targets and their build directories.
 - Create `docs/deployment/google-cloud-cicd.md` for Google Cloud, GitHub Environment, WIF, Firebase target, and activation setup.
 
@@ -45,7 +45,7 @@
 - Consumes the existing or migrated package manifests and lockfiles in `BE/`, `FE/user/`, `FE/admin/`, and `ML/`.
 - Produces a required PR check that runs package build, typecheck, lint, and tests when the relevant package exists; missing scripts or lockfiles for a changed package fail with a clear message.
 
-- [ ] Add pull-request and `master` push triggers scoped to application paths; add `workflow_dispatch` for validating workflow changes without treating an empty repository as tested.
+- [ ] Add a pull-request trigger scoped to application/workflow paths, a reusable `workflow_call` full-validation mode for master/release deploys, and `workflow_dispatch` without treating an empty repository as tested.
 - [ ] Add Node checks using Node 22 and pnpm 12.15.0 for packages with their manifests and frozen lockfile.
 - [ ] Add Python checks using Python 3.12 and `uv sync --frozen --group dev`, `uv run ruff check`, and `uv run pytest` when `ML/pyproject.toml` exists.
 - [ ] Fail the preflight when a changed application component has no runnable manifest or required lockfile; report absent optional components as not migrated.
@@ -63,7 +63,7 @@
 - Produces Cloud Run deployment for migrated API/serving ML packages and Firebase Hosting deploys for `FE/user` and `FE/admin`; production uses the `production` GitHub Environment.
 
 - [ ] Define Firebase Hosting targets `user` and `admin` with public directories `FE/user/dist` and `FE/admin/dist`.
-- [ ] Configure staging on merge to `master`, Firebase PR preview when GCP/Firebase configuration is present, and production on published release after the protected environment gate.
+- [ ] Configure staging after successful reusable CI on merge to `master`, production on a published release after staging and the protected environment gate, and Firebase PR preview from the trusted deploy workflow after CI succeeds.
 - [ ] Authenticate with `google-github-actions/auth@v3` and Workload Identity Federation; grant only `contents: read` and `id-token: write` to deploy jobs.
 - [ ] Deploy the API to Cloud Run from `BE/`; deploy ML only when a serving entrypoint exists. Do not deploy training notebooks or datasets.
 - [ ] Document the required Google APIs, WIF provider/service-account roles, GitHub Environment variables, Firebase site targets, and the manual owner-side environment protection step.
