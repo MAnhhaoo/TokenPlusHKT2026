@@ -132,6 +132,34 @@ function ReportReviewModal({
                 <b>{report.historyCount} lần ngập</b>
               </span>
             </div>
+            {report.aiSummary && (
+              <p
+                style={{
+                  marginTop: "10px",
+                  fontSize: "12px",
+                  color: "var(--teal)",
+                  lineHeight: "1.45",
+                }}
+              >
+                🤖 <b>AI Gemini:</b> {report.aiSummary}
+              </p>
+            )}
+            {report.recommendation && (
+              <div
+                style={{
+                  marginTop: "8px",
+                  background: "rgba(59, 130, 246, 0.08)",
+                  borderLeft: "3px solid #3b82f6",
+                  padding: "6px 10px",
+                  borderRadius: "0 6px 6px 0",
+                  fontSize: "11.5px",
+                  color: "#1e40af",
+                  lineHeight: "1.4",
+                }}
+              >
+                <b>Khuyến nghị:</b> {report.recommendation}
+              </div>
+            )}
           </div>
           {duplicates.length > 0 ? (
             <div className="duplicate-note">

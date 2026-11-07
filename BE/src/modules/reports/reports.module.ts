@@ -4,6 +4,7 @@ import { FloodReportEntity } from "./models/flood-report.entity";
 import { MapPointEntity } from "../map/models/map-point.entity";
 import { CommunityUserEntity } from "../users/models/community-user.entity";
 import { ReportsService } from "./services/reports.service";
+import { GeminiVisionService } from "./services/gemini-vision.service";
 import { ReportsController } from "./controllers/reports.controller";
 import { MapModule } from "../map/map.module";
 
@@ -17,7 +18,7 @@ import { MapModule } from "../map/map.module";
     ]),
   ],
   controllers: [ReportsController],
-  providers: [ReportsService],
-  exports: [ReportsService],
+  providers: [ReportsService, GeminiVisionService],
+  exports: [ReportsService, GeminiVisionService],
 })
 export class ReportsModule {}

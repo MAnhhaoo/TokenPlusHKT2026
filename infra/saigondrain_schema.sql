@@ -83,6 +83,8 @@ CREATE TABLE flood_reports (
     visual VARCHAR(50) NOT NULL DEFAULT 'citizen',
     "photoUrl" TEXT,
     "reporterId" VARCHAR(50) REFERENCES community_users(id) ON DELETE SET NULL,
+    "aiSummary" TEXT,
+    "recommendation" TEXT,
     "createdAt" TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

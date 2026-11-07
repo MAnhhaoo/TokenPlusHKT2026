@@ -102,6 +102,20 @@ export class FloodReportEntity {
   @Column({ type: "varchar", length: 32, nullable: true })
   reporterId?: string;
 
+  @ApiProperty({
+    required: false,
+    example: "Hệ thống AI Gemini phát hiện ngập sâu ~32 cm tại làn xe máy.",
+  })
+  @Column({ type: "text", nullable: true })
+  aiSummary?: string;
+
+  @ApiProperty({
+    required: false,
+    example: "Xe máy nên chuyển sang làn giữa tim đường hoặc chọn lộ trình thay thế.",
+  })
+  @Column({ type: "text", nullable: true })
+  recommendation?: string;
+
   @CreateDateColumn()
   createdAt: Date;
 
