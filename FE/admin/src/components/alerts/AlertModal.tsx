@@ -41,7 +41,6 @@ function AlertModal({
     area: !draft.area ? "Vui lòng chọn khu vực." : "",
     title: !draft.title.trim() ? "Vui lòng nhập tiêu đề." : "",
     message: !draft.message.trim() ? "Vui lòng nhập nội dung cảnh báo." : "",
-    channels: !draft.channels.length ? "Vui lòng chọn ít nhất một kênh." : "",
   }
   const valid = !Object.values(errors).some(Boolean)
 
@@ -56,7 +55,7 @@ function AlertModal({
       subtitle={
         initial
           ? `Đang chỉnh sửa ${initial.id}`
-          : "Tạo cảnh báo mô phỏng trong phiên hiện tại"
+          : "Phát thông tin đến người dân và trung tâm điều hành"
       }
       onClose={onClose}
     >
@@ -138,7 +137,6 @@ function AlertModal({
         </Field>
         <div className="channel-field">
           <span className="field-label">Kênh phát hành</span>
-          {submitted && errors.channels && <span className="field-error" role="alert">{errors.channels}</span>}
           <div className="channel-list">
             {["Web", "Push", "Trung tâm điều hành"].map((channel) => (
               <label

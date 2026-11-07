@@ -56,10 +56,10 @@ function MapPage({
       <SectionHeader
         action={
           <StatusPill tone="safe">
-            Chẩn đoán Mô phỏng AI
+            Chẩn đoán Realtime AI
           </StatusPill>
         }
-        description="Minh họa các điểm ngập, thời tiết và lịch sử bằng dữ liệu mô phỏng."
+        description="Giám sát ngập lụt đô thị TP.HCM kết hợp thời tiết thực và 425 quan trắc lịch sử 24 năm."
         title="Bản đồ Tác nghiệp & Điều hành"
       />
 

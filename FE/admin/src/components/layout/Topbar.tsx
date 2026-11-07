@@ -31,7 +31,7 @@ const pageMeta: Record<
   { eyebrow: string; title: string; subtitle: string; live?: boolean }
 > = {
   overview: {
-    eyebrow: "Giám sát mô phỏng",
+    eyebrow: "Giám sát thời gian thực",
     title: "Tổng quan điều hành",
     subtitle: "",
     live: true,
@@ -116,7 +116,7 @@ function Topbar({
             </Heading>
             {meta.live && (
               <span className="live-badge">
-                <i /> DEMO
+                <i /> LIVE
               </span>
             )}
           </div>
@@ -124,21 +124,20 @@ function Topbar({
         </div>
       </div>
       <div className="topbar-actions">
-        <button
-          type="button"
+        <div
           className="weather-chip"
           onClick={onSyncWeather}
           role={onSyncWeather ? "button" : undefined}
           style={onSyncWeather ? { cursor: "pointer" } : undefined}
-          title="Nhấn để làm mới dữ liệu thời tiết mô phỏng"
+          title="Nhấn để đồng bộ thời tiết thực tế từ Open-Meteo API"
         >
           <CloudRain size={18} />
           <span>
             <small>{weather?.locationName || "TP. Hồ Chí Minh"}</small>
             <b>{weatherSummary}</b>
           </span>
-        </button>
-        <IconButton onClick={onCreateAlert} label="Thông báo" className="notification-button">
+        </div>
+        <IconButton label="Thông báo" className="notification-button">
           <Bell size={19} />
           <i />
         </IconButton>

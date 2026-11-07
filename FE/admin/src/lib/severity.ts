@@ -7,3 +7,4 @@ export function severityLabel(severity: Severity) {
       ? "Cao"
       : "Trung bình"
 }
+

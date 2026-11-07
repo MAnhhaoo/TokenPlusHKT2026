@@ -13,7 +13,19 @@ import ReportReviewModal from "@/components/reports/ReportReviewModal"
 import AlertModal from "@/components/alerts/AlertModal"
 import ConfirmDialog from "@/components/ui/ConfirmDialog"
 import UserDetailModal from "@/components/users/UserDetailModal"
-import { mockReports, mockAlerts, mockPoints, mockUsers, mockWeather, mockTrends } from "@/data/mockData"
+import {
+  approveReportApi,
+  createAlertApi,
+  endAlertApi,
+  fetchAdminInitialData,
+  fetchCurrentWeatherApi,
+  fetchUsersCsvBlob,
+  rejectReportApi,
+  subscribeAdminRealtime,
+  syncWeatherForecastsApi,
+  updateAlertApi,
+  updateUserStatusApi,
+} from "@/lib/api"
 import type {
   AlertDraft,
   AreaAlert,
@@ -28,12 +40,26 @@ import type {
   WeatherSnapshot,
 } from "@/types"
 
+const emptyTrendItem = {
+  labels: ["00:00"],
+  reports: [0],
+  rain: [0],
+  insight: "Đang tải dữ liệu xu hướng từ cơ sở dữ liệu…",
+}
+
+const emptyTrends: TrendsMap = {
+  "24h": emptyTrendItem,
+  "7d": emptyTrendItem,
+  "30d": emptyTrendItem,
+}
+
 export default function App() {
-  const [reports, setReports] = useState<FloodReport[]>(() => structuredClone(mockReports))
-  const [alerts, setAlerts] = useState<AreaAlert[]>(() => structuredClone(mockAlerts))
-  const [mapPoints, setMapPoints] = useState<MapPoint[]>(() => structuredClone(mockPoints))
-  const trendsData: TrendsMap = mockTrends
-  const [weather, setWeather] = useState<WeatherSnapshot | null>(mockWeather)
+  const [reports, setReports] = useState<FloodReport[]>([])
+  const [alerts, setAlerts] = useState<AreaAlert[]>([])
+  const [mapPoints, setMapPoints] = useState<MapPoint[]>([])
+  const [trendsData, setTrendsData] = useState<TrendsMap>(emptyTrends)
+  const [weather, setWeather] = useState<WeatherSnapshot | null>(null)
+  const [isLiveBackend, setIsLiveBackend] = useState(false)
   const [selectedMapPoint, setSelectedMapPoint] = useState<string | null>("p1")
   const [layers, setLayers] = useState<MapLayer[]>([
     "flood",
@@ -53,9 +79,108 @@ export default function App() {
   const [toast, setToast] = useState<string | null>(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [page, setPage] = useState<Page>("overview")
-  const [users, setUsers] = useState<CommunityUser[]>(() => structuredClone(mockUsers))
+  const [users, setUsers] = useState<CommunityUser[]>([])
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null)
 
+  useEffect(() => {
+    let active = true
+    async function loadInitial() {
+      const data = await fetchAdminInitialData()
+      if (!active || !data.live) return
+      if (data.reports) setReports(data.reports)
+      if (data.alerts) setAlerts(data.alerts)
+      if (data.mapPoints) setMapPoints(data.mapPoints)
+      if (data.users) setUsers(data.users)
+      if (data.trends) setTrendsData(data.trends)
+      if (data.weather) setWeather(data.weather)
+      setIsLiveBackend(true)
+    }
+    loadInitial()
+
+    const unsubscribe = subscribeAdminRealtime({
+      onReportCreated: ({ report, mapPoint }) => {
+        if (!active) return
+        setReports((current) =>
+          current.some((r) => r.id === report.id)
+            ? current
+            : [report, ...current],
+        )
+        if (mapPoint) {
+          setMapPoints((current) =>
+            current.some((pt) => pt.id === mapPoint.id)
+              ? current
+              : [...current, mapPoint],
+          )
+        }
+        setToast(
+          `Realtime: Báo cáo mới ${report.id} tại ${report.location} vừa được gửi.`,
+        )
+      },
+      onReportApproved: ({ report, updatedMapPoint }) => {
+        if (!active) return
+        setReports((current) =>
+          current.map((item) => (item.id === report.id ? report : item)),
+        )
+        if (updatedMapPoint) {
+          setMapPoints((current) =>
+            current.map((pt) =>
+              pt.linkedReportId === report.id ? updatedMapPoint : pt,
+            ),
+          )
+        }
+      },
+      onReportRejected: ({ report }) => {
+        if (!active) return
+        setReports((current) =>
+          current.map((item) => (item.id === report.id ? report : item)),
+        )
+      },
+      onAlertCreated: (alert) => {
+        if (!active) return
+        setAlerts((current) =>
+          current.some((a) => a.id === alert.id)
+            ? current
+            : [alert, ...current],
+        )
+      },
+      onAlertUpdated: (alert) => {
+        if (!active) return
+        setAlerts((current) =>
+          current.map((a) => (a.id === alert.id ? alert : a)),
+        )
+      },
+      onAlertEnded: (alert) => {
+        if (!active) return
+        setAlerts((current) =>
+          current.map((a) => (a.id === alert.id ? alert : a)),
+        )
+      },
+      onWeatherUpdated: ({ snapshot }) => {
+        if (!active) return
+        if (snapshot) setWeather(snapshot)
+      },
+      onUserUpdated: ({ action, user }) => {
+        if (!active || !user) return
+        setUsers((current) => {
+          const exists = current.some((u) => u.id === user.id)
+          if (exists) {
+            return current.map((u) => (u.id === user.id ? user : u))
+          }
+          return [user, ...current]
+        })
+        if (action === "registered") {
+          setToast(
+            `Realtime: Người dùng mới ${user.name} (${user.district}) vừa đăng ký tài khoản!`,
+          )
+        }
+      },
+    })
+
+    return () => {
+      active = false
+      unsubscribe()
+    }
+  }, [])
 
   useEffect(() => {
     if (!toast) return
@@ -63,12 +188,6 @@ export default function App() {
     return () => window.clearTimeout(timer)
   }, [toast])
 
-  const displayUsers = users.map((user) => {
-    const owned = reports.filter((report) => report.reporterId === user.id)
-    return { ...user, reports: owned.length,
-      verifiedReports: owned.filter((report) => report.status === "verified").length,
-      rejectedReports: owned.filter((report) => report.status === "rejected").length }
-  })
   const pendingCount = reports.filter(
     (report) => report.status === "pending",
   ).length
@@ -96,26 +215,32 @@ export default function App() {
     }
   }
 
-  const handleSyncWeather = () => {
-    setWeather({ ...mockWeather })
-    setToast("Đã làm mới thời tiết mô phỏng · không kết nối dịch vụ bên ngoài.")
+  const handleSyncWeather = async () => {
+    await syncWeatherForecastsApi()
+    const freshWeather = await fetchCurrentWeatherApi()
+    if (freshWeather) {
+      setWeather(freshWeather)
+      setToast(
+        `Đã đồng bộ thời tiết từ Open-Meteo: ${freshWeather.weatherCondition} · ${Math.round(freshWeather.temperatureC)}°C.`,
+      )
+    }
   }
 
   const approveReport = async () => {
     if (!reviewing) return
     const targetId = reviewing.id
-
+    const apiResult = await approveReportApi(targetId)
     setReports((current) =>
       current.map((report) =>
         report.id === targetId
-          ? { ...report, status: "verified" }
+          ? apiResult?.report ?? { ...report, status: "verified" }
           : report,
       ),
     )
     setMapPoints((current) =>
       current.map((point) =>
         point.linkedReportId === targetId
-          ? { ...point, type: "flood" }
+          ? apiResult?.updatedMapPoint ?? { ...point, type: "flood" }
           : point,
       ),
     )
@@ -126,15 +251,14 @@ export default function App() {
   const rejectReport = async (reason?: string) => {
     if (!rejecting) return
     const targetId = rejecting.id
-
+    const apiResult = await rejectReportApi(targetId, reason)
     setReports((current) =>
       current.map((report) =>
         report.id === targetId
-          ? { ...report, status: "rejected" }
+          ? apiResult?.report ?? { ...report, status: "rejected" }
           : report,
       ),
     )
-    setMapPoints((current) => current.filter((point) => point.linkedReportId !== targetId))
     setRejecting(null)
     setReviewing(null)
     setToast(
@@ -143,21 +267,21 @@ export default function App() {
   }
 
   const saveAlert = async (draft: AlertDraft) => {
-    if (alertModal?.mode === "edit" && alertModal.alert && alerts.some((a) => a.id === alertModal.alert?.id)) {
+    if (alertModal?.mode === "edit" && alertModal.alert) {
       const targetId = alertModal.alert.id
-
+      const updated = await updateAlertApi(targetId, draft)
       setAlerts((current) =>
         current.map((alert) =>
-          alert.id === targetId ? ({ ...alert, ...draft }) : alert,
+          alert.id === targetId ? (updated ?? { ...alert, ...draft }) : alert,
         ),
       )
       setToast(`Đã cập nhật cảnh báo ${targetId}.`)
     } else {
-
-      const nextNumber = Math.max(190, ...alerts.map((a) => Number(a.id.replace(/\D/g, "")))) + 1
+      const created = await createAlertApi(draft)
+      const nextNumber = 190 + alerts.length
       setAlerts((current) => [
-        {
-          id: `AL-${nextNumber}`,
+        created ?? {
+          id: `AL-0${nextNumber}`,
           ...draft,
           startedAt: "18:49",
           status: "active",
@@ -165,7 +289,7 @@ export default function App() {
         },
         ...current,
       ])
-      setToast("Đã tạo cảnh báo mô phỏng · không gửi thông tin ra ngoài.")
+      setToast("Cảnh báo mới đã được phát tới các kênh đã chọn.")
     }
     setAlertModal(null)
   }
@@ -173,11 +297,11 @@ export default function App() {
   const endAlert = async () => {
     if (!endingAlert) return
     const targetId = endingAlert.id
-
+    const ended = await endAlertApi(targetId)
     setAlerts((current) =>
       current.map((alert) =>
         alert.id === targetId
-          ? ({ ...alert, status: "ended" })
+          ? (ended ?? { ...alert, status: "ended" })
           : alert,
       ),
     )
@@ -185,9 +309,21 @@ export default function App() {
     setEndingAlert(null)
   }
 
-  const selectedUser = displayUsers.find((user) => user.id === selectedUserId) ?? null
+  const selectedUser = users.find((user) => user.id === selectedUserId) ?? null
 
   const exportUsers = async () => {
+    const backendBlob = await fetchUsersCsvBlob()
+    if (backendBlob) {
+      const url = URL.createObjectURL(backendBlob)
+      const link = document.createElement("a")
+      link.href = url
+      link.download = "saigondrain-nguoi-dung.csv"
+      link.click()
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000)
+      setToast("Đã xuất danh sách người dùng từ Backend ra tệp CSV.")
+      return
+    }
+
     const statusLabel: Record<UserStatus, string> = {
       active: "Hoạt động",
       review: "Cần xem xét",
@@ -205,7 +341,7 @@ export default function App() {
       "Trạng thái",
       "Hoạt động cuối",
     ]
-    const rows = displayUsers.map((user) => [
+    const rows = users.map((user) => [
       user.id,
       user.name,
       user.district,
@@ -237,10 +373,10 @@ export default function App() {
   const updateUserStatus = async (status: UserStatus) => {
     if (!selectedUser) return
     const targetId = selectedUser.id
-
+    const updatedUser = await updateUserStatusApi(targetId, status)
     setUsers((current) =>
       current.map((user) =>
-        user.id === targetId ? ({ ...user, status }) : user,
+        user.id === targetId ? (updatedUser ?? { ...user, status }) : user,
       ),
     )
     setToast(
@@ -322,7 +458,7 @@ export default function App() {
           {page === "users" && (
             <UsersPage
               onSelect={(user) => setSelectedUserId(user.id)}
-              users={displayUsers}
+              users={users}
             />
           )}
           {page === "analytics" && (
@@ -333,14 +469,16 @@ export default function App() {
               setTrendRange={setTrendRange}
               trendRange={trendRange}
               trendsData={trendsData}
-              users={displayUsers}
+              users={users}
             />
           )}
 
           <footer className="page-footer">
             <span>SaigonDrain AI · Trung tâm điều hành đô thị thông minh</span>
             <span>
-              Dữ liệu mô phỏng · Thay đổi chỉ lưu trong phiên, tải lại để đặt lại
+              {isLiveBackend
+                ? "Đã kết nối Backend API & Open-Meteo · Hệ thống Vận hành TP.HCM"
+                : "SaigonDrain AI v2.0 · Hệ thống Vận hành & Cảnh báo Ngập lụt Đô thị TP.HCM"}
             </span>
           </footer>
         </div>

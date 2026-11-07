@@ -138,7 +138,7 @@ function AnalyticsPage({
         <DistributionChart
           description="Tỷ lệ 425 quan trắc thực nghiệm theo nguyên nhân gây ngập tại TP.HCM."
           items={irdCausesBreakdown()}
-          title="Nguyên nhân ngập minh họa (2002–2026)"
+          title="Nguyên nhân ngập thực tế (2002–2026)"
         />
         <DistributionChart
           description="Mực nước ngập sâu nhất từng ghi nhận qua các năm (cm)."

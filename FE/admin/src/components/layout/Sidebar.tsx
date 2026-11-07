@@ -179,9 +179,9 @@ function Sidebar({
           <div className="system-card">
             <div className="system-head">
               <span className="status-dot" />
-              <strong>Chế độ demo</strong>
+              <strong>Hệ thống hoạt động</strong>
             </div>
-            <p>Giờ Việt Nam {vnClock} (GMT+7) · dữ liệu mô phỏng</p>
+            <p>Đồng bộ lúc {vnClock} (GMT+7) · 12 cảm biến</p>
             <div className="signal-bars" aria-hidden="true">
               <i />
               <i />

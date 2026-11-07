@@ -3,12 +3,10 @@ function WaterGauge({
   max = 60,
   label = "cm",
   tone = 0,
-  title = "Mực nước hiện tại",
 }: {
   value: number
   max?: number
   label?: string
-  title?: string
   tone?: number
 }) {
   const percent = Math.max(0, Math.min(100, (value / max) * 100))
@@ -16,7 +14,7 @@ function WaterGauge({
 
   return (
     <div
-      aria-label={`${title}: ${value} trên ${max} ${label}`}
+      aria-label={`Mực nước ${value} trên ${max} ${label}`}
       aria-valuemax={max}
       aria-valuemin={0}
       aria-valuenow={value}
@@ -24,7 +22,7 @@ function WaterGauge({
       role="meter"
     >
       <div className="gauge-head">
-        <span>{title}</span>
+        <span>Mực nước hiện tại</span>
         <strong>
           {value}
           <small>{label}</small>

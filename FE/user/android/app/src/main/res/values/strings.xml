@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">SaigonDrain AI</string>
+    <string name="title_activity_main">SaigonDrain AI</string>
+    <string name="package_name">com.saigondrain.app</string>
+    <string name="custom_url_scheme">com.saigondrain.app</string>
+</resources>
