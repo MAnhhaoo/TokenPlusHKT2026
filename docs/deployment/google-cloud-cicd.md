@@ -12,6 +12,16 @@ The pipeline currently covers only the NestJS API in `BE/` and the public user f
 
 Deployment is disabled until `GCP_DEPLOY_STAGING` and `GCP_DEPLOY_PRODUCTION` are configured. The staging workflow records a successful revision only after all selected services deploy. It carries changes forward from the last successful staging revision, and superseded push runs skip themselves so the latest run can deploy the accumulated change set.
 
+<!-- coderabbit-ai-generated:v1 -->
+
+<!-- coderabbit-ai-generated-section:v1:d72aa8edd4c462c1341077dd672c6e5af0105b27e8771bc7cee4de1b2e4a18a8 -->
+
+At the workflow level, the concurrency group is keyed by the release tag or push commit SHA. GitHub allows one running and one pending run per group; a new run replaces an older pending run without canceling the active run.
+
+Staging and production jobs use separate repository-wide concurrency groups with `queue: max`. Each group allows one running job and up to 100 pending jobs; further jobs are canceled when the queue is full. A push does not replace a pending release staging job. If a release's staging job is canceled, production cannot deploy that release. Rerun all jobs in the release workflow after addressing the cancellation; production also requires the release to remain the latest release and pass its Environment gate.
+
+<!-- /coderabbit-ai-generated:v1 -->
+
 The API is private by default on Cloud Run. `GCP_API_PUBLIC=true` enables unauthenticated Cloud Run access; use it only after application-level authentication is implemented and reviewed. With the API private, browser requests from Firebase Hosting need a separate authentication/connectivity design. CORS and API authentication are application concerns and are not configured by this pipeline.
 
 ## GitHub configuration
