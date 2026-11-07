@@ -75,46 +75,25 @@ export function buildRealtimeAdminMapPoints(
   const currentRainMm = weather?.currentRainMm ?? 0
   const seenIds = new Set<string>()
 
-  // 1. Điểm giám sát thực tế từ PostgreSQL (/api/map/points)
+  // 1. Điểm giám sát thực tế từ PostgreSQL (/api/map/points?excludeReports=true)
   if (Array.isArray(rawPoints)) {
     for (const pt of rawPoints) {
       if (!pt?.id || seenIds.has(pt.id)) continue
+      // Loại bỏ hoàn toàn báo cáo người dân khỏi bản đồ vận hành (chỉ hiển thị ở tab Báo cáo cộng đồng)
+      if (
+        (pt as any).linkedReportId ||
+        pt.id.startsWith("p_RP-") ||
+        pt.id.startsWith("flood_rpt_") ||
+        pt.id.startsWith("report-")
+      ) {
+        continue
+      }
       seenIds.add(pt.id)
       result.push(pt)
     }
   }
 
-  // 2. Báo cáo hiện trường thực tế từ người dân (chưa bị từ chối)
-  if (reports && reports.length > 0) {
-    for (const r of reports) {
-      if (r.status === "rejected") continue
-      if (!r.coordinates) continue
-      if (result.some((pt) => pt.linkedReportId === r.id)) continue
-      const parts = r.coordinates.split(",").map((s) => parseFloat(s.trim()))
-      if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
-        const ptId = `flood_rpt_${r.id}`
-        if (seenIds.has(ptId)) continue
-        seenIds.add(ptId)
-        result.push({
-          id: ptId,
-          x: 50,
-          y: 50,
-          lat: parts[0],
-          lng: parts[1],
-          label: r.location,
-          district: r.district,
-          type: r.status === "pending" ? "pending" : "flood",
-          severity: r.severity,
-          depth: r.aiDepth ?? r.reportedDepth ?? 0,
-          rainfall: currentRainMm,
-          historyCount: r.historyCount ?? 1,
-          linkedReportId: r.id,
-        })
-      }
-    }
-  }
-
-  // 3. 250 ĐIỂM ĐEN LỊCH SỬ IRD (2002–2026) -> Lớp 'history' (Dữ liệu thật từ GPKG IRD)
+  // 2. 250 ĐIỂM ĐEN LỊCH SỬ IRD (2002–2026) -> Lớp 'history' (Dữ liệu thật từ GPKG IRD)
   const sourceHotspots = defaultHotspots as any[]
 
   for (const h of sourceHotspots) {
@@ -131,7 +110,7 @@ export function buildRealtimeAdminMapPoints(
       district: h.district,
       type: "history",
       severity: h.severity || "medium",
-      depth: h.maxDepth ?? h.depth ?? 0,
+      depth: 0, // Thời gian thực tạnh mưa: mặt đường khô ráo, độ sâu = 0
       maxDepth: h.maxDepth ?? h.depth ?? 0,
       historyCount: h.historyCount ?? 1,
       rainfall: 0,
@@ -163,7 +142,7 @@ export async function fetchAdminInitialData(): Promise<{
     ] = await Promise.all([
       fetch(`${API_BASE}/reports`),
       fetch(`${API_BASE}/alerts`),
-      fetch(`${API_BASE}/map/points`),
+      fetch(`${API_BASE}/map/points?excludeReports=true`),
       fetch(`${API_BASE}/users`),
       fetch(`${API_BASE}/analytics/trends`),
       fetchCurrentWeatherApi(),

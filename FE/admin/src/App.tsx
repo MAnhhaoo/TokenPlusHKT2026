@@ -508,15 +508,7 @@ export default function App() {
               reports={reports}
             />
           )}
-          {page === "alerts" && (
-            <AlertsPage
-              alerts={alerts}
-              weather={weather}
-              points={mapPoints}
-              onEdit={(alert) => setAlertModal({ mode: "edit", alert })}
-              onEnd={setEndingAlert}
-            />
-          )}
+          
           {page === "users" && (
             <UsersPage
               onSelect={(user) => setSelectedUserId(user.id)}

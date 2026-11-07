@@ -6,7 +6,6 @@ export type Page =
   | "overview"
   | "map"
   | "reports"
-  | "alerts"
   | "users"
   | "analytics"
 export type UserStatus = "active" | "review" | "blocked"

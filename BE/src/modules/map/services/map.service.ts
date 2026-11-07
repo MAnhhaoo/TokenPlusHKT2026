@@ -179,14 +179,11 @@ export class MapService {
           }
 
           if (isCleared) {
-            if (
-              activeLayers.includes("history") ||
-              activeLayers.includes("risk")
-            ) {
+            if (activeLayers.includes("history")) {
               dynamicPoints.push({
                 ...point,
                 depth: 0,
-                type: "risk",
+                type: "history",
                 label: `${point.label} (Đã rút hết nước)`,
               });
             }
@@ -285,7 +282,7 @@ export class MapService {
           dynamicPoints.push({
             ...point,
             depth: 0,
-            type: "risk",
+            type: "history",
           });
         }
         continue;

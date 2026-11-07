@@ -7,7 +7,12 @@ const c = new Client({
   database: 'saigondrain',
 });
 c.connect().then(async () => {
-  await c.query(`UPDATE flood_reports SET estimateddurationmin = 45, estimatedclearat = '01:10, 08/11/2026', drainageratecmpermin = 0.65 WHERE estimateddurationmin IS NULL`);
-  console.log('Updated estimates for null reports successfully');
+  const now = new Date();
+  const clearDate = new Date(now.getTime() + 42 * 60000);
+  const clearHourStr = String(clearDate.getHours()).padStart(2, '0');
+  const clearMinStr = String(clearDate.getMinutes()).padStart(2, '0');
+  const clearTimeStr = `${clearHourStr}:${clearMinStr}, 08/11/2026`;
+  await c.query(`UPDATE flood_reports SET "createdAt" = $1, "reportedDepth" = 30, "aiDepth" = 30, estimateddurationmin = 42, estimatedclearat = $2 WHERE id = $3`, [now, clearTimeStr, 'RP-2422']);
+  console.log('Updated RP-2422 to fresh time:', clearTimeStr);
   await c.end();
 }).catch(console.error);

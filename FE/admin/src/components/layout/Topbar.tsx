@@ -46,12 +46,7 @@ const pageMeta: Record<
     title: "Báo cáo hiện trường",
     subtitle: "Hàng chờ xác minh, bộ lọc chất lượng và trạng thái xử lý",
   },
-  alerts: {
-    eyebrow: "Truyền thông đô thị",
-    title: "Cảnh báo khu vực",
-    subtitle: "Phát hành, cập nhật và kết thúc cảnh báo theo khu vực",
-  },
-  users: {
+    users: {
     eyebrow: "Dữ liệu cộng đồng",
     title: "Quản lý người dùng",
     subtitle: "Hồ sơ, quyền truy cập và chất lượng đóng góp cộng đồng",
@@ -141,7 +136,7 @@ function Topbar({
           <Bell size={19} />
           <i />
         </IconButton>
-        {page === "overview" || page === "alerts" ? (
+        {page === "overview" ? (
           <Button aria-label="Tạo cảnh báo" onClick={onCreateAlert}>
             <Plus size={17} /> <span>Tạo cảnh báo</span>
           </Button>

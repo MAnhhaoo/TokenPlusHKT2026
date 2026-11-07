@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import Icon from "@/components/ui/Icon";
+import { getUserLocation } from "@/lib/location";
 import CommunityMap from "./CommunityMap";
 import type { CommunityReport, ReportType, Severity } from "@/types";
 
@@ -45,6 +46,38 @@ export default function CommunityPage({
   const [selectedDistrict, setSelectedDistrict] = useState("Tất cả quận/huyện");
   const [filterType, setFilterType] = useState<"all" | ReportType>("all");
   const [mobileViewMode, setMobileViewMode] = useState<"map" | "list">("map");
+  const [isLocatingUser, setIsLocatingUser] = useState(false);
+
+  const handleUseCurrentGps = async () => {
+    setIsLocatingUser(true);
+    try {
+      const loc = await getUserLocation();
+      if (loc && activeReports.length > 0) {
+        // Find nearest report
+        let nearest: CommunityReport | null = null;
+        let minDistance = Infinity;
+        for (const r of activeReports) {
+          if (r.lat && r.lng) {
+            const d = Math.hypot(r.lat - loc.latitude, r.lng - loc.longitude);
+            if (d < minDistance) {
+              minDistance = d;
+              nearest = r;
+            }
+          }
+        }
+        if (nearest) {
+          setSelectedReportId(nearest.id);
+          if (nearest.district) {
+            setSelectedDistrict(nearest.district);
+          }
+        }
+      }
+    } catch {
+      // ignore
+    } finally {
+      setIsLocatingUser(false);
+    }
+  };
 
   // Only show non-rejected reports to the community (admin has locked rejected reports)
   const activeReports = useMemo(() => {
@@ -178,6 +211,14 @@ export default function CommunityPage({
               >
                 <Icon name="close" size={14} />
               </button>
+              <button
+                type="button"
+                className={`comm-gps-search-btn ${isLocatingUser ? "animate-spin" : ""}`}
+                onClick={handleUseCurrentGps}
+                title="Định vị và tìm sự cố gần vị trí của tôi"
+              >
+                <Icon name="location" size={15} />
+              </button>
             </div>
 
             <div className="community-filters-row">
@@ -301,7 +342,14 @@ export default function CommunityPage({
                         <span className="hydro-label">Mực nước:</span>
                         <strong className={`hydro-val ${report.severity}`}>{depth} cm</strong>
                       </div>
-                      {report.estimatedDurationMin ? (
+                      {report.estimatedClearAt === "Đã rút hết nước" || report.estimatedDurationMin === 0 ? (
+                        <div className="hydro-item">
+                          <span className="hydro-label">Hiện trạng:</span>
+                          <strong className="hydro-val" style={{ color: "#10b981" }}>
+                            ✓ Đã rút hết nước
+                          </strong>
+                        </div>
+                      ) : report.estimatedDurationMin ? (
                         <div className="hydro-item">
                           <span className="hydro-label">Dự kiến rút:</span>
                           <strong className="hydro-val text-teal">
@@ -311,6 +359,21 @@ export default function CommunityPage({
                             <small className="hydro-sub">
                               ({report.estimatedClearAt.split(",")[0]})
                             </small>
+                          )}
+                          {report.description?.includes("tự động gia hạn") && (
+                            <span
+                              style={{
+                                display: "inline-block",
+                                fontSize: "10px",
+                                color: "#0369a1",
+                                background: "#e0f2fe",
+                                padding: "1px 6px",
+                                borderRadius: "4px",
+                                marginTop: "2px",
+                              }}
+                            >
+                              🌧️ Tự động gia hạn
+                            </span>
                           )}
                         </div>
                       ) : (

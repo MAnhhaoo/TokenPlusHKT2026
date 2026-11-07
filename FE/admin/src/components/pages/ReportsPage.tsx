@@ -305,6 +305,30 @@ function ReportsPage({
                           >
                             <Unlock size={13} /> Mở khóa
                           </Button>
+                        ) : report.status === "pending" ? (
+                          <>
+                            <Button
+                              variant="primary"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                if (onToggleLock) onToggleLock(report)
+                                else onReview(report)
+                              }}
+                              title="Duyệt và mở hiển thị lên bản đồ cộng đồng"
+                            >
+                              <Sparkles size={13} /> Duyệt & Mở
+                            </Button>
+                            <Button
+                              variant="danger"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                onReview(report)
+                              }}
+                              title="Khóa / Từ chối"
+                            >
+                              <Lock size={13} /> Khóa
+                            </Button>
+                          </>
                         ) : (
                           <Button
                             variant="danger"
