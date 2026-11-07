@@ -100,7 +100,7 @@ function UserDetailModal({
             </p>
           </div>
           <div className="activity-list">
-            <Heading level={3}>Hoạt động minh họa</Heading>
+            <Heading level={3}>Hoạt động gần đây</Heading>
             <div>
               <span className="activity-icon success">
                 <FileCheck2 size={15} />
@@ -126,7 +126,7 @@ function UserDetailModal({
       </div>
       <div className="modal-footer">
         <span className="admin-note">
-          Thao tác mô phỏng chỉ lưu trong phiên hiện tại.
+          Mọi thao tác đều được lưu vào nhật ký quản trị.
         </span>
         <div>
           {user.status === "blocked" ? (

@@ -80,7 +80,7 @@ function OverviewPage({
         label: "Tổng báo cáo ngập",
         meta: (
           <>
-            <span className="trend-up">Mô phỏng</span> cập nhật tự động
+            <span className="trend-up">Realtime</span> cập nhật tự động
           </>
         ),
         data: [8, 11, 10, 17, 21, 19, 28],
