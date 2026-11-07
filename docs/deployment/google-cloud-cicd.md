@@ -28,7 +28,7 @@ Configure environment variables separately for staging and production:
 | Environment variable | Required for | Notes |
 | --- | --- | --- |
 | `GCP_PROJECT_ID` | Every deploy | Google Cloud project ID. |
-| `GCP_REGION` | Cloud Run | Example: `asia-southeast1`. |
+| `GCP_REGION` | Every deploy | Example: `asia-southeast1`. |
 | `GCP_WORKLOAD_IDENTITY_PROVIDER` | Every deploy | Full WIF provider resource name. |
 | `GCP_DEPLOY_SERVICE_ACCOUNT` | Every deploy | GitHub Actions deployer identity. |
 | `GCP_RUNTIME_SERVICE_ACCOUNT` | API deploy | Cloud Run runtime identity. |
