@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from "react"
-import Icon from "@/components/ui/Icon"
-import { matchDynamicPlacePool, reverseGeocodeApi, searchPlacesApi } from "@/lib/api"
-import { getUserLocation } from "@/lib/location"
-import type { RouteEndpoint, VehicleMode } from "@/types"
+import { useEffect, useRef, useState } from "react";
+import Icon from "@/components/ui/Icon";
+import { matchDynamicPlacePool, reverseGeocodeApi, searchPlacesApi } from "@/lib/api";
+import { getUserLocation } from "@/lib/location";
+import type { RouteEndpoint, VehicleMode } from "@/types";
 
 function RouteSearch({
   origin,
@@ -13,232 +13,232 @@ function RouteSearch({
   vehicleMode = "motorcycle",
   onSelectVehicleMode,
 }: {
-  origin: RouteEndpoint | null
-  destination: RouteEndpoint | null
-  onSelectOrigin: (place: RouteEndpoint | null) => void
-  onSelectDestination: (place: RouteEndpoint | null) => void
-  onSwap: () => void
-  vehicleMode?: VehicleMode
-  onSelectVehicleMode?: (mode: VehicleMode) => void
+  origin: RouteEndpoint | null;
+  destination: RouteEndpoint | null;
+  onSelectOrigin: (place: RouteEndpoint | null) => void;
+  onSelectDestination: (place: RouteEndpoint | null) => void;
+  onSwap: () => void;
+  vehicleMode?: VehicleMode;
+  onSelectVehicleMode?: (mode: VehicleMode) => void;
 }) {
-  const [originText, setOriginText] = useState(origin?.label ?? "")
-  const [destText, setDestText] = useState(destination?.label ?? "")
-  const [activeField, setActiveField] = useState<"origin" | "dest" | null>(null)
-  const [suggestions, setSuggestions] = useState<RouteEndpoint[]>([])
-  const [loading, setLoading] = useState(false)
-  const [highlightIndex, setHighlightIndex] = useState(-1)
-  const wrapRef = useRef<HTMLDivElement>(null)
-  const swappingRef = useRef(false)
-  const reqSeqRef = useRef(0)
-  const [gpsLoading, setGpsLoading] = useState(false)
+  const [originText, setOriginText] = useState(origin?.label ?? "");
+  const [destText, setDestText] = useState(destination?.label ?? "");
+  const [activeField, setActiveField] = useState<"origin" | "dest" | null>(null);
+  const [suggestions, setSuggestions] = useState<RouteEndpoint[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [highlightIndex, setHighlightIndex] = useState(-1);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const swappingRef = useRef(false);
+  const reqSeqRef = useRef(0);
+  const searchAbortRef = useRef<AbortController | null>(null);
+  useEffect(() => () => searchAbortRef.current?.abort(), []);
+
+  async function searchPlaces(query: string, allowNominatim = true) {
+    searchAbortRef.current?.abort();
+    const controller = new AbortController();
+    searchAbortRef.current = controller;
+    const results = await searchPlacesApi(query, controller.signal, { allowNominatim });
+    return controller.signal.aborted ? [] : results;
+  }
+  const [gpsLoading, setGpsLoading] = useState(false);
 
   const handleGetOriginGps = async () => {
-    setGpsLoading(true)
+    setGpsLoading(true);
     try {
-      const { latitude, longitude } = await getUserLocation()
+      const { latitude, longitude, isIpFallback } = await getUserLocation();
+      const locationLabel = isIpFallback ? "Vị trí gần đúng" : "Vị trí của bạn";
       try {
-        const geo = await reverseGeocodeApi(latitude, longitude)
-        const street = geo.location || (geo.district ? `${geo.district}, TP.HCM` : "Vị trí của bạn")
-        const label = `Vị trí của bạn · ${street}`
+        const geo = await reverseGeocodeApi(latitude, longitude);
+        const street =
+          geo.location || (geo.district ? `${geo.district}, TP.HCM` : "Vị trí của bạn");
+        const label = `${locationLabel} · ${street}`;
         const place: RouteEndpoint = {
           label,
           address: geo.location,
           district: geo.district,
           coords: [longitude, latitude],
-          isCurrentLocation: true,
-        }
-        onSelectOrigin(place)
-        setOriginText(label)
-        setActiveField(null)
-        setSuggestions([])
+          isCurrentLocation: !isIpFallback,
+        };
+        onSelectOrigin(place);
+        setOriginText(label);
+        setActiveField(null);
+        setSuggestions([]);
       } catch {
-        const label = `Vị trí của bạn (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`
+        const label = `${locationLabel} (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`;
         const place: RouteEndpoint = {
           label,
           coords: [longitude, latitude],
-          isCurrentLocation: true,
-        }
-        onSelectOrigin(place)
-        setOriginText(label)
-        setActiveField(null)
-        setSuggestions([])
+          isCurrentLocation: !isIpFallback,
+        };
+        onSelectOrigin(place);
+        setOriginText(label);
+        setActiveField(null);
+        setSuggestions([]);
       }
     } finally {
-      setGpsLoading(false)
+      setGpsLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    if (swappingRef.current) return
-    setOriginText(origin?.label ?? "")
-  }, [origin])
+    if (swappingRef.current) return;
+    setOriginText(origin?.label ?? "");
+  }, [origin]);
 
   useEffect(() => {
-    if (swappingRef.current) return
-    setDestText(destination?.label ?? "")
-  }, [destination])
+    if (swappingRef.current) return;
+    setDestText(destination?.label ?? "");
+  }, [destination]);
 
   const handleSwapClick = async () => {
-    swappingRef.current = true
-    const prevOriginText = originText
-    const prevDestText = destText
-    const prevOrigin = origin
-    const prevDest = destination
+    swappingRef.current = true;
+    const prevOriginText = originText;
+    const prevDestText = destText;
+    const prevOrigin = origin;
+    const prevDest = destination;
 
-    setOriginText(prevDestText)
-    setDestText(prevOriginText)
-    setSuggestions([])
-    setHighlightIndex(-1)
-    setActiveField(null)
-    onSwap()
+    setOriginText(prevDestText);
+    setDestText(prevOriginText);
+    setSuggestions([]);
+    setHighlightIndex(-1);
+    setActiveField(null);
+    onSwap();
 
     window.setTimeout(() => {
-      swappingRef.current = false
-    }, 80)
+      swappingRef.current = false;
+    }, 80);
 
     // Nếu người dùng mới gõ chữ mà chưa bấm chọn gợi ý, tự động phân giải địa điểm khi đảo chiều
     if (!prevDest && prevDestText.trim().length >= 2) {
-      const res = await searchPlacesApi(prevDestText.trim())
+      const res = await searchPlaces(prevDestText.trim());
       if (res.length > 0) {
-        onSelectOrigin(res[0])
+        onSelectOrigin(res[0]);
       }
     }
     if (!prevOrigin && prevOriginText.trim().length >= 2) {
-      const res = await searchPlacesApi(prevOriginText.trim())
+      const res = await searchPlaces(prevOriginText.trim());
       if (res.length > 0) {
-        onSelectDestination(res[0])
+        onSelectDestination(res[0]);
       }
     }
-  }
+  };
 
   useEffect(() => {
     if (!activeField) {
-      setSuggestions([])
-      setLoading(false)
-      return
+      setSuggestions([]);
+      setLoading(false);
+      return;
     }
-    const query = (activeField === "origin" ? originText : destText).trim()
-    const committedLabel =
-      activeField === "origin" ? origin?.label : destination?.label
+    const query = (activeField === "origin" ? originText : destText).trim();
+    const committedLabel = activeField === "origin" ? origin?.label : destination?.label;
 
     if (!query || query === committedLabel) {
-      setSuggestions([])
-      setLoading(false)
-      setHighlightIndex(-1)
-      return
+      setSuggestions([]);
+      setLoading(false);
+      setHighlightIndex(-1);
+      return;
     }
 
     // 1. Lọc tức thì (0ms) từ dữ liệu động đã tải từ PostgreSQL & Bản đồ trực tuyến
-    const dynamicMatches = matchDynamicPlacePool(query)
+    const dynamicMatches = matchDynamicPlacePool(query);
     if (dynamicMatches.length > 0) {
-      setSuggestions(dynamicMatches)
-      setHighlightIndex(0)
-      setLoading(false)
+      setSuggestions(dynamicMatches);
+      setHighlightIndex(0);
+      setLoading(false);
     } else {
-      setSuggestions([])
-      setHighlightIndex(-1)
-      setLoading(true)
+      setSuggestions([]);
+      setHighlightIndex(-1);
+      setLoading(true);
     }
 
-    // 2. Truy vấn mở rộng trực tiếp API bản đồ thực tế với debounce 25ms (không hủy giữa chừng để làm giàu cache)
-    const seq = ++reqSeqRef.current
+    // Debounce autocomplete; Nominatim is reserved for explicit commits.
+    const seq = ++reqSeqRef.current;
     const timer = window.setTimeout(async () => {
-      const results = await searchPlacesApi(query)
-      if (reqSeqRef.current !== seq) return
-      setSuggestions(results)
-      setHighlightIndex(results.length > 0 ? 0 : -1)
-      setLoading(false)
-    }, 25)
+      const results = await searchPlaces(query, false);
+      if (reqSeqRef.current !== seq) return;
+      setSuggestions(results);
+      setHighlightIndex(results.length > 0 ? 0 : -1);
+      setLoading(false);
+    }, 300);
 
     return () => {
-      window.clearTimeout(timer)
-    }
-  }, [activeField, originText, destText, origin?.label, destination?.label])
+      ++reqSeqRef.current;
+      searchAbortRef.current?.abort();
+      window.clearTimeout(timer);
+    };
+  }, [activeField, originText, destText, origin?.label, destination?.label]);
 
   useEffect(() => {
     const handleClickOutside = (ev: MouseEvent) => {
       if (wrapRef.current && !wrapRef.current.contains(ev.target as Node)) {
-        setActiveField(null)
+        setActiveField(null);
       }
-    }
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [])
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
-  const commitPlace = (
-    place: RouteEndpoint,
-    targetField?: "origin" | "dest",
-  ) => {
-    const field = targetField ?? activeField
-    const isGps = Boolean(place.isCurrentLocation || place.label.includes("Vị trí của bạn"))
+  const commitPlace = (place: RouteEndpoint, targetField?: "origin" | "dest") => {
+    const field = targetField ?? activeField;
+    const isGps = Boolean(place.isCurrentLocation || place.label.includes("Vị trí của bạn"));
     const finalPlace: RouteEndpoint = {
       ...place,
       isCurrentLocation: isGps,
-    }
+    };
     if (field === "origin") {
-      setOriginText(finalPlace.label)
-      onSelectOrigin(finalPlace)
+      setOriginText(finalPlace.label);
+      onSelectOrigin(finalPlace);
     } else if (field === "dest") {
-      setDestText(finalPlace.label)
-      onSelectDestination(finalPlace)
+      setDestText(finalPlace.label);
+      onSelectDestination(finalPlace);
     }
-    setSuggestions([])
-    setActiveField(null)
-  }
+    setSuggestions([]);
+    setActiveField(null);
+  };
 
   const handleKeyDown = async (
     ev: React.KeyboardEvent<HTMLInputElement>,
     field: "origin" | "dest",
   ) => {
     if (ev.key === "ArrowDown" && suggestions.length > 0) {
-      ev.preventDefault()
-      setHighlightIndex((prev) => (prev + 1) % suggestions.length)
-      return
+      ev.preventDefault();
+      setHighlightIndex((prev) => (prev + 1) % suggestions.length);
+      return;
     }
     if (ev.key === "ArrowUp" && suggestions.length > 0) {
-      ev.preventDefault()
-      setHighlightIndex((prev) =>
-        prev <= 0 ? suggestions.length - 1 : prev - 1,
-      )
-      return
+      ev.preventDefault();
+      setHighlightIndex((prev) => (prev <= 0 ? suggestions.length - 1 : prev - 1));
+      return;
     }
     if (ev.key === "Enter") {
-      ev.preventDefault()
-      const text = (field === "origin" ? originText : destText).trim()
+      ev.preventDefault();
+      const text = (field === "origin" ? originText : destText).trim();
       if (!text) {
-        if (field === "origin") onSelectOrigin(null)
-        else onSelectDestination(null)
-        setActiveField(null)
-        return
+        if (field === "origin") onSelectOrigin(null);
+        else onSelectDestination(null);
+        setActiveField(null);
+        return;
       }
       if (suggestions.length > 0) {
-        const chosen =
-          suggestions[highlightIndex >= 0 ? highlightIndex : 0] ??
-          suggestions[0]
-        commitPlace(chosen, field)
-        return
+        const chosen = suggestions[highlightIndex >= 0 ? highlightIndex : 0] ?? suggestions[0];
+        commitPlace(chosen, field);
+        return;
       }
-      const results = await searchPlacesApi(text)
+      const results = await searchPlaces(text);
       if (results.length > 0) {
-        commitPlace(results[0], field)
+        commitPlace(results[0], field);
       } else {
-        setActiveField(null)
+        setActiveField(null);
       }
     } else if (ev.key === "Escape") {
-      setActiveField(null)
+      setActiveField(null);
     }
-  }
+  };
 
-  const currentQuery = (
-    activeField === "origin" ? originText : destText
-  ).trim()
+  const currentQuery = (activeField === "origin" ? originText : destText).trim();
 
   return (
-    <div
-      aria-label="Tìm lộ trình điểm đi và điểm đến"
-      className="route-search-wrap"
-      ref={wrapRef}
-    >
+    <div aria-label="Tìm lộ trình điểm đi và điểm đến" className="route-search-wrap" ref={wrapRef}>
       {onSelectVehicleMode && (
         <div className="search-vehicle-tabs" role="tablist" aria-label="Chọn loại phương tiện">
           <button
@@ -273,31 +273,30 @@ function RouteSearch({
         </div>
         <div className="search-values">
           <label className="search-value">
-            <small>Điểm đi</small>
             <div className="search-input-row">
               <input
                 aria-label="Nhập điểm đi"
                 className="search-input"
                 onChange={(e) => {
-                  const val = e.target.value
-                  setOriginText(val)
-                  setActiveField("origin")
-                  if (!val.trim()) onSelectOrigin(null)
+                  const val = e.target.value;
+                  setOriginText(val);
+                  setActiveField("origin");
+                  if (!val.trim()) onSelectOrigin(null);
                 }}
                 onFocus={() => setActiveField("origin")}
                 onBlur={() => {
                   window.setTimeout(async () => {
-                    const text = originText.trim()
+                    const text = originText.trim();
                     if (text && (!origin || origin.label !== text)) {
-                      const res = await searchPlacesApi(text)
+                      const res = await searchPlaces(text);
                       if (res.length > 0) {
-                        commitPlace(res[0], "origin")
+                        commitPlace(res[0], "origin");
                       }
                     }
-                  }, 60)
+                  }, 60);
                 }}
                 onKeyDown={(e) => handleKeyDown(e, "origin")}
-                placeholder="Nhập điểm đi hoặc bấm nút GPS…"
+                placeholder="Chọn điểm đi hoặc bấm GPS…"
                 type="text"
                 value={originText}
               />
@@ -305,58 +304,61 @@ function RouteSearch({
                 <button
                   aria-label="Xóa điểm đi"
                   className="search-clear-btn"
-                  onClick={() => {
-                    setOriginText("")
-                    onSelectOrigin(null)
-                    setSuggestions([])
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setOriginText("");
+                    onSelectOrigin(null);
+                    setSuggestions([]);
                   }}
                   type="button"
                 >
-                  <Icon name="close" size={14} />
+                  <Icon name="close" size={13} />
                 </button>
               )}
               <button
                 aria-label="Lấy vị trí GPS hiện tại làm điểm xuất phát"
                 className={`search-gps-btn ${gpsLoading ? "is-loading" : ""}`}
-                onClick={handleGetOriginGps}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleGetOriginGps();
+                }}
                 title="Lấy vị trí GPS của bạn làm điểm xuất phát"
                 type="button"
               >
                 {gpsLoading ? (
                   <span className="search-gps-spinner" />
                 ) : (
-                  <Icon name="location" size={16} />
+                  <Icon name="location" size={15} />
                 )}
               </button>
             </div>
           </label>
           <span aria-hidden="true" className="search-divider" />
           <label className="search-value">
-            <small>Điểm đến</small>
             <div className="search-input-row">
               <input
                 aria-label="Nhập điểm đến"
                 className="search-input"
                 onChange={(e) => {
-                  const val = e.target.value
-                  setDestText(val)
-                  setActiveField("dest")
-                  if (!val.trim()) onSelectDestination(null)
+                  const val = e.target.value;
+                  setDestText(val);
+                  setActiveField("dest");
+                  if (!val.trim()) onSelectDestination(null);
                 }}
                 onFocus={() => setActiveField("dest")}
                 onBlur={() => {
                   window.setTimeout(async () => {
-                    const text = destText.trim()
+                    const text = destText.trim();
                     if (text && (!destination || destination.label !== text)) {
-                      const res = await searchPlacesApi(text)
+                      const res = await searchPlaces(text);
                       if (res.length > 0) {
-                        commitPlace(res[0], "dest")
+                        commitPlace(res[0], "dest");
                       }
                     }
-                  }, 60)
+                  }, 60);
                 }}
                 onKeyDown={(e) => handleKeyDown(e, "dest")}
-                placeholder="Nhập điểm đến (tên đường, địa chỉ, địa danh…)"
+                placeholder="Tìm điểm đến, tên đường, địa chỉ…"
                 type="text"
                 value={destText}
               />
@@ -364,14 +366,15 @@ function RouteSearch({
                 <button
                   aria-label="Xóa điểm đến"
                   className="search-clear-btn"
-                  onClick={() => {
-                    setDestText("")
-                    onSelectDestination(null)
-                    setSuggestions([])
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setDestText("");
+                    onSelectDestination(null);
+                    setSuggestions([]);
                   }}
                   type="button"
                 >
-                  <Icon name="close" size={14} />
+                  <Icon name="close" size={13} />
                 </button>
               )}
             </div>
@@ -397,7 +400,12 @@ function RouteSearch({
           {activeField === "origin" && !originText.trim() && (
             <li key="gps-current-location">
               <button
-                className="suggestion-item is-gps-item" onMouseDown={(e) => { e.preventDefault(); handleGetOriginGps(); }} onClick={handleGetOriginGps}
+                className="suggestion-item is-gps-item"
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  handleGetOriginGps();
+                }}
+                onClick={handleGetOriginGps}
                 type="button"
               >
                 <span className="suggestion-icon gps-bubble">
@@ -418,7 +426,12 @@ function RouteSearch({
             suggestions.map((place, idx) => (
               <li key={`${place.label}-${place.coords.join(",")}`}>
                 <button
-                  className={`suggestion-item ${idx === highlightIndex ? "is-highlighted" : ""}`} onMouseDown={(e) => { e.preventDefault(); commitPlace(place); }} onClick={() => commitPlace(place)}
+                  className={`suggestion-item ${idx === highlightIndex ? "is-highlighted" : ""}`}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    commitPlace(place);
+                  }}
+                  onClick={() => commitPlace(place)}
                   onMouseEnter={() => setHighlightIndex(idx)}
                   type="button"
                 >
@@ -434,7 +447,7 @@ function RouteSearch({
         </ul>
       )}
     </div>
-  )
+  );
 }
 
-export default RouteSearch
+export default RouteSearch;

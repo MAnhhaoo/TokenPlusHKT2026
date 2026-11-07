@@ -29,7 +29,7 @@ function Brand() {
       </span>
       <span className="brand-ai">AI</span>
     </div>
-  )
+  );
 }
 
-export default Brand
+export default Brand;

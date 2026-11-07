@@ -1,5 +1,5 @@
-import Icon from "@/components/ui/Icon"
-import type { RouteId, RouteItem } from "@/types"
+import Icon from "@/components/ui/Icon";
+import type { RouteId, RouteItem } from "@/types";
 
 function RouteOption({
   id,
@@ -7,12 +7,12 @@ function RouteOption({
   onSelect,
   routeItem,
 }: {
-  id: RouteId
-  selected: boolean
-  onSelect: (id: RouteId) => void
-  routeItem: RouteItem
+  id: RouteId;
+  selected: boolean;
+  onSelect: (id: RouteId) => void;
+  routeItem: RouteItem;
 }) {
-  const item = routeItem
+  const item = routeItem;
 
   return (
     <button
@@ -37,7 +37,7 @@ function RouteOption({
       </span>
       <span aria-hidden="true" className={`route-swatch ${id}`} />
     </button>
-  )
+  );
 }
 
-export default RouteOption
+export default RouteOption;

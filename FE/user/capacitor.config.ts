@@ -1,4 +1,4 @@
-import type { CapacitorConfig } from "@capacitor/cli"
+import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
   appId: "com.saigondrain.app",
@@ -14,6 +14,6 @@ const config: CapacitorConfig = {
   plugins: {
     Geolocation: {},
   },
-}
+};
 
-export default config
+export default config;

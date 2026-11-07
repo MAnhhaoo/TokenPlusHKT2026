@@ -1,16 +1,16 @@
-import Icon from "@/components/ui/Icon"
-import type { NavigationStep } from "@/types"
+import Icon from "@/components/ui/Icon";
+import type { NavigationStep } from "@/types";
 
 function formatVietnamEta(durationText?: string): string {
-  const minutesMatch = durationText?.match(/(\d+)/)
-  const addMinutes = minutesMatch ? Number(minutesMatch[1]) : 0
-  const target = new Date(Date.now() + addMinutes * 60_000)
+  const minutesMatch = durationText?.match(/(\d+)/);
+  const addMinutes = minutesMatch ? Number(minutesMatch[1]) : 0;
+  const target = new Date(Date.now() + addMinutes * 60_000);
   return new Intl.DateTimeFormat("vi-VN", {
     timeZone: "Asia/Ho_Chi_Minh",
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
-  }).format(target)
+  }).format(target);
 }
 
 function TurnByTurnDirections({
@@ -18,12 +18,12 @@ function TurnByTurnDirections({
   distance,
   durationText,
 }: {
-  steps: readonly NavigationStep[]
-  distance?: string
-  durationText?: string
+  steps: readonly NavigationStep[];
+  distance?: string;
+  durationText?: string;
 }) {
-  const hasRoute = steps.length > 0 && distance && distance !== "—"
-  const etaVietnam = formatVietnamEta(durationText)
+  const hasRoute = steps.length > 0 && distance && distance !== "—";
+  const etaVietnam = formatVietnamEta(durationText);
 
   return (
     <div className="directions-section">
@@ -56,7 +56,7 @@ function TurnByTurnDirections({
         ))}
       </div>
     </div>
-  )
+  );
 }
 
-export default TurnByTurnDirections
+export default TurnByTurnDirections;

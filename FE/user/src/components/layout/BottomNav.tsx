@@ -1,12 +1,12 @@
-import Icon from "@/components/ui/Icon"
-import type { AppTab } from "@/types"
+import Icon from "@/components/ui/Icon";
+import type { AppTab } from "@/types";
 
 function BottomNav({
   activeTab,
   onSelect,
 }: {
-  activeTab: AppTab
-  onSelect: (tab: AppTab) => void
+  activeTab: AppTab;
+  onSelect: (tab: AppTab) => void;
 }) {
   return (
     <nav aria-label="Điều hướng chính" className="bottom-nav">
@@ -34,11 +34,20 @@ function BottomNav({
         onClick={() => onSelect("saved")}
         type="button"
       >
-        <Icon name="route" size={22} />
+        <Icon name="route" size={21} />
         <span>Tuyến đường</span>
       </button>
+      <button
+        aria-current={activeTab === "weather" ? "page" : undefined}
+        className={activeTab === "weather" ? "is-active" : ""}
+        onClick={() => onSelect("weather")}
+        type="button"
+      >
+        <Icon name="sun" size={21} />
+        <span>Thời tiết</span>
+      </button>
     </nav>
-  )
+  );
 }
 
-export default BottomNav
+export default BottomNav;

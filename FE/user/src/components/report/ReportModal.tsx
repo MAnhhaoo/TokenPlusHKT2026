@@ -1,54 +1,55 @@
-import { useEffect, useRef, useState } from "react"
-import Icon from "@/components/ui/Icon"
-import { getUserLocation } from "@/lib/location"
+import { useDialogFocus } from "@/hooks/useDialogFocus";
+import { useEffect, useRef, useState } from "react";
+import Icon from "@/components/ui/Icon";
+import { getUserLocation } from "@/lib/location";
 import {
   createCitizenReport,
   matchDynamicPlacePool,
   reverseGeocodeApi,
   searchPlacesApi,
-} from "@/lib/api"
-import type { ReportType, RouteEndpoint, Severity } from "@/types"
+} from "@/lib/api";
+import type { ReportType, RouteEndpoint, Severity } from "@/types";
 
 function compressImageToDataUrl(file: File): Promise<string> {
   return new Promise((resolve) => {
-    const reader = new FileReader()
+    const reader = new FileReader();
     reader.onload = () => {
-      const result = typeof reader.result === "string" ? reader.result : ""
+      const result = typeof reader.result === "string" ? reader.result : "";
       if (!result) {
-        resolve("")
-        return
+        resolve("");
+        return;
       }
-      const img = new Image()
+      const img = new Image();
       img.onload = () => {
-        const maxDim = 640
-        let w = img.width
-        let h = img.height
+        const maxDim = 640;
+        let w = img.width;
+        let h = img.height;
         if (w > maxDim || h > maxDim) {
           if (w > h) {
-            h = Math.round((h * maxDim) / w)
-            w = maxDim
+            h = Math.round((h * maxDim) / w);
+            w = maxDim;
           } else {
-            w = Math.round((w * maxDim) / h)
-            h = maxDim
+            w = Math.round((w * maxDim) / h);
+            h = maxDim;
           }
         }
-        const canvas = document.createElement("canvas")
-        canvas.width = w
-        canvas.height = h
-        const ctx = canvas.getContext("2d")
+        const canvas = document.createElement("canvas");
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext("2d");
         if (ctx) {
-          ctx.drawImage(img, 0, 0, w, h)
-          resolve(canvas.toDataURL("image/jpeg", 0.78))
+          ctx.drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL("image/jpeg", 0.78));
         } else {
-          resolve(result)
+          resolve(result);
         }
-      }
-      img.onerror = () => resolve(result)
-      img.src = result
-    }
-    reader.onerror = () => resolve("")
-    reader.readAsDataURL(file)
-  })
+      };
+      img.onerror = () => resolve(result);
+      img.src = result;
+    };
+    reader.onerror = () => resolve("");
+    reader.readAsDataURL(file);
+  });
 }
 
 function ReportModal({
@@ -57,170 +58,134 @@ function ReportModal({
   reporterId,
   onReportCreated,
 }: {
-  open: boolean
-  onClose: () => void
-  reporterId?: string
-  onReportCreated?: () => void
+  open: boolean;
+  onClose: () => void;
+  reporterId?: string;
+  onReportCreated?: () => void;
 }) {
-  const [type, setType] = useState<ReportType>("flood")
-  const [severity, setSeverity] = useState<Severity>("medium")
-  const [submitted, setSubmitted] = useState(false)
-  const [submitting, setSubmitting] = useState(false)
-  const [createdReportId, setCreatedReportId] = useState<string | null>(null)
-  const [photoName, setPhotoName] = useState("")
-  const [photoDataUrl, setPhotoDataUrl] = useState("")
+  const [type, setType] = useState<ReportType>("flood");
+  const [severity, setSeverity] = useState<Severity>("medium");
+  const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [createdReportId, setCreatedReportId] = useState<string | null>(null);
+  const [photoName, setPhotoName] = useState("");
+  const [photoDataUrl, setPhotoDataUrl] = useState("");
 
-  const [locationText, setLocationText] = useState("")
-  const [selectedDistrict, setSelectedDistrict] = useState("Bình Thạnh")
-  const [coords, setCoords] = useState<[number, number]>([106.7185, 10.7934])
-  const [locSuggestions, setLocSuggestions] = useState<RouteEndpoint[]>([])
-  const [showSuggestions, setShowSuggestions] = useState(false)
-  const [locatingGps, setLocatingGps] = useState(false)
-  const [description, setDescription] = useState("")
+  const [locationText, setLocationText] = useState("");
+  const [selectedDistrict, setSelectedDistrict] = useState("Bình Thạnh");
+  const [coords, setCoords] = useState<[number, number]>([106.7185, 10.7934]);
+  const [locSuggestions, setLocSuggestions] = useState<RouteEndpoint[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [locatingGps, setLocatingGps] = useState(false);
+  const [description, setDescription] = useState("");
 
-  const closeRef = useRef<HTMLButtonElement>(null)
-  const panelRef = useRef<HTMLDivElement>(null)
-  const successRef = useRef<HTMLDivElement>(null)
+  const panelRef = useDialogFocus(open, closeModal);
+  const successRef = useRef<HTMLDivElement>(null);
 
   function closeModal() {
-    onClose()
+    onClose();
     window.setTimeout(() => {
-      setSubmitted(false)
-      setSubmitting(false)
-      setCreatedReportId(null)
-      setPhotoName("")
-      setPhotoDataUrl("")
-      setDescription("")
-      setType("flood")
-      setSeverity("medium")
-      setShowSuggestions(false)
-    }, 250)
+      setSubmitError(null);
+      setSubmitted(false);
+      setSubmitting(false);
+      setCreatedReportId(null);
+      setPhotoName("");
+      setPhotoDataUrl("");
+      setDescription("");
+      setType("flood");
+      setSeverity("medium");
+      setShowSuggestions(false);
+    }, 250);
   }
 
   useEffect(() => {
-    if (!showSuggestions) return
-    const clean = locationText.trim()
+    if (!showSuggestions) return;
+    const clean = locationText.trim();
     if (!clean) {
-      setLocSuggestions([])
-      return
+      setLocSuggestions([]);
+      return;
     }
-    const dynamicMatches = matchDynamicPlacePool(clean)
+    const dynamicMatches = matchDynamicPlacePool(clean);
     if (dynamicMatches.length > 0) {
-      setLocSuggestions(dynamicMatches)
+      setLocSuggestions(dynamicMatches);
     }
 
-    let active = true
+    let active = true;
     const timer = window.setTimeout(async () => {
-      const results = await searchPlacesApi(clean)
-      if (active) setLocSuggestions(results)
-    }, 25)
+      const results = await searchPlacesApi(clean);
+      if (active) setLocSuggestions(results);
+    }, 25);
     return () => {
-      active = false
-      window.clearTimeout(timer)
-    }
-  }, [locationText, showSuggestions])
+      active = false;
+      window.clearTimeout(timer);
+    };
+  }, [locationText, showSuggestions]);
 
   async function handleUseGps() {
-    setLocatingGps(true)
+    setLocatingGps(true);
     try {
-      const { latitude, longitude } = await getUserLocation()
-      const geo = await reverseGeocodeApi(latitude, longitude)
-      setLocationText(
-        geo.district
-          ? `${geo.location}, ${geo.district}`
-          : geo.location,
-      )
-      setSelectedDistrict(geo.district || "TP.HCM")
-      setCoords([longitude, latitude])
-      setShowSuggestions(false)
+      const { latitude, longitude } = await getUserLocation();
+      const geo = await reverseGeocodeApi(latitude, longitude);
+      setLocationText(geo.district ? `${geo.location}, ${geo.district}` : geo.location);
+      setSelectedDistrict(geo.district || "TP.HCM");
+      setCoords([longitude, latitude]);
+      setShowSuggestions(false);
     } catch (err) {
-      console.warn("Failed to locate position in ReportModal:", err)
+      console.warn("Failed to locate position in ReportModal:", err);
     } finally {
-      setLocatingGps(false)
+      setLocatingGps(false);
     }
   }
 
   async function handlePhotoChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0]
+    const file = event.target.files?.[0];
     if (!file) {
-      setPhotoName("")
-      setPhotoDataUrl("")
-      return
+      setPhotoName("");
+      setPhotoDataUrl("");
+      return;
     }
-    setPhotoName(file.name)
-    const dataUrl = await compressImageToDataUrl(file)
-    setPhotoDataUrl(dataUrl)
+    setPhotoName(file.name);
+    const dataUrl = await compressImageToDataUrl(file);
+    setPhotoDataUrl(dataUrl);
   }
 
   async function handleSubmit() {
-    setSubmitting(true)
-    const rawLoc = locationText.trim() || "Nguyễn Hữu Cảnh, Bình Thạnh"
-    const cleanLocation = rawLoc.split(/[·,]/)[0].trim() || rawLoc
-    const created = await createCitizenReport({
-      reportType: type,
-      severity,
-      photoUrl: photoDataUrl || photoName || undefined,
-      location: cleanLocation,
-      district: selectedDistrict,
-      description: description.trim() || undefined,
-      lat: coords[1],
-      lng: coords[0],
-      reporterId,
-    })
-    setCreatedReportId(created?.id ?? null)
-    setSubmitting(false)
-    setSubmitted(true)
-    if (created) onReportCreated?.()
+    setSubmitting(true);
+    setSubmitError(null);
+    try {
+      const rawLoc = locationText.trim() || "Nguyễn Hữu Cảnh, Bình Thạnh";
+      const cleanLocation = rawLoc.split(/[·,]/)[0].trim() || rawLoc;
+      const created = await createCitizenReport({
+        reportType: type,
+        severity,
+        photoUrl: photoDataUrl || photoName || undefined,
+        location: cleanLocation,
+        district: selectedDistrict,
+        description: description.trim() || undefined,
+        lat: coords[1],
+        lng: coords[0],
+        reporterId,
+      });
+      if (!created) {
+        setSubmitError("Không thể gửi báo cáo. Vui lòng thử lại.");
+        return;
+      }
+      setCreatedReportId(created.id);
+      setSubmitted(true);
+      onReportCreated?.();
+    } catch {
+      setSubmitError("Không thể gửi báo cáo. Vui lòng thử lại.");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
-  const closeModalRef = useRef(closeModal)
-  closeModalRef.current = closeModal
-
   useEffect(() => {
-    if (!open) return
+    if (submitted) successRef.current?.focus();
+  }, [submitted]);
 
-    const previousFocus = document.activeElement as HTMLElement | null
-    closeRef.current?.focus()
-
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        event.preventDefault()
-        closeModalRef.current()
-        return
-      }
-      if (event.key !== "Tab") return
-      const panel = panelRef.current
-      if (!panel) return
-      const focusable = Array.from(
-        panel.querySelectorAll<HTMLElement>(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-        ),
-      ).filter((element) => !element.hasAttribute("disabled"))
-      if (focusable.length === 0) return
-      const first = focusable[0]
-      const last = focusable[focusable.length - 1]
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault()
-        last.focus()
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault()
-        first.focus()
-      }
-    }
-
-    window.addEventListener("keydown", onKeyDown)
-
-    return () => {
-      window.removeEventListener("keydown", onKeyDown)
-      previousFocus?.focus()
-    }
-  }, [open])
-
-  useEffect(() => {
-    if (submitted) successRef.current?.focus()
-  }, [submitted])
-
-  if (!open) return null
+  if (!open) return null;
 
   return (
     <div className="modal-backdrop" onMouseDown={closeModal}>
@@ -230,6 +195,7 @@ function ReportModal({
         aria-modal="true"
         className="report-modal"
         onMouseDown={(event) => event.stopPropagation()}
+        tabIndex={-1}
         ref={panelRef}
         role="dialog"
       >
@@ -237,7 +203,6 @@ function ReportModal({
           aria-label="Đóng báo cáo"
           className="icon-button modal-close"
           onClick={closeModal}
-          ref={closeRef}
           type="button"
         >
           <Icon name="close" size={20} />
@@ -255,21 +220,14 @@ function ReportModal({
               <Icon name="check" size={30} />
             </span>
             <span className="success-pill">
-              {createdReportId
-                ? `Đã ghi nhận · ${createdReportId}`
-                : "Đã ghi nhận"}
+              {createdReportId ? `Đã ghi nhận · ${createdReportId}` : "Đã ghi nhận"}
             </span>
             <h2 id="report-title">Cảm ơn bạn đã bảo vệ cộng đồng</h2>
             <p id="report-description">
-              Báo cáo tại{" "}
-              <strong>{locationText.trim() || "khu vực bạn chọn"}</strong> đã
-              được gửi tới Trung tâm điều hành theo thời gian thực.
+              Báo cáo tại <strong>{locationText.trim() || "khu vực bạn chọn"}</strong> đã được gửi
+              tới Trung tâm điều hành theo thời gian thực.
             </p>
-            <button
-              className="primary-modal-button"
-              onClick={closeModal}
-              type="button"
-            >
+            <button className="primary-modal-button" onClick={closeModal} type="button">
               Quay lại bản đồ
             </button>
           </div>
@@ -287,11 +245,7 @@ function ReportModal({
               </div>
             </div>
 
-            <div
-              aria-label="Loại sự cố"
-              className="report-type-grid"
-              role="group"
-            >
+            <div aria-label="Loại sự cố" className="report-type-grid" role="group">
               <button
                 aria-pressed={type === "flood"}
                 className={type === "flood" ? "is-selected" : ""}
@@ -335,10 +289,7 @@ function ReportModal({
                     onClick={() => setSeverity(id)}
                     type="button"
                   >
-                    <span
-                      aria-hidden="true"
-                      className={`severity-dot ${id}`}
-                    />
+                    <span aria-hidden="true" className={`severity-dot ${id}`} />
                     <span>
                       <strong>{title}</strong>
                       <small>{caption}</small>
@@ -357,8 +308,8 @@ function ReportModal({
                     aria-label="Nhập tên đường hoặc vị trí ngập"
                     className="report-location-input"
                     onChange={(e) => {
-                      setLocationText(e.target.value)
-                      setShowSuggestions(true)
+                      setLocationText(e.target.value);
+                      setShowSuggestions(true);
                     }}
                     onFocus={() => setShowSuggestions(true)}
                     placeholder="Nhập tên đường, giao lộ (VD: Nguyễn Hữu Cảnh, Bình Thạnh…)"
@@ -385,10 +336,10 @@ function ReportModal({
                       <button
                         className="suggestion-item"
                         onClick={() => {
-                          setLocationText(place.label)
-                          setSelectedDistrict(place.district || "TP.HCM")
-                          setCoords(place.coords)
-                          setShowSuggestions(false)
+                          setLocationText(place.label);
+                          setSelectedDistrict(place.district || "TP.HCM");
+                          setCoords(place.coords);
+                          setShowSuggestions(false);
                         }}
                         type="button"
                       >
@@ -440,6 +391,7 @@ function ReportModal({
               />
             </label>
 
+            {submitError && <p role="alert">{submitError}</p>}
             <button
               className="primary-modal-button"
               disabled={submitting}
@@ -453,7 +405,7 @@ function ReportModal({
         )}
       </div>
     </div>
-  )
+  );
 }
 
-export default ReportModal
+export default ReportModal;

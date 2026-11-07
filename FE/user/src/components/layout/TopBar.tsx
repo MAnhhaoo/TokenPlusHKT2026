@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react"
-import Brand from "@/components/layout/Brand"
-import Icon from "@/components/ui/Icon"
-import type { CommunityUserProfile, WeatherSnapshot } from "@/types"
+import { useEffect, useState } from "react";
+import Brand from "@/components/layout/Brand";
+import Icon from "@/components/ui/Icon";
+import type { CommunityUserProfile, WeatherSnapshot } from "@/types";
 
 function formatVietnamClock(date = new Date()): string {
   return new Intl.DateTimeFormat("vi-VN", {
@@ -9,7 +9,7 @@ function formatVietnamClock(date = new Date()): string {
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
-  }).format(date)
+  }).format(date);
 }
 
 function TopBar({
@@ -23,28 +23,28 @@ function TopBar({
   activeMainTab = "map",
   onSelectMainTab,
 }: {
-  weather?: WeatherSnapshot | null
-  onSyncWeather?: () => void
-  currentUser?: CommunityUserProfile | null
-  onOpenAuth?: () => void
-  alertCount?: number
-  onOpenAlerts?: () => void
-  onOpenGuide?: () => void
-  activeMainTab?: "map" | "weather"
-  onSelectMainTab?: (tab: "map" | "weather") => void
+  weather?: WeatherSnapshot | null;
+  onSyncWeather?: () => void;
+  currentUser?: CommunityUserProfile | null;
+  onOpenAuth?: () => void;
+  alertCount?: number;
+  onOpenAlerts?: () => void;
+  onOpenGuide?: () => void;
+  activeMainTab?: "map" | "weather";
+  onSelectMainTab?: (tab: "map" | "weather") => void;
 }) {
-  const [vnTime, setVnTime] = useState(() => formatVietnamClock())
+  const [vnTime, setVnTime] = useState(() => formatVietnamClock());
 
   useEffect(() => {
     const timer = window.setInterval(() => {
-      setVnTime(formatVietnamClock())
-    }, 30_000)
-    return () => window.clearInterval(timer)
-  }, [])
+      setVnTime(formatVietnamClock());
+    }, 30_000);
+    return () => window.clearInterval(timer);
+  }, []);
 
   const weatherLabel = weather
     ? `${weather.weatherCondition} · ${Math.round(weather.temperatureC)}°C`
-    : "Nắng ráo · 31°C"
+    : "Nắng ráo · 31°C";
 
   return (
     <header className={`top-bar ${activeMainTab === "weather" ? "in-weather-mode" : ""}`}>
@@ -91,9 +91,12 @@ function TopBar({
                   ? "rain"
                   : "sun"
               }
-              size={16}
+              size={15}
             />
             <span className="weather-chip-text">{weatherLabel}</span>
+            <span className="weather-chip-short">
+              {weather ? `${Math.round(weather.temperatureC)}°C` : "31°C"}
+            </span>
           </button>
         )}
 
@@ -115,16 +118,12 @@ function TopBar({
           type="button"
         >
           <Icon name="bell" size={20} />
-          {alertCount > 0 && (
-            <span aria-hidden="true" className="notification-dot" />
-          )}
+          {alertCount > 0 && <span aria-hidden="true" className="notification-dot" />}
         </button>
 
         <button
           aria-label={
-            currentUser
-              ? `Tài khoản ${currentUser.name}`
-              : "Đăng nhập hoặc Đăng ký tài khoản"
+            currentUser ? `Tài khoản ${currentUser.name}` : "Đăng nhập hoặc Đăng ký tài khoản"
           }
           className={`user-button ${currentUser ? "is-logged-in" : "is-guest"}`}
           onClick={onOpenAuth}
@@ -149,7 +148,7 @@ function TopBar({
         </button>
       </div>
     </header>
-  )
+  );
 }
 
-export default TopBar
+export default TopBar;

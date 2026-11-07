@@ -1,14 +1,14 @@
-import type { ReactNode } from "react"
-import type { IconName } from "@/types"
+import type { ReactNode } from "react";
+import type { IconName } from "@/types";
 
 function Icon({
   name,
   size = 20,
   className = "",
 }: {
-  name: IconName
-  size?: number
-  className?: string
+  name: IconName;
+  size?: number;
+  className?: string;
 }) {
   const paths: Record<IconName, ReactNode> = {
     alert: (
@@ -163,7 +163,7 @@ function Icon({
         <path d="M4 21a8 8 0 0 1 16 0" />
       </>
     ),
-  }
+  };
 
   return (
     <svg
@@ -174,17 +174,11 @@ function Icon({
       viewBox="0 0 24 24"
       width={size}
     >
-      <g
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="1.8"
-      >
+      <g stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8">
         {paths[name]}
       </g>
     </svg>
-  )
+  );
 }
 
-
-export default Icon
+export default Icon;

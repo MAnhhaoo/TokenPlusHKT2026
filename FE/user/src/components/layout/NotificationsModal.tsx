@@ -1,5 +1,6 @@
-import Icon from "@/components/ui/Icon"
-import type { AreaAlertItem } from "@/types"
+import { useDialogFocus } from "@/hooks/useDialogFocus";
+import Icon from "@/components/ui/Icon";
+import type { AreaAlertItem } from "@/types";
 
 function NotificationsModal({
   open,
@@ -8,22 +9,25 @@ function NotificationsModal({
   onClose,
   alerts,
 }: {
-  open: boolean
-  mode: "alerts" | "guide"
-  onChangeMode: (next: "alerts" | "guide") => void
-  onClose: () => void
-  alerts: AreaAlertItem[]
+  open: boolean;
+  mode: "alerts" | "guide";
+  onChangeMode: (next: "alerts" | "guide") => void;
+  onClose: () => void;
+  alerts: AreaAlertItem[];
 }) {
-  if (!open) return null
+  const panelRef = useDialogFocus(open, onClose);
+  if (!open) return null;
 
   return (
     <div
       aria-label="Cảnh báo khu vực và hướng dẫn an toàn"
       aria-modal="true"
       className="modal-backdrop"
-      onClick={(ev) => {
-        if (ev.target === ev.currentTarget) onClose()
+      onMouseDown={(ev) => {
+        if (ev.target === ev.currentTarget) onClose();
       }}
+      ref={panelRef}
+      tabIndex={-1}
       role="dialog"
     >
       <div className="report-modal auth-modal">
@@ -85,7 +89,7 @@ function NotificationsModal({
               </div>
             ) : (
               alerts.map((alert) => {
-                const isCritical = alert.level === "Nghiêm trọng"
+                const isCritical = alert.level === "Nghiêm trọng";
                 return (
                   <article
                     className={`notif-alert-card ${isCritical ? "is-critical" : "is-warning"}`}
@@ -99,12 +103,11 @@ function NotificationsModal({
                     </div>
                     <strong>{alert.title}</strong>
                     <span className="notif-area">
-                      <Icon name="pin" size={13} /> {alert.area} ·{" "}
-                      {alert.hazardType}
+                      <Icon name="pin" size={13} /> {alert.area} · {alert.hazardType}
                     </span>
                     <p>{alert.message}</p>
                   </article>
-                )
+                );
               })
             )}
           </div>
@@ -113,39 +116,33 @@ function NotificationsModal({
             <div className="notif-guide-item">
               <strong>1. Không cố vượt điểm ngập trên 25 cm (quá nửa bánh xe)</strong>
               <p>
-                Mực nước trên 25 cm dễ làm nước tràn vào ống xả và lọc gió gây
-                chết máy, đồng thời che khuất ổ gà hoặc nắp cống bị bật.
+                Mực nước trên 25 cm dễ làm nước tràn vào ống xả và lọc gió gây chết máy, đồng thời
+                che khuất ổ gà hoặc nắp cống bị bật.
               </p>
             </div>
             <div className="notif-guide-item">
               <strong>2. Ưu tiên chọn "Tuyến đề xuất" trên SaigonDrain AI</strong>
               <p>
-                Thuật toán tự động đối chiếu dữ liệu mưa Open-Meteo và các điểm
-                ngập cộng đồng vừa được Trung tâm điều hành xác minh để tìm
-                đường vòng khô ráo.
+                Thuật toán tự động đối chiếu dữ liệu mưa Open-Meteo và các điểm ngập cộng đồng vừa
+                được Trung tâm điều hành xác minh để tìm đường vòng khô ráo.
               </p>
             </div>
             <div className="notif-guide-item">
               <strong>3. Giữ khoảng cách và đi số thấp đều ga</strong>
               <p>
-                Với xe số, giữ số 1 hoặc 2; với xe tay ga, giữ đều tay ga và
-                tránh đi sát xe tải/ô tô lớn để không bị sóng nước đánh ngã.
+                Với xe số, giữ số 1 hoặc 2; với xe tay ga, giữ đều tay ga và tránh đi sát xe tải/ô
+                tô lớn để không bị sóng nước đánh ngã.
               </p>
             </div>
           </div>
         )}
 
-        <button
-          className="primary-modal-button"
-          onClick={onClose}
-          type="button"
-        >
+        <button className="primary-modal-button" onClick={onClose} type="button">
           Đã hiểu, quay lại bản đồ
         </button>
       </div>
     </div>
-  )
+  );
 }
 
-export default NotificationsModal
-
+export default NotificationsModal;

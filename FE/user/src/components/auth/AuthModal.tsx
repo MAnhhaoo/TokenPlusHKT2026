@@ -1,11 +1,8 @@
-import { useState } from "react"
-import Icon from "@/components/ui/Icon"
-import {
-  clearAuthSession,
-  loginUserApi,
-  registerUserApi,
-} from "@/lib/api"
-import type { CommunityUserProfile } from "@/types"
+import { useDialogFocus } from "@/hooks/useDialogFocus";
+import { useState } from "react";
+import Icon from "@/components/ui/Icon";
+import { clearAuthSession, loginUserApi, registerUserApi } from "@/lib/api";
+import type { CommunityUserProfile } from "@/types";
 
 const HCMC_DISTRICTS = [
   "Quận 1",
@@ -22,7 +19,7 @@ const HCMC_DISTRICTS = [
   "Bình Tân",
   "Bình Chánh",
   "Nhà Bè",
-]
+];
 
 function AuthModal({
   open,
@@ -31,93 +28,92 @@ function AuthModal({
   onAuthSuccess,
   onLogout,
 }: {
-  open: boolean
-  onClose: () => void
-  currentUser: CommunityUserProfile | null
-  onAuthSuccess: (user: CommunityUserProfile) => void
-  onLogout: () => void
+  open: boolean;
+  onClose: () => void;
+  currentUser: CommunityUserProfile | null;
+  onAuthSuccess: (user: CommunityUserProfile) => void;
+  onLogout: () => void;
 }) {
-  const [mode, setMode] = useState<"login" | "register">("login")
-  const [identifier, setIdentifier] = useState("")
-  const [loginPassword, setLoginPassword] = useState("")
+  const [mode, setMode] = useState<"login" | "register">("login");
+  const [identifier, setIdentifier] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
 
-  const [name, setName] = useState("")
-  const [phone, setPhone] = useState("")
-  const [email, setEmail] = useState("")
-  const [district, setDistrict] = useState("Bình Thạnh")
-  const [regPassword, setRegPassword] = useState("")
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [district, setDistrict] = useState("Bình Thạnh");
+  const [regPassword, setRegPassword] = useState("");
 
-  const [loading, setLoading] = useState(false)
-  const [errorMsg, setErrorMsg] = useState<string | null>(null)
-  const [successMsg, setSuccessMsg] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
-  if (!open) return null
+  const panelRef = useDialogFocus(open, onClose);
+  if (!open) return null;
 
   async function handleLoginSubmit(ev: React.FormEvent) {
-    ev.preventDefault()
-    setErrorMsg(null)
-    setSuccessMsg(null)
+    ev.preventDefault();
+    setErrorMsg(null);
+    setSuccessMsg(null);
     if (!identifier.trim() || !loginPassword.trim()) {
-      setErrorMsg("Vui lòng nhập đầy đủ Email/Số điện thoại và mật khẩu.")
-      return
+      setErrorMsg("Vui lòng nhập đầy đủ Email/Số điện thoại và mật khẩu.");
+      return;
     }
-    setLoading(true)
+    setLoading(true);
     const res = await loginUserApi({
       identifier: identifier.trim(),
       password: loginPassword,
-    })
-    setLoading(false)
+    });
+    setLoading(false);
     if (!res.ok || !res.user) {
-      setErrorMsg(res.message)
-      return
+      setErrorMsg(res.message);
+      return;
     }
-    setSuccessMsg(res.message)
-    onAuthSuccess(res.user)
+    setSuccessMsg(res.message);
+    onAuthSuccess(res.user);
   }
 
   async function handleRegisterSubmit(ev: React.FormEvent) {
-    ev.preventDefault()
-    setErrorMsg(null)
-    setSuccessMsg(null)
+    ev.preventDefault();
+    setErrorMsg(null);
+    setSuccessMsg(null);
     if (!name.trim() || !phone.trim() || !email.trim() || !regPassword.trim()) {
-      setErrorMsg("Vui lòng điền đầy đủ thông tin đăng ký.")
-      return
+      setErrorMsg("Vui lòng điền đầy đủ thông tin đăng ký.");
+      return;
     }
     if (regPassword.length < 6) {
-      setErrorMsg("Mật khẩu phải có ít nhất 6 ký tự.")
-      return
+      setErrorMsg("Mật khẩu phải có ít nhất 6 ký tự.");
+      return;
     }
-    setLoading(true)
-    const registeredEmail = email.trim()
+    setLoading(true);
+    const registeredEmail = email.trim();
     const res = await registerUserApi({
       name: name.trim(),
       phone: phone.trim(),
       email: registeredEmail,
       district,
       password: regPassword,
-    })
-    setLoading(false)
+    });
+    setLoading(false);
     if (!res.ok) {
-      setErrorMsg(res.message)
-      return
+      setErrorMsg(res.message);
+      return;
     }
     // Chuyển sang tab Đăng nhập để người dùng đăng nhập sau khi đăng ký xong
-    setName("")
-    setPhone("")
-    setEmail("")
-    setRegPassword("")
-    setIdentifier(registeredEmail)
-    setLoginPassword("")
-    setMode("login")
-    setSuccessMsg(
-      "Đăng ký tài khoản thành công! Vui lòng nhập mật khẩu để đăng nhập.",
-    )
+    setName("");
+    setPhone("");
+    setEmail("");
+    setRegPassword("");
+    setIdentifier(registeredEmail);
+    setLoginPassword("");
+    setMode("login");
+    setSuccessMsg("Đăng ký tài khoản thành công! Vui lòng nhập mật khẩu để đăng nhập.");
   }
 
   function handleQuickFillDemo() {
-    setIdentifier("hoanganh.tran@email.vn")
-    setLoginPassword("123456")
-    setErrorMsg(null)
+    setIdentifier("hoanganh.tran@email.vn");
+    setLoginPassword("123456");
+    setErrorMsg(null);
   }
 
   return (
@@ -125,9 +121,11 @@ function AuthModal({
       aria-label="Hộp thoại tài khoản người dùng"
       aria-modal="true"
       className="modal-backdrop"
-      onClick={(ev) => {
-        if (ev.target === ev.currentTarget) onClose()
+      onMouseDown={(ev) => {
+        if (ev.target === ev.currentTarget) onClose();
       }}
+      ref={panelRef}
+      tabIndex={-1}
       role="dialog"
     >
       <div className="report-modal auth-modal">
@@ -171,9 +169,7 @@ function AuthModal({
                 </span>
                 <span className="auth-verified-badge">
                   <Icon name="check" size={13} />{" "}
-                  {currentUser.identityVerified
-                    ? "Đã xác thực danh tính"
-                    : "Thành viên cộng đồng"}
+                  {currentUser.identityVerified ? "Đã xác thực danh tính" : "Thành viên cộng đồng"}
                 </span>
               </div>
             </div>
@@ -214,19 +210,15 @@ function AuthModal({
               <button
                 className="auth-logout-button"
                 onClick={() => {
-                  clearAuthSession()
-                  setSuccessMsg(null)
-                  onLogout()
+                  clearAuthSession();
+                  setSuccessMsg(null);
+                  onLogout();
                 }}
                 type="button"
               >
                 Đăng xuất
               </button>
-              <button
-                className="primary-modal-button"
-                onClick={onClose}
-                type="button"
-              >
+              <button className="primary-modal-button" onClick={onClose} type="button">
                 Quay lại bản đồ
               </button>
             </div>
@@ -238,9 +230,9 @@ function AuthModal({
                 aria-selected={mode === "login"}
                 className={mode === "login" ? "is-active" : ""}
                 onClick={() => {
-                  setMode("login")
-                  setErrorMsg(null)
-                  setSuccessMsg(null)
+                  setMode("login");
+                  setErrorMsg(null);
+                  setSuccessMsg(null);
                 }}
                 role="tab"
                 type="button"
@@ -251,9 +243,9 @@ function AuthModal({
                 aria-selected={mode === "register"}
                 className={mode === "register" ? "is-active" : ""}
                 onClick={() => {
-                  setMode("register")
-                  setErrorMsg(null)
-                  setSuccessMsg(null)
+                  setMode("register");
+                  setErrorMsg(null);
+                  setSuccessMsg(null);
                 }}
                 role="tab"
                 type="button"
@@ -291,20 +283,12 @@ function AuthModal({
 
                 <div className="auth-demo-hint">
                   <span>Tài khoản mẫu có sẵn (MK: 123456)</span>
-                  <button
-                    className="auth-quick-fill"
-                    onClick={handleQuickFillDemo}
-                    type="button"
-                  >
+                  <button className="auth-quick-fill" onClick={handleQuickFillDemo} type="button">
                     Điền nhanh: Trần Hoàng Anh
                   </button>
                 </div>
 
-                <button
-                  className="primary-modal-button"
-                  disabled={loading}
-                  type="submit"
-                >
+                <button className="primary-modal-button" disabled={loading} type="submit">
                   {loading ? "Đang xác thực…" : "Đăng nhập"}
                   <Icon name="arrow" size={20} />
                 </button>
@@ -334,10 +318,7 @@ function AuthModal({
 
                   <label className="auth-field">
                     <span>Khu vực (TP.HCM)</span>
-                    <select
-                      onChange={(e) => setDistrict(e.target.value)}
-                      value={district}
-                    >
+                    <select onChange={(e) => setDistrict(e.target.value)} value={district}>
                       {HCMC_DISTRICTS.map((d) => (
                         <option key={d} value={d}>
                           {d}
@@ -367,11 +348,7 @@ function AuthModal({
                   />
                 </label>
 
-                <button
-                  className="primary-modal-button"
-                  disabled={loading}
-                  type="submit"
-                >
+                <button className="primary-modal-button" disabled={loading} type="submit">
                   {loading ? "Đang tạo tài khoản…" : "Đăng ký tài khoản"}
                   <Icon name="arrow" size={20} />
                 </button>
@@ -381,7 +358,7 @@ function AuthModal({
         )}
       </div>
     </div>
-  )
+  );
 }
 
-export default AuthModal
+export default AuthModal;

@@ -1,5 +1,5 @@
-import { useEffect, useRef } from "react"
-import Icon from "@/components/ui/Icon"
+import { useEffect, useRef } from "react";
+import Icon from "@/components/ui/Icon";
 import type {
   ForecastSlot,
   NavigationStep,
@@ -8,11 +8,11 @@ import type {
   SavedRoutePair,
   VehicleMode,
   WeatherSnapshot,
-} from "@/types"
-import JourneyStatus from "@/components/journey/JourneyStatus"
-import ForecastTimeline from "@/components/journey/ForecastTimeline"
-import RouteOption from "@/components/journey/RouteOption"
-import TurnByTurnDirections from "@/components/journey/TurnByTurnDirections"
+} from "@/types";
+import JourneyStatus from "@/components/journey/JourneyStatus";
+import ForecastTimeline from "@/components/journey/ForecastTimeline";
+import RouteOption from "@/components/journey/RouteOption";
+import TurnByTurnDirections from "@/components/journey/TurnByTurnDirections";
 
 function JourneyPanel({
   forecastIndex,
@@ -37,64 +37,55 @@ function JourneyPanel({
   vehicleMode = "motorcycle",
   onSelectVehicleMode,
 }: {
-  forecastIndex: number
-  setForecastIndex: (index: number) => void
-  selectedRoute: RouteId
-  setSelectedRoute: (route: RouteId) => void
-  expanded: boolean
-  setExpanded: (expanded: boolean) => void
-  isNavigating: boolean
-  onStart: () => void
-  onReport: () => void
-  focusSection?: "forecast" | "routes" | null
-  forecasts: readonly ForecastSlot[]
-  routesData: Record<RouteId, RouteItem>
-  navigationSteps: readonly NavigationStep[]
-  canSaveRoute?: boolean
-  onSaveCurrentRoute?: () => void
-  savedRoutes?: readonly SavedRoutePair[]
-  onSelectSavedRoute?: (pair: SavedRoutePair) => void
-  onRemoveSavedRoute?: (id: string) => void
-  weather?: WeatherSnapshot | null
-  vehicleMode?: VehicleMode
-  onSelectVehicleMode?: (mode: VehicleMode) => void
+  forecastIndex: number;
+  setForecastIndex: (index: number) => void;
+  selectedRoute: RouteId;
+  setSelectedRoute: (route: RouteId) => void;
+  expanded: boolean;
+  setExpanded: (expanded: boolean) => void;
+  isNavigating: boolean;
+  onStart: () => void;
+  onReport: () => void;
+  focusSection?: "forecast" | "routes" | null;
+  forecasts: readonly ForecastSlot[];
+  routesData: Record<RouteId, RouteItem>;
+  navigationSteps: readonly NavigationStep[];
+  canSaveRoute?: boolean;
+  onSaveCurrentRoute?: () => void;
+  savedRoutes?: readonly SavedRoutePair[];
+  onSelectSavedRoute?: (pair: SavedRoutePair) => void;
+  onRemoveSavedRoute?: (id: string) => void;
+  weather?: WeatherSnapshot | null;
+  vehicleMode?: VehicleMode;
+  onSelectVehicleMode?: (mode: VehicleMode) => void;
 }) {
-  const forecastRef = useRef<HTMLDivElement>(null)
-  const routesRef = useRef<HTMLDivElement>(null)
+  const forecastRef = useRef<HTMLDivElement>(null);
+  const routesRef = useRef<HTMLDivElement>(null);
 
-  const hasEndpoints = Boolean(canSaveRoute)
+  const hasEndpoints = Boolean(canSaveRoute);
   const hasRoute = Boolean(
-    hasEndpoints &&
-      routesData?.safe?.coordinates &&
-      routesData.safe.coordinates.length > 1
-  )
+    hasEndpoints && routesData?.safe?.coordinates && routesData.safe.coordinates.length > 1,
+  );
 
   useEffect(() => {
-    if (!expanded || !focusSection) return
-    const target =
-      focusSection === "routes" ? routesRef.current : forecastRef.current
-    if (!target) return
-    const reduced = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches
+    if (!expanded || !focusSection) return;
+    const target = focusSection === "routes" ? routesRef.current : forecastRef.current;
+    if (!target) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const frame = window.requestAnimationFrame(() => {
       target.scrollIntoView({
         behavior: reduced ? "auto" : "smooth",
         block: "start",
-      })
-    })
-    return () => window.cancelAnimationFrame(frame)
-  }, [expanded, focusSection])
+      });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [expanded, focusSection]);
 
   return (
-    <section
-      className={`journey-panel ${expanded ? "is-expanded" : "is-collapsed"}`}
-    >
+    <section className={`journey-panel ${expanded ? "is-expanded" : "is-collapsed"}`}>
       <button
         aria-expanded={expanded}
-        aria-label={
-          expanded ? "Thu gọn bảng hành trình" : "Mở rộng bảng hành trình"
-        }
+        aria-label={expanded ? "Thu gọn bảng hành trình" : "Mở rộng bảng hành trình"}
         className="sheet-handle"
         onClick={() => setExpanded(!expanded)}
         type="button"
@@ -110,25 +101,16 @@ function JourneyPanel({
             </span>
             <strong>Đang dẫn đường ({vehicleMode === "car" ? "Ô tô" : "Xe máy"})</strong>
             <small>
-              còn {routesData[selectedRoute].time} ·{" "}
-              {routesData[selectedRoute].distance}
+              còn {routesData[selectedRoute].time} · {routesData[selectedRoute].distance}
             </small>
           </div>
         )}
 
-        <JourneyStatus
-          forecastIndex={forecastIndex}
-          slots={forecasts}
-          weather={weather}
-        />
+        <JourneyStatus forecastIndex={forecastIndex} slots={forecasts} weather={weather} />
 
         <div className="panel-scroll">
           <div ref={forecastRef}>
-            <ForecastTimeline
-              value={forecastIndex}
-              onChange={setForecastIndex}
-              slots={forecasts}
-            />
+            <ForecastTimeline value={forecastIndex} onChange={setForecastIndex} slots={forecasts} />
           </div>
 
           {hasEndpoints ? (
@@ -243,15 +225,27 @@ function JourneyPanel({
 
               <div className={`route-explanation ${selectedRoute}`}>
                 <span className="explanation-icon">
-                  <Icon
-                    name={selectedRoute === "safe" ? "shield" : "alert"}
-                    size={19}
-                  />
+                  <Icon name={selectedRoute === "safe" ? "shield" : "alert"} size={19} />
                 </span>
                 <p>{routesData[selectedRoute].detail}</p>
-                <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#047857', background: '#ecfdf5', padding: '6px 10px', borderRadius: '6px', border: '1px solid #a7f3d0' }}>
+                <div
+                  style={{
+                    marginTop: "8px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    fontSize: "12px",
+                    color: "#047857",
+                    background: "#ecfdf5",
+                    padding: "6px 10px",
+                    borderRadius: "6px",
+                    border: "1px solid #a7f3d0",
+                  }}
+                >
                   <strong>🤖 Mô hình AI:</strong>
-                  <span>Tuyến đường được phân tích nguy cơ ngập qua mô hình GIS MCDA & LightGBM</span>
+                  <span>
+                    Tuyến đường được phân tích nguy cơ ngập qua mô hình GIS MCDA & LightGBM
+                  </span>
                 </div>
               </div>
 
@@ -271,7 +265,8 @@ function JourneyPanel({
                 <div className="prompt-text">
                   <strong>Chưa chọn điểm xuất phát & điểm đến</strong>
                   <p>
-                    Vui lòng nhập <b>Điểm đi</b> và <b>Điểm đến</b> ở thanh tìm kiếm phía trên để hệ thống tự động tìm tuyến đường né ngập an toàn nhất.
+                    Vui lòng nhập <b>Điểm đi</b> và <b>Điểm đến</b> ở thanh tìm kiếm phía trên để hệ
+                    thống tự động tìm tuyến đường né ngập an toàn nhất.
                   </p>
                 </div>
               </div>
@@ -313,42 +308,27 @@ function JourneyPanel({
         </div>
       </div>
 
-      <div className="panel-actions">
-        {hasEndpoints && hasRoute ? (
-          <>
-            <button
-              className={`start-button ${selectedRoute} ${
-                isNavigating ? "is-navigating" : ""
-              }`}
-              onClick={onStart}
-              type="button"
-            >
-              <span>
-                <small>
-                  {isNavigating ? "Đang dẫn đường" : "Bắt đầu với"}
-                </small>
-                <strong>
-                  {isNavigating
-                    ? "Kết thúc hành trình"
-                    : `${routesData[selectedRoute].name} (${routesData[selectedRoute].time})`}
-                </strong>
-              </span>
-              <Icon name={isNavigating ? "close" : "arrow"} size={21} />
-            </button>
-            <button className="report-secondary" onClick={onReport} type="button">
-              <Icon name="camera" size={18} />
-              Báo cáo hiện trường
-            </button>
-          </>
-        ) : (
-          <button className="report-secondary is-full" onClick={onReport} type="button">
-            <Icon name="camera" size={18} />
-            Báo cáo điểm ngập / sự cố hiện trường
+      {hasEndpoints && hasRoute && (
+        <div className="panel-actions">
+          <button
+            className={`start-button ${selectedRoute} ${isNavigating ? "is-navigating" : ""}`}
+            onClick={onStart}
+            type="button"
+          >
+            <span>
+              <small>{isNavigating ? "Đang dẫn đường" : "Bắt đầu với"}</small>
+              <strong>
+                {isNavigating
+                  ? "Kết thúc hành trình"
+                  : `${routesData[selectedRoute].name} (${routesData[selectedRoute].time})`}
+              </strong>
+            </span>
+            <Icon name={isNavigating ? "close" : "arrow"} size={21} />
           </button>
-        )}
-      </div>
+        </div>
+      )}
     </section>
-  )
+  );
 }
 
-export default JourneyPanel
+export default JourneyPanel;

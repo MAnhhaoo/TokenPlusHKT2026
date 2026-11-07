@@ -1,4 +1,4 @@
-import type { RouteId } from "@/types"
+import type { RouteId } from "@/types";
 
 function MapLegend({ selectedRoute }: { selectedRoute: RouteId }) {
   return (
@@ -8,9 +8,7 @@ function MapLegend({ selectedRoute }: { selectedRoute: RouteId }) {
         <i className="legend-line safe" />
         Tuyến đề xuất
       </span>
-      <span
-        className={`legend-row ${selectedRoute === "balanced" ? "is-current" : ""}`}
-      >
+      <span className={`legend-row ${selectedRoute === "balanced" ? "is-current" : ""}`}>
         <i className="legend-line balanced" />
         Tuyến dự phòng
       </span>
@@ -19,7 +17,7 @@ function MapLegend({ selectedRoute }: { selectedRoute: RouteId }) {
         Điểm ngập cần tránh
       </span>
     </aside>
-  )
+  );
 }
 
-export default MapLegend
+export default MapLegend;

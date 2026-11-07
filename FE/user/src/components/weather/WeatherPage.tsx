@@ -1,28 +1,25 @@
-import { useEffect, useRef, useState } from "react"
-import { getUserLocation } from "@/lib/location"
-import { reverseGeocodeApi } from "@/lib/api"
+import { useEffect, useRef, useState } from "react";
+import { getUserLocation } from "@/lib/location";
+import { reverseGeocodeApi } from "@/lib/api";
 import {
   DEFAULT_HCMC_WEATHER,
   type DetailedWeatherData,
   fetchFullRealWeather,
   searchWeatherLocation,
-} from "@/lib/weatherApi"
+} from "@/lib/weatherApi";
 
 function WeatherIllustration({
   theme,
   weatherCode,
   size = 180,
 }: {
-  theme: "sunny" | "rainy" | "cloudy" | "night"
-  weatherCode: number
-  size?: number
+  theme: "sunny" | "rainy" | "cloudy" | "night";
+  weatherCode: number;
+  size?: number;
 }) {
   if (theme === "rainy" || weatherCode >= 51) {
     return (
-      <div
-        className="weather-hero-art rainy"
-        style={{ width: size, height: size }}
-      >
+      <div className="weather-hero-art rainy" style={{ width: size, height: size }}>
         <svg
           fill="none"
           height="100%"
@@ -44,7 +41,13 @@ function WeatherIllustration({
               <stop offset="100%" stopColor="#0284C7" />
             </linearGradient>
             <filter id="cloudShadow" x="-20%" y="-20%" width="140%" height="140%">
-              <feDropShadow dx="0" dy="12" stdDeviation="16" floodColor="#0F2B48" floodOpacity="0.35" />
+              <feDropShadow
+                dx="0"
+                dy="12"
+                stdDeviation="16"
+                floodColor="#0F2B48"
+                floodOpacity="0.35"
+              />
             </filter>
           </defs>
           {/* Main Rain Cloud */}
@@ -59,21 +62,54 @@ function WeatherIllustration({
             />
           </g>
           {/* Rain drops with gentle slant */}
-          <line className="rain-drop drop-1" stroke="url(#rainGrad)" strokeLinecap="round" strokeWidth="5" x1="55" x2="45" y1="145" y2="175" />
-          <line className="rain-drop drop-2" stroke="url(#rainGrad)" strokeLinecap="round" strokeWidth="5" x1="85" x2="75" y1="145" y2="175" />
-          <line className="rain-drop drop-3" stroke="url(#rainGrad)" strokeLinecap="round" strokeWidth="5" x1="115" x2="105" y1="145" y2="175" />
-          <line className="rain-drop drop-4" stroke="url(#rainGrad)" strokeLinecap="round" strokeWidth="5" x1="145" x2="135" y1="145" y2="175" />
+          <line
+            className="rain-drop drop-1"
+            stroke="url(#rainGrad)"
+            strokeLinecap="round"
+            strokeWidth="5"
+            x1="55"
+            x2="45"
+            y1="145"
+            y2="175"
+          />
+          <line
+            className="rain-drop drop-2"
+            stroke="url(#rainGrad)"
+            strokeLinecap="round"
+            strokeWidth="5"
+            x1="85"
+            x2="75"
+            y1="145"
+            y2="175"
+          />
+          <line
+            className="rain-drop drop-3"
+            stroke="url(#rainGrad)"
+            strokeLinecap="round"
+            strokeWidth="5"
+            x1="115"
+            x2="105"
+            y1="145"
+            y2="175"
+          />
+          <line
+            className="rain-drop drop-4"
+            stroke="url(#rainGrad)"
+            strokeLinecap="round"
+            strokeWidth="5"
+            x1="145"
+            x2="135"
+            y1="145"
+            y2="175"
+          />
         </svg>
       </div>
-    )
+    );
   }
 
   if (theme === "night") {
     return (
-      <div
-        className="weather-hero-art night"
-        style={{ width: size, height: size }}
-      >
+      <div className="weather-hero-art night" style={{ width: size, height: size }}>
         <svg
           fill="none"
           height="100%"
@@ -87,14 +123,17 @@ function WeatherIllustration({
               <stop offset="100%" stopColor="#F9D776" />
             </linearGradient>
             <filter id="moonGlow" x="-30%" y="-30%" width="160%" height="160%">
-              <feDropShadow dx="0" dy="0" stdDeviation="18" floodColor="#FDE68A" floodOpacity="0.45" />
+              <feDropShadow
+                dx="0"
+                dy="0"
+                stdDeviation="18"
+                floodColor="#FDE68A"
+                floodOpacity="0.45"
+              />
             </filter>
           </defs>
           <g filter="url(#moonGlow)">
-            <path
-              d="M135 45 A60 60 0 1 0 135 155 A45 45 0 0 1 135 45 Z"
-              fill="url(#moonGrad)"
-            />
+            <path d="M135 45 A60 60 0 1 0 135 155 A45 45 0 0 1 135 45 Z" fill="url(#moonGrad)" />
           </g>
           {/* Stars */}
           <circle cx="155" cy="55" fill="#FFF9D2" r="3" />
@@ -102,15 +141,12 @@ function WeatherIllustration({
           <circle cx="45" cy="65" fill="#FFF9D2" r="2" />
         </svg>
       </div>
-    )
+    );
   }
 
   // Sunny / Fair weather (Matches user's Image 1 illustration)
   return (
-    <div
-      className="weather-hero-art sunny"
-      style={{ width: size, height: size }}
-    >
+    <div className="weather-hero-art sunny" style={{ width: size, height: size }}>
       <svg
         fill="none"
         height="100%"
@@ -128,21 +164,91 @@ function WeatherIllustration({
             <stop offset="100%" stopColor="#FDE68A" stopOpacity="0.88" />
           </linearGradient>
           <filter id="sunGlow" x="-40%" y="-40%" width="180%" height="180%">
-            <feDropShadow dx="0" dy="0" stdDeviation="22" floodColor="#F59E0B" floodOpacity="0.45" />
+            <feDropShadow
+              dx="0"
+              dy="0"
+              stdDeviation="22"
+              floodColor="#F59E0B"
+              floodOpacity="0.45"
+            />
           </filter>
         </defs>
         {/* Sun Rays & Body */}
         <g filter="url(#sunGlow)">
           <circle cx="95" cy="85" fill="url(#sunGrad)" r="40" />
           {/* Rays */}
-          <line stroke="#FBBF24" strokeLinecap="round" strokeWidth="6" x1="95" x2="95" y1="28" y2="38" />
-          <line stroke="#FBBF24" strokeLinecap="round" strokeWidth="6" x1="95" x2="95" y1="132" y2="142" />
-          <line stroke="#FBBF24" strokeLinecap="round" strokeWidth="6" x1="38" x2="48" y1="85" y2="85" />
-          <line stroke="#FBBF24" strokeLinecap="round" strokeWidth="6" x1="142" x2="152" y1="85" y2="85" />
-          <line stroke="#FBBF24" strokeLinecap="round" strokeWidth="5" x1="55" x2="63" y1="45" y2="53" />
-          <line stroke="#FBBF24" strokeLinecap="round" strokeWidth="5" x1="127" x2="135" y1="117" y2="125" />
-          <line stroke="#FBBF24" strokeLinecap="round" strokeWidth="5" x1="135" x2="127" y1="45" y2="53" />
-          <line stroke="#FBBF24" strokeLinecap="round" strokeWidth="5" x1="63" x2="55" y1="117" y2="125" />
+          <line
+            stroke="#FBBF24"
+            strokeLinecap="round"
+            strokeWidth="6"
+            x1="95"
+            x2="95"
+            y1="28"
+            y2="38"
+          />
+          <line
+            stroke="#FBBF24"
+            strokeLinecap="round"
+            strokeWidth="6"
+            x1="95"
+            x2="95"
+            y1="132"
+            y2="142"
+          />
+          <line
+            stroke="#FBBF24"
+            strokeLinecap="round"
+            strokeWidth="6"
+            x1="38"
+            x2="48"
+            y1="85"
+            y2="85"
+          />
+          <line
+            stroke="#FBBF24"
+            strokeLinecap="round"
+            strokeWidth="6"
+            x1="142"
+            x2="152"
+            y1="85"
+            y2="85"
+          />
+          <line
+            stroke="#FBBF24"
+            strokeLinecap="round"
+            strokeWidth="5"
+            x1="55"
+            x2="63"
+            y1="45"
+            y2="53"
+          />
+          <line
+            stroke="#FBBF24"
+            strokeLinecap="round"
+            strokeWidth="5"
+            x1="127"
+            x2="135"
+            y1="117"
+            y2="125"
+          />
+          <line
+            stroke="#FBBF24"
+            strokeLinecap="round"
+            strokeWidth="5"
+            x1="135"
+            x2="127"
+            y1="45"
+            y2="53"
+          />
+          <line
+            stroke="#FBBF24"
+            strokeLinecap="round"
+            strokeWidth="5"
+            x1="63"
+            x2="55"
+            y1="117"
+            y2="125"
+          />
         </g>
         {/* Soft Front Cloud matching image 1 */}
         <path
@@ -151,7 +257,7 @@ function WeatherIllustration({
         />
       </svg>
     </div>
-  )
+  );
 }
 
 function WeatherSmallIcon({
@@ -159,9 +265,9 @@ function WeatherSmallIcon({
   isRain,
   size = 28,
 }: {
-  code: number
-  isRain?: boolean
-  size?: number
+  code: number;
+  isRain?: boolean;
+  size?: number;
 }) {
   if (isRain || code >= 51) {
     return (
@@ -176,11 +282,35 @@ function WeatherSmallIcon({
           d="M6 13a4 4 0 0 1 .5 -7.9A5.5 5.5 0 0 1 17 7.5a3.5 3.5 0 0 1-.5 6.9z"
           fill="#94A3B8"
         />
-        <line stroke="#38BDF8" strokeLinecap="round" strokeWidth="2" x1="8" x2="7" y1="16" y2="19" />
-        <line stroke="#38BDF8" strokeLinecap="round" strokeWidth="2" x1="12" x2="11" y1="16" y2="19" />
-        <line stroke="#38BDF8" strokeLinecap="round" strokeWidth="2" x1="16" x2="15" y1="16" y2="19" />
+        <line
+          stroke="#38BDF8"
+          strokeLinecap="round"
+          strokeWidth="2"
+          x1="8"
+          x2="7"
+          y1="16"
+          y2="19"
+        />
+        <line
+          stroke="#38BDF8"
+          strokeLinecap="round"
+          strokeWidth="2"
+          x1="12"
+          x2="11"
+          y1="16"
+          y2="19"
+        />
+        <line
+          stroke="#38BDF8"
+          strokeLinecap="round"
+          strokeWidth="2"
+          x1="16"
+          x2="15"
+          y1="16"
+          y2="19"
+        />
       </svg>
-    )
+    );
   }
   if (code >= 2) {
     return (
@@ -192,12 +322,9 @@ function WeatherSmallIcon({
         xmlns="http://www.w3.org/2000/svg"
       >
         <circle cx="10" cy="9" fill="#FBBF24" r="4" />
-        <path
-          d="M8 17h8a4 4 0 0 0 .5-7.9A5 5 0 0 0 7 11a3.5 3.5 0 0 0 1 6z"
-          fill="#FDE68A"
-        />
+        <path d="M8 17h8a4 4 0 0 0 .5-7.9A5 5 0 0 0 7 11a3.5 3.5 0 0 0 1 6z" fill="#FDE68A" />
       </svg>
-    )
+    );
   }
   return (
     <svg
@@ -209,145 +336,149 @@ function WeatherSmallIcon({
     >
       <circle cx="12" cy="12" fill="#FBBF24" r="5" />
       <line stroke="#FBBF24" strokeLinecap="round" strokeWidth="2" x1="12" x2="12" y1="3" y2="5" />
-      <line stroke="#FBBF24" strokeLinecap="round" strokeWidth="2" x1="12" x2="12" y1="19" y2="21" />
+      <line
+        stroke="#FBBF24"
+        strokeLinecap="round"
+        strokeWidth="2"
+        x1="12"
+        x2="12"
+        y1="19"
+        y2="21"
+      />
       <line stroke="#FBBF24" strokeLinecap="round" strokeWidth="2" x1="3" x2="5" y1="12" y2="12" />
-      <line stroke="#FBBF24" strokeLinecap="round" strokeWidth="2" x1="19" x2="21" y1="12" y2="12" />
+      <line
+        stroke="#FBBF24"
+        strokeLinecap="round"
+        strokeWidth="2"
+        x1="19"
+        x2="21"
+        y1="12"
+        y2="12"
+      />
     </svg>
-  )
+  );
 }
 
 function WeatherPage({
   onLocateUser,
   onThemeChange,
 }: {
-  onLocateUser?: () => void
-  onThemeChange?: (theme: "sunny" | "rainy" | "cloudy" | "night") => void
+  onLocateUser?: () => void;
+  onThemeChange?: (theme: "sunny" | "rainy" | "cloudy" | "night") => void;
 }) {
-  const [data, setData] = useState<DetailedWeatherData>(DEFAULT_HCMC_WEATHER)
-  const [loading, setLoading] = useState(false)
-  const [searchQuery, setSearchQuery] = useState("")
-  const [searching, setSearching] = useState(false)
+  const [data, setData] = useState<DetailedWeatherData>(DEFAULT_HCMC_WEATHER);
+  const [loading, setLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searching, setSearching] = useState(false);
   const [searchResults, setSearchResults] = useState<
     Array<{
-      name: string
-      country: string
-      admin1?: string
-      lat: number
-      lng: number
-      displayLabel: string
+      name: string;
+      country: string;
+      admin1?: string;
+      lat: number;
+      lng: number;
+      displayLabel: string;
     }>
-  >([])
-  const [showDropdown, setShowDropdown] = useState(false)
-  const searchWrapRef = useRef<HTMLDivElement>(null)
+  >([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const searchWrapRef = useRef<HTMLDivElement>(null);
 
   // Tải thời tiết thực tế từ Open-Meteo khi mở tab
   useEffect(() => {
-    let active = true
-        async function loadInitial() {
-      setLoading(true)
+    let active = true;
+    async function loadInitial() {
+      setLoading(true);
       try {
-        const { latitude, longitude } = await getUserLocation()
-        const geo = await reverseGeocodeApi(latitude, longitude)
-        const locationLabel = geo.district ? `${geo.district}, TP.HCM` : (geo.location || "Hồ Chí Minh")
-        const res = await fetchFullRealWeather(latitude, longitude, locationLabel)
+        const { latitude, longitude } = await getUserLocation();
+        const geo = await reverseGeocodeApi(latitude, longitude);
+        const locationLabel = geo.district
+          ? `${geo.district}, TP.HCM`
+          : geo.location || "Hồ Chí Minh";
+        const res = await fetchFullRealWeather(latitude, longitude, locationLabel);
         if (active) {
-          setData(res)
-          onThemeChange?.(res.theme)
-          setLoading(false)
+          setData(res);
+          onThemeChange?.(res.theme);
+          setLoading(false);
         }
       } catch {
-        const res = await fetchFullRealWeather(10.7769, 106.7009, "Hồ Chí Minh")
+        const res = await fetchFullRealWeather(10.7769, 106.7009, "Hồ Chí Minh");
         if (active) {
-          setData(res)
-          onThemeChange?.(res.theme)
-          setLoading(false)
+          setData(res);
+          onThemeChange?.(res.theme);
+          setLoading(false);
         }
       }
     }
-    loadInitial()
+    loadInitial();
     return () => {
-      active = false
-    }
-  }, [])
+      active = false;
+    };
+  }, []);
 
   // Tìm kiếm địa điểm với debounce
   useEffect(() => {
     if (!searchQuery.trim() || searchQuery.trim().length < 2) {
-      setSearchResults([])
-      setShowDropdown(false)
-      return
+      setSearchResults([]);
+      setShowDropdown(false);
+      return;
     }
 
     const timer = setTimeout(async () => {
-      setSearching(true)
-      const results = await searchWeatherLocation(searchQuery)
-      setSearchResults(results)
-      setShowDropdown(results.length > 0)
-      setSearching(false)
-    }, 300)
+      setSearching(true);
+      const results = await searchWeatherLocation(searchQuery);
+      setSearchResults(results);
+      setShowDropdown(results.length > 0);
+      setSearching(false);
+    }, 300);
 
-    return () => clearTimeout(timer)
-  }, [searchQuery])
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   // Đóng dropdown khi click ra ngoài
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (
-        searchWrapRef.current &&
-        !searchWrapRef.current.contains(e.target as Node)
-      ) {
-        setShowDropdown(false)
+      if (searchWrapRef.current && !searchWrapRef.current.contains(e.target as Node)) {
+        setShowDropdown(false);
       }
     }
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [])
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Chọn một địa điểm tìm được
-  async function handleSelectLocation(loc: {
-    name: string
-    lat: number
-    lng: number
-  }) {
-    setShowDropdown(false)
-    setSearchQuery("")
-    setLoading(true)
-    const fresh = await fetchFullRealWeather(loc.lat, loc.lng, loc.name)
-    setData(fresh)
-    onThemeChange?.(fresh.theme)
-    setLoading(false)
+  async function handleSelectLocation(loc: { name: string; lat: number; lng: number }) {
+    setShowDropdown(false);
+    setSearchQuery("");
+    setLoading(true);
+    const fresh = await fetchFullRealWeather(loc.lat, loc.lng, loc.name);
+    setData(fresh);
+    onThemeChange?.(fresh.theme);
+    setLoading(false);
   }
 
   // Định vị GPS của người dùng hiện tại và tự động nhận diện Quận/Phường thực tế
   async function handleUseGps() {
-    setLoading(true)
+    setLoading(true);
     try {
-      const { latitude, longitude } = await getUserLocation()
-      const geo = await reverseGeocodeApi(latitude, longitude)
-      const locationLabel = geo.location || (geo.district ? `${geo.district}, TP.HCM` : "Hồ Chí Minh")
+      const { latitude, longitude } = await getUserLocation();
+      const geo = await reverseGeocodeApi(latitude, longitude);
+      const locationLabel =
+        geo.location || (geo.district ? `${geo.district}, TP.HCM` : "Hồ Chí Minh");
 
-      const fresh = await fetchFullRealWeather(
-        latitude,
-        longitude,
-        locationLabel,
-      )
-      setData(fresh)
-      onThemeChange?.(fresh.theme)
-      onLocateUser?.()
+      const fresh = await fetchFullRealWeather(latitude, longitude, locationLabel);
+      setData(fresh);
+      onThemeChange?.(fresh.theme);
+      onLocateUser?.();
     } catch (err) {
-      console.warn("Failed to locate weather position:", err)
+      console.warn("Failed to locate weather position:", err);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
   // Xác định theme class theo điều kiện thời tiết thật
   const themeClass =
-    data.theme === "rainy"
-      ? "theme-rainy"
-      : data.theme === "night"
-        ? "theme-night"
-        : "theme-sunny"
+    data.theme === "rainy" ? "theme-rainy" : data.theme === "night" ? "theme-night" : "theme-sunny";
 
   return (
     <div className={`weather-view-shell ${themeClass}`}>
@@ -369,13 +500,7 @@ function WeatherPage({
                 width="18"
                 xmlns="http://www.w3.org/2000/svg"
               >
-                <circle
-                  cx="11"
-                  cy="11"
-                  r="7"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                />
+                <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
                 <line
                   stroke="currentColor"
                   strokeLinecap="round"
@@ -408,13 +533,7 @@ function WeatherPage({
                   width="18"
                   xmlns="http://www.w3.org/2000/svg"
                 >
-                  <circle
-                    cx="12"
-                    cy="12"
-                    r="8"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  />
+                  <circle cx="12" cy="12" r="8" stroke="currentColor" strokeWidth="2" />
                   <line stroke="currentColor" strokeWidth="2" x1="12" x2="12" y1="2" y2="5" />
                   <line stroke="currentColor" strokeWidth="2" x1="12" x2="12" y1="19" y2="22" />
                   <line stroke="currentColor" strokeWidth="2" x1="2" x2="5" y1="12" y2="12" />
@@ -465,7 +584,11 @@ function WeatherPage({
               <strong>{data.locationName}</strong>
               <span className="dot-divider">|</span>
               <span className="live-status">
-                {loading ? "Đang đồng bộ…" : (data.updatedAt || "Vừa xong")}
+                {loading
+                  ? "Đang đồng bộ…"
+                  : !data.live
+                    ? "Thời tiết không khả dụng · dữ liệu mẫu"
+                    : data.updatedAt || "Vừa xong"}
               </span>
             </div>
 
@@ -481,11 +604,7 @@ function WeatherPage({
           </div>
 
           <div className="hero-right-illustration">
-            <WeatherIllustration
-              size={210}
-              theme={data.theme}
-              weatherCode={data.weatherCode}
-            />
+            <WeatherIllustration size={210} theme={data.theme} weatherCode={data.weatherCode} />
           </div>
         </section>
 
@@ -499,13 +618,7 @@ function WeatherPage({
               width="18"
               xmlns="http://www.w3.org/2000/svg"
             >
-              <circle
-                cx="12"
-                cy="12"
-                r="9"
-                stroke="currentColor"
-                strokeWidth="2"
-              />
+              <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
               <polyline
                 points="12 7 12 12 15 15"
                 stroke="currentColor"
@@ -577,7 +690,7 @@ function WeatherPage({
                 const rangeWidth = Math.min(
                   100,
                   Math.max(25, ((d.tempMax - d.tempMin) / 14) * 100),
-                )
+                );
                 return (
                   <div className="daily-row-item" key={idx}>
                     <span className="daily-name">{d.dayLabel}</span>
@@ -591,14 +704,11 @@ function WeatherPage({
                     </div>
                     <span className="daily-min">{d.tempMin}°</span>
                     <div className="daily-bar-track">
-                      <div
-                        className="daily-bar-range"
-                        style={{ width: `${rangeWidth}%` }}
-                      />
+                      <div className="daily-bar-range" style={{ width: `${rangeWidth}%` }} />
                     </div>
                     <span className="daily-max">{d.tempMax}°</span>
                   </div>
-                )
+                );
               })}
             </div>
           </section>
@@ -648,10 +758,10 @@ function WeatherPage({
                   </svg>
                   <span>GIÓ</span>
                 </div>
-                <div className="metric-big-value">{data.windSpeedKmh} <small>km/h</small></div>
-                <p className="metric-note">
-                  Gió nhẹ, hướng {data.windDirectionText}
-                </p>
+                <div className="metric-big-value">
+                  {data.windSpeedKmh} <small>km/h</small>
+                </div>
+                <p className="metric-note">Gió nhẹ, hướng {data.windDirectionText}</p>
               </article>
             </div>
 
@@ -675,15 +785,13 @@ function WeatherPage({
                 <span>MẶT TRỜI</span>
               </div>
               <div className="metric-big-value">{data.sunsetTime}</div>
-              <p className="metric-note">
-                Hoàng hôn hôm nay · Mặt trời mọc lúc {data.sunriseTime}
-              </p>
+              <p className="metric-note">Hoàng hôn hôm nay · Mặt trời mọc lúc {data.sunriseTime}</p>
             </article>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default WeatherPage
+export default WeatherPage;

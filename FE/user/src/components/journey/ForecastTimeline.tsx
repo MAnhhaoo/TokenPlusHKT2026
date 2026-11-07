@@ -1,13 +1,13 @@
-import type { ForecastSlot } from "@/types"
+import type { ForecastSlot } from "@/types";
 
 function ForecastTimeline({
   value,
   onChange,
   slots,
 }: {
-  value: number
-  onChange: (index: number) => void
-  slots: readonly ForecastSlot[]
+  value: number;
+  onChange: (index: number) => void;
+  slots: readonly ForecastSlot[];
 }) {
   const current = slots[value] ??
     slots[0] ?? {
@@ -16,7 +16,7 @@ function ForecastTimeline({
       rain: "0 mm",
       risk: "Thấp",
       zone: 0 as const,
-    }
+    };
 
   return (
     <div className="forecast-section">
@@ -25,26 +25,18 @@ function ForecastTimeline({
           <h2>Dự báo lượng mưa</h2>
           <p>Chọn mốc thời gian để so sánh mức độ rủi ro.</p>
         </div>
-        <span className={`risk-pill zone-${current.zone}`}>
-          {current.risk}
-        </span>
+        <span className={`risk-pill zone-${current.zone}`}>{current.risk}</span>
       </div>
-      <div
-        aria-label="Mốc thời gian dự báo"
-        className="forecast-tabs"
-        role="group"
-      >
+      <div aria-label="Mốc thời gian dự báo" className="forecast-tabs" role="group">
         {slots.map((slot, index) => {
-          const rain = Number.parseInt(slot.rain, 10)
-          const height = Math.max(16, Math.min(100, (rain / 60) * 100))
+          const rain = Number.parseFloat(slot.rain);
+          const height = Math.max(16, Math.min(100, (rain / 60) * 100));
 
           return (
             <button
               aria-label={`${slot.label}: ${slot.rain} mưa, nguy cơ ${slot.risk.toLowerCase()}`}
               aria-pressed={value === index}
-              className={`zone-${slot.zone} ${
-                value === index ? "is-active" : ""
-              }`}
+              className={`zone-${slot.zone} ${value === index ? "is-active" : ""}`}
               key={slot.id}
               onClick={() => onChange(index)}
               type="button"
@@ -56,11 +48,11 @@ function ForecastTimeline({
               </span>
               <small>{slot.risk}</small>
             </button>
-          )
+          );
         })}
       </div>
     </div>
-  )
+  );
 }
 
-export default ForecastTimeline
+export default ForecastTimeline;
