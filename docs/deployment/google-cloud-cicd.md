@@ -14,11 +14,13 @@ Deployment is disabled until `GCP_DEPLOY_STAGING` and `GCP_DEPLOY_PRODUCTION` ar
 
 <!-- coderabbit-ai-generated:v1 -->
 
-<!-- coderabbit-ai-generated-section:v1:d72aa8edd4c462c1341077dd672c6e5af0105b27e8771bc7cee4de1b2e4a18a8 -->
+<!-- coderabbit-ai-generated-section:v1:a73463ccac65d6ee14fce63b62a3cfbfc45ff243245607911c7d956ee2e8e7e9 -->
 
 At the workflow level, the concurrency group is keyed by the release tag or push commit SHA. GitHub allows one running and one pending run per group; a new run replaces an older pending run without canceling the active run.
 
-Staging and production jobs use separate repository-wide concurrency groups with `queue: max`. Each group allows one running job and up to 100 pending jobs; further jobs are canceled when the queue is full. A push does not replace a pending release staging job. If a release's staging job is canceled, production cannot deploy that release. Rerun all jobs in the release workflow after addressing the cancellation; production also requires the release to remain the latest release and pass its Environment gate.
+Staging and production jobs use separate repository-wide concurrency groups with `queue: max`. Each group allows one running job and up to 100 pending jobs; further jobs are canceled when the queue is full. A push does not replace a pending release staging job. If a release's staging job is canceled, production cannot deploy that release. Before rerunning canceled staging or production jobs, confirm the release is still the latest release; if it has been superseded, use the latest release's workflow instead. After addressing a staging cancellation, rerun all jobs in the release workflow. Production also requires the release to remain the latest release and pass its Environment gate.
+
+After the release workflow finishes, if `master` is newer than the release revision, restore staging to the latest `master` revision: rerun all jobs in the latest `master` push workflow and verify the deployed services. If release staging failed partway through, the recorded staging revision may not reflect partial deployments; redeploy affected services at the latest `master` revision as needed.
 
 <!-- /coderabbit-ai-generated:v1 -->
 
