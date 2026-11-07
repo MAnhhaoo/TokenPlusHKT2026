@@ -307,12 +307,20 @@ function parseStepsFromLeg(leg: any): NavigationStep[] {
 
     if (!street) street = "Trục đường tiếp theo";
 
+    const stepCoords: [number, number] | undefined =
+      st.start_location &&
+      typeof st.start_location.lng === "function" &&
+      typeof st.start_location.lat === "function"
+        ? [st.start_location.lng(), st.start_location.lat()]
+        : undefined;
+
     return {
       icon,
       instruction,
       street,
       distance: st.distance?.text || "100 m",
       distanceMeters: st.distance?.value || 100,
+      ...(stepCoords ? { coords: stepCoords } : {}),
     };
   });
 }

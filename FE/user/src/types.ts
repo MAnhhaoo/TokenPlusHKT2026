@@ -57,6 +57,8 @@ export type NavigationStep = {
   instruction: string;
   street: string;
   distance: string;
+  distanceMeters?: number;
+  coords?: [number, number];
 };
 
 export type WeatherSnapshot = {

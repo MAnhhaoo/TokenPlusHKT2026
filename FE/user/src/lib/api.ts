@@ -48,7 +48,61 @@ function normalizeVn(text: string): string {
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/đ/g, "d")
+    .replace(/\bq\.?\s*(\d{1,2})\b/g, "quan $1")
+    .replace(/\bp\.?\s*(\d{1,2})\b/g, "phuong $1")
+    .replace(/\bd\.\s+/g, "duong ")
+    .replace(/\bdh\b/g, "dai hoc")
+    .replace(/\bbv\b/g, "benh vien")
+    .replace(/\bcc\b/g, "chung cu")
+    .replace(/[,.;:()[\]'"/\\|+-]+/g, " ")
+    .replace(/\s+/g, " ")
     .trim();
+}
+
+function isWithinHcmcBounds(lat: number, lng: number): boolean {
+  return (
+    Number.isFinite(lat) &&
+    Number.isFinite(lng) &&
+    lat >= 10.34 &&
+    lat <= 11.18 &&
+    lng >= 106.34 &&
+    lng <= 107.06
+  );
+}
+
+function cleanQueryForGeocoder(raw: string): string {
+  return raw
+    .replace(/^[Đđ]\.\s*/u, "")
+    .replace(/\bQ\.?\s*(\d{1,2})\b/giu, "Quận $1")
+    .replace(/\bP\.?\s*(\d{1,2})\b/giu, "Phường $1")
+    .replace(/\bĐH\b/giu, "Đại học")
+    .replace(/\bBV\b/giu, "Bệnh viện")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function extractFallbackQueries(raw: string): string[] {
+  const cleaned = cleanQueryForGeocoder(raw);
+  const variants = new Set<string>([cleaned]);
+
+  // Nếu có dấu gạch ngang kiểu Google Maps ("Bánh Mì Huynh Hoa - Lê Thị Riêng")
+  if (cleaned.includes(" - ")) {
+    for (const part of cleaned.split(" - ")) {
+      if (part.trim().length >= 3) variants.add(part.trim());
+    }
+  }
+
+  // Nếu tìm hẻm/ngõ/số nhà ("Hẻm 387 Trần Xuân Soạn", "387/12 Trần Xuân Soạn")
+  const withoutAlleyWord = cleaned.replace(/^(hẻm|hem|ngõ|ngo|số|so)\s+/iu, "").trim();
+  if (withoutAlleyWord.length >= 3) {
+    variants.add(withoutAlleyWord);
+  }
+  const streetOnly = withoutAlleyWord.replace(/^\d+[a-zA-Z]?(?:\/\d+[a-zA-Z]?)*\s+/u, "").trim();
+  if (streetOnly.length >= 3) {
+    variants.add(streetOnly);
+  }
+
+  return Array.from(variants);
 }
 
 function getWordInitials(text: string): string {
@@ -73,7 +127,8 @@ function registerDynamicPlaces(items: RouteEndpoint[]) {
       norm === "ho chi minh" ||
       norm === "tp ho chi minh" ||
       norm === "thanh pho ho chi minh" ||
-      norm === "tp.hcm"
+      norm === "tp hcm" ||
+      norm === "tphcm"
     ) {
       continue;
     }
@@ -85,28 +140,71 @@ function registerDynamicPlaces(items: RouteEndpoint[]) {
   }
 }
 
+// Khởi tạo sẵn 250 tuyến đường / giao lộ thực tế tại TP.HCM vào bộ nhớ tìm kiếm tức thì (0ms)
+if (Array.isArray(defaultHotspots)) {
+  const initialHotspotPlaces: RouteEndpoint[] = [];
+  for (const h of defaultHotspots as Array<{
+    location?: string;
+    district?: string;
+    lat?: number;
+    lng?: number;
+  }>) {
+    if (!h?.location || typeof h.lat !== "number" || typeof h.lng !== "number") continue;
+    const district = (h.district || "TP.HCM").trim();
+    const label = `${h.location} · ${district}`;
+    initialHotspotPlaces.push({
+      label,
+      address: `${h.location}, ${district}, TP. Hồ Chí Minh`,
+      district,
+      coords: [h.lng, h.lat],
+    });
+  }
+  registerDynamicPlaces(initialHotspotPlaces);
+}
+
 /**
  * Chấm điểm độ khớp thực tế giữa từ khóa người dùng gõ và địa điểm trả về
- * Loại bỏ các kết quả nhiễu không liên quan (ví dụ gõ "trường đại học" nhưng API trả "Đường Trần Não")
  */
 function scorePlaceMatch(query: string, place: RouteEndpoint): number {
   const normQ = normalizeVn(query);
   if (!normQ) return 0;
   const normLabel = normalizeVn(place.label);
   const normAddr = normalizeVn(place.address ?? "");
-  const combined = `${normLabel} ${normAddr}`;
+  const normDist = normalizeVn(place.district ?? "");
+  const combined = `${normLabel} ${normAddr} ${normDist}`;
   const initials = getWordInitials(place.label);
 
+  if (normLabel === normQ) return 105;
   if (normLabel.startsWith(normQ)) return 100;
   if (normLabel.includes(` ${normQ}`)) return 92;
-  if (normLabel.includes(normQ)) return 85;
-  if (initials.startsWith(normQ)) return 78;
-  if (normAddr.includes(normQ)) return 65;
+  if (normLabel.includes(normQ)) return 86;
+  if (initials.length >= 2 && initials.startsWith(normQ)) return 78;
+  if (normAddr.includes(normQ)) return 72;
+
+  // Nếu câu truy vấn chứa trọn tên đường/địa điểm (VD: gõ "Hẻm 387 Trần Xuân Soạn" khớp "Trần Xuân Soạn")
+  const mainLabelPart = normalizeVn(place.label.split("·")[0] ?? place.label);
+  if (mainLabelPart.length >= 4 && normQ.includes(mainLabelPart)) {
+    return 70;
+  }
 
   // Kiểm tra độ khớp theo từng từ (token matching)
-  const stopWords = new Set(["duong", "pho", "quan", "phuong", "tp", "hcm"]);
+  const stopWords = new Set([
+    "duong",
+    "pho",
+    "quan",
+    "phuong",
+    "tp",
+    "hcm",
+    "thanh",
+    "ho",
+    "chi",
+    "minh",
+    "hem",
+    "ngo",
+    "so",
+  ]);
   const qWords = normQ.split(/\s+/).filter((w) => w.length > 0 && !stopWords.has(w));
-  if (qWords.length === 0) return 0;
+  if (qWords.length === 0) return 30;
 
   let matchedWords = 0;
   for (const w of qWords) {
@@ -115,19 +213,24 @@ function scorePlaceMatch(query: string, place: RouteEndpoint): number {
     }
   }
 
-  // Nếu gõ từ 2 từ trở lên (VD: "trường đại học"), ít nhất 60% số từ phải xuất hiện trong tên/địa chỉ
   const ratio = matchedWords / qWords.length;
-  if (qWords.length >= 2 && ratio >= 0.6) {
-    return Math.round(50 + ratio * 30);
+  if (qWords.length >= 2 && ratio >= 0.45) {
+    return Math.round(45 + ratio * 35);
+  }
+  if (matchedWords >= 2) {
+    return 50;
   }
   if (qWords.length === 1 && matchedWords === 1) {
-    return 55;
+    return 58;
+  }
+  if (matchedWords === 1 && qWords.length <= 3) {
+    return 35;
   }
   return 0;
 }
 
 /**
- * Lọc tức thì (< 1ms) từ tập dữ liệu thật đã tải động từ PostgreSQL & Bản đồ trực tuyến
+ * Lọc tức thì (< 1ms) từ tập dữ liệu thật đã tải động từ PostgreSQL, 250 tuyến đường TP.HCM & Bản đồ trực tuyến
  */
 export function matchDynamicPlacePool(query: string): RouteEndpoint[] {
   const clean = query.trim();
@@ -135,7 +238,7 @@ export function matchDynamicPlacePool(query: string): RouteEndpoint[] {
   const normQ = normalizeVn(clean);
   if (!normQ) return [];
 
-  const exactCached = placeSearchCache.get(normQ);
+  const exactCached = placeSearchCache.get(`commit:${normQ}`);
   if (exactCached && exactCached.length > 0) {
     return exactCached;
   }
@@ -143,14 +246,14 @@ export function matchDynamicPlacePool(query: string): RouteEndpoint[] {
   const scored: Array<{ place: RouteEndpoint; score: number }> = [];
   for (const place of dynamicPlacePool) {
     const score = scorePlaceMatch(clean, place);
-    if (score > 0) {
+    if (score >= 55) {
       scored.push({ place, score });
     }
   }
 
   return scored
     .sort((a, b) => b.score - a.score)
-    .slice(0, 6)
+    .slice(0, 8)
     .map((item) => item.place);
 }
 
@@ -162,9 +265,18 @@ function buildSmartSearchQueries(keyword: string): {
   arcgisQuery: string;
   arcgisCategory: string;
   nominatimQuery: string;
+  photonQuery: string;
   isCategorySearch: boolean;
 } {
-  const norm = normalizeVn(keyword);
+  const cleaned = cleanQueryForGeocoder(keyword);
+  const norm = normalizeVn(cleaned);
+  const alreadyHasHcm =
+    norm.includes("ho chi minh") ||
+    norm.includes("tphcm") ||
+    norm.includes("tp hcm") ||
+    norm.includes("sai gon");
+  const withHcm = alreadyHasHcm ? cleaned : `${cleaned}, Hồ Chí Minh`;
+
   if (
     norm.includes("quan nuoc") ||
     norm.includes("ca phe") ||
@@ -173,12 +285,11 @@ function buildSmartSearchQueries(keyword: string): {
     norm.includes("tra sua")
   ) {
     return {
-      arcgisQuery: norm === "quan nuoc" || norm === "quan ca phe" ? "Coffee" : keyword,
+      arcgisQuery: norm === "quan nuoc" || norm === "quan ca phe" ? "Coffee" : cleaned,
       arcgisCategory: "Coffee Shop,Food",
       nominatimQuery:
-        norm === "quan nuoc" || norm === "quan ca phe"
-          ? "cafe, Hồ Chí Minh"
-          : `${keyword}, Hồ Chí Minh`,
+        norm === "quan nuoc" || norm === "quan ca phe" ? "cafe, Hồ Chí Minh" : withHcm,
+      photonQuery: norm === "quan nuoc" || norm === "quan ca phe" ? "cafe Hồ Chí Minh" : cleaned,
       isCategorySearch: true,
     };
   }
@@ -189,15 +300,15 @@ function buildSmartSearchQueries(keyword: string): {
     norm.includes("com tam") ||
     norm.includes("pho ") ||
     norm.includes("bun ") ||
-    norm.includes("lau ")
+    norm.includes("lau ") ||
+    norm.includes("banh mi")
   ) {
     return {
-      arcgisQuery: norm === "quan an" || norm === "nha hang" ? "Nhà hàng" : keyword,
+      arcgisQuery: norm === "quan an" || norm === "nha hang" ? "Nhà hàng" : cleaned,
       arcgisCategory: "Food",
       nominatimQuery:
-        norm === "quan an" || norm === "nha hang"
-          ? "restaurant, Hồ Chí Minh"
-          : `${keyword}, Hồ Chí Minh`,
+        norm === "quan an" || norm === "nha hang" ? "restaurant, Hồ Chí Minh" : withHcm,
+      photonQuery: norm === "quan an" || norm === "nha hang" ? "nhà hàng Hồ Chí Minh" : cleaned,
       isCategorySearch: true,
     };
   }
@@ -210,36 +321,37 @@ function buildSmartSearchQueries(keyword: string): {
     norm.includes("takashimaya")
   ) {
     return {
-      arcgisQuery: norm.includes("trung tam thuong mai") || norm === "tttm" ? "Mall" : keyword,
+      arcgisQuery: norm.includes("trung tam thuong mai") || norm === "tttm" ? "Mall" : cleaned,
       arcgisCategory: "Shopping Center,Shops and Service",
       nominatimQuery:
-        norm.includes("trung tam thuong mai") || norm === "tttm"
-          ? "mall, Hồ Chí Minh"
-          : `${keyword}, Hồ Chí Minh`,
+        norm.includes("trung tam thuong mai") || norm === "tttm" ? "mall, Hồ Chí Minh" : withHcm,
+      photonQuery:
+        norm.includes("trung tam thuong mai") || norm === "tttm" ? "Vincom Hồ Chí Minh" : cleaned,
       isCategorySearch: true,
     };
   }
   if (norm.includes("sieu thi") || norm.includes("bach hoa")) {
     return {
-      arcgisQuery: norm === "sieu thi" ? "Co.opmart" : keyword,
+      arcgisQuery: norm === "sieu thi" ? "Co.opmart" : cleaned,
       arcgisCategory: "Food and Drink,Shops and Service",
-      nominatimQuery: norm === "sieu thi" ? "supermarket, Hồ Chí Minh" : `${keyword}, Hồ Chí Minh`,
+      nominatimQuery: norm === "sieu thi" ? "supermarket, Hồ Chí Minh" : withHcm,
+      photonQuery: norm === "sieu thi" ? "Co.opmart Hồ Chí Minh" : cleaned,
       isCategorySearch: true,
     };
   }
   if (norm.includes("rap chieu phim") || norm.includes("rap phim") || norm.includes("cgv")) {
     return {
-      arcgisQuery: norm.includes("rap chieu phim") || norm === "rap phim" ? "Cinema" : keyword,
+      arcgisQuery: norm.includes("rap chieu phim") || norm === "rap phim" ? "Cinema" : cleaned,
       arcgisCategory: "Cinema,Arts and Entertainment",
       nominatimQuery:
-        norm.includes("rap chieu phim") || norm === "rap phim"
-          ? "cinema, Hồ Chí Minh"
-          : `${keyword}, Hồ Chí Minh`,
+        norm.includes("rap chieu phim") || norm === "rap phim" ? "cinema, Hồ Chí Minh" : withHcm,
+      photonQuery:
+        norm.includes("rap chieu phim") || norm === "rap phim" ? "CGV Hồ Chí Minh" : cleaned,
       isCategorySearch: true,
     };
   }
   if (norm.includes("truong dai hoc") || norm.includes("dai hoc")) {
-    const sub = keyword.replace(/^[Tt]rường\s+/u, "").trim();
+    const sub = cleaned.replace(/^[Tt]rường\s+/u, "").trim();
     return {
       arcgisQuery: sub || "Đại học",
       arcgisCategory: "College and University,Education",
@@ -247,14 +359,16 @@ function buildSmartSearchQueries(keyword: string): {
         norm === "truong dai hoc" || norm === "dai hoc"
           ? "university, Hồ Chí Minh"
           : `${sub}, Hồ Chí Minh`,
+      photonQuery: sub || "Đại học Hồ Chí Minh",
       isCategorySearch: true,
     };
   }
   if (norm.includes("benh vien") || norm.includes("phong kham")) {
     return {
-      arcgisQuery: keyword,
+      arcgisQuery: cleaned,
       arcgisCategory: "Hospital,Medical",
-      nominatimQuery: norm === "benh vien" ? "hospital, Hồ Chí Minh" : `${keyword}, Hồ Chí Minh`,
+      nominatimQuery: norm === "benh vien" ? "hospital, Hồ Chí Minh" : withHcm,
+      photonQuery: cleaned,
       isCategorySearch: true,
     };
   }
@@ -263,76 +377,184 @@ function buildSmartSearchQueries(keyword: string): {
       arcgisQuery: "Petrolimex",
       arcgisCategory: "Gas Station",
       nominatimQuery: "fuel, Hồ Chí Minh",
+      photonQuery: "Petrolimex Hồ Chí Minh",
       isCategorySearch: true,
     };
   }
   return {
-    arcgisQuery: keyword,
+    arcgisQuery: cleaned,
     arcgisCategory: "",
-    nominatimQuery: `${keyword}, Hồ Chí Minh`,
+    nominatimQuery: withHcm,
+    photonQuery: cleaned,
     isCategorySearch: false,
   };
 }
 
+function parseArcgisCandidates(candidates: any[]): RouteEndpoint[] {
+  const out: RouteEndpoint[] = [];
+  for (const c of candidates) {
+    const lat = c?.location?.y;
+    const lng = c?.location?.x;
+    if (typeof lat !== "number" || typeof lng !== "number" || !isWithinHcmcBounds(lat, lng)) {
+      continue;
+    }
+    const attrs = c?.attributes ?? {};
+    const addrType = String(attrs.Addr_type || "");
+    if (addrType === "Locality" || addrType === "Admin") continue;
+
+    const mainName = (attrs.PlaceName || attrs.StAddr || c.address?.split(",")[0] || "").trim();
+    if (!mainName) continue;
+    const normMain = normalizeVn(mainName);
+    if (
+      normMain === "ho chi minh" ||
+      normMain === "thanh pho ho chi minh" ||
+      normMain === "viet nam"
+    ) {
+      continue;
+    }
+    const district = (
+      attrs.District ||
+      attrs.Subregion ||
+      attrs.Nbrhd ||
+      attrs.City ||
+      "TP.HCM"
+    ).trim();
+    const fullAddress = attrs.Place_addr || c.address || `${mainName}, ${district}`;
+    const label =
+      district && !normMain.includes(normalizeVn(district))
+        ? `${mainName} · ${district}`
+        : mainName;
+    out.push({
+      label,
+      address: fullAddress,
+      district,
+      coords: [lng, lat],
+    });
+  }
+  return out;
+}
+
 async function fetchArcgisCandidates(
   keyword: string,
-  maxLocations = 8,
+  maxLocations = 10,
   signal?: AbortSignal,
 ): Promise<RouteEndpoint[]> {
   try {
-    const { arcgisQuery, arcgisCategory, isCategorySearch } = buildSmartSearchQueries(keyword);
+    const { arcgisQuery, arcgisCategory } = buildSmartSearchQueries(keyword);
     const categoryParam = arcgisCategory ? `&category=${encodeURIComponent(arcgisCategory)}` : "";
-    // Không nối ", Hồ Chí Minh" vào SingleLine vì searchExtent đã khóa cứng tọa độ TP.HCM (tránh lỗi hiểu nhầm POI thành tên đường)
-    const arcgisUrl = `https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?SingleLine=${encodeURIComponent(arcgisQuery)}${categoryParam}&f=json&countryCode=VNM&location=106.7009,10.7769&searchExtent=106.35,10.35,107.05,11.16&outFields=PlaceName,Place_addr,StAddr,Nbrhd,District,City,Subregion,Addr_type,Type&maxLocations=${maxLocations}`;
-    const arcgisRes = await fetch(arcgisUrl, { signal });
-    if (!arcgisRes.ok) return [];
-    const arcgisData = await arcgisRes.json();
-    const candidates = Array.isArray(arcgisData?.candidates) ? arcgisData.candidates : [];
-    const out: RouteEndpoint[] = [];
-    for (const c of candidates) {
-      const lat = c?.location?.y;
-      const lng = c?.location?.x;
-      if (typeof lat !== "number" || typeof lng !== "number") continue;
-      const attrs = c?.attributes ?? {};
-      const addrType = String(attrs.Addr_type || "");
-      if (addrType === "Locality" || addrType === "Admin") continue;
+    const baseParams = `${categoryParam}&f=json&countryCode=VNM&location=106.7009,10.7769&searchExtent=106.35,10.35,107.05,11.16&outFields=PlaceName,Place_addr,StAddr,Nbrhd,District,City,Subregion,Addr_type,Type&maxLocations=${maxLocations}`;
 
-      const mainName = (attrs.PlaceName || attrs.StAddr || c.address?.split(",")[0] || "").trim();
-      if (!mainName) continue;
-      const normMain = normalizeVn(mainName);
-      if (
-        normMain === "ho chi minh" ||
-        normMain === "thanh pho ho chi minh" ||
-        normMain === "viet nam"
-      ) {
-        continue;
+    const directUrl = `https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?SingleLine=${encodeURIComponent(arcgisQuery)}${baseParams}`;
+    const hcmScopedUrl = `https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?SingleLine=${encodeURIComponent(`${arcgisQuery}, Hồ Chí Minh`)}${baseParams}`;
+
+    const [resDirect, resScoped] = await Promise.all([
+      fetch(directUrl, { signal })
+        .then((r) => (r.ok ? r.json() : null))
+        .catch(() => null),
+      fetch(hcmScopedUrl, { signal })
+        .then((r) => (r.ok ? r.json() : null))
+        .catch(() => null),
+    ]);
+
+    const combinedCandidates = [
+      ...(Array.isArray(resDirect?.candidates) ? resDirect.candidates : []),
+      ...(Array.isArray(resScoped?.candidates) ? resScoped.candidates : []),
+    ];
+    let out = parseArcgisCandidates(combinedCandidates);
+
+    // Nếu người dùng gõ "Hẻm 387 Trần Xuân Soạn" hoặc "Bánh Mì Huynh Hoa - Lê Thị Riêng" mà chưa ra kết quả, tự động thử biến thể tên đường/chính
+    if (out.length === 0) {
+      const fallbacks = extractFallbackQueries(keyword).slice(1);
+      for (const fb of fallbacks) {
+        if (signal?.aborted) break;
+        const fbUrl = `https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?SingleLine=${encodeURIComponent(`${fb}, Hồ Chí Minh`)}${baseParams}`;
+        const fbData = await fetch(fbUrl, { signal })
+          .then((r) => (r.ok ? r.json() : null))
+          .catch(() => null);
+        if (Array.isArray(fbData?.candidates) && fbData.candidates.length > 0) {
+          out = parseArcgisCandidates(fbData.candidates);
+          if (out.length > 0) break;
+        }
       }
-      const district = (
-        attrs.District ||
-        attrs.Subregion ||
-        attrs.Nbrhd ||
-        attrs.City ||
-        "TP.HCM"
-      ).trim();
-      const fullAddress = attrs.Place_addr || c.address || `${mainName}, ${district}`;
-      const label =
-        district && !normMain.includes(normalizeVn(district))
-          ? `${mainName} · ${district}`
-          : mainName;
-      const item: RouteEndpoint = {
-        label,
-        address: fullAddress,
-        district,
-        coords: [lng, lat],
-      };
-      // Giữ toàn bộ kết quả POI/Danh mục (như Vincom cho "trung tâm thương mại", Highlands cho "quán nước"); chỉ lọc nhiễu đối với StreetName
-      if (
-        isCategorySearch ||
-        addrType === "POI" ||
-        addrType === "PointAddress" ||
-        scorePlaceMatch(keyword, item) > 0
-      ) {
-        out.push(item);
+    }
+
+    registerDynamicPlaces(out);
+    return out;
+  } catch {
+    return [];
+  }
+}
+
+async function fetchPhotonCandidates(
+  keyword: string,
+  limit = 10,
+  signal?: AbortSignal,
+): Promise<RouteEndpoint[]> {
+  try {
+    const { photonQuery } = buildSmartSearchQueries(keyword);
+    const queriesToTry = [photonQuery, ...extractFallbackQueries(keyword)];
+    const uniqueQueries = Array.from(new Set(queriesToTry)).slice(0, 2);
+
+    const responses = await Promise.all(
+      uniqueQueries.map((q) => {
+        const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&lat=10.7769&lon=106.7009&limit=${limit}&bbox=106.35,10.35,107.05,11.16`;
+        return fetch(url, { signal })
+          .then((r) => (r.ok ? r.json() : null))
+          .catch(() => null);
+      }),
+    );
+
+    const out: RouteEndpoint[] = [];
+    for (const data of responses) {
+      const features = Array.isArray(data?.features) ? data.features : [];
+      for (const f of features) {
+        const lng = Number(f?.geometry?.coordinates?.[0]);
+        const lat = Number(f?.geometry?.coordinates?.[1]);
+        if (!isWithinHcmcBounds(lat, lng)) continue;
+        const props = f?.properties ?? {};
+        const mainName = (
+          props.name ||
+          [props.housenumber, props.street].filter(Boolean).join(" ") ||
+          props.street ||
+          ""
+        ).trim();
+        if (!mainName) continue;
+        const normMain = normalizeVn(mainName);
+        if (
+          normMain === "ho chi minh" ||
+          normMain === "thanh pho ho chi minh" ||
+          normMain === "viet nam"
+        ) {
+          continue;
+        }
+        const district = (
+          props.district ||
+          props.city_district ||
+          props.county ||
+          props.suburb ||
+          props.city ||
+          "TP.HCM"
+        ).trim();
+        const fullAddress =
+          [
+            props.name,
+            props.housenumber ? `${props.housenumber} ${props.street || ""}`.trim() : props.street,
+            props.suburb || props.locality,
+            district,
+            "TP. Hồ Chí Minh",
+          ]
+            .filter(Boolean)
+            .join(", ") || `${mainName}, ${district}`;
+        const label =
+          district && !normMain.includes(normalizeVn(district))
+            ? `${mainName} · ${district}`
+            : mainName;
+        out.push({
+          label,
+          address: fullAddress,
+          district,
+          coords: [lng, lat],
+        });
       }
     }
     registerDynamicPlaces(out);
@@ -342,63 +564,69 @@ async function fetchArcgisCandidates(
   }
 }
 
+function parseNominatimItems(data: any[]): RouteEndpoint[] {
+  if (!Array.isArray(data)) return [];
+  const out: RouteEndpoint[] = [];
+  for (const item of data) {
+    const lat = Number(item?.lat);
+    const lng = Number(item?.lon);
+    if (!isWithinHcmcBounds(lat, lng)) continue;
+    const addr = item?.address ?? {};
+    const mainName = (
+      item?.name ||
+      [addr.house_number, addr.road].filter(Boolean).join(" ") ||
+      item?.display_name?.split(",")[0] ||
+      ""
+    ).trim();
+    if (!mainName) continue;
+    const normMain = normalizeVn(mainName);
+    if (normMain === "ho chi minh" || normMain === "thanh pho ho chi minh") continue;
+    const district = (
+      addr.city_district ||
+      addr.suburb ||
+      addr.county ||
+      addr.quarter ||
+      "TP.HCM"
+    ).trim();
+    const fullAddress = (item?.display_name || `${mainName}, ${district}, TP. Hồ Chí Minh`).trim();
+    const label =
+      district && !normMain.includes(normalizeVn(district))
+        ? `${mainName} · ${district}`
+        : mainName;
+    out.push({
+      label,
+      address: fullAddress,
+      district,
+      coords: [lng, lat],
+    });
+  }
+  return out;
+}
+
 async function fetchNominatimCandidates(
   keyword: string,
-  limit = 8,
+  limit = 10,
   signal?: AbortSignal,
 ): Promise<RouteEndpoint[]> {
   try {
-    const { nominatimQuery, isCategorySearch } = buildSmartSearchQueries(keyword);
-    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(nominatimQuery)}&format=jsonv2&addressdetails=1&limit=${limit}&countrycodes=vn&viewbox=106.35,11.16,107.05,10.35&bounded=1&accept-language=vi`;
-    const res = await fetch(url, { signal });
-    if (!res.ok) return [];
-    const data = await res.json();
-    if (!Array.isArray(data)) return [];
+    const { nominatimQuery } = buildSmartSearchQueries(keyword);
+    const cleaned = cleanQueryForGeocoder(keyword);
+    const queries = Array.from(
+      new Set([cleaned, nominatimQuery, ...extractFallbackQueries(keyword)]),
+    ).slice(0, 2);
+
+    const responses = await Promise.all(
+      queries.map((q) => {
+        const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=jsonv2&addressdetails=1&limit=${limit}&countrycodes=vn&viewbox=106.35,11.16,107.05,10.35&bounded=1&accept-language=vi`;
+        return fetch(url, { signal })
+          .then((r) => (r.ok ? r.json() : []))
+          .catch(() => []);
+      }),
+    );
+
     const out: RouteEndpoint[] = [];
-    for (const item of data) {
-      const lat = Number(item?.lat);
-      const lng = Number(item?.lon);
-      if (!Number.isFinite(lat) || !Number.isFinite(lng)) continue;
-      const addr = item?.address ?? {};
-      const mainName = (
-        item?.name ||
-        [addr.house_number, addr.road].filter(Boolean).join(" ") ||
-        item?.display_name?.split(",")[0] ||
-        ""
-      ).trim();
-      if (!mainName) continue;
-      const normMain = normalizeVn(mainName);
-      if (normMain === "ho chi minh" || normMain === "thanh pho ho chi minh") continue;
-      const district = (
-        addr.city_district ||
-        addr.suburb ||
-        addr.county ||
-        addr.quarter ||
-        "TP.HCM"
-      ).trim();
-      const fullAddress = (
-        item?.display_name || `${mainName}, ${district}, TP. Hồ Chí Minh`
-      ).trim();
-      const label =
-        district && !normMain.includes(normalizeVn(district))
-          ? `${mainName} · ${district}`
-          : mainName;
-      const place: RouteEndpoint = {
-        label,
-        address: fullAddress,
-        district,
-        coords: [lng, lat],
-      };
-      if (
-        isCategorySearch ||
-        item?.category === "amenity" ||
-        item?.category === "shop" ||
-        item?.category === "tourism" ||
-        item?.category === "leisure" ||
-        scorePlaceMatch(keyword, place) > 0
-      ) {
-        out.push(place);
-      }
+    for (const data of responses) {
+      out.push(...parseNominatimItems(data));
     }
     registerDynamicPlaces(out);
     return out;
@@ -417,6 +645,9 @@ export function warmPlaceSearchEngine(): void {
     void fetch("https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer?f=json").catch(
       () => null,
     );
+    void fetch("https://photon.komoot.io/api/?q=Saigon&lat=10.7769&lon=106.7009&limit=1").catch(
+      () => null,
+    );
   }, 40);
 }
 
@@ -424,8 +655,24 @@ if (typeof window !== "undefined") {
   warmPlaceSearchEngine();
 }
 
+function withProviderTimeout<T>(promise: Promise<T>, ms: number, fallback: T): Promise<T> {
+  return new Promise((resolve) => {
+    const timer = window.setTimeout(() => resolve(fallback), ms);
+    promise
+      .then((val) => {
+        window.clearTimeout(timer);
+        resolve(val);
+      })
+      .catch(() => {
+        window.clearTimeout(timer);
+        resolve(fallback);
+      });
+  });
+}
+
 /**
- * Tìm kiếm địa điểm / đường phố thời gian thực 100% từ API Bản đồ trực tuyến (ArcGIS World Geocoder + OpenStreetMap Photon qua Backend)
+ * Tìm kiếm địa điểm / đường phố / POI / hẻm thời gian thực kết hợp đa nguồn:
+ * Google Places + ArcGIS World Geocoder + Photon OpenStreetMap + Nominatim OSM + 250 tuyến đường TP.HCM
  */
 export async function searchPlacesApi(
   query: string,
@@ -444,90 +691,114 @@ export async function searchPlacesApi(
     return cached;
   }
 
-  const results: RouteEndpoint[] = [...matchDynamicPlacePool(clean)];
-  const googlePromise = searchPlacesWithGoogle(clean).then((res) => {
-    if (res.length > 0) registerDynamicPlaces(res);
-    return res;
-  });
+  const localResults: RouteEndpoint[] = [...matchDynamicPlacePool(clean)];
 
-  const arcgisDirectPromise = fetchArcgisCandidates(clean, 7, signal);
+  const googlePromise = withProviderTimeout(
+    searchPlacesWithGoogle(clean).then((res) => {
+      if (res.length > 0) registerDynamicPlaces(res);
+      return res;
+    }),
+    1800,
+    [],
+  );
+
+  const arcgisDirectPromise = withProviderTimeout(
+    fetchArcgisCandidates(clean, 10, signal),
+    1800,
+    [],
+  );
+  const photonDirectPromise = withProviderTimeout(
+    fetchPhotonCandidates(clean, 10, signal),
+    1800,
+    [],
+  );
   const nominatimPromise =
     options.allowNominatim === false
       ? Promise.resolve([])
-      : fetchNominatimCandidates(clean, 7, signal);
+      : withProviderTimeout(fetchNominatimCandidates(clean, 10, signal), 2000, []);
 
-  const backendPromise = (async (): Promise<RouteEndpoint[]> => {
-    if (options.allowNominatim === false) return [];
-    try {
-      const res = await fetch(`${API_BASE}/map/geocode/search?q=${encodeURIComponent(clean)}`, {
-        signal,
-      });
-      if (!res.ok) return [];
-      const data = await res.json();
-      if (!Array.isArray(data)) return [];
-      const out: RouteEndpoint[] = [];
-      for (const item of data) {
-        if (typeof item?.lat !== "number" || typeof item?.lng !== "number") continue;
-        const name = (item.name || clean).trim();
-        const normName = normalizeVn(name);
-        if (normName === "ho chi minh" || normName === "thanh pho ho chi minh") continue;
-        const district = (item.district || "TP. Hồ Chí Minh").trim();
-        const address = (item.address || (district ? `${name}, ${district}` : name)).trim();
-        const label =
-          district && !normName.includes(normalizeVn(district)) ? `${name} · ${district}` : name;
-        const place: RouteEndpoint = {
-          label,
-          address,
-          district,
-          coords: [item.lng, item.lat],
-        };
-        if (scorePlaceMatch(clean, place) > 0) {
-          out.push(place);
+  const backendPromise = withProviderTimeout(
+    (async (): Promise<RouteEndpoint[]> => {
+      try {
+        const res = await fetch(`${API_BASE}/map/geocode/search?q=${encodeURIComponent(clean)}`, {
+          signal,
+        });
+        if (!res.ok) return [];
+        const data = await res.json();
+        if (!Array.isArray(data)) return [];
+        const out: RouteEndpoint[] = [];
+        for (const item of data) {
+          if (
+            typeof item?.lat !== "number" ||
+            typeof item?.lng !== "number" ||
+            !isWithinHcmcBounds(item.lat, item.lng)
+          ) {
+            continue;
+          }
+          const name = (item.name || clean).trim();
+          const normName = normalizeVn(name);
+          if (normName === "ho chi minh" || normName === "thanh pho ho chi minh") continue;
+          const district = (item.district || "TP. Hồ Chí Minh").trim();
+          const address = (item.address || (district ? `${name}, ${district}` : name)).trim();
+          const label =
+            district && !normName.includes(normalizeVn(district)) ? `${name} · ${district}` : name;
+          out.push({
+            label,
+            address,
+            district,
+            coords: [item.lng, item.lat],
+          });
         }
+        registerDynamicPlaces(out);
+        return out;
+      } catch {
+        return [];
       }
-      registerDynamicPlaces(out);
-      return out;
-    } catch {
-      return [];
-    }
-  })();
+    })(),
+    1800,
+    [],
+  );
 
-  // Ưu tiên nguồn trả về có đủ kết quả khớp trước mà không bị chặn bởi nguồn trả về rỗng
-  const remoteBatch = await new Promise<RouteEndpoint[]>((resolve) => {
-    let settledCount = 0;
-    let resolved = false;
-    const collected: RouteEndpoint[] = [];
-    const handleBatch = (batch: RouteEndpoint[]) => {
-      settledCount += 1;
-      collected.push(...batch);
-      if (!resolved && collected.length >= 3) {
-        resolved = true;
-        resolve([...collected]);
-      } else if (!resolved && settledCount >= 4) {
-        resolved = true;
-        resolve([...collected]);
-      }
-    };
-    void googlePromise.then(handleBatch);
-    void arcgisDirectPromise.then(handleBatch);
-    void nominatimPromise.then(handleBatch);
-    void backendPromise.then(handleBatch);
-  });
+  const settledBatches = await Promise.all([
+    googlePromise,
+    photonDirectPromise,
+    nominatimPromise,
+    arcgisDirectPromise,
+    backendPromise,
+  ]);
 
   if (signal?.aborted) return [];
-  const merged: RouteEndpoint[] = [...remoteBatch, ...results];
+  const remoteBatch = settledBatches.flat();
+  const merged: RouteEndpoint[] = [...remoteBatch, ...localResults];
   const unique: RouteEndpoint[] = [];
   for (const item of merged) {
-    if (!unique.some((r) => normalizeVn(r.label) === normalizeVn(item.label))) {
+    const normItemLabel = normalizeVn(item.label.split("·")[0] ?? item.label);
+    const isDuplicate = unique.some((r) => {
+      const normRLabel = normalizeVn(r.label.split("·")[0] ?? r.label);
+      const sameLabel =
+        normalizeVn(r.label) === normalizeVn(item.label) ||
+        (normRLabel === normItemLabel &&
+          Math.hypot(r.coords[0] - item.coords[0], r.coords[1] - item.coords[1]) < 0.004);
+      return sameLabel;
+    });
+    if (!isDuplicate) {
       unique.push(item);
     }
   }
 
   const finalResults = unique
-    .sort((a, b) => scorePlaceMatch(clean, b) - scorePlaceMatch(clean, a))
-    .slice(0, 7);
+    .map((item, idx) => ({
+      item,
+      // Giữ điểm nền (20) cho mọi kết quả hợp lệ từ bộ giải mã địa lý trong phạm vi TP.HCM, ưu tiên độ khớp từ khóa cao nhất lên đầu
+      score: Math.max(20, scorePlaceMatch(clean, item)) - idx * 0.1,
+    }))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 10)
+    .map((entry) => entry.item);
+
   if (finalResults.length > 0) {
     placeSearchCache.set(cacheKey, finalResults);
+    placeSearchCache.set(`commit:${normalizeVn(clean)}`, finalResults);
   }
   return finalResults;
 }
@@ -1010,11 +1281,20 @@ export async function fetchJourneyRoutes(
                 : icon === "turn-right"
                   ? "Rẽ phải vào"
                   : "Đi theo";
+            const distM = Math.max(30, Math.round(s.distance ?? 100));
+            const loc = Array.isArray(s.maneuver?.location)
+              ? ([Number(s.maneuver.location[0]), Number(s.maneuver.location[1])] as [
+                  number,
+                  number,
+                ])
+              : undefined;
             return {
               icon,
               instruction,
               street: s.name || "Trục đường chính",
-              distance: `${Math.max(30, Math.round(s.distance ?? 100))} m`,
+              distance: `${distM} m`,
+              distanceMeters: distM,
+              ...(loc ? { coords: loc } : {}),
             };
           });
 
@@ -1030,9 +1310,11 @@ export async function fetchJourneyRoutes(
                 : "Từ hẻm nhỏ, đi ra đón xe tại",
             street: `${firstRoad} (${snapDist} m)`,
             distance: `Trong ${snapDist} m`,
+            distanceMeters: snapDist,
+            coords: originCoords,
           });
         }
-        steps.push(...mainSteps.slice(0, 8));
+        steps.push(...mainSteps.slice(0, 15));
 
         // Tính toán tốc độ di chuyển theo phương tiện: Xe máy (~32 km/h) vs Ô tô (~40 km/h)
         const speedFactor = vehicleMode === "motorcycle" ? 1.05 : 0.95;
@@ -1196,6 +1478,45 @@ export async function analyzeReportImageApi(payload: {
   };
 }
 
+async function snapCoordinateToRoad(
+  lat?: number,
+  lng?: number,
+  location?: string,
+): Promise<{ lat?: number; lng?: number }> {
+  if (typeof lat !== "number" || typeof lng !== "number") {
+    return { lat, lng };
+  }
+  const targetNorm = normalizeVn(location || "").replace(/^(duong|hem|nga tu|cau)\s+/, "");
+  try {
+    const res = await fetch(
+      `https://router.project-osrm.org/nearest/v1/driving/${lng},${lat}?number=15`,
+      { signal: AbortSignal.timeout(1500) },
+    );
+    if (res.ok) {
+      const data = await res.json();
+      const waypoints: any[] = Array.isArray(data?.waypoints) ? data.waypoints : [];
+      if (waypoints.length > 0) {
+        if (targetNorm) {
+          const matched = waypoints.find((wp) => {
+            const wn = normalizeVn(wp?.name || "").replace(/^(duong|hem|nga tu|cau)\s+/, "");
+            return wn && (wn.includes(targetNorm) || targetNorm.includes(wn));
+          });
+          if (matched && Array.isArray(matched.location)) {
+            return { lng: matched.location[0], lat: matched.location[1] };
+          }
+        }
+        const first = waypoints[0];
+        if (Array.isArray(first?.location) && (first.distance ?? 999) <= 80) {
+          return { lng: first.location[0], lat: first.location[1] };
+        }
+      }
+    }
+  } catch {
+    // ignore network/timeout and keep original coords
+  }
+  return { lat, lng };
+}
+
 export async function createCitizenReport(payload: {
   reportType: ReportType;
   severity: Severity;
@@ -1218,11 +1539,17 @@ export async function createCitizenReport(payload: {
   aiConfidence?: number;
   mapPoint?: MapFloodPoint;
 } | null> {
+  const snapped = await snapCoordinateToRoad(payload.lat, payload.lng, payload.location);
+  const finalPayload = {
+    ...payload,
+    lat: snapped.lat ?? payload.lat,
+    lng: snapped.lng ?? payload.lng,
+  };
   try {
     const res = await fetch(`${API_BASE}/reports`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+      body: JSON.stringify(finalPayload),
     });
     if (res.ok) {
       return await res.json();
@@ -1235,7 +1562,7 @@ export async function createCitizenReport(payload: {
   const fallbackId = `RP-${Math.floor(2420 + Math.random() * 800)}`;
   return {
     id: fallbackId,
-    aiDepth: payload.reportedDepth ?? (payload.severity === "high" ? 40 : 25),
+    aiDepth: finalPayload.reportedDepth ?? (finalPayload.severity === "high" ? 40 : 25),
     aiConfidence: 89,
   };
 }

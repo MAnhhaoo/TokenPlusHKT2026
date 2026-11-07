@@ -214,11 +214,20 @@ export class JourneyService {
                 : icon === "turn-right"
                   ? "Rẽ phải vào"
                   : "Đi theo";
+            const distM = Math.max(30, Math.round(s.distance ?? 100));
+            const loc = Array.isArray(s.maneuver?.location)
+              ? ([
+                  Number(s.maneuver.location[0]),
+                  Number(s.maneuver.location[1]),
+                ] as [number, number])
+              : undefined;
             return {
               icon,
               instruction,
               street: s.name || "Trục đường chính",
-              distance: `${Math.max(30, Math.round(s.distance ?? 100))} m`,
+              distance: `${distM} m`,
+              distanceMeters: distM,
+              ...(loc ? { coords: loc } : {}),
             };
           });
 
@@ -231,9 +240,11 @@ export class JourneyService {
             instruction: "Từ vị trí trong hẻm, đi ra",
             street: `${firstRoad} (${Math.round(startDist)} m)`,
             distance: `Trong ${Math.round(startDist)} m`,
+            distanceMeters: Math.round(startDist),
+            coords: [fromLng, fromLat],
           });
         }
-        navigationSteps = [...navigationSteps, ...mainSteps].slice(0, 6);
+        navigationSteps = [...navigationSteps, ...mainSteps].slice(0, 15);
 
         return {
           index: idx,

@@ -6,6 +6,8 @@ export interface NavigationStepItem {
   instruction: string;
   street: string;
   distance: string;
+  distanceMeters?: number;
+  coords?: [number, number];
 }
 
 @Entity("route_options")
