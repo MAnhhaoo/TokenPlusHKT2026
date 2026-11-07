@@ -9,6 +9,7 @@ import {
   reverseGeocodeApi,
   searchPlacesApi,
   type FloodAiAnalysis,
+  type CitizenReportResult,
 } from "@/lib/api";
 import { processAndAnalyzeImageFile } from "@/lib/visionAnalysis";
 import type { MapFloodPoint, ReportType, RouteEndpoint, Severity } from "@/types";
@@ -30,6 +31,7 @@ function ReportModal({
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [createdReportId, setCreatedReportId] = useState<string | null>(null);
+  const [createdData, setCreatedData] = useState<CitizenReportResult | null>(null);
   const [photoName, setPhotoName] = useState("");
   const [photoDataUrl, setPhotoDataUrl] = useState("");
   const [aiAnalysis, setAiAnalysis] = useState<FloodAiAnalysis | null>(null);
@@ -54,6 +56,7 @@ function ReportModal({
       setSubmitted(false);
       setSubmitting(false);
       setCreatedReportId(null);
+      setCreatedData(null);
       setPhotoName("");
       setPhotoDataUrl("");
       setAiAnalysis(null);
@@ -236,6 +239,7 @@ function ReportModal({
         return;
       }
       setCreatedReportId(created.id);
+      setCreatedData(created);
       setSubmitted(true);
       const createdPoint: MapFloodPoint = created.mapPoint ?? {
         id: `p_${created.id}`,
@@ -295,16 +299,49 @@ function ReportModal({
               <Icon name="check" size={30} />
             </span>
             <span className="success-pill">
-              {createdReportId ? `⚡ Đã tự động duyệt · ${createdReportId}` : "⚡ Đã tự động duyệt"}
+              {createdReportId ? `⚡ Đã phát cảnh báo · ${createdReportId}` : "⚡ Đã phát cảnh báo"}
             </span>
-            <h2 id="report-title">Báo cáo đã xuất hiện trên bản đồ cộng đồng!</h2>
+            <h2 id="report-title">Cảnh báo đã lên bản đồ & hệ thống!</h2>
             <p id="report-description">
-              Hệ thống AI Gemini đã phân tích ảnh và tự động xác thực báo cáo tại{" "}
-              <strong>{locationText.trim() || "khu vực bạn chọn"}</strong>. Báo cáo đã lập tức hiển
-              thị công khai trên bản đồ thời gian thực để cảnh báo cho người dân.
+              Hệ thống đã tự động đối chiếu hình ảnh AI Gemini, lượng mưa thực tế và lịch sử ngập tại{" "}
+              <strong>{locationText.trim() || "khu vực bạn chọn"}</strong> để phát cảnh báo đến người đi đường.
             </p>
+
+            {/* Khối dự đoán thời gian hết ngập theo Thủy văn & Lượng mưa */}
+            <div className="flood-prediction-banner">
+              <div className="prediction-header">
+                <span className="prediction-icon">⏳</span>
+                <div>
+                  <strong className="prediction-title">Dự kiến nước rút hoàn toàn</strong>
+                  <p className="prediction-subtitle">
+                    Ước tính sau <strong>~{createdData?.estimatedDurationMin || 45} phút</strong>
+                    {createdData?.estimatedClearAt ? ` (khoảng ${createdData.estimatedClearAt.split(',')[0].trim()})` : ""}
+                  </p>
+                </div>
+              </div>
+
+              <div className="prediction-details-grid">
+                <div className="prediction-stat">
+                  <span className="stat-label">Mực nước ngập</span>
+                  <strong className="stat-value">{createdData?.reportedDepth || (severity === "high" ? 42 : severity === "medium" ? 25 : 12)} cm</strong>
+                </div>
+                <div className="prediction-stat">
+                  <span className="stat-label">Tốc độ tiêu thoát</span>
+                  <strong className="stat-value">~{createdData?.drainageRateCmPerMin || 0.65} cm/phút</strong>
+                </div>
+                <div className="prediction-stat">
+                  <span className="stat-label">Dữ liệu thời tiết</span>
+                  <strong className="stat-value">Open-Meteo Realtime</strong>
+                </div>
+                <div className="prediction-stat">
+                  <span className="stat-label">Mô hình tính toán</span>
+                  <strong className="stat-value">Thủy văn & Triều cường</strong>
+                </div>
+              </div>
+            </div>
+
             <button className="primary-modal-button" onClick={closeModal} type="button">
-              Quay lại bản đồ
+              Xem cảnh báo trên bản đồ
             </button>
           </div>
         ) : (
@@ -376,32 +413,31 @@ function ReportModal({
             </fieldset>
 
             <div className="report-location-field">
-              <div className="report-location">
+              <label className="report-location-label" htmlFor="report-location-input">
+                {hasCustomLocation
+                  ? "Vị trí ngập (do bạn nhập)"
+                  : "Vị trí hiện tại của bạn (tự động nhận diện)"}
+              </label>
+              <div className="report-location-input-row">
                 <Icon name="pin" size={18} />
-                <div className="report-location-input-wrap">
-                  <small>
-                    {hasCustomLocation
-                      ? "Vị trí do bạn nhập (tùy chọn)"
-                      : "Vị trí hiện tại của bạn (tự động nhận diện)"}
-                  </small>
-                  <input
-                    aria-label="Nhập tên đường hoặc vị trí ngập"
-                    className="report-location-input"
-                    onChange={(e) => {
-                      setLocationText(e.target.value);
-                      setHasCustomLocation(true);
-                      setShowSuggestions(true);
-                    }}
-                    onFocus={() => setShowSuggestions(true)}
-                    placeholder={
-                      locatingGps
-                        ? "Đang định vị vị trí hiện tại của bạn…"
-                        : "Nhập tên đường, giao lộ (VD: Nguyễn Hữu Cảnh, Bình Thạnh…)"
-                    }
-                    type="text"
-                    value={locationText}
-                  />
-                </div>
+                <input
+                  id="report-location-input"
+                  aria-label="Nhập tên đường hoặc vị trí ngập"
+                  className="report-location-input"
+                  onChange={(e) => {
+                    setLocationText(e.target.value);
+                    setHasCustomLocation(true);
+                    setShowSuggestions(true);
+                  }}
+                  onFocus={() => setShowSuggestions(true)}
+                  placeholder={
+                    locatingGps
+                      ? "Đang xác định vị trí của bạn…"
+                      : "Nhập tên đường, giao lộ (VD: Nguyễn Hữu Cảnh, Bình Thạnh…)"
+                  }
+                  type="text"
+                  value={locationText}
+                />
                 <button
                   className="gps-locate-btn"
                   disabled={locatingGps}

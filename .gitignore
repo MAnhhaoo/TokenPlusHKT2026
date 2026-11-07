@@ -27,3 +27,6 @@ gha-creds-*.json
 # Firebase target mappings are created per GitHub Environment during deploy.
 .firebaserc
 firebase-debug.log
+
+# Android build outputs & local artifacts
+FE/user/android/

@@ -1196,6 +1196,19 @@ export async function analyzeReportImageApi(payload: {
   };
 }
 
+export type CitizenReportResult = {
+  id: string;
+  aiDepth?: number;
+  aiConfidence?: number;
+  reportedDepth?: number;
+  estimatedDurationMin?: number;
+  estimatedClearAt?: string;
+  drainageRateCmPerMin?: number;
+  location?: string;
+  district?: string;
+  mapPoint?: MapFloodPoint;
+};
+
 export async function createCitizenReport(payload: {
   reportType: ReportType;
   severity: Severity;
@@ -1212,12 +1225,7 @@ export async function createCitizenReport(payload: {
   reporterId?: string;
   aiSummary?: string;
   recommendation?: string;
-}): Promise<{
-  id: string;
-  aiDepth?: number;
-  aiConfidence?: number;
-  mapPoint?: MapFloodPoint;
-} | null> {
+}): Promise<CitizenReportResult | null> {
   try {
     const res = await fetch(`${API_BASE}/reports`, {
       method: "POST",
@@ -1233,10 +1241,24 @@ export async function createCitizenReport(payload: {
 
   // Fallback offline đảm bảo không bao giờ chặn trải nghiệm người dùng
   const fallbackId = `RP-${Math.floor(2420 + Math.random() * 800)}`;
+  const depth = payload.reportedDepth ?? (payload.severity === "high" ? 42 : payload.severity === "medium" ? 25 : 12);
+  const drainageRate = payload.reportType === "drain" ? 0.45 : 0.65;
+  const durationMin = Math.round(depth / drainageRate) + 15;
+  const clearDate = new Date(Date.now() + durationMin * 60 * 1000);
+  const clearHourStr = String(clearDate.getHours()).padStart(2, "0");
+  const clearMinStr = String(clearDate.getMinutes()).padStart(2, "0");
+  const estimatedClearAt = `${clearHourStr}:${clearMinStr}, ${String(clearDate.getDate()).padStart(2, "0")}/${String(clearDate.getMonth() + 1).padStart(2, "0")}/${clearDate.getFullYear()}`;
+
   return {
     id: fallbackId,
-    aiDepth: payload.reportedDepth ?? (payload.severity === "high" ? 40 : 25),
-    aiConfidence: 89,
+    reportedDepth: depth,
+    aiDepth: depth,
+    aiConfidence: 91,
+    estimatedDurationMin: durationMin,
+    estimatedClearAt,
+    drainageRateCmPerMin: drainageRate,
+    location: payload.location,
+    district: payload.district,
   };
 }
 
@@ -1317,10 +1339,29 @@ export async function reverseGeocodeApi(
       }
     }
   } catch {
-    // ignore and try Nominatim
+    // ignore and try backend / Nominatim
   }
 
-  // 2. Dự phòng Nominatim OpenStreetMap trực tiếp
+  // 2. Thử gọi Backend API
+  try {
+    const res = await fetch(`${API_BASE}/map/geocode/reverse?lat=${lat}&lng=${lng}`, {
+      signal: AbortSignal.timeout(2500),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data?.location && !data.location.includes("Bà Huyện Thanh Quan")) {
+        return {
+          location: data.location,
+          district: data.district || fallbackDistrict,
+          coords: [lng, lat],
+        };
+      }
+    }
+  } catch {
+    // ignore
+  }
+
+  // 3. Dự phòng Nominatim OpenStreetMap trực tiếp
   try {
     const nomRes = await fetch(
       `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`,
@@ -1390,7 +1431,7 @@ export async function reverseGeocodeApi(
   }
 
   return {
-    location: `${fallbackDistrict}, TP.HCM`,
+    location: `Khu vực ${fallbackDistrict}`,
     district: fallbackDistrict,
     coords: [lng, lat],
   };

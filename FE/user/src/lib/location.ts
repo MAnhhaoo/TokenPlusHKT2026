@@ -71,62 +71,65 @@ export async function getUserLocation(): Promise<UserGeoLocation> {
     // ignore permissions API error
   }
 
-  const requestBrowserPosition = (
-    highAccuracy: boolean,
-    timeoutMs: number,
-  ): Promise<GeolocationPosition> =>
-    new Promise((resolve, reject) => {
-      let settled = false;
-      const timer = setTimeout(() => {
-        if (settled) return;
-        settled = true;
-        reject(new Error("Geolocation timeout"));
-      }, timeoutMs + 1500);
+  return new Promise<UserGeoLocation>((resolve) => {
+    let resolved = false;
 
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          if (settled) return;
-          settled = true;
-          clearTimeout(timer);
-          resolve(pos);
-        },
-        (err) => {
-          if (settled) return;
-          settled = true;
-          clearTimeout(timer);
-          reject(err);
-        },
-        { enableHighAccuracy: highAccuracy, timeout: timeoutMs, maximumAge: 0 },
-      );
-    });
+    // Timeout an toàn 4.5 giây: nếu GPS phần cứng quá lâu, tự động chuyển IP geolocation
+    const safetyTimer = window.setTimeout(async () => {
+      if (!resolved) {
+        resolved = true;
+        const ipLoc = await fallbackIp();
+        resolve(ipLoc);
+      }
+    }, 4500);
 
-  // Bước 1: Thử lấy tọa độ độ chính xác cao (GPS / Wi-Fi triangulation)
-  try {
-    const pos = await requestBrowserPosition(true, 7000);
-    const isCoarseIp = (pos.coords.accuracy ?? 0) > 3000;
-    return {
-      latitude: pos.coords.latitude,
-      longitude: pos.coords.longitude,
-      isIpFallback: isCoarseIp,
-    };
-  } catch (err: any) {
-    // Nếu người dùng bấm Block (PERMISSION_DENIED = 1), không gọi lại lần 2
-    if (err && err.code === 1) {
-      return fallbackIp();
-    }
-  }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        if (!resolved) {
+          resolved = true;
+          window.clearTimeout(safetyTimer);
+          resolve({
+            latitude: pos.coords.latitude,
+            longitude: pos.coords.longitude,
+            isIpFallback: false,
+          });
+        }
+      },
+      (err) => {
+        if (resolved) return;
+        // Nếu người dùng bấm Chặn (code === 1), chuyển thẳng sang fallback
+        if (err && err.code === 1) {
+          resolved = true;
+          window.clearTimeout(safetyTimer);
+          void fallbackIp().then(resolve);
+          return;
+        }
 
-  // Bước 2: Trên máy tính bàn / laptop không có chip GPS, thử lại với enableHighAccuracy: false (Wi-Fi/Network Location)
-  try {
-    const pos = await requestBrowserPosition(false, 5000);
-    const isCoarseIp = (pos.coords.accuracy ?? 0) > 3000;
-    return {
-      latitude: pos.coords.latitude,
-      longitude: pos.coords.longitude,
-      isIpFallback: isCoarseIp,
-    };
-  } catch (err) {
-    console.warn("GPS lookup denied or unavailable, switching to IP Geolocation:", err);
-    return fallbackIp();
-  }
+        // Thử lại ngay với độ chính xác tiêu chuẩn (tương thích cao trên PC/Laptop Windows)
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            if (!resolved) {
+              resolved = true;
+              window.clearTimeout(safetyTimer);
+              resolve({
+                latitude: pos.coords.latitude,
+                longitude: pos.coords.longitude,
+                isIpFallback: false,
+              });
+            }
+          },
+          async () => {
+            if (!resolved) {
+              resolved = true;
+              window.clearTimeout(safetyTimer);
+              const ipLoc = await fallbackIp();
+              resolve(ipLoc);
+            }
+          },
+          { enableHighAccuracy: false, timeout: 3000, maximumAge: 120000 },
+        );
+      },
+      { enableHighAccuracy: true, timeout: 3500, maximumAge: 60000 },
+    );
+  });
 }
