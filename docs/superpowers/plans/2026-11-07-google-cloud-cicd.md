@@ -46,16 +46,17 @@
 - Consumes the existing or migrated package manifests and lockfiles in `BE/`, `FE/user/`, `FE/admin/`, and `ML/`.
 - Produces a required PR check that runs package build, typecheck, lint, and tests when the relevant package exists; missing scripts or lockfiles for a changed package fail with a clear message.
 
-- [ ] Add a pull-request trigger scoped to application/workflow paths, a reusable `workflow_call` full-validation mode for master/release deploys, and `workflow_dispatch` without treating an empty repository as tested.
-- [ ] Add Node checks using Node 22 and pnpm 12.15.0 for packages with their manifests and frozen lockfile.
-- [ ] Add Python checks using Python 3.12 and `uv sync --frozen --group dev`, `uv run ruff check`, and `uv run pytest` when `ML/pyproject.toml` exists.
-- [ ] Fail the preflight when a changed application component has no runnable manifest or required lockfile; report absent optional components as not migrated.
-- [ ] Validate workflow YAML with `actionlint` and inspect trigger/job conditions for a workflow-only change and a component change.
+- [x] Add a pull-request trigger scoped to application/workflow paths, a reusable `workflow_call` full-validation mode for master/release deploys, and `workflow_dispatch` without treating an empty repository as tested.
+- [x] Add Node checks using Node 22 and pnpm 12.15.0 for packages with their manifests and frozen lockfile.
+- [x] Add Python checks using Python 3.12 and `uv sync --frozen --group dev`, `uv run ruff check`, and `uv run pytest` when `ML/pyproject.toml` exists.
+- [x] Fail the preflight when a changed application component has no runnable manifest or required lockfile; report absent optional components as not migrated.
+- [x] Validate workflow YAML with `actionlint` and inspect trigger/job conditions for a workflow-only change and a component change.
 
 ### Task 2: Google Cloud Deployment Foundation
 
 **Files:**
 - Create: `.github/workflows/deploy.yml`
+- Create: `.gitignore`
 - Create: `firebase.json`
 - Create: `docs/deployment/google-cloud-cicd.md`
 
@@ -63,12 +64,12 @@
 - Consumes GitHub Environment variables for project ID, region, WIF provider, deploy service account, and Firebase site IDs.
 - Produces Cloud Run deployment for migrated API/serving ML packages and Firebase Hosting deploys for `FE/user` and `FE/admin`; production uses the `production` GitHub Environment.
 
-- [ ] Define Firebase Hosting targets `user` and `admin` with public directories `FE/user/dist` and `FE/admin/dist`.
-- [ ] Configure staging after successful reusable CI on merge to `master`, production on a published release after staging and the protected environment gate, and Firebase PR preview from the trusted deploy workflow after CI succeeds.
-- [ ] Take the PR number from the trusted `workflow_run` payload; validate artifact frontend flags as JSON booleans and never execute downloaded artifact contents in the trusted workflow.
-- [ ] Authenticate with `google-github-actions/auth@v3` and Workload Identity Federation; grant `contents: read` and `id-token: write` to deploy jobs, with `actions: read` only on the trusted preview jobs that download CI artifacts.
-- [ ] Deploy the API to Cloud Run from `BE/`; deploy ML only when a serving entrypoint exists. Do not deploy training notebooks or datasets.
-- [ ] Document the required Google APIs, WIF provider/service-account roles, GitHub Environment variables, Firebase site targets, and the manual owner-side environment protection step.
-- [ ] Validate workflow YAML with `actionlint`, parse `firebase.json`, inspect permission scopes, and confirm deployment cannot run from fork PRs.
+- [x] Define Firebase Hosting targets `user` and `admin` with public directories `FE/user/dist` and `FE/admin/dist`.
+- [x] Configure staging after successful reusable CI on merge to `master`, production on a published release after staging and the protected environment gate, and Firebase PR preview from the trusted deploy workflow after CI succeeds.
+- [x] Take the PR number from the trusted `workflow_run` payload; validate artifact frontend flags as JSON booleans and never execute downloaded artifact contents in the trusted workflow.
+- [x] Authenticate with `google-github-actions/auth@v3` and Workload Identity Federation; grant `contents: read` and `id-token: write` to deploy jobs, with `actions: read` only on the trusted preview jobs that download CI artifacts.
+- [x] Deploy the API to Cloud Run from `BE/`; deploy ML only when a serving entrypoint exists. Do not deploy training notebooks or datasets.
+- [x] Document the required Google APIs, WIF provider/service-account roles, GitHub Environment variables, Firebase site targets, and the manual owner-side environment protection step.
+- [x] Validate workflow YAML with `actionlint`, parse `firebase.json`, inspect permission scopes, and confirm deployment cannot run from fork PRs.
 
 ---
