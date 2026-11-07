@@ -303,8 +303,9 @@ function ReportModal({
             </span>
             <h2 id="report-title">Cảnh báo đã lên bản đồ & hệ thống!</h2>
             <p id="report-description">
-              Hệ thống đã tự động đối chiếu hình ảnh AI Gemini, lượng mưa thực tế và lịch sử ngập tại{" "}
-              <strong>{locationText.trim() || "khu vực bạn chọn"}</strong> để phát cảnh báo đến người đi đường.
+              Hệ thống đã tự động đối chiếu hình ảnh AI Gemini, lượng mưa thực tế và lịch sử ngập
+              tại <strong>{locationText.trim() || "khu vực bạn chọn"}</strong> để phát cảnh báo đến
+              người đi đường.
             </p>
 
             {/* Khối dự đoán thời gian hết ngập theo Thủy văn & Lượng mưa */}
@@ -315,7 +316,9 @@ function ReportModal({
                   <strong className="prediction-title">Dự kiến nước rút hoàn toàn</strong>
                   <p className="prediction-subtitle">
                     Ước tính sau <strong>~{createdData?.estimatedDurationMin || 45} phút</strong>
-                    {createdData?.estimatedClearAt ? ` (khoảng ${createdData.estimatedClearAt.split(',')[0].trim()})` : ""}
+                    {createdData?.estimatedClearAt
+                      ? ` (khoảng ${createdData.estimatedClearAt.split(",")[0].trim()})`
+                      : ""}
                   </p>
                 </div>
               </div>
@@ -323,11 +326,17 @@ function ReportModal({
               <div className="prediction-details-grid">
                 <div className="prediction-stat">
                   <span className="stat-label">Mực nước ngập</span>
-                  <strong className="stat-value">{createdData?.reportedDepth || (severity === "high" ? 42 : severity === "medium" ? 25 : 12)} cm</strong>
+                  <strong className="stat-value">
+                    {createdData?.reportedDepth ||
+                      (severity === "high" ? 42 : severity === "medium" ? 25 : 12)}{" "}
+                    cm
+                  </strong>
                 </div>
                 <div className="prediction-stat">
                   <span className="stat-label">Tốc độ tiêu thoát</span>
-                  <strong className="stat-value">~{createdData?.drainageRateCmPerMin || 0.65} cm/phút</strong>
+                  <strong className="stat-value">
+                    ~{createdData?.drainageRateCmPerMin || 0.65} cm/phút
+                  </strong>
                 </div>
                 <div className="prediction-stat">
                   <span className="stat-label">Dữ liệu thời tiết</span>

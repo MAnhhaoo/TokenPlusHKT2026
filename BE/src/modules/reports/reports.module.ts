@@ -24,4 +24,3 @@ import { MapModule } from "../map/map.module";
   exports: [ReportsService, GeminiVisionService],
 })
 export class ReportsModule {}
-

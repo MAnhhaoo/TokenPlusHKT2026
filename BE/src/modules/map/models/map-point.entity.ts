@@ -70,7 +70,12 @@ export class MapPointEntity {
   estimatedDurationMin?: number;
 
   @ApiProperty({ required: false, example: "00:25, 08/11/2026" })
-  @Column({ name: "estimatedclearat", type: "varchar", length: 64, nullable: true })
+  @Column({
+    name: "estimatedclearat",
+    type: "varchar",
+    length: 64,
+    nullable: true,
+  })
   estimatedClearAt?: string;
 
   @ApiProperty({ required: false, example: 0.65 })

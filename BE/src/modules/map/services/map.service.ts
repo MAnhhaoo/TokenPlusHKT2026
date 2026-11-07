@@ -144,10 +144,16 @@ export class MapService {
           let calculatedSeverity = point.severity;
           let isCleared = false;
 
-          if (point.updatedAt && point.drainageRateCmPerMin && point.depth > 0) {
+          if (
+            point.updatedAt &&
+            point.drainageRateCmPerMin &&
+            point.depth > 0
+          ) {
             const minutesElapsed = Math.max(
               0,
-              Math.floor((Date.now() - new Date(point.updatedAt).getTime()) / 60000),
+              Math.floor(
+                (Date.now() - new Date(point.updatedAt).getTime()) / 60000,
+              ),
             );
             // Nếu lượng mưa tại thành phố/quận nhỏ (< 3mm) nghĩa là trời đã tạnh hoặc mưa rất nhỏ
             if (cityRainMm < 3) {
@@ -170,7 +176,10 @@ export class MapService {
           }
 
           if (isCleared) {
-            if (activeLayers.includes("history") || activeLayers.includes("risk")) {
+            if (
+              activeLayers.includes("history") ||
+              activeLayers.includes("risk")
+            ) {
               dynamicPoints.push({
                 ...point,
                 depth: 0,
@@ -348,7 +357,10 @@ export class MapService {
         const clearMinStr = String(clearDate.getMinutes()).padStart(2, "0");
         clearTimeStr = `${clearHourStr}:${clearMinStr}, ${String(
           clearDate.getDate(),
-        ).padStart(2, "0")}/${String(clearDate.getMonth() + 1).padStart(2, "0")}/${clearDate.getFullYear()}`;
+        ).padStart(
+          2,
+          "0",
+        )}/${String(clearDate.getMonth() + 1).padStart(2, "0")}/${clearDate.getFullYear()}`;
       }
 
       dynamicPoints.push({
@@ -510,7 +522,7 @@ export class MapService {
    * Tìm kiếm địa điểm / Autocomplete thời gian thực tại TP.HCM (kiểu Google Maps)
    * Kết hợp ArcGIS World Geocoder (POI + địa chỉ tiếng Việt) & Photon OpenStreetMap
    */
-  async searchPlaces(keyword: string, limit = 6) {
+  async searchPlaces(keyword: string, limit = 10) {
     const cleanKeyword = (keyword || "").trim();
     if (!cleanKeyword) {
       return [];
@@ -530,8 +542,8 @@ export class MapService {
       lng: number;
     }> = [];
 
-    // 1. Truy vấn song song từ PostgreSQL map_points và ArcGIS World Geocoding Service
-    const [dbPoints, arcgisRes] = await Promise.all([
+    // 1. Truy vấn song song từ PostgreSQL map_points, ArcGIS World Geocoder và Photon OpenStreetMap
+    const [dbPoints, arcgisRes, photonRes] = await Promise.all([
       this.mapPointRepo.find().catch(() => []),
       firstValueFrom(
         this.httpService.get(
@@ -550,6 +562,18 @@ export class MapService {
             timeout: 1500,
           },
         ),
+      ).catch(() => null),
+      firstValueFrom(
+        this.httpService.get(`${photonBase}/api/`, {
+          params: {
+            q: cleanKeyword,
+            lat: 10.7769,
+            lon: 106.7009,
+            bbox: "106.35,10.35,107.05,11.16",
+            limit,
+          },
+          timeout: 1500,
+        }),
       ).catch(() => null),
     ]);
 
@@ -578,21 +602,6 @@ export class MapService {
     }
 
     const candidates = arcgisRes?.data?.candidates ?? [];
-    // Chỉ gọi thêm Photon OSM nếu tổng kết quả < 2
-    const photonRes =
-      results.length + candidates.length >= 2
-        ? null
-        : await firstValueFrom(
-            this.httpService.get(`${photonBase}/api/`, {
-              params: {
-                q: `${cleanKeyword}, Hồ Chí Minh`,
-                lat: 10.7769,
-                lon: 106.7009,
-                limit,
-              },
-              timeout: 1000,
-            }),
-          ).catch(() => null);
     for (const c of candidates) {
       const lat = c?.location?.y;
       const lng = c?.location?.x;

@@ -223,32 +223,6 @@ function JourneyPanel({
                 </div>
               )}
 
-              <div className={`route-explanation ${selectedRoute}`}>
-                <span className="explanation-icon">
-                  <Icon name={selectedRoute === "safe" ? "shield" : "alert"} size={19} />
-                </span>
-                <p>{routesData[selectedRoute].detail}</p>
-                <div
-                  style={{
-                    marginTop: "8px",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "6px",
-                    fontSize: "12px",
-                    color: "#047857",
-                    background: "#ecfdf5",
-                    padding: "6px 10px",
-                    borderRadius: "6px",
-                    border: "1px solid #a7f3d0",
-                  }}
-                >
-                  <strong>🤖 Mô hình AI:</strong>
-                  <span>
-                    Tuyến đường được phân tích nguy cơ ngập qua mô hình GIS MCDA & LightGBM
-                  </span>
-                </div>
-              </div>
-
               <TurnByTurnDirections
                 distance={routesData[selectedRoute].distance}
                 durationText={routesData[selectedRoute].time}

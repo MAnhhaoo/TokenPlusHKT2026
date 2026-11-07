@@ -1,8 +1,8 @@
 [
   {
     "id": "ird_16",
-    "lat": 10.806235,
-    "lng": 106.729408,
+    "lat": 10.805625,
+    "lng": 106.731228,
     "label": "Quốc Hương",
     "locationName": "Đường Quốc Hương",
     "locationType": "Street",
@@ -17,26 +17,14 @@
     "maxDepth": 140,
     "minDepth": 20,
     "depth": 140,
-    "causes": [
-      "Mưa lớn",
-      "Triều cường",
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa lớn", "Triều cường", "Mưa & Triều"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2011,
-      2018,
-      2019,
-      2020,
-      2023,
-      2025,
-      2026
-    ]
+    "years": [2011, 2018, 2019, 2020, 2023, 2025, 2026]
   },
   {
     "id": "ird_17",
-    "lat": 10.793315,
-    "lng": 106.715471,
+    "lat": 10.7894,
+    "lng": 106.716552,
     "label": "Nguyễn Hữu Cảnh",
     "locationName": "Đường Nguyễn Hữu Cảnh",
     "locationType": "Street",
@@ -51,28 +39,14 @@
     "maxDepth": 100,
     "minDepth": 20,
     "depth": 100,
-    "causes": [
-      "Mưa lớn",
-      "Triều cường",
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa lớn", "Triều cường", "Mưa & Triều"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2008,
-      2010,
-      2011,
-      2013,
-      2016,
-      2018,
-      2019,
-      2020,
-      2024
-    ]
+    "years": [2008, 2010, 2011, 2013, 2016, 2018, 2019, 2020, 2024]
   },
   {
     "id": "ird_242",
-    "lat": 10.807364,
-    "lng": 106.733608,
+    "lat": 10.803068,
+    "lng": 106.737815,
     "label": "Thảo Điền",
     "locationName": "Đường Thảo Điền",
     "locationType": "Street",
@@ -87,24 +61,14 @@
     "maxDepth": 20,
     "minDepth": 20,
     "depth": 20,
-    "causes": [
-      "Triều cường",
-      "Mưa lớn",
-      "Mưa & Triều"
-    ],
+    "causes": ["Triều cường", "Mưa lớn", "Mưa & Triều"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2008,
-      2018,
-      2019,
-      2020,
-      2023
-    ]
+    "years": [2008, 2018, 2019, 2020, 2023]
   },
   {
     "id": "ird_7",
-    "lat": 10.807857,
-    "lng": 106.726037,
+    "lat": 10.804935,
+    "lng": 106.726435,
     "label": "Nguyễn Văn Hưởng",
     "locationName": "Đường Nguyễn Văn Hưởng",
     "locationType": "Street",
@@ -119,23 +83,14 @@
     "maxDepth": 60,
     "minDepth": 10,
     "depth": 60,
-    "causes": [
-      "Triều cường",
-      "Mưa lớn"
-    ],
+    "causes": ["Triều cường", "Mưa lớn"],
     "primaryCause": "Triều cường",
-    "years": [
-      2018,
-      2019,
-      2020,
-      2024,
-      2025
-    ]
+    "years": [2018, 2019, 2020, 2024, 2025]
   },
   {
     "id": "ird_3",
-    "lat": 10.721411,
-    "lng": 106.732548,
+    "lat": 10.751577,
+    "lng": 106.728532,
     "label": "Huỳnh Tấn Phát",
     "locationName": "Đường Huỳnh Tấn Phát",
     "locationType": "Street",
@@ -150,26 +105,14 @@
     "maxDepth": 50,
     "minDepth": 15,
     "depth": 50,
-    "causes": [
-      "Triều cường",
-      "Mưa lớn",
-      "Mưa & Triều"
-    ],
+    "causes": ["Triều cường", "Mưa lớn", "Mưa & Triều"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002,
-      2010,
-      2011,
-      2012,
-      2016,
-      2023,
-      2025
-    ]
+    "years": [2002, 2010, 2011, 2012, 2016, 2023, 2025]
   },
   {
     "id": "ird_2",
-    "lat": 10.753053,
-    "lng": 106.707505,
+    "lat": 10.75183,
+    "lng": 106.71068,
     "label": "Trần Xuân Soạn",
     "locationName": "Đường Trần Xuân Soạn",
     "locationType": "Street",
@@ -184,22 +127,14 @@
     "maxDepth": 60,
     "minDepth": 15,
     "depth": 60,
-    "causes": [
-      "Triều cường",
-      "Mưa & Triều"
-    ],
+    "causes": ["Triều cường", "Mưa & Triều"],
     "primaryCause": "Triều cường",
-    "years": [
-      2011,
-      2019,
-      2023,
-      2025
-    ]
+    "years": [2011, 2019, 2023, 2025]
   },
   {
     "id": "ird_34",
-    "lat": 10.787981,
-    "lng": 106.732281,
+    "lat": 10.786727,
+    "lng": 106.732374,
     "label": "Lương Định Của",
     "locationName": "Đường Lương Định Của",
     "locationType": "Street",
@@ -214,22 +149,14 @@
     "maxDepth": 60,
     "minDepth": 15,
     "depth": 60,
-    "causes": [
-      "Triều cường",
-      "Mưa & Triều"
-    ],
+    "causes": ["Triều cường", "Mưa & Triều"],
     "primaryCause": "Triều cường",
-    "years": [
-      2011,
-      2012,
-      2018,
-      2025
-    ]
+    "years": [2011, 2012, 2018, 2025]
   },
   {
     "id": "ird_42",
-    "lat": 10.847523,
-    "lng": 106.74787,
+    "lat": 10.849299,
+    "lng": 106.753567,
     "label": "Kha Vạn Cân",
     "locationName": "Kha Vạn Cân",
     "locationType": "Residential area",
@@ -244,24 +171,14 @@
     "maxDepth": 50,
     "minDepth": 15,
     "depth": 50,
-    "causes": [
-      "Mưa & Triều",
-      "Triều cường",
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa & Triều", "Triều cường", "Mưa lớn"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2010,
-      2012,
-      2018,
-      2019,
-      2026
-    ]
+    "years": [2010, 2012, 2018, 2019, 2026]
   },
   {
     "id": "ird_18",
-    "lat": 10.805093,
-    "lng": 106.718919,
+    "lat": 10.800877,
+    "lng": 106.723325,
     "label": "Ung Văn Khiêm",
     "locationName": "Đường Ung Văn Khiêm",
     "locationType": "Street",
@@ -276,26 +193,14 @@
     "maxDepth": 40,
     "minDepth": 30,
     "depth": 40,
-    "causes": [
-      "Mưa lớn",
-      "Triều cường",
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa lớn", "Triều cường", "Mưa & Triều"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2002,
-      2008,
-      2010,
-      2012,
-      2013,
-      2019,
-      2020
-    ]
+    "years": [2002, 2008, 2010, 2012, 2013, 2019, 2020]
   },
   {
     "id": "ird_35",
-    "lat": 10.792844,
-    "lng": 106.711928,
+    "lat": 10.791828,
+    "lng": 106.713965,
     "label": "Ngô Tất Tố",
     "locationName": "Đường Ngô Tất Tố",
     "locationType": "Street",
@@ -310,22 +215,14 @@
     "maxDepth": 50,
     "minDepth": 20,
     "depth": 50,
-    "causes": [
-      "Triều cường",
-      "Mưa & Triều"
-    ],
+    "causes": ["Triều cường", "Mưa & Triều"],
     "primaryCause": "Triều cường",
-    "years": [
-      2007,
-      2010,
-      2011,
-      2012
-    ]
+    "years": [2007, 2010, 2011, 2012]
   },
   {
     "id": "ird_52",
-    "lat": 10.789112,
-    "lng": 106.761688,
+    "lat": 10.787741,
+    "lng": 106.762722,
     "label": "Nguyễn Duy Trinh",
     "locationName": "Đường Nguyễn Duy Trinh",
     "locationType": "Street",
@@ -340,23 +237,14 @@
     "maxDepth": 50,
     "minDepth": 30,
     "depth": 50,
-    "causes": [
-      "Mưa lớn",
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa lớn", "Mưa & Triều"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2016,
-      2018,
-      2019,
-      2020,
-      2024
-    ]
+    "years": [2016, 2018, 2019, 2020, 2024]
   },
   {
     "id": "ird_19",
-    "lat": 10.858121,
-    "lng": 106.747884,
+    "lat": 10.860605,
+    "lng": 106.745924,
     "label": "Tô Ngọc Vân",
     "locationName": "Đường Tô Ngọc Vân",
     "locationType": "Street",
@@ -371,23 +259,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2017,
-      2019,
-      2020,
-      2022,
-      2023,
-      2024
-    ]
+    "years": [2017, 2019, 2020, 2022, 2023, 2024]
   },
   {
     "id": "ird_20",
-    "lat": 10.85224,
-    "lng": 106.75547,
+    "lat": 10.850641,
+    "lng": 106.765127,
     "label": "Võ Văn Ngân",
     "locationName": "Đường Võ Văn Ngân",
     "locationType": "Street",
@@ -402,23 +281,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn",
-      "Triều cường"
-    ],
+    "causes": ["Mưa lớn", "Triều cường"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2005,
-      2017,
-      2019,
-      2020,
-      2024
-    ]
+    "years": [2005, 2017, 2019, 2020, 2024]
   },
   {
     "id": "ird_4",
-    "lat": 10.694138,
-    "lng": 106.700615,
+    "lat": 10.710703,
+    "lng": 106.702014,
     "label": "Lê Văn Lương",
     "locationName": "Đường Lê Văn Lương",
     "locationType": "Street",
@@ -433,21 +303,14 @@
     "maxDepth": 50,
     "minDepth": 15,
     "depth": 50,
-    "causes": [
-      "Triều cường",
-      "Mưa & Triều"
-    ],
+    "causes": ["Triều cường", "Mưa & Triều"],
     "primaryCause": "Triều cường",
-    "years": [
-      2011,
-      2012,
-      2025
-    ]
+    "years": [2011, 2012, 2025]
   },
   {
     "id": "ird_49",
-    "lat": 10.732532,
-    "lng": 106.643558,
+    "lat": 10.742509,
+    "lng": 106.664954,
     "label": "Phạm Thế Hiển",
     "locationName": "Phạm Thế Hiển",
     "locationType": "Residential area",
@@ -462,22 +325,14 @@
     "maxDepth": 60,
     "minDepth": 30,
     "depth": 60,
-    "causes": [
-      "Mưa & Triều",
-      "Triều cường"
-    ],
+    "causes": ["Mưa & Triều", "Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2008,
-      2011,
-      2012,
-      2025
-    ]
+    "years": [2008, 2011, 2012, 2025]
   },
   {
     "id": "ird_140",
-    "lat": 10.797746,
-    "lng": 106.70744,
+    "lat": 10.793153,
+    "lng": 106.707832,
     "label": "Xô Viết Nghệ Tĩnh",
     "locationName": "Đường Xô Viết Nghệ Tĩnh",
     "locationType": "Street",
@@ -492,20 +347,14 @@
     "maxDepth": 40,
     "minDepth": 30,
     "depth": 40,
-    "causes": [
-      "Triều cường",
-      "Mưa & Triều"
-    ],
+    "causes": ["Triều cường", "Mưa & Triều"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002,
-      2010
-    ]
+    "years": [2002, 2010]
   },
   {
     "id": "ird_130",
-    "lat": 10.804286,
-    "lng": 106.70363,
+    "lat": 10.80318,
+    "lng": 106.706204,
     "label": "Bạch Đằng",
     "locationName": "Đường Bạch Đằng",
     "locationType": "Street",
@@ -520,23 +369,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn",
-      "Triều cường",
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa lớn", "Triều cường", "Mưa & Triều"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2002,
-      2010,
-      2016,
-      2024
-    ]
+    "years": [2002, 2010, 2016, 2024]
   },
   {
     "id": "ird_143",
-    "lat": 10.810633,
-    "lng": 106.708251,
+    "lat": 10.802161,
+    "lng": 106.709332,
     "label": "Đinh Bộ Lĩnh",
     "locationName": "Đường Đinh Bộ Lĩnh",
     "locationType": "Street",
@@ -551,21 +391,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường",
-      "Mưa lớn"
-    ],
+    "causes": ["Triều cường", "Mưa lớn"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002,
-      2013,
-      2016
-    ]
+    "years": [2002, 2013, 2016]
   },
   {
     "id": "ird_256",
-    "lat": 10.851759,
-    "lng": 106.751508,
+    "lat": 10.850684,
+    "lng": 106.753239,
     "label": "Đặng Thị Rành",
     "locationName": "Đường Đặng Thị Rành",
     "locationType": "Street",
@@ -580,21 +413,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2023,
-      2024,
-      2025,
-      2026
-    ]
+    "years": [2023, 2024, 2025, 2026]
   },
   {
     "id": "ird_172",
-    "lat": 10.813864,
-    "lng": 106.69512,
+    "lat": 10.804216,
+    "lng": 106.694987,
     "label": "Nơ Trang Long",
     "locationName": "Đường Nơ Trang Long",
     "locationType": "Street",
@@ -609,20 +435,14 @@
     "maxDepth": 100,
     "minDepth": 50,
     "depth": 100,
-    "causes": [
-      "Mưa & Triều",
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa & Triều", "Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2002,
-      2016
-    ]
+    "years": [2002, 2016]
   },
   {
     "id": "ird_81",
-    "lat": 10.796962,
-    "lng": 106.696487,
+    "lat": 10.795108,
+    "lng": 106.697972,
     "label": "Bùi Hữu Nghĩa",
     "locationName": "Đường Bùi Hữu Nghĩa",
     "locationType": "Street",
@@ -637,20 +457,14 @@
     "maxDepth": 50,
     "minDepth": 20,
     "depth": 50,
-    "causes": [
-      "Triều cường",
-      "Mưa & Triều"
-    ],
+    "causes": ["Triều cường", "Mưa & Triều"],
     "primaryCause": "Triều cường",
-    "years": [
-      2011,
-      2012
-    ]
+    "years": [2011, 2012]
   },
   {
     "id": "ird_145",
-    "lat": 10.817683,
-    "lng": 106.704755,
+    "lat": 10.812333,
+    "lng": 106.710439,
     "label": "Nguyễn Xí",
     "locationName": "Đường Nguyễn Xí",
     "locationType": "Street",
@@ -665,25 +479,18 @@
     "maxDepth": 50,
     "minDepth": 50,
     "depth": 50,
-    "causes": [
-      "Triều cường",
-      "Mưa & Triều",
-      "Mưa lớn"
-    ],
+    "causes": ["Triều cường", "Mưa & Triều", "Mưa lớn"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002,
-      2019
-    ]
+    "years": [2002, 2019]
   },
   {
     "id": "ird_1",
-    "lat": 10.822895,
-    "lng": 106.727557,
-    "label": "Bình quới",
-    "locationName": "Đường Bình quới",
+    "lat": 10.824025,
+    "lng": 106.732929,
+    "label": "Bình Quới",
+    "locationName": "Đường Bình Quới",
     "locationType": "Street",
-    "fullAddress": "Đường Bình quới, Phường 27, Bình Thạnh",
+    "fullAddress": "Đường Bình Quới, Phường 27, Bình Thạnh",
     "district": "Bình Thạnh",
     "ward": "Phường 27",
     "province": null,
@@ -694,19 +501,14 @@
     "maxDepth": 45,
     "minDepth": 15,
     "depth": 45,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2006,
-      2025
-    ]
+    "years": [2006, 2025]
   },
   {
     "id": "ird_79",
-    "lat": 10.739085,
-    "lng": 106.719041,
+    "lat": 10.738423,
+    "lng": 106.714292,
     "label": "Nguyễn Thị Thập",
     "locationName": "Đường Nguyễn Thị Thập",
     "locationType": "Street",
@@ -721,19 +523,14 @@
     "maxDepth": 40,
     "minDepth": 20,
     "depth": 40,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2011,
-      2023
-    ]
+    "years": [2011, 2023]
   },
   {
     "id": "ird_160",
-    "lat": 10.696444,
-    "lng": 106.572107,
+    "lat": 10.695977,
+    "lng": 106.579195,
     "label": "Xã Tân Nhựt",
     "locationName": "Xã Tân Nhựt",
     "locationType": "Commune",
@@ -748,20 +545,14 @@
     "maxDepth": 30,
     "minDepth": 10,
     "depth": 30,
-    "causes": [
-      "Triều cường",
-      "Mưa & Triều"
-    ],
+    "causes": ["Triều cường", "Mưa & Triều"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002,
-      2006
-    ]
+    "years": [2002, 2006]
   },
   {
     "id": "ird_23",
-    "lat": 10.719927,
-    "lng": 106.611327,
+    "lat": 10.717868,
+    "lng": 106.61374,
     "label": "Hồ Học Lãm",
     "locationName": "Đường Hồ Học Lãm",
     "locationType": "Street",
@@ -776,20 +567,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2019,
-      2023,
-      2025
-    ]
+    "years": [2019, 2023, 2025]
   },
   {
     "id": "ird_24",
-    "lat": 10.735594,
-    "lng": 106.611401,
+    "lat": 10.743364,
+    "lng": 106.62096,
     "label": "Kinh Dương Vương",
     "locationName": "Kinh Dương Vương",
     "locationType": "Street",
@@ -804,21 +589,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn",
-      "Triều cường"
-    ],
+    "causes": ["Mưa lớn", "Triều cường"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2008,
-      2015,
-      2023
-    ]
+    "years": [2008, 2015, 2023]
   },
   {
     "id": "ird_213",
-    "lat": 10.839681,
-    "lng": 106.714983,
+    "lat": 10.829584,
+    "lng": 106.714115,
     "label": "Quốc lộ 13",
     "locationName": "Quốc lộ 13",
     "locationType": "National Highway",
@@ -833,21 +611,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường",
-      "Mưa lớn"
-    ],
+    "causes": ["Triều cường", "Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2007,
-      2019,
-      2024
-    ]
+    "years": [2007, 2019, 2024]
   },
   {
     "id": "ird_255",
-    "lat": 10.850571,
-    "lng": 106.753258,
+    "lat": 10.849783,
+    "lng": 106.755173,
     "label": "Hồ Văn Tư",
     "locationName": "Đường Hồ Văn Tư",
     "locationType": "Street",
@@ -862,20 +633,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2023,
-      2024,
-      2025
-    ]
+    "years": [2023, 2024, 2025]
   },
   {
     "id": "ird_351",
-    "lat": 10.74604,
-    "lng": 106.620374,
+    "lat": 10.736159,
+    "lng": 106.62154,
     "label": "An Dương Vương",
     "locationName": "Đường An Dương Vương",
     "locationType": "Street",
@@ -890,20 +655,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2010,
-      2013,
-      2015
-    ]
+    "years": [2010, 2013, 2015]
   },
   {
     "id": "ird_114",
-    "lat": 10.741599,
-    "lng": 106.644543,
+    "lat": 10.746348,
+    "lng": 106.655888,
     "label": "Bình Đông",
     "locationName": "Đường Bình Đông",
     "locationType": "Street",
@@ -918,23 +677,18 @@
     "maxDepth": 100,
     "minDepth": 80,
     "depth": 100,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002,
-      2008
-    ]
+    "years": [2002, 2008]
   },
   {
     "id": "ird_224",
-    "lat": 10.84664,
-    "lng": 106.711503,
-    "label": "Số 7",
-    "locationName": "Đường Số 7",
+    "lat": 10.841432,
+    "lng": 106.709529,
+    "label": "Đường số 7",
+    "locationName": "Đường số 7",
     "locationType": "Street",
-    "fullAddress": "Đường Số 7, Phường Hiệp Bình Phước, TP. Thủ Đức",
+    "fullAddress": "Đường số 7, Phường Hiệp Bình Phước, TP. Thủ Đức",
     "district": "TP. Thủ Đức",
     "ward": "Phường Hiệp Bình Phước",
     "province": null,
@@ -945,20 +699,15 @@
     "maxDepth": 100,
     "minDepth": 100,
     "depth": 100,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2006,
-      2011
-    ]
+    "years": [2006, 2011]
   },
   {
     "id": "ird_38",
-    "lat": 10.701264,
-    "lng": 106.73724,
-    "label": "Huỳnh Tấn Phát",
+    "lat": 10.701109,
+    "lng": 106.738207,
+    "label": "Huỳnh Tấn Phát (Nhà Bè)",
     "locationName": "Huỳnh Tấn Phát",
     "locationType": "Residential area",
     "fullAddress": "Huỳnh Tấn Phát, Nhà Bè, Nhà Bè",
@@ -972,20 +721,14 @@
     "maxDepth": 50,
     "minDepth": 30,
     "depth": 50,
-    "causes": [
-      "Triều cường",
-      "Mưa & Triều"
-    ],
+    "causes": ["Triều cường", "Mưa & Triều"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002,
-      2012
-    ]
+    "years": [2002, 2012]
   },
   {
     "id": "ird_39",
-    "lat": 10.849413,
-    "lng": 106.723737,
+    "lat": 10.851225,
+    "lng": 106.716366,
     "label": "Phường Hiệp Bình",
     "locationName": "Phường Hiệp Bình",
     "locationType": "Residential area",
@@ -1000,20 +743,14 @@
     "maxDepth": 50,
     "minDepth": 30,
     "depth": 50,
-    "causes": [
-      "Mưa & Triều",
-      "Triều cường"
-    ],
+    "causes": ["Mưa & Triều", "Triều cường"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2002,
-      2012
-    ]
+    "years": [2002, 2012]
   },
   {
     "id": "ird_44",
-    "lat": 10.742743,
-    "lng": 106.65301,
+    "lat": 10.74168,
+    "lng": 106.655949,
     "label": "Phường 12",
     "locationName": "Phường 12",
     "locationType": "Residential area",
@@ -1028,20 +765,14 @@
     "maxDepth": 50,
     "minDepth": 50,
     "depth": 50,
-    "causes": [
-      "Mưa & Triều",
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa & Triều", "Mưa lớn"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2002,
-      2012
-    ]
+    "years": [2002, 2012]
   },
   {
     "id": "ird_82",
-    "lat": 10.789976,
-    "lng": 106.711967,
+    "lat": 10.790121,
+    "lng": 106.714175,
     "label": "Phú Mỹ",
     "locationName": "Đường Phú Mỹ",
     "locationType": "Street",
@@ -1056,19 +787,14 @@
     "maxDepth": 50,
     "minDepth": 30,
     "depth": 50,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2008,
-      2011
-    ]
+    "years": [2008, 2011]
   },
   {
     "id": "ird_83",
-    "lat": 10.750802,
-    "lng": 106.664668,
+    "lat": 10.749667,
+    "lng": 106.666843,
     "label": "Bến Bình Đông",
     "locationName": "Đường Bến Bình Đông",
     "locationType": "Street",
@@ -1083,19 +809,14 @@
     "maxDepth": 50,
     "minDepth": 30,
     "depth": 50,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2011,
-      2012
-    ]
+    "years": [2011, 2012]
   },
   {
     "id": "ird_102",
-    "lat": 10.791614,
-    "lng": 106.695525,
+    "lat": 10.791131,
+    "lng": 106.696701,
     "label": "Đinh Tiên Hoàng",
     "locationName": "Đinh Tiên Hoàng",
     "locationType": "Street",
@@ -1110,19 +831,14 @@
     "maxDepth": 50,
     "minDepth": 20,
     "depth": 50,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002,
-      2011
-    ]
+    "years": [2002, 2011]
   },
   {
     "id": "ird_122",
-    "lat": 10.852063,
-    "lng": 106.654133,
+    "lat": 10.849407,
+    "lng": 106.650596,
     "label": "Phạm Văn Chiêu",
     "locationName": "Đường Phạm Văn Chiêu",
     "locationType": "Street",
@@ -1137,19 +853,14 @@
     "maxDepth": 50,
     "minDepth": 30,
     "depth": 50,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2019,
-      2023
-    ]
+    "years": [2019, 2023]
   },
   {
     "id": "ird_212",
-    "lat": 10.746251,
-    "lng": 106.50144,
+    "lat": 10.745187,
+    "lng": 106.498579,
     "label": "Khu B, Xã Bình Lợi",
     "locationName": "Khu B, Xã Bình Lợi",
     "locationType": "Commune",
@@ -1164,23 +875,18 @@
     "maxDepth": 50,
     "minDepth": 20,
     "depth": 50,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2006,
-      2007
-    ]
+    "years": [2006, 2007]
   },
   {
     "id": "ird_22",
-    "lat": 10.742349,
-    "lng": 106.606518,
-    "label": "Số 17A",
-    "locationName": "Đường Số 17A",
+    "lat": 10.740909,
+    "lng": 106.6076,
+    "label": "Đường số 17A",
+    "locationName": "Đường số 17A",
     "locationType": "Street",
-    "fullAddress": "Đường Số 17A, Phường An Lạc A, Bình Tân",
+    "fullAddress": "Đường số 17A, Phường An Lạc A, Bình Tân",
     "district": "Bình Tân",
     "ward": "Phường An Lạc A",
     "province": null,
@@ -1191,19 +897,14 @@
     "maxDepth": 40,
     "minDepth": 20,
     "depth": 40,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2023,
-      2025
-    ]
+    "years": [2023, 2025]
   },
   {
     "id": "ird_187",
-    "lat": 10.817568,
-    "lng": 106.719868,
+    "lat": 10.816261,
+    "lng": 106.720454,
     "label": "Chợ Thanh Đa",
     "locationName": "Chợ Thanh Đa",
     "locationType": "Market",
@@ -1218,19 +919,14 @@
     "maxDepth": 40,
     "minDepth": 20,
     "depth": 40,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2005,
-      2007
-    ]
+    "years": [2005, 2007]
   },
   {
     "id": "ird_217",
-    "lat": 10.712324,
-    "lng": 106.653749,
+    "lat": 10.714097,
+    "lng": 106.655596,
     "label": "Quốc Lộ 50",
     "locationName": "Quốc Lộ 50",
     "locationType": "Commune",
@@ -1245,19 +941,14 @@
     "maxDepth": 40,
     "minDepth": 20,
     "depth": 40,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2006,
-      2023
-    ]
+    "years": [2006, 2023]
   },
   {
     "id": "ird_406",
-    "lat": 10.752354,
-    "lng": 106.65749,
+    "lat": 10.752061,
+    "lng": 106.658974,
     "label": "Châu Văn Liêm",
     "locationName": "Đường Châu Văn Liêm",
     "locationType": "Street",
@@ -1272,18 +963,14 @@
     "maxDepth": 40,
     "minDepth": 30,
     "depth": 40,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2010
-    ]
+    "years": [2010]
   },
   {
     "id": "ird_155",
-    "lat": 10.67997,
-    "lng": 106.641892,
+    "lat": 10.676276,
+    "lng": 106.65364,
     "label": "Xã Đa Phước",
     "locationName": "Xã Đa Phước",
     "locationType": "Commune",
@@ -1298,19 +985,14 @@
     "maxDepth": 30,
     "minDepth": 10,
     "depth": 30,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002,
-      2006
-    ]
+    "years": [2002, 2006]
   },
   {
     "id": "ird_156",
-    "lat": 10.689742,
-    "lng": 106.619565,
+    "lat": 10.689931,
+    "lng": 106.624062,
     "label": "Xã An Phú Tây",
     "locationName": "Xã An Phú Tây",
     "locationType": "Commune",
@@ -1325,19 +1007,14 @@
     "maxDepth": 30,
     "minDepth": 10,
     "depth": 30,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002,
-      2006
-    ]
+    "years": [2002, 2006]
   },
   {
     "id": "ird_159",
-    "lat": 10.704511,
-    "lng": 106.593298,
+    "lat": 10.701611,
+    "lng": 106.593353,
     "label": "Xã Tân Kiên",
     "locationName": "Xã Tân Kiên",
     "locationType": "Commune",
@@ -1352,20 +1029,14 @@
     "maxDepth": 30,
     "minDepth": 10,
     "depth": 30,
-    "causes": [
-      "Triều cường",
-      "Mưa lớn"
-    ],
+    "causes": ["Triều cường", "Mưa lớn"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002,
-      2019
-    ]
+    "years": [2002, 2019]
   },
   {
     "id": "ird_27",
-    "lat": 10.736135,
-    "lng": 106.605095,
+    "lat": 10.735843,
+    "lng": 106.606573,
     "label": "Sinco",
     "locationName": "Đường Sinco",
     "locationType": "Street",
@@ -1380,19 +1051,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2023,
-      2025
-    ]
+    "years": [2023, 2025]
   },
   {
     "id": "ird_30",
-    "lat": 10.843977,
-    "lng": 106.652693,
+    "lat": 10.842431,
+    "lng": 106.658293,
     "label": "Nguyễn Văn Khối",
     "locationName": "Đường Nguyễn Văn Khối",
     "locationType": "Street",
@@ -1407,18 +1073,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2023
-    ]
+    "years": [2023]
   },
   {
     "id": "ird_32",
-    "lat": 10.819114,
-    "lng": 106.717542,
+    "lat": 10.818809,
+    "lng": 106.71883,
     "label": "Thanh Đa",
     "locationName": "Đường Thanh Đa",
     "locationType": "Street",
@@ -1433,20 +1095,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường",
-      "Mưa lớn"
-    ],
+    "causes": ["Triều cường", "Mưa lớn"],
     "primaryCause": "Triều cường",
-    "years": [
-      2013,
-      2025
-    ]
+    "years": [2013, 2025]
   },
   {
     "id": "ird_53",
-    "lat": 10.777465,
-    "lng": 106.696494,
+    "lat": 10.775511,
+    "lng": 106.6992,
     "label": "Nam Kỳ Khởi Nghĩa",
     "locationName": "Đường Nam Kỳ Khởi Nghĩa",
     "locationType": "Street",
@@ -1461,19 +1117,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2010,
-      2016
-    ]
+    "years": [2010, 2016]
   },
   {
     "id": "ird_57",
-    "lat": 10.852106,
-    "lng": 106.661032,
+    "lat": 10.849307,
+    "lng": 106.665809,
     "label": "Lê Đức Thọ",
     "locationName": "Đường Lê Đức Thọ",
     "locationType": "Street",
@@ -1488,19 +1139,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2016,
-      2023
-    ]
+    "years": [2016, 2023]
   },
   {
     "id": "ird_64",
-    "lat": 10.770817,
-    "lng": 106.691466,
+    "lat": 10.769725,
+    "lng": 106.693112,
     "label": "Lê Lai",
     "locationName": "Đường Lê Lai",
     "locationType": "Street",
@@ -1515,19 +1161,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2010,
-      2022
-    ]
+    "years": [2010, 2022]
   },
   {
     "id": "ird_65",
-    "lat": 10.774783,
-    "lng": 106.698654,
+    "lat": 10.773682,
+    "lng": 106.700338,
     "label": "Lê Lợi",
     "locationName": "Đường Lê Lợi",
     "locationType": "Street",
@@ -1542,19 +1183,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2010,
-      2022
-    ]
+    "years": [2010, 2022]
   },
   {
     "id": "ird_71",
-    "lat": 10.597518,
-    "lng": 106.740611,
+    "lat": 10.591068,
+    "lng": 106.742931,
     "label": "Nguyễn Văn Tạo",
     "locationName": "Đường Nguyễn Văn Tạo",
     "locationType": "Street",
@@ -1569,20 +1205,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường",
-      "Mưa & Triều"
-    ],
+    "causes": ["Triều cường", "Mưa & Triều"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002,
-      2025
-    ]
+    "years": [2002, 2025]
   },
   {
     "id": "ird_113",
-    "lat": 10.739012,
-    "lng": 106.631915,
+    "lat": 10.735858,
+    "lng": 106.633834,
     "label": "Nguyễn Văn Luông",
     "locationName": "Đường Nguyễn Văn Luông",
     "locationType": "Street",
@@ -1597,18 +1227,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2008
-    ]
+    "years": [2008]
   },
   {
     "id": "ird_128",
-    "lat": 10.84549,
-    "lng": 106.783972,
+    "lat": 10.844843,
+    "lng": 106.787997,
     "label": "Lê Văn Việt",
     "locationName": "Đường Lê Văn Việt",
     "locationType": "Street",
@@ -1623,19 +1249,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2017,
-      2024
-    ]
+    "years": [2017, 2024]
   },
   {
     "id": "ird_138",
-    "lat": 10.830504,
-    "lng": 106.63083,
+    "lat": 10.829054,
+    "lng": 106.632398,
     "label": "Phan Huy Ích",
     "locationName": "Đường Phan Huy Ích",
     "locationType": "Street",
@@ -1650,19 +1271,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2018,
-      2025
-    ]
+    "years": [2018, 2025]
   },
   {
     "id": "ird_139",
-    "lat": 10.808918,
-    "lng": 106.702641,
+    "lat": 10.808008,
+    "lng": 106.705363,
     "label": "Bùi Đình Túy",
     "locationName": "Đường Bùi Đình Túy",
     "locationType": "Street",
@@ -1677,18 +1293,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_147",
-    "lat": 10.802418,
-    "lng": 106.709493,
+    "lat": 10.801474,
+    "lng": 106.711336,
     "label": "Cầu vượt Hàng Xanh",
     "locationName": "Cầu vượt Hàng Xanh",
     "locationType": "Intersection",
@@ -1703,19 +1315,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002,
-      2008
-    ]
+    "years": [2002, 2008]
   },
   {
     "id": "ird_232",
-    "lat": 10.800709,
-    "lng": 106.708015,
+    "lat": 10.798344,
+    "lng": 106.705094,
     "label": "Điện Biên Phủ",
     "locationName": "Đường Điện Biên Phủ",
     "locationType": "Street",
@@ -1730,23 +1337,18 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa & Triều"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2010,
-      2012
-    ]
+    "years": [2010, 2012]
   },
   {
     "id": "ird_254",
-    "lat": 10.850763,
-    "lng": 106.751014,
-    "label": "Văn Cam",
-    "locationName": "Đường Văn Cam",
+    "lat": 10.850102,
+    "lng": 106.752879,
+    "label": "Dương Văn Cam (Linh Tây)",
+    "locationName": "Đường Dương Văn Cam",
     "locationType": "Street",
-    "fullAddress": "Đường Văn Cam, Phường Linh Tây, TP. Thủ Đức",
+    "fullAddress": "Đường Dương Văn Cam, Phường Linh Tây, TP. Thủ Đức",
     "district": "TP. Thủ Đức",
     "ward": "Phường Linh Tây",
     "province": null,
@@ -1757,19 +1359,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2023,
-      2025
-    ]
+    "years": [2023, 2025]
   },
   {
     "id": "ird_262",
-    "lat": 10.830506,
-    "lng": 106.79852,
+    "lat": 10.814748,
+    "lng": 106.812894,
     "label": "Lã Xuân Oai",
     "locationName": "Đường Lã Xuân Oai",
     "locationType": "Street",
@@ -1784,20 +1381,15 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2023,
-      2024
-    ]
+    "years": [2023, 2024]
   },
   {
     "id": "ird_307",
-    "lat": 10.845674,
-    "lng": 106.783844,
-    "label": "Lê Văn Việt",
+    "lat": 10.844978,
+    "lng": 106.786297,
+    "label": "Lê Văn Việt (Hiệp Phú)",
     "locationName": "Đường Lê Văn Việt",
     "locationType": "Street",
     "fullAddress": "Đường Lê Văn Việt, Phường Hiệp Phú, TP. Thủ Đức (Quận 9 cũ)",
@@ -1811,19 +1403,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2024,
-      2026
-    ]
+    "years": [2024, 2026]
   },
   {
     "id": "ird_308",
-    "lat": 10.851056,
-    "lng": 106.751177,
+    "lat": 10.849608,
+    "lng": 106.75345,
     "label": "Dương Văn Cam",
     "locationName": "Đường Dương Văn Cam",
     "locationType": "Street",
@@ -1838,19 +1425,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2024,
-      2025
-    ]
+    "years": [2024, 2025]
   },
   {
     "id": "ird_384",
-    "lat": 10.75852,
-    "lng": 106.633802,
+    "lat": 10.757012,
+    "lng": 106.63595,
     "label": "Tân Hóa",
     "locationName": "Đường Tân Hóa",
     "locationType": "Street",
@@ -1865,18 +1447,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2013
-    ]
+    "years": [2013]
   },
   {
     "id": "ird_387",
-    "lat": 10.793362,
-    "lng": 106.642375,
+    "lat": 10.793319,
+    "lng": 106.643413,
     "label": "Bàu Cát",
     "locationName": "Bàu Cát",
     "locationType": "Residential area",
@@ -1891,18 +1469,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2013
-    ]
+    "years": [2013]
   },
   {
     "id": "ird_393",
-    "lat": 10.770474,
-    "lng": 106.633511,
+    "lat": 10.769521,
+    "lng": 106.634109,
     "label": "Hòa Bình",
     "locationName": "Đường Hòa Bình",
     "locationType": "Street",
@@ -1917,25 +1491,20 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2010,
-      2013
-    ]
+    "years": [2010, 2013]
   },
   {
     "id": "ird_206",
-    "lat": 10.841321,
-    "lng": 106.723623,
-    "label": "Phường Hiệp Bình Phước, khu phố 6",
-    "locationName": "Phường Hiệp Bình Phước, khu phố 6",
+    "lat": 10.840276,
+    "lng": 106.725683,
+    "label": "KP6 Hiệp Bình Phước",
+    "locationName": "Khu phố 6, Phường Hiệp Bình Phước",
     "locationType": "Neighborhood",
-    "fullAddress": "Phường Hiệp Bình Phước, khu phố 6, Phường Hiệp Bình Chánh, TP. Thủ Đức",
+    "fullAddress": "Khu phố 6, Phường Hiệp Bình Phước, TP. Thủ Đức",
     "district": "TP. Thủ Đức",
-    "ward": "Phường Hiệp Bình Chánh",
+    "ward": "Phường Hiệp Bình Phước",
     "province": null,
     "type": "flood",
     "depthClass": "Severe",
@@ -1944,22 +1513,18 @@
     "maxDepth": 300,
     "minDepth": 300,
     "depth": 300,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2007
-    ]
+    "years": [2007]
   },
   {
     "id": "ird_207",
-    "lat": 10.830339,
-    "lng": 106.725559,
-    "label": "Phường Hiệp Bình Chánh, khu phố 5",
-    "locationName": "Phường Hiệp Bình Chánh, khu phố 5",
+    "lat": 10.829218,
+    "lng": 106.727265,
+    "label": "KP5 Hiệp Bình Chánh",
+    "locationName": "Khu phố 5, Phường Hiệp Bình Chánh",
     "locationType": "Neighborhood",
-    "fullAddress": "Phường Hiệp Bình Chánh, khu phố 5, TP. Thủ Đức",
+    "fullAddress": "Khu phố 5, Phường Hiệp Bình Chánh, TP. Thủ Đức",
     "district": "TP. Thủ Đức",
     "ward": "Phường Hiệp Bình Chánh",
     "province": null,
@@ -1970,22 +1535,18 @@
     "maxDepth": 300,
     "minDepth": 300,
     "depth": 300,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2007
-    ]
+    "years": [2007]
   },
   {
     "id": "ird_208",
-    "lat": 10.823323,
-    "lng": 106.716455,
-    "label": "Phường Hiệp Bình Chánh, khu phố 3",
-    "locationName": "Phường Hiệp Bình Chánh, khu phố 3",
+    "lat": 10.822228,
+    "lng": 106.718232,
+    "label": "KP3 Hiệp Bình Chánh",
+    "locationName": "Khu phố 3, Phường Hiệp Bình Chánh",
     "locationType": "Neighborhood",
-    "fullAddress": "Phường Hiệp Bình Chánh, khu phố 3, TP. Thủ Đức",
+    "fullAddress": "Khu phố 3, Phường Hiệp Bình Chánh, TP. Thủ Đức",
     "district": "TP. Thủ Đức",
     "ward": "Phường Hiệp Bình Chánh",
     "province": null,
@@ -1996,22 +1557,18 @@
     "maxDepth": 300,
     "minDepth": 300,
     "depth": 300,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2007
-    ]
+    "years": [2007]
   },
   {
     "id": "ird_209",
-    "lat": 10.825217,
-    "lng": 106.72362,
-    "label": "Phường Hiệp Bình Chánh, khu phố 4",
-    "locationName": "Phường Hiệp Bình Chánh, khu phố 4",
+    "lat": 10.824091,
+    "lng": 106.725119,
+    "label": "KP4 Hiệp Bình Chánh",
+    "locationName": "Khu phố 4, Phường Hiệp Bình Chánh",
     "locationType": "Neighborhood",
-    "fullAddress": "Phường Hiệp Bình Chánh, khu phố 4, TP. Thủ Đức",
+    "fullAddress": "Khu phố 4, Phường Hiệp Bình Chánh, TP. Thủ Đức",
     "district": "TP. Thủ Đức",
     "ward": "Phường Hiệp Bình Chánh",
     "province": null,
@@ -2022,22 +1579,18 @@
     "maxDepth": 300,
     "minDepth": 300,
     "depth": 300,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2007
-    ]
+    "years": [2007]
   },
   {
     "id": "ird_321",
-    "lat": 10.779706,
-    "lng": 106.711234,
-    "label": "Khu đô thị Thảo Thiểm",
-    "locationName": "Khu đô thị Thảo Thiểm",
+    "lat": 10.778715,
+    "lng": 106.713034,
+    "label": "Khu đô thị Thủ Thiêm",
+    "locationName": "Khu đô thị Thủ Thiêm",
     "locationType": "Residential area",
-    "fullAddress": "Khu đô thị Thảo Thiểm, Phường Thủ Thiêm, TP. Thủ Đức (Quận 2 cũ)",
+    "fullAddress": "Khu đô thị Thủ Thiêm, Phường Thủ Thiêm, TP. Thủ Đức (Quận 2 cũ)",
     "district": "TP. Thủ Đức (Quận 2 cũ)",
     "ward": "Phường Thủ Thiêm",
     "province": null,
@@ -2048,23 +1601,19 @@
     "maxDepth": 120,
     "minDepth": 120,
     "depth": 120,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_169",
-    "lat": 10.899835,
-    "lng": 106.679327,
+    "lat": 10.89884,
+    "lng": 106.681193,
     "label": "Xã Nhị Bình",
     "locationName": "Xã Nhị Bình",
-    "locationType": "Street",
-    "fullAddress": "Xã Nhị Bình, Quận 12",
-    "district": "Quận 12",
+    "locationType": "Commune",
+    "fullAddress": "Xã Nhị Bình, Hóc Môn",
+    "district": "Hóc Môn",
     "ward": "Xã Nhị Bình",
     "province": null,
     "type": "flood",
@@ -2074,18 +1623,14 @@
     "maxDepth": 100,
     "minDepth": 50,
     "depth": 100,
-    "causes": [
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa & Triều"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_177",
-    "lat": 10.719249,
-    "lng": 106.625927,
+    "lat": 10.718262,
+    "lng": 106.627644,
     "label": "Bến Mễ Cốc",
     "locationName": "Đường Bến Mễ Cốc",
     "locationType": "Street",
@@ -2100,18 +1645,14 @@
     "maxDepth": 100,
     "minDepth": 80,
     "depth": 100,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_179",
-    "lat": 10.74435,
-    "lng": 106.659488,
+    "lat": 10.742142,
+    "lng": 106.655838,
     "label": "Nguyễn Duy",
     "locationName": "Đường Nguyễn Duy",
     "locationType": "Street",
@@ -2126,18 +1667,14 @@
     "maxDepth": 100,
     "minDepth": 80,
     "depth": 100,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_180",
-    "lat": 10.71759,
-    "lng": 106.626652,
+    "lat": 10.716594,
+    "lng": 106.628445,
     "label": "Rạch Cát",
     "locationName": "Đường Rạch Cát",
     "locationType": "Street",
@@ -2152,18 +1689,14 @@
     "maxDepth": 100,
     "minDepth": 80,
     "depth": 100,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_181",
-    "lat": 10.737362,
-    "lng": 106.640774,
+    "lat": 10.736332,
+    "lng": 106.64254,
     "label": "Nguyễn Nhược Thị",
     "locationName": "Đường Nguyễn Nhược Thị",
     "locationType": "Street",
@@ -2178,18 +1711,14 @@
     "maxDepth": 100,
     "minDepth": 80,
     "depth": 100,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_205",
-    "lat": 10.853262,
-    "lng": 106.719533,
+    "lat": 10.85264,
+    "lng": 106.721562,
     "label": "Tiểu học Hiệp Bình Phước",
     "locationName": "Tiểu học Hiệp Bình Phước",
     "locationType": "School",
@@ -2204,19 +1733,15 @@
     "maxDepth": 100,
     "minDepth": 100,
     "depth": 100,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2007
-    ]
+    "years": [2007]
   },
   {
     "id": "ird_382",
-    "lat": 10.769533,
-    "lng": 106.637075,
-    "label": "Hòa Bình",
+    "lat": 10.768518,
+    "lng": 106.638858,
+    "label": "Hòa Bình (Q.11)",
     "locationName": "Đường Hòa Bình",
     "locationType": "Street",
     "fullAddress": "Đường Hòa Bình, Phường 3, Quận 11",
@@ -2230,18 +1755,14 @@
     "maxDepth": 100,
     "minDepth": 100,
     "depth": 100,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2013
-    ]
+    "years": [2013]
   },
   {
     "id": "ird_87",
-    "lat": 10.715061,
-    "lng": 106.623149,
+    "lat": 10.714036,
+    "lng": 106.62494,
     "label": "Bến Phú Định",
     "locationName": "Đường Bến Phú Định",
     "locationType": "Street",
@@ -2256,18 +1777,14 @@
     "maxDepth": 70,
     "minDepth": 70,
     "depth": 70,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2012
-    ]
+    "years": [2012]
   },
   {
     "id": "ird_210",
-    "lat": 10.854155,
-    "lng": 106.70598,
+    "lat": 10.853235,
+    "lng": 106.707771,
     "label": "Khu Villa An Phú Đông 12",
     "locationName": "Khu Villa An Phú Đông 12",
     "locationType": "Neighborhood",
@@ -2282,18 +1799,14 @@
     "maxDepth": 70,
     "minDepth": 70,
     "depth": 70,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2007
-    ]
+    "years": [2007]
   },
   {
     "id": "ird_194",
-    "lat": 10.705643,
-    "lng": 106.731156,
+    "lat": 10.70462,
+    "lng": 106.732937,
     "label": "Phạm Hữu Lầu",
     "locationName": "Đường Phạm Hữu Lầu",
     "locationType": "Street",
@@ -2308,18 +1821,14 @@
     "maxDepth": 60,
     "minDepth": 30,
     "depth": 60,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2025
-    ]
+    "years": [2025]
   },
   {
     "id": "ird_202",
-    "lat": 10.856104,
-    "lng": 106.727457,
+    "lat": 10.854663,
+    "lng": 106.729159,
     "label": "Phường Hiệp Bình Phước",
     "locationName": "Phường Hiệp Bình Phước",
     "locationType": "Ward",
@@ -2334,18 +1843,14 @@
     "maxDepth": 60,
     "minDepth": 30,
     "depth": 60,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2006
-    ]
+    "years": [2006]
   },
   {
     "id": "ird_203",
-    "lat": 10.848803,
-    "lng": 106.740408,
+    "lat": 10.847948,
+    "lng": 106.742238,
     "label": "Phường Linh Đông",
     "locationName": "Phường Linh Đông",
     "locationType": "Ward",
@@ -2360,22 +1865,18 @@
     "maxDepth": 60,
     "minDepth": 30,
     "depth": 60,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2006
-    ]
+    "years": [2006]
   },
   {
     "id": "ird_314",
-    "lat": 10.851897,
-    "lng": 106.75025,
-    "label": "Kha Vạn Câm",
-    "locationName": "Đường Kha Vạn Câm",
+    "lat": 10.848524,
+    "lng": 106.747152,
+    "label": "Kha Vạn Cân (Linh Đông)",
+    "locationName": "Đường Kha Vạn Cân",
     "locationType": "Street",
-    "fullAddress": "Đường Kha Vạn Câm, Phường Linh Đông, TP. Thủ Đức",
+    "fullAddress": "Đường Kha Vạn Cân, Phường Linh Đông, TP. Thủ Đức",
     "district": "TP. Thủ Đức",
     "ward": "Phường Linh Đông",
     "province": null,
@@ -2386,22 +1887,18 @@
     "maxDepth": 60,
     "minDepth": 60,
     "depth": 60,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2024
-    ]
+    "years": [2024]
   },
   {
     "id": "ird_40",
-    "lat": 10.716644,
-    "lng": 106.613402,
-    "label": "Hồ Ngọc Lãm",
-    "locationName": "Hồ Ngọc Lãm",
+    "lat": 10.715612,
+    "lng": 106.615164,
+    "label": "Hồ Học Lãm (An Lạc)",
+    "locationName": "Đường Hồ Học Lãm",
     "locationType": "Residential area",
-    "fullAddress": "Hồ Ngọc Lãm, Phường An Lạc, Bình Tân",
+    "fullAddress": "Đường Hồ Học Lãm, Phường An Lạc, Bình Tân",
     "district": "Bình Tân",
     "ward": "Phường An Lạc",
     "province": null,
@@ -2412,18 +1909,14 @@
     "maxDepth": 50,
     "minDepth": 30,
     "depth": 50,
-    "causes": [
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa & Triều"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2012
-    ]
+    "years": [2012]
   },
   {
     "id": "ird_41",
-    "lat": 10.722142,
-    "lng": 106.602877,
+    "lat": 10.721455,
+    "lng": 106.604852,
     "label": "Đại lộ Võ Văn Kiệt",
     "locationName": "Đại lộ Võ Văn Kiệt",
     "locationType": "Residential area",
@@ -2438,24 +1931,20 @@
     "maxDepth": 50,
     "minDepth": 30,
     "depth": 50,
-    "causes": [
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa & Triều"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2012
-    ]
+    "years": [2012]
   },
   {
     "id": "ird_50",
-    "lat": 10.771928,
-    "lng": 106.700705,
-    "label": "Pasteur-Hàm Nghị",
-    "locationName": "Pasteur-Hàm Nghị",
+    "lat": 10.77085,
+    "lng": 106.702521,
+    "label": "Pasteur - Hàm Nghi",
+    "locationName": "Ngã tư Pasteur - Hàm Nghi",
     "locationType": "Intersection",
-    "fullAddress": "Pasteur-Hàm Nghị, Bến Nghé, Quận 1",
+    "fullAddress": "Ngã tư Pasteur - Hàm Nghi, Phường Bến Nghé, Quận 1",
     "district": "Quận 1",
-    "ward": "Bến Nghé",
+    "ward": "Phường Bến Nghé",
     "province": null,
     "type": "flood",
     "depthClass": "Heavy",
@@ -2464,22 +1953,18 @@
     "maxDepth": 50,
     "minDepth": 50,
     "depth": 50,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2016
-    ]
+    "years": [2016]
   },
   {
     "id": "ird_85",
-    "lat": 10.794429,
-    "lng": 106.683211,
-    "label": "Phan Đình Phùn",
-    "locationName": "Đường Phan Đình Phùn",
+    "lat": 10.793412,
+    "lng": 106.684996,
+    "label": "Phan Đình Phùng",
+    "locationName": "Đường Phan Đình Phùng",
     "locationType": "Street",
-    "fullAddress": "Đường Phan Đình Phùn, Phường 2, Phú Nhuận",
+    "fullAddress": "Đường Phan Đình Phùng, Phường 2, Phú Nhuận",
     "district": "Phú Nhuận",
     "ward": "Phường 2",
     "province": null,
@@ -2490,22 +1975,18 @@
     "maxDepth": 50,
     "minDepth": 30,
     "depth": 50,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2011
-    ]
+    "years": [2011]
   },
   {
     "id": "ird_98",
-    "lat": 10.807237,
-    "lng": 106.709764,
-    "label": "Xô Viết Nghệ",
-    "locationName": "Đường Xô Viết Nghệ",
+    "lat": 10.806217,
+    "lng": 106.711554,
+    "label": "Xô Viết Nghệ Tĩnh (P.25)",
+    "locationName": "Đường Xô Viết Nghệ Tĩnh",
     "locationType": "Street",
-    "fullAddress": "Đường Xô Viết Nghệ, Phường 25, Bình Thạnh",
+    "fullAddress": "Đường Xô Viết Nghệ Tĩnh, Phường 25, Bình Thạnh",
     "district": "Bình Thạnh",
     "ward": "Phường 25",
     "province": null,
@@ -2516,18 +1997,14 @@
     "maxDepth": 50,
     "minDepth": 20,
     "depth": 50,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2011
-    ]
+    "years": [2011]
   },
   {
     "id": "ird_105",
-    "lat": 10.712915,
-    "lng": 106.621836,
+    "lat": 10.711897,
+    "lng": 106.623602,
     "label": "Phú Định",
     "locationName": "Đường Phú Định",
     "locationType": "Street",
@@ -2542,18 +2019,14 @@
     "maxDepth": 50,
     "minDepth": 50,
     "depth": 50,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2011
-    ]
+    "years": [2011]
   },
   {
     "id": "ird_106",
-    "lat": 10.738954,
-    "lng": 106.632696,
+    "lat": 10.737932,
+    "lng": 106.634473,
     "label": "Lò Gốm",
     "locationName": "Đường Lò Gốm",
     "locationType": "Street",
@@ -2568,19 +2041,15 @@
     "maxDepth": 50,
     "minDepth": 50,
     "depth": 50,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2011
-    ]
+    "years": [2011]
   },
   {
     "id": "ird_107",
-    "lat": 10.713353,
-    "lng": 106.615433,
-    "label": "Hồ Học Lãm",
+    "lat": 10.712329,
+    "lng": 106.617209,
+    "label": "Hồ Học Lãm (Q.8)",
     "locationName": "Đường Hồ Học Lãm",
     "locationType": "Street",
     "fullAddress": "Đường Hồ Học Lãm, Phường 16, Quận 8",
@@ -2594,18 +2063,14 @@
     "maxDepth": 50,
     "minDepth": 50,
     "depth": 50,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2011
-    ]
+    "years": [2011]
   },
   {
     "id": "ird_108",
-    "lat": 10.743672,
-    "lng": 106.721415,
+    "lat": 10.742647,
+    "lng": 106.723197,
     "label": "Lý Phục Man",
     "locationName": "Đường Lý Phục Man",
     "locationType": "Street",
@@ -2620,22 +2085,18 @@
     "maxDepth": 50,
     "minDepth": 50,
     "depth": 50,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2011
-    ]
+    "years": [2011]
   },
   {
     "id": "ird_112",
-    "lat": 10.738101,
-    "lng": 106.699585,
-    "label": "Số 10",
-    "locationName": "Đường Số 10",
+    "lat": 10.737084,
+    "lng": 106.701367,
+    "label": "Đường số 10",
+    "locationName": "Đường số 10",
     "locationType": "Street",
-    "fullAddress": "Đường Số 10, Phường Tân Phong, Quận 7",
+    "fullAddress": "Đường số 10, Phường Tân Phong, Quận 7",
     "district": "Quận 7",
     "ward": "Phường Tân Phong",
     "province": null,
@@ -2646,18 +2107,14 @@
     "maxDepth": 50,
     "minDepth": 50,
     "depth": 50,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2011
-    ]
+    "years": [2011]
   },
   {
     "id": "ird_116",
-    "lat": 10.80629,
-    "lng": 106.729603,
+    "lat": 10.805289,
+    "lng": 106.731377,
     "label": "Quốc Hương & Tống Hữu Định",
     "locationName": "Quốc Hương & Tống Hữu Định",
     "locationType": "Intersection",
@@ -2672,18 +2129,14 @@
     "maxDepth": 50,
     "minDepth": 30,
     "depth": 50,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_117",
-    "lat": 10.806112,
-    "lng": 106.731264,
+    "lat": 10.805116,
+    "lng": 106.733037,
     "label": "Lê Văn Miến",
     "locationName": "Đường Lê Văn Miến",
     "locationType": "Street",
@@ -2698,19 +2151,15 @@
     "maxDepth": 50,
     "minDepth": 30,
     "depth": 50,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_118",
-    "lat": 10.789687,
-    "lng": 106.773234,
-    "label": "số 46",
+    "lat": 10.788758,
+    "lng": 106.774256,
+    "label": "Đường số 46",
     "locationName": "Đường số 46",
     "locationType": "Street",
     "fullAddress": "Đường số 46, Phường Bình Trưng Đông, TP. Thủ Đức (Quận 2 cũ)",
@@ -2724,19 +2173,15 @@
     "maxDepth": 50,
     "minDepth": 30,
     "depth": 50,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_119",
-    "lat": 10.790679,
-    "lng": 106.771575,
-    "label": "số 48",
+    "lat": 10.789659,
+    "lng": 106.773354,
+    "label": "Đường số 48",
     "locationName": "Đường số 48",
     "locationType": "Street",
     "fullAddress": "Đường số 48, Phường Bình Trưng Đông, TP. Thủ Đức (Quận 2 cũ)",
@@ -2750,19 +2195,15 @@
     "maxDepth": 50,
     "minDepth": 30,
     "depth": 50,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_120",
-    "lat": 10.786969,
-    "lng": 106.770013,
-    "label": "số 41",
+    "lat": 10.785947,
+    "lng": 106.771774,
+    "label": "Đường số 41",
     "locationName": "Đường số 41",
     "locationType": "Street",
     "fullAddress": "Đường số 41, Phường Bình Trưng Đông, TP. Thủ Đức (Quận 2 cũ)",
@@ -2776,18 +2217,14 @@
     "maxDepth": 50,
     "minDepth": 30,
     "depth": 50,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_121",
-    "lat": 10.845567,
-    "lng": 106.645112,
+    "lat": 10.84454,
+    "lng": 106.64689,
     "label": "Cây Trâm",
     "locationName": "Đường Cây Trâm",
     "locationType": "Street",
@@ -2802,22 +2239,18 @@
     "maxDepth": 50,
     "minDepth": 30,
     "depth": 50,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_175",
-    "lat": 10.820441,
-    "lng": 106.723302,
-    "label": "Bình Qưới",
-    "locationName": "Đường Bình Qưới",
+    "lat": 10.819437,
+    "lng": 106.725074,
+    "label": "Bình Quới (P.28)",
+    "locationName": "Đường Bình Quới",
     "locationType": "Street",
-    "fullAddress": "Đường Bình Qưới, Phường 28, Bình Thạnh",
+    "fullAddress": "Đường Bình Quới, Phường 28, Bình Thạnh",
     "district": "Bình Thạnh",
     "ward": "Phường 28",
     "province": null,
@@ -2828,18 +2261,14 @@
     "maxDepth": 50,
     "minDepth": 50,
     "depth": 50,
-    "causes": [
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa & Triều"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_182",
-    "lat": 10.787432,
-    "lng": 106.688735,
+    "lat": 10.786397,
+    "lng": 106.69053,
     "label": "Võ Thị Sáu",
     "locationName": "Đường Võ Thị Sáu",
     "locationType": "Street",
@@ -2854,18 +2283,14 @@
     "maxDepth": 50,
     "minDepth": 50,
     "depth": 50,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_183",
-    "lat": 10.752186,
-    "lng": 106.681942,
+    "lat": 10.751162,
+    "lng": 106.683743,
     "label": "Cầu Chữ Y",
     "locationName": "Cầu Chữ Y",
     "locationType": "Bridge",
@@ -2880,18 +2305,14 @@
     "maxDepth": 50,
     "minDepth": 50,
     "depth": 50,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_223",
-    "lat": 10.850018,
-    "lng": 106.739694,
+    "lat": 10.848998,
+    "lng": 106.741476,
     "label": "Rạch Lùng",
     "locationName": "Rạch Lùng",
     "locationType": "Canal",
@@ -2906,18 +2327,14 @@
     "maxDepth": 50,
     "minDepth": 40,
     "depth": 50,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2006
-    ]
+    "years": [2006]
   },
   {
     "id": "ird_266",
-    "lat": 10.851256,
-    "lng": 106.751712,
+    "lat": 10.850244,
+    "lng": 106.753501,
     "label": "Trương Văn Ngư",
     "locationName": "Đường Trương Văn Ngư",
     "locationType": "Street",
@@ -2932,23 +2349,19 @@
     "maxDepth": 50,
     "minDepth": 50,
     "depth": 50,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2026
-    ]
+    "years": [2026]
   },
   {
     "id": "ird_333",
-    "lat": 10.856677,
-    "lng": 106.607808,
-    "label": "Song Hành QL2",
-    "locationName": "Đường Song Hành QL2",
+    "lat": 10.855669,
+    "lng": 106.609608,
+    "label": "Song Hành QL22",
+    "locationName": "Đường Song Hành Quốc Lộ 22",
     "locationType": "Street",
-    "fullAddress": "Đường Song Hành QL2, Phường Tân Hưng Thuận, TP. Thủ Đức",
-    "district": "TP. Thủ Đức",
+    "fullAddress": "Đường Song Hành Quốc Lộ 22, Phường Tân Hưng Thuận, Quận 12",
+    "district": "Quận 12",
     "ward": "Phường Tân Hưng Thuận",
     "province": null,
     "type": "flood",
@@ -2958,23 +2371,19 @@
     "maxDepth": 50,
     "minDepth": 50,
     "depth": 50,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_334",
-    "lat": 10.857392,
-    "lng": 106.606212,
+    "lat": 10.856396,
+    "lng": 106.607957,
     "label": "Nguyễn Ảnh Thủ",
     "locationName": "Đường Nguyễn Ảnh Thủ",
     "locationType": "Street",
-    "fullAddress": "Đường Nguyễn Ảnh Thủ, Phường Trung Mỹ Tây, TP. Thủ Đức",
-    "district": "TP. Thủ Đức",
+    "fullAddress": "Đường Nguyễn Ảnh Thủ, Phường Trung Mỹ Tây, Quận 12",
+    "district": "Quận 12",
     "ward": "Phường Trung Mỹ Tây",
     "province": null,
     "type": "flood",
@@ -2984,23 +2393,19 @@
     "maxDepth": 50,
     "minDepth": 50,
     "depth": 50,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_335",
-    "lat": 10.855827,
-    "lng": 106.605729,
+    "lat": 10.854787,
+    "lng": 106.607479,
     "label": "Quốc Lộ 22",
     "locationName": "Quốc Lộ 22",
     "locationType": "National Highway",
-    "fullAddress": "Quốc Lộ 22, Phường Trung Mỹ Tây, TP. Thủ Đức",
-    "district": "TP. Thủ Đức",
+    "fullAddress": "Quốc Lộ 22, Phường Trung Mỹ Tây, Quận 12",
+    "district": "Quận 12",
     "ward": "Phường Trung Mỹ Tây",
     "province": null,
     "type": "flood",
@@ -3010,18 +2415,14 @@
     "maxDepth": 50,
     "minDepth": 50,
     "depth": 50,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_360",
-    "lat": 10.704487,
-    "lng": 106.595433,
+    "lat": 10.703465,
+    "lng": 106.597172,
     "label": "Quốc Lộ 1",
     "locationName": "Quốc Lộ 1",
     "locationType": "National Highway",
@@ -3036,18 +2437,14 @@
     "maxDepth": 50,
     "minDepth": 50,
     "depth": 50,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2008
-    ]
+    "years": [2008]
   },
   {
     "id": "ird_361",
-    "lat": 10.764242,
-    "lng": 106.698457,
+    "lat": 10.761452,
+    "lng": 106.700312,
     "label": "Nguyễn Hữu Hào",
     "locationName": "Đường Nguyễn Hữu Hào",
     "locationType": "Street",
@@ -3062,18 +2459,14 @@
     "maxDepth": 50,
     "minDepth": 30,
     "depth": 50,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2008
-    ]
+    "years": [2008]
   },
   {
     "id": "ird_362",
-    "lat": 10.754144,
-    "lng": 106.697777,
+    "lat": 10.753059,
+    "lng": 106.699559,
     "label": "Tôn Thất Thuyết",
     "locationName": "Đường Tôn Thất Thuyết",
     "locationType": "Street",
@@ -3088,18 +2481,14 @@
     "maxDepth": 50,
     "minDepth": 30,
     "depth": 50,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2008
-    ]
+    "years": [2008]
   },
   {
     "id": "ird_381",
-    "lat": 10.845977,
-    "lng": 106.630566,
+    "lat": 10.844923,
+    "lng": 106.632388,
     "label": "Nguyễn Văn Quá",
     "locationName": "Đường Nguyễn Văn Quá",
     "locationType": "Street",
@@ -3114,18 +2503,14 @@
     "maxDepth": 50,
     "minDepth": 50,
     "depth": 50,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2013
-    ]
+    "years": [2013]
   },
   {
     "id": "ird_410",
-    "lat": 10.802591,
-    "lng": 106.709548,
+    "lat": 10.801474,
+    "lng": 106.711341,
     "label": "Hàng Xanh",
     "locationName": "Hàng Xanh",
     "locationType": "Roundabout",
@@ -3140,22 +2525,18 @@
     "maxDepth": 50,
     "minDepth": 50,
     "depth": 50,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2010
-    ]
+    "years": [2010]
   },
   {
     "id": "ird_417",
-    "lat": 10.799402,
-    "lng": 106.723463,
-    "label": "Cau Cầu Sài Gòn",
-    "locationName": "Cau Cầu Sài Gòn",
+    "lat": 10.798468,
+    "lng": 106.725228,
+    "label": "Chân Cầu Sài Gòn",
+    "locationName": "Chân Cầu Sài Gòn",
     "locationType": "Street",
-    "fullAddress": "Cau Cầu Sài Gòn, Phường 22, Bình Thạnh",
+    "fullAddress": "Chân Cầu Sài Gòn, Phường 22, Bình Thạnh",
     "district": "Bình Thạnh",
     "ward": "Phường 22",
     "province": null,
@@ -3166,18 +2547,14 @@
     "maxDepth": 50,
     "minDepth": 50,
     "depth": 50,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2010
-    ]
+    "years": [2010]
   },
   {
     "id": "ird_164",
-    "lat": 10.758392,
-    "lng": 106.660029,
+    "lat": 10.757371,
+    "lng": 106.661806,
     "label": "Lý Thường Kiệt",
     "locationName": "Đường Lý Thường Kiệt",
     "locationType": "Street",
@@ -3192,18 +2569,14 @@
     "maxDepth": 40,
     "minDepth": 20,
     "depth": 40,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_165",
-    "lat": 10.773337,
-    "lng": 106.703784,
+    "lat": 10.772438,
+    "lng": 106.705681,
     "label": "Nguyễn Huệ",
     "locationName": "Đường Nguyễn Huệ",
     "locationType": "Street",
@@ -3218,18 +2591,14 @@
     "maxDepth": 40,
     "minDepth": 20,
     "depth": 40,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_166",
-    "lat": 10.793036,
-    "lng": 106.701129,
+    "lat": 10.792013,
+    "lng": 106.702915,
     "label": "Nguyễn Đình Chiểu",
     "locationName": "Đường Nguyễn Đình Chiểu",
     "locationType": "Street",
@@ -3244,18 +2613,14 @@
     "maxDepth": 40,
     "minDepth": 20,
     "depth": 40,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_239",
-    "lat": 10.708461,
-    "lng": 106.61331,
+    "lat": 10.713548,
+    "lng": 106.620318,
     "label": "Nguyễn Ngọc Cung",
     "locationName": "Đường Nguyễn Ngọc Cung",
     "locationType": "Street",
@@ -3270,18 +2635,14 @@
     "maxDepth": 40,
     "minDepth": 20,
     "depth": 40,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2023
-    ]
+    "years": [2023]
   },
   {
     "id": "ird_405",
-    "lat": 10.760221,
-    "lng": 106.682224,
+    "lat": 10.759202,
+    "lng": 106.678185,
     "label": "Lê Hồng Phong",
     "locationName": "Đường Lê Hồng Phong",
     "locationType": "Street",
@@ -3296,18 +2657,14 @@
     "maxDepth": 40,
     "minDepth": 30,
     "depth": 40,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2010
-    ]
+    "years": [2010]
   },
   {
     "id": "ird_407",
-    "lat": 10.760474,
-    "lng": 106.682217,
+    "lat": 10.75948,
+    "lng": 106.683989,
     "label": "Nguyễn Văn Cừ",
     "locationName": "Đường Nguyễn Văn Cừ",
     "locationType": "Intersection",
@@ -3322,18 +2679,14 @@
     "maxDepth": 40,
     "minDepth": 30,
     "depth": 40,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2010
-    ]
+    "years": [2010]
   },
   {
     "id": "ird_416",
-    "lat": 10.795269,
-    "lng": 106.688368,
+    "lat": 10.794235,
+    "lng": 106.690152,
     "label": "Trần Khánh Dư",
     "locationName": "Đường Trần Khánh Dư",
     "locationType": "Street",
@@ -3348,19 +2701,15 @@
     "maxDepth": 40,
     "minDepth": 30,
     "depth": 40,
-    "causes": [
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa & Triều"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2010
-    ]
+    "years": [2010]
   },
   {
     "id": "ird_5",
-    "lat": 10.694083,
-    "lng": 106.709577,
-    "label": "Phạm Hữu Lầu",
+    "lat": 10.693106,
+    "lng": 106.711373,
+    "label": "Phạm Hữu Lầu (Phước Kiển)",
     "locationName": "Đường Phạm Hữu Lầu",
     "locationType": "Street",
     "fullAddress": "Đường Phạm Hữu Lầu, Phước Kiển, Nhà Bè",
@@ -3374,18 +2723,14 @@
     "maxDepth": 30,
     "minDepth": 15,
     "depth": 30,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2025
-    ]
+    "years": [2025]
   },
   {
     "id": "ird_6",
-    "lat": 10.670955,
-    "lng": 106.714214,
+    "lat": 10.669947,
+    "lng": 106.715998,
     "label": "Nguyễn Bình",
     "locationName": "Đường Nguyễn Bình",
     "locationType": "Street",
@@ -3400,18 +2745,14 @@
     "maxDepth": 30,
     "minDepth": 15,
     "depth": 30,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2025
-    ]
+    "years": [2025]
   },
   {
     "id": "ird_8",
-    "lat": 10.80045,
-    "lng": 106.729995,
+    "lat": 10.799695,
+    "lng": 106.731742,
     "label": "Võ Nguyên Giáp",
     "locationName": "Đường Võ Nguyên Giáp",
     "locationType": "Street",
@@ -3426,18 +2767,14 @@
     "maxDepth": 30,
     "minDepth": 15,
     "depth": 30,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2025
-    ]
+    "years": [2025]
   },
   {
     "id": "ird_9",
-    "lat": 10.771248,
-    "lng": 106.709153,
+    "lat": 10.770521,
+    "lng": 106.710883,
     "label": "Mai Chí Thọ",
     "locationName": "Đường Mai Chí Thọ",
     "locationType": "Street",
@@ -3452,18 +2789,14 @@
     "maxDepth": 30,
     "minDepth": 15,
     "depth": 30,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2025
-    ]
+    "years": [2025]
   },
   {
     "id": "ird_154",
-    "lat": 10.753635,
-    "lng": 106.480335,
+    "lat": 10.752653,
+    "lng": 106.482086,
     "label": "Xã Bình Lợi",
     "locationName": "Xã Bình Lợi",
     "locationType": "Commune",
@@ -3478,24 +2811,20 @@
     "maxDepth": 30,
     "minDepth": 10,
     "depth": 30,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_157",
-    "lat": 10.657876,
-    "lng": 106.582963,
-    "label": "Xã Tân Quý Tây, Huyện Bình Chánh, Thành Phố",
-    "locationName": "Xã Tân Quý Tây, Huyện Bình Chánh, Thành Phố",
+    "lat": 10.65686,
+    "lng": 106.584772,
+    "label": "Xã Tân Quý Tây",
+    "locationName": "Xã Tân Quý Tây",
     "locationType": "Commune",
-    "fullAddress": "Xã Tân Quý Tây, Huyện Bình Chánh, Thành Phố",
+    "fullAddress": "Xã Tân Quý Tây, Bình Chánh",
     "district": "Bình Chánh",
-    "ward": null,
+    "ward": "Xã Tân Quý Tây",
     "province": null,
     "type": "flood",
     "depthClass": "Moderate",
@@ -3504,18 +2833,14 @@
     "maxDepth": 30,
     "minDepth": 10,
     "depth": 30,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_158",
-    "lat": 10.649678,
-    "lng": 106.651899,
+    "lat": 10.648705,
+    "lng": 106.653681,
     "label": "Xã Quy Đức",
     "locationName": "Xã Quy Đức",
     "locationType": "Commune",
@@ -3530,18 +2855,14 @@
     "maxDepth": 30,
     "minDepth": 10,
     "depth": 30,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_161",
-    "lat": 10.69178,
-    "lng": 106.65177,
+    "lat": 10.690381,
+    "lng": 106.653676,
     "label": "Xã Phong Phú",
     "locationName": "Xã Phong Phú",
     "locationType": "Commune",
@@ -3556,21 +2877,17 @@
     "maxDepth": 30,
     "minDepth": 10,
     "depth": 30,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_211",
-    "lat": 10.82538,
-    "lng": 106.731573,
+    "lat": 10.824345,
+    "lng": 106.733366,
     "label": "UBND Phường 28 Quận Bình Thạnh",
     "locationName": "UBND Phường 28 Quận Bình Thạnh",
-    "locationType": "School",
+    "locationType": "Neighborhood",
     "fullAddress": "UBND Phường 28 Quận Bình Thạnh",
     "district": "Bình Thạnh",
     "ward": "Phường 28",
@@ -3582,18 +2899,14 @@
     "maxDepth": 30,
     "minDepth": 30,
     "depth": 30,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2007
-    ]
+    "years": [2007]
   },
   {
     "id": "ird_273",
-    "lat": 10.791037,
-    "lng": 106.752593,
+    "lat": 10.79003,
+    "lng": 106.7544,
     "label": "Nguyễn Thị Định",
     "locationName": "Đường Nguyễn Thị Định",
     "locationType": "Street",
@@ -3608,18 +2921,14 @@
     "maxDepth": 30,
     "minDepth": 15,
     "depth": 30,
-    "causes": [
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa & Triều"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2018
-    ]
+    "years": [2018]
   },
   {
     "id": "ird_274",
-    "lat": 10.823483,
-    "lng": 106.699915,
+    "lat": 10.822487,
+    "lng": 106.70169,
     "label": "Phạm Văn Đồng",
     "locationName": "Đường Phạm Văn Đồng",
     "locationType": "Street",
@@ -3634,18 +2943,14 @@
     "maxDepth": 30,
     "minDepth": 15,
     "depth": 30,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2018
-    ]
+    "years": [2018]
   },
   {
     "id": "ird_276",
-    "lat": 10.830492,
-    "lng": 106.766546,
+    "lat": 10.829482,
+    "lng": 106.768354,
     "label": "Đỗ Xuân Hợp",
     "locationName": "Đường Đỗ Xuân Hợp",
     "locationType": "Street",
@@ -3660,23 +2965,19 @@
     "maxDepth": 30,
     "minDepth": 15,
     "depth": 30,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2018
-    ]
+    "years": [2018]
   },
   {
     "id": "ird_296",
-    "lat": 10.852199,
-    "lng": 106.749877,
-    "label": "Phạm Văn Đồng",
+    "lat": 10.845822,
+    "lng": 106.745862,
+    "label": "Phạm Văn Đồng (Linh Tây)",
     "locationName": "Đường Phạm Văn Đồng",
     "locationType": "Street",
-    "fullAddress": "Đường Phạm Văn Đồng, Phường Linh Tây, TP. Thủ Đức (Quận 2 cũ)",
-    "district": "TP. Thủ Đức (Quận 2 cũ)",
+    "fullAddress": "Đường Phạm Văn Đồng, Phường Linh Tây, TP. Thủ Đức",
+    "district": "TP. Thủ Đức",
     "ward": "Phường Linh Tây",
     "province": null,
     "type": "flood",
@@ -3686,18 +2987,14 @@
     "maxDepth": 25,
     "minDepth": 25,
     "depth": 25,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_163",
-    "lat": 11.023301,
-    "lng": 106.588736,
+    "lat": 11.022282,
+    "lng": 106.59052,
     "label": "Rạch Cây Điệp",
     "locationName": "Rạch Cây Điệp",
     "locationType": "Dike",
@@ -3712,23 +3009,19 @@
     "maxDepth": 20,
     "minDepth": 20,
     "depth": 20,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_297",
-    "lat": 10.826648,
-    "lng": 106.767175,
-    "label": "Đỗ Xuân Hợp",
+    "lat": 10.825634,
+    "lng": 106.769003,
+    "label": "Đỗ Xuân Hợp (Phước Long B)",
     "locationName": "Đường Đỗ Xuân Hợp",
     "locationType": "Street",
-    "fullAddress": "Đường Đỗ Xuân Hợp, Phường Phước Long B, TP. Thủ Đức (Quận 2 cũ)",
-    "district": "TP. Thủ Đức (Quận 2 cũ)",
+    "fullAddress": "Đường Đỗ Xuân Hợp, Phường Phước Long B, TP. Thủ Đức (Quận 9 cũ)",
+    "district": "TP. Thủ Đức (Quận 9 cũ)",
     "ward": "Phường Phước Long B",
     "province": null,
     "type": "flood",
@@ -3738,22 +3031,18 @@
     "maxDepth": 20,
     "minDepth": 20,
     "depth": 20,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_10",
-    "lat": 10.806955,
-    "lng": 106.679772,
-    "label": "Thich Quang Duc",
-    "locationName": "Đường Thich Quang Duc",
+    "lat": 10.80591,
+    "lng": 106.681533,
+    "label": "Thích Quảng Đức",
+    "locationName": "Đường Thích Quảng Đức",
     "locationType": "Street",
-    "fullAddress": "Đường Thich Quang Duc, Phường 5, Phú Nhuận",
+    "fullAddress": "Đường Thích Quảng Đức, Phường 5, Phú Nhuận",
     "district": "Phú Nhuận",
     "ward": "Phường 5",
     "province": null,
@@ -3764,23 +3053,19 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2025
-    ]
+    "years": [2025]
   },
   {
     "id": "ird_11",
-    "lat": 11.006055,
-    "lng": 106.640129,
+    "lat": 11.005057,
+    "lng": 106.641906,
     "label": "Hồ Văn Cống",
     "locationName": "Đường Hồ Văn Cống",
     "locationType": "Street",
-    "fullAddress": "Đường Hồ Văn Cống, Tương Bình Hiệp, Chánh Hiệp, Bình Dương",
-    "district": "Chánh Hiệp",
+    "fullAddress": "Đường Hồ Văn Cống, Tương Bình Hiệp, Thủ Dầu Một (Bình Dương)",
+    "district": "Thủ Dầu Một (Bình Dương)",
     "ward": "Tương Bình Hiệp",
     "province": "Bình Dương",
     "type": "flood",
@@ -3790,23 +3075,19 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2025
-    ]
+    "years": [2025]
   },
   {
     "id": "ird_12",
-    "lat": 10.399396,
-    "lng": 107.118964,
-    "label": "Hẻm 646 Đ. 30 Tháng 4",
-    "locationName": "Đường Hẻm 646 Đ. 30 Tháng 4",
+    "lat": 10.399245,
+    "lng": 107.120132,
+    "label": "Hẻm 646 Đường 30/4",
+    "locationName": "Hẻm 646 Đường 30 Tháng 4",
     "locationType": "Street",
-    "fullAddress": "Đường Hẻm 646 Đ. 30 Tháng 4, Rạch Dừa, Rạch Dừa, Bà Rịa-Vũng Tàu",
-    "district": "Rạch Dừa",
+    "fullAddress": "Hẻm 646 Đường 30 Tháng 4, Rạch Dừa, Vũng Tàu (BR-VT), Bà Rịa-Vũng Tàu",
+    "district": "Vũng Tàu (BR-VT)",
     "ward": "Rạch Dừa",
     "province": "Bà Rịa-Vũng Tàu",
     "type": "flood",
@@ -3816,23 +3097,19 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2025
-    ]
+    "years": [2025]
   },
   {
     "id": "ird_13",
-    "lat": 10.396712,
-    "lng": 107.11821,
+    "lat": 10.395724,
+    "lng": 107.120128,
     "label": "842 Bình Giã",
-    "locationName": "Đường 842 Bình Giã",
+    "locationName": "Đường Bình Giã (842)",
     "locationType": "Street",
-    "fullAddress": "Đường 842 Bình Giã, Rạch Dừa, Rạch Dừa, Bà Rịa-Vũng Tàu",
-    "district": "Rạch Dừa",
+    "fullAddress": "Đường Bình Giã (842), Rạch Dừa, Vũng Tàu (BR-VT), Bà Rịa-Vũng Tàu",
+    "district": "Vũng Tàu (BR-VT)",
     "ward": "Rạch Dừa",
     "province": "Bà Rịa-Vũng Tàu",
     "type": "flood",
@@ -3842,24 +3119,20 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2025
-    ]
+    "years": [2025]
   },
   {
     "id": "ird_14",
-    "lat": 10.77088,
-    "lng": 106.706418,
-    "label": "Hầm Thủ Thiên",
-    "locationName": "Hầm Thủ Thiên",
+    "lat": 10.769756,
+    "lng": 106.708218,
+    "label": "Hầm Thủ Thiêm",
+    "locationName": "Hầm Thủ Thiêm",
     "locationType": "Tunnel",
-    "fullAddress": "Hầm Thủ Thiên, TP. Thủ Đức (Quận 2 cũ)",
+    "fullAddress": "Hầm Thủ Thiêm, Phường Thủ Thiêm, TP. Thủ Đức (Quận 2 cũ)",
     "district": "TP. Thủ Đức (Quận 2 cũ)",
-    "ward": null,
+    "ward": "Phường Thủ Thiêm",
     "province": null,
     "type": "flood",
     "depthClass": "Unknown",
@@ -3868,22 +3141,18 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2016
-    ]
+    "years": [2016]
   },
   {
     "id": "ird_15",
-    "lat": 10.821716,
-    "lng": 106.650418,
-    "label": "Sân bay",
-    "locationName": "Sân bay",
+    "lat": 10.820696,
+    "lng": 106.6522,
+    "label": "Sân bay Tân Sơn Nhất (Ga đi)",
+    "locationName": "Ga Quốc nội Sân bay Tân Sơn Nhất",
     "locationType": "Airport",
-    "fullAddress": "Sân bay, Phường Tân Sơn, Tân Bình",
+    "fullAddress": "Ga Quốc nội Sân bay Tân Sơn Nhất, Phường Tân Sơn, Tân Bình",
     "district": "Tân Bình",
     "ward": "Phường Tân Sơn",
     "province": null,
@@ -3894,18 +3163,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2016
-    ]
+    "years": [2016]
   },
   {
     "id": "ird_21",
-    "lat": 10.810711,
-    "lng": 106.723445,
+    "lat": 10.809682,
+    "lng": 106.725229,
     "label": "Phường Thảo Điền",
     "locationName": "Phường Thảo Điền",
     "locationType": "Ward",
@@ -3920,18 +3185,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2020
-    ]
+    "years": [2020]
   },
   {
     "id": "ird_25",
-    "lat": 10.728992,
-    "lng": 106.610865,
+    "lat": 10.727972,
+    "lng": 106.612661,
     "label": "Lê Cơ",
     "locationName": "Đường Lê Cơ",
     "locationType": "Street",
@@ -3946,24 +3207,20 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2023
-    ]
+    "years": [2023]
   },
   {
     "id": "ird_26",
-    "lat": 10.748964,
-    "lng": 106.593007,
-    "label": "Quốc lộ 1, đoạn qua Công ty TNHH PouYuen Việt Nam",
-    "locationName": "Quốc lộ 1, đoạn qua Công ty TNHH PouYuen Việt Nam",
+    "lat": 10.74792,
+    "lng": 106.59475,
+    "label": "Quốc lộ 1 (PouYuen)",
+    "locationName": "Quốc lộ 1 (đoạn qua Công ty PouYuen)",
     "locationType": "National Highway",
-    "fullAddress": "Quốc lộ 1, đoạn qua Công ty TNHH PouYuen Việt Nam, Bình Tân",
+    "fullAddress": "Quốc lộ 1 (đoạn qua Công ty PouYuen), Phường Tân Tạo, Bình Tân",
     "district": "Bình Tân",
-    "ward": null,
+    "ward": "Phường Tân Tạo",
     "province": null,
     "type": "flood",
     "depthClass": "Unknown",
@@ -3972,18 +3229,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2023
-    ]
+    "years": [2023]
   },
   {
     "id": "ird_28",
-    "lat": 10.843767,
-    "lng": 106.613386,
+    "lat": 10.84276,
+    "lng": 106.615189,
     "label": "Ngã tư An Sương",
     "locationName": "Ngã tư An Sương",
     "locationType": "Intersection",
@@ -3998,18 +3251,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2023
-    ]
+    "years": [2023]
   },
   {
     "id": "ird_29",
-    "lat": 10.720709,
-    "lng": 106.620599,
+    "lat": 10.71969,
+    "lng": 106.622374,
     "label": "Phạm Đức Sơn",
     "locationName": "Đường Phạm Đức Sơn",
     "locationType": "Street",
@@ -4024,18 +3273,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2023
-    ]
+    "years": [2023]
   },
   {
     "id": "ird_31",
-    "lat": 10.845121,
-    "lng": 106.655342,
+    "lat": 10.844099,
+    "lng": 106.657084,
     "label": "Lê Văn Thọ",
     "locationName": "Đường Lê Văn Thọ",
     "locationType": "Street",
@@ -4050,23 +3295,19 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2023
-    ]
+    "years": [2023]
   },
   {
     "id": "ird_33",
-    "lat": 11.158141,
-    "lng": 106.580083,
+    "lat": 11.156633,
+    "lng": 106.582075,
     "label": "Phường Long Nguyên",
     "locationName": "Phường Long Nguyên",
     "locationType": "Ward",
-    "fullAddress": "Phường Long Nguyên, An Điền, Bình Dương",
-    "district": "Long Nguyên",
+    "fullAddress": "Phường Long Nguyên, An Điền, Bến Cát (Bình Dương)",
+    "district": "Bến Cát (Bình Dương)",
     "ward": "An Điền",
     "province": "Bình Dương",
     "type": "flood",
@@ -4076,18 +3317,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa & Triều"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2025
-    ]
+    "years": [2025]
   },
   {
     "id": "ird_45",
-    "lat": 10.746934,
-    "lng": 106.655172,
+    "lat": 10.745782,
+    "lng": 106.656722,
     "label": "Phường 13",
     "locationName": "Phường 13",
     "locationType": "Residential area",
@@ -4102,18 +3339,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa & Triều"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2012
-    ]
+    "years": [2012]
   },
   {
     "id": "ird_46",
-    "lat": 10.749827,
-    "lng": 106.663161,
+    "lat": 10.748284,
+    "lng": 106.665103,
     "label": "Tùng Thiện Vương",
     "locationName": "Tùng Thiện Vương",
     "locationType": "Residential area",
@@ -4128,22 +3361,18 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa & Triều"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2012
-    ]
+    "years": [2012]
   },
   {
     "id": "ird_47",
-    "lat": 10.747676,
-    "lng": 106.672292,
-    "label": "Hưng Phú Street",
-    "locationName": "Hưng Phú Street",
-    "locationType": "Residential area",
-    "fullAddress": "Hưng Phú Street, Phường Hưng Phú, Quận 8",
+    "lat": 10.74605,
+    "lng": 106.674118,
+    "label": "Hưng Phú",
+    "locationName": "Đường Hưng Phú",
+    "locationType": "Street",
+    "fullAddress": "Đường Hưng Phú, Phường Hưng Phú, Quận 8",
     "district": "Quận 8",
     "ward": "Phường Hưng Phú",
     "province": null,
@@ -4154,18 +3383,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa & Triều"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2012
-    ]
+    "years": [2012]
   },
   {
     "id": "ird_48",
-    "lat": 10.743878,
-    "lng": 106.680116,
+    "lat": 10.742581,
+    "lng": 106.682177,
     "label": "Tạ Quang Bửu",
     "locationName": "Tạ Quang Bửu",
     "locationType": "Residential area",
@@ -4180,18 +3405,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa & Triều"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2012
-    ]
+    "years": [2012]
   },
   {
     "id": "ird_54",
-    "lat": 10.765381,
-    "lng": 106.690319,
+    "lat": 10.764358,
+    "lng": 106.692105,
     "label": "Trần Hưng Đạo",
     "locationName": "Đường Trần Hưng Đạo",
     "locationType": "Street",
@@ -4206,18 +3427,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2016
-    ]
+    "years": [2016]
   },
   {
     "id": "ird_55",
-    "lat": 10.804861,
-    "lng": 106.66299,
+    "lat": 10.803847,
+    "lng": 106.6648,
     "label": "Phan Đình Giót",
     "locationName": "Đường Phan Đình Giót",
     "locationType": "Street",
@@ -4232,18 +3449,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2016
-    ]
+    "years": [2016]
   },
   {
     "id": "ird_56",
-    "lat": 10.795884,
-    "lng": 106.641001,
+    "lat": 10.79486,
+    "lng": 106.642795,
     "label": "Nguyễn Hồng Đào",
     "locationName": "Đường Nguyễn Hồng Đào",
     "locationType": "Street",
@@ -4258,18 +3471,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2016
-    ]
+    "years": [2016]
   },
   {
     "id": "ird_58",
-    "lat": 10.83505,
-    "lng": 106.66343,
+    "lat": 10.834019,
+    "lng": 106.665203,
     "label": "Quang Trung",
     "locationName": "Đường Quang Trung",
     "locationType": "Street",
@@ -4284,18 +3493,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2016
-    ]
+    "years": [2016]
   },
   {
     "id": "ird_59",
-    "lat": 10.739808,
-    "lng": 106.668104,
+    "lat": 10.738804,
+    "lng": 106.669907,
     "label": "Phạm Hùng",
     "locationName": "Đường Phạm Hùng",
     "locationType": "Street",
@@ -4310,18 +3515,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2016
-    ]
+    "years": [2016]
   },
   {
     "id": "ird_61",
-    "lat": 10.807294,
-    "lng": 106.662658,
+    "lat": 10.806277,
+    "lng": 106.664401,
     "label": "Trường Sơn",
     "locationName": "Đường Trường Sơn",
     "locationType": "Street",
@@ -4336,18 +3537,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2016
-    ]
+    "years": [2016]
   },
   {
     "id": "ird_62",
-    "lat": 10.767604,
-    "lng": 106.690366,
+    "lat": 10.766599,
+    "lng": 106.692141,
     "label": "Bùi Viện",
     "locationName": "Đường Bùi Viện",
     "locationType": "Street",
@@ -4362,18 +3559,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2022
-    ]
+    "years": [2022]
   },
   {
     "id": "ird_63",
-    "lat": 10.766159,
-    "lng": 106.688467,
+    "lat": 10.765139,
+    "lng": 106.690248,
     "label": "Cống Quỳnh",
     "locationName": "Đường Cống Quỳnh",
     "locationType": "Street",
@@ -4388,22 +3581,18 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2022
-    ]
+    "years": [2022]
   },
   {
     "id": "ird_67",
-    "lat": 10.807866,
-    "lng": 106.729255,
-    "label": "Phan Đình Phùng",
-    "locationName": "Đường Phan Đình Phùng",
+    "lat": 10.806843,
+    "lng": 106.731028,
+    "label": "Quốc Hương (Đoạn Xuân Thủy)",
+    "locationName": "Đường Quốc Hương (đoạn Xuân Thủy)",
     "locationType": "Street",
-    "fullAddress": "Đường Phan Đình Phùng, Phường Thảo Điền, TP. Thủ Đức (Quận 2 cũ)",
+    "fullAddress": "Đường Quốc Hương (đoạn Xuân Thủy), Phường Thảo Điền, TP. Thủ Đức (Quận 2 cũ)",
     "district": "TP. Thủ Đức (Quận 2 cũ)",
     "ward": "Phường Thảo Điền",
     "province": null,
@@ -4414,19 +3603,15 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2022
-    ]
+    "years": [2022]
   },
   {
     "id": "ird_73",
-    "lat": 10.787562,
-    "lng": 106.707226,
-    "label": "Nguyễn Hữu Cảnh",
+    "lat": 10.786542,
+    "lng": 106.709007,
+    "label": "Nguyễn Hữu Cảnh (Bến Nghé)",
     "locationName": "Đường Nguyễn Hữu Cảnh",
     "locationType": "Street",
     "fullAddress": "Đường Nguyễn Hữu Cảnh, Bến Nghé, Quận 1",
@@ -4440,24 +3625,20 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa & Triều"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2025
-    ]
+    "years": [2025]
   },
   {
     "id": "ird_78",
-    "lat": 10.703306,
-    "lng": 106.736384,
-    "label": "Huỳnh Tấn Phá",
-    "locationName": "Đường Huỳnh Tấn Phá",
+    "lat": 10.702285,
+    "lng": 106.738135,
+    "label": "Huỳnh Tấn Phát (Nhà Bè)",
+    "locationName": "Đường Huỳnh Tấn Phát",
     "locationType": "Street",
-    "fullAddress": "Đường Huỳnh Tấn Phá, Nhà Bè",
+    "fullAddress": "Đường Huỳnh Tấn Phát, Thị trấn Nhà Bè, Nhà Bè",
     "district": "Nhà Bè",
-    "ward": null,
+    "ward": "Thị trấn Nhà Bè",
     "province": null,
     "type": "flood",
     "depthClass": "Unknown",
@@ -4466,18 +3647,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2011
-    ]
+    "years": [2011]
   },
   {
     "id": "ird_86",
-    "lat": 10.689263,
-    "lng": 106.681392,
+    "lat": 10.688299,
+    "lng": 106.682696,
     "label": "Trường Mầm non Vành Khuyên",
     "locationName": "Trường Mầm non Vành Khuyên",
     "locationType": "School",
@@ -4492,18 +3669,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2012
-    ]
+    "years": [2012]
   },
   {
     "id": "ird_89",
-    "lat": 10.75439,
-    "lng": 106.653392,
+    "lat": 10.753371,
+    "lng": 106.655181,
     "label": "Dương Tử Giang",
     "locationName": "Đường Dương Tử Giang",
     "locationType": "Street",
@@ -4518,19 +3691,15 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2012
-    ]
+    "years": [2012]
   },
   {
     "id": "ird_93",
-    "lat": 10.786936,
-    "lng": 106.593036,
-    "label": "Quốc lộ 1",
+    "lat": 10.785914,
+    "lng": 106.594833,
+    "label": "Quốc lộ 1 (Bình Tân)",
     "locationName": "Quốc lộ 1",
     "locationType": "National Highway",
     "fullAddress": "Quốc lộ 1, Bình Hưng Hòa A, Bình Tân",
@@ -4544,18 +3713,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2012
-    ]
+    "years": [2012]
   },
   {
     "id": "ird_94",
-    "lat": 10.704397,
-    "lng": 106.593637,
+    "lat": 10.703379,
+    "lng": 106.595416,
     "label": "Dương Đình Cúc",
     "locationName": "Đường Dương Đình Cúc",
     "locationType": "Street",
@@ -4570,18 +3735,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2012
-    ]
+    "years": [2012]
   },
   {
     "id": "ird_95",
-    "lat": 10.746161,
-    "lng": 106.652049,
+    "lat": 10.745161,
+    "lng": 106.653818,
     "label": "Khu vực bến Bình Đông",
     "locationName": "Khu vực bến Bình Đông",
     "locationType": "Residential area",
@@ -4596,23 +3757,19 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2012
-    ]
+    "years": [2012]
   },
   {
     "id": "ird_96",
-    "lat": 10.97839,
-    "lng": 106.649502,
+    "lat": 10.977455,
+    "lng": 106.651204,
     "label": "Chợ Thủ Dầu Một",
     "locationName": "Chợ Thủ Dầu Một",
-    "locationType": "Residential area",
-    "fullAddress": "Chợ Thủ Dầu Một, Phường Phú Cường, Phường Thủ Dầu Một, Bình Dương",
-    "district": "Phường Thủ Dầu Một",
+    "locationType": "Market",
+    "fullAddress": "Chợ Thủ Dầu Một, Phường Phú Cường, Thủ Dầu Một (Bình Dương)",
+    "district": "Thủ Dầu Một (Bình Dương)",
     "ward": "Phường Phú Cường",
     "province": "Bình Dương",
     "type": "flood",
@@ -4622,23 +3779,19 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2012
-    ]
+    "years": [2012]
   },
   {
     "id": "ird_97",
-    "lat": 10.910051,
-    "lng": 106.691008,
+    "lat": 10.908847,
+    "lng": 106.692314,
     "label": "Lái Thiêu",
     "locationName": "Lái Thiêu",
     "locationType": "Ward",
-    "fullAddress": "Lái Thiêu, Phường Lái Thiêu, Phường Lái Thiêu, Bình Dương",
-    "district": "Phường Lái Thiêu",
+    "fullAddress": "Lái Thiêu, Phường Lái Thiêu, Thuận An (Bình Dương)",
+    "district": "Thuận An (Bình Dương)",
     "ward": "Phường Lái Thiêu",
     "province": "Bình Dương",
     "type": "flood",
@@ -4648,18 +3801,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2012
-    ]
+    "years": [2012]
   },
   {
     "id": "ird_123",
-    "lat": 10.787621,
-    "lng": 106.70388,
+    "lat": 10.786624,
+    "lng": 106.705684,
     "label": "Nguyễn Bỉnh Khiêm",
     "locationName": "Đường Nguyễn Bỉnh Khiêm",
     "locationType": "Street",
@@ -4674,18 +3823,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_124",
-    "lat": 10.735075,
-    "lng": 106.633788,
+    "lat": 10.718262,
+    "lng": 106.627644,
     "label": "Mễ Cốc",
     "locationName": "Đường Mễ Cốc",
     "locationType": "Street",
@@ -4700,18 +3845,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_129",
-    "lat": 10.820008,
-    "lng": 106.775633,
+    "lat": 10.819005,
+    "lng": 106.777405,
     "label": "Dương Đình Hội",
     "locationName": "Đường Dương Đình Hội",
     "locationType": "Street",
@@ -4726,18 +3867,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2024
-    ]
+    "years": [2024]
   },
   {
     "id": "ird_131",
-    "lat": 10.790897,
-    "lng": 106.705554,
+    "lat": 10.789877,
+    "lng": 106.707336,
     "label": "Kênh Nhiêu Lộc - Thị Nghè",
     "locationName": "Kênh Nhiêu Lộc - Thị Nghè",
     "locationType": "Canal",
@@ -4752,18 +3889,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2008
-    ]
+    "years": [2008]
   },
   {
     "id": "ird_132",
-    "lat": 10.747838,
-    "lng": 106.639328,
+    "lat": 10.746818,
+    "lng": 106.641109,
     "label": "Kênh Hàng Bàng",
     "locationName": "Kênh Hàng Bàng",
     "locationType": "Canal",
@@ -4778,18 +3911,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2008
-    ]
+    "years": [2008]
   },
   {
     "id": "ird_133",
-    "lat": 10.751093,
-    "lng": 106.66303,
+    "lat": 10.750073,
+    "lng": 106.664811,
     "label": "Kênh Tàu Hủ",
     "locationName": "Kênh Tàu Hủ",
     "locationType": "Canal",
@@ -4804,18 +3933,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2008
-    ]
+    "years": [2008]
   },
   {
     "id": "ird_134",
-    "lat": 10.755352,
-    "lng": 106.686392,
+    "lat": 10.754331,
+    "lng": 106.688174,
     "label": "Rạch Bến Nghé",
     "locationName": "Rạch Bến Nghé",
     "locationType": "Canal",
@@ -4830,18 +3955,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2008
-    ]
+    "years": [2008]
   },
   {
     "id": "ird_135",
-    "lat": 10.732669,
-    "lng": 106.637781,
+    "lat": 10.731649,
+    "lng": 106.639563,
     "label": "Kênh Đôi",
     "locationName": "Kênh Đôi",
     "locationType": "Canal",
@@ -4856,18 +3977,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2008
-    ]
+    "years": [2008]
   },
   {
     "id": "ird_136",
-    "lat": 10.753369,
-    "lng": 106.707112,
+    "lat": 10.752349,
+    "lng": 106.708894,
     "label": "Kênh Tẻ",
     "locationName": "Kênh Tẻ",
     "locationType": "Canal",
@@ -4882,18 +3999,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2008
-    ]
+    "years": [2008]
   },
   {
     "id": "ird_137",
-    "lat": 10.755334,
-    "lng": 106.641305,
+    "lat": 10.75424,
+    "lng": 106.643078,
     "label": "Cây Gõ",
     "locationName": "Cây Gõ",
     "locationType": "Intersection",
@@ -4908,18 +4021,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2008
-    ]
+    "years": [2008]
   },
   {
     "id": "ird_141",
-    "lat": 10.80322,
-    "lng": 106.721794,
+    "lat": 10.802184,
+    "lng": 106.72358,
     "label": "Phường 25",
     "locationName": "Phường 25",
     "locationType": "Ward",
@@ -4934,18 +4043,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_142",
-    "lat": 10.823052,
-    "lng": 106.72924,
+    "lat": 10.822168,
+    "lng": 106.731129,
     "label": "Phường 26",
     "locationName": "Phường 26",
     "locationType": "Ward",
@@ -4960,18 +4065,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_152",
-    "lat": 10.82212,
-    "lng": 106.711626,
+    "lat": 10.82112,
+    "lng": 106.713255,
     "label": "Cầu Bình Triệu",
     "locationName": "Cầu Bình Triệu",
     "locationType": "Bridge",
@@ -4986,18 +4087,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_162",
-    "lat": 10.909768,
-    "lng": 106.662078,
+    "lat": 10.908748,
+    "lng": 106.663861,
     "label": "Rạch Bà Hồng",
     "locationName": "Rạch Bà Hồng",
     "locationType": "Dike",
@@ -5012,18 +4109,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_170",
-    "lat": 10.888193,
-    "lng": 106.685731,
+    "lat": 10.887879,
+    "lng": 106.687727,
     "label": "Thạnh Lộc",
     "locationName": "Đường Thạnh Lộc",
     "locationType": "Street",
@@ -5038,18 +4131,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa & Triều"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_171",
-    "lat": 10.850358,
-    "lng": 106.676867,
+    "lat": 10.849339,
+    "lng": 106.678633,
     "label": "Phường 17",
     "locationName": "Phường 17",
     "locationType": "Ward",
@@ -5064,18 +4153,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa & Triều"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2002
-    ]
+    "years": [2002]
   },
   {
     "id": "ird_186",
-    "lat": 10.789326,
-    "lng": 106.711689,
+    "lat": 10.78924,
+    "lng": 106.713646,
     "label": "Rạch Văn Thánh",
     "locationName": "Rạch Văn Thánh",
     "locationType": "Residential area",
@@ -5090,22 +4175,18 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2007
-    ]
+    "years": [2007]
   },
   {
     "id": "ird_189",
-    "lat": 10.865485,
-    "lng": 106.706756,
-    "label": "Tổ 47 KP3",
-    "locationName": "Tổ 47 KP3",
+    "lat": 10.864468,
+    "lng": 106.708509,
+    "label": "Tổ 47 KP3 An Phú Đông",
+    "locationName": "Đường An Phú Đông 3 (Tổ 47 KP3)",
     "locationType": "Street",
-    "fullAddress": "Tổ 47 KP3, Phường An Phú Đông, Quận 12",
+    "fullAddress": "Đường An Phú Đông 3 (Tổ 47 KP3), Phường An Phú Đông, Quận 12",
     "district": "Quận 12",
     "ward": "Phường An Phú Đông",
     "province": null,
@@ -5116,22 +4197,18 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2007
-    ]
+    "years": [2007]
   },
   {
     "id": "ird_190",
-    "lat": 10.861066,
-    "lng": 106.707399,
-    "label": "Tổ 46 KP3",
-    "locationName": "Tổ 46 KP3",
+    "lat": 10.860073,
+    "lng": 106.709188,
+    "label": "Tổ 46 KP3 An Phú Đông",
+    "locationName": "Đường An Phú Đông (Tổ 46 KP3)",
     "locationType": "Street",
-    "fullAddress": "Tổ 46 KP3, Phường An Phú Đông, Quận 12",
+    "fullAddress": "Đường An Phú Đông (Tổ 46 KP3), Phường An Phú Đông, Quận 12",
     "district": "Quận 12",
     "ward": "Phường An Phú Đông",
     "province": null,
@@ -5142,22 +4219,18 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2007
-    ]
+    "years": [2007]
   },
   {
     "id": "ird_193",
-    "lat": 10.811003,
-    "lng": 106.73263,
-    "label": "Số 2",
-    "locationName": "Đường Số 2",
+    "lat": 10.809985,
+    "lng": 106.734407,
+    "label": "Đường số 2",
+    "locationName": "Đường số 2",
     "locationType": "Street",
-    "fullAddress": "Đường Số 2, Phường Thảo Điền, TP. Thủ Đức (Quận 2 cũ)",
+    "fullAddress": "Đường số 2, Phường Thảo Điền, TP. Thủ Đức (Quận 2 cũ)",
     "district": "TP. Thủ Đức (Quận 2 cũ)",
     "ward": "Phường Thảo Điền",
     "province": null,
@@ -5168,18 +4241,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2005
-    ]
+    "years": [2005]
   },
   {
     "id": "ird_218",
-    "lat": 10.596662,
-    "lng": 106.744127,
+    "lat": 10.595641,
+    "lng": 106.745907,
     "label": "Thanh Niên Xung Phong",
     "locationName": "Đường Thanh Niên Xung Phong",
     "locationType": "Street",
@@ -5194,18 +4263,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2006
-    ]
+    "years": [2006]
   },
   {
     "id": "ird_219",
-    "lat": 10.609976,
-    "lng": 106.755905,
+    "lat": 10.61209,
+    "lng": 106.755312,
     "label": "Mương Lớn",
     "locationName": "Đường Mương Lớn",
     "locationType": "Street",
@@ -5220,18 +4285,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2006
-    ]
+    "years": [2006]
   },
   {
     "id": "ird_220",
-    "lat": 10.595649,
-    "lng": 106.732752,
+    "lat": 10.594633,
+    "lng": 106.734534,
     "label": "Gò Me",
     "locationName": "Đường Gò Me",
     "locationType": "Street",
@@ -5246,18 +4307,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2006
-    ]
+    "years": [2006]
   },
   {
     "id": "ird_221",
-    "lat": 10.597437,
-    "lng": 106.721254,
+    "lat": 10.596416,
+    "lng": 106.723034,
     "label": "Rạch Mường Đình",
     "locationName": "Rạch Mường Đình",
     "locationType": "Canal",
@@ -5272,18 +4329,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2006
-    ]
+    "years": [2006]
   },
   {
     "id": "ird_222",
-    "lat": 10.60034,
-    "lng": 106.725221,
+    "lat": 10.599353,
+    "lng": 106.727003,
     "label": "Liên Ấp 3-4",
     "locationName": "Đường Liên Ấp 3-4",
     "locationType": "Street",
@@ -5298,22 +4351,18 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2006
-    ]
+    "years": [2006]
   },
   {
     "id": "ird_225",
-    "lat": 10.87406,
-    "lng": 106.726044,
-    "label": "Khu phố 4, phường Bình Chiểu",
-    "locationName": "Khu phố 4, phường Bình Chiểu",
+    "lat": 10.873236,
+    "lng": 106.727779,
+    "label": "KP4 Bình Chiểu",
+    "locationName": "Khu phố 4, Phường Bình Chiểu",
     "locationType": "Neighborhood",
-    "fullAddress": "Khu phố 4, phường Bình Chiểu, TP. Thủ Đức",
+    "fullAddress": "Khu phố 4, Phường Bình Chiểu, TP. Thủ Đức",
     "district": "TP. Thủ Đức",
     "ward": "Phường Bình Chiểu",
     "province": null,
@@ -5324,18 +4373,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2007
-    ]
+    "years": [2007]
   },
   {
     "id": "ird_226",
-    "lat": 10.859473,
-    "lng": 106.679951,
+    "lat": 10.858466,
+    "lng": 106.681719,
     "label": "Phường Thạnh Lộc",
     "locationName": "Phường Thạnh Lộc",
     "locationType": "Ward",
@@ -5350,18 +4395,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa & Triều"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2012
-    ]
+    "years": [2012]
   },
   {
     "id": "ird_227",
-    "lat": 10.740693,
-    "lng": 106.635843,
+    "lat": 10.739663,
+    "lng": 106.637631,
     "label": "Phạm Văn Chí",
     "locationName": "Đường Phạm Văn Chí",
     "locationType": "Street",
@@ -5376,18 +4417,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa & Triều"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2012
-    ]
+    "years": [2012]
   },
   {
     "id": "ird_228",
-    "lat": 10.755121,
-    "lng": 106.642926,
+    "lat": 10.754119,
+    "lng": 106.64471,
     "label": "Hồng Bàng",
     "locationName": "Đường Hồng Bàng",
     "locationType": "Street",
@@ -5402,18 +4439,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa & Triều"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2012
-    ]
+    "years": [2012]
   },
   {
     "id": "ird_229",
-    "lat": 10.803363,
-    "lng": 106.700069,
+    "lat": 10.802323,
+    "lng": 106.701856,
     "label": "Vũ Tùng",
     "locationName": "Đường Vũ Tùng",
     "locationType": "Street",
@@ -5428,18 +4461,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa & Triều"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2012
-    ]
+    "years": [2012]
   },
   {
     "id": "ird_231",
-    "lat": 10.799367,
-    "lng": 106.698356,
+    "lat": 10.79835,
+    "lng": 106.700149,
     "label": "Nguyễn Xuân Ôn",
     "locationName": "Đường Nguyễn Xuân Ôn",
     "locationType": "Street",
@@ -5454,19 +4483,15 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa & Triều"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2012
-    ]
+    "years": [2012]
   },
   {
     "id": "ird_233",
-    "lat": 10.791136,
-    "lng": 106.681753,
-    "label": "Nam Kỳ Khởi Nghĩa",
+    "lat": 10.790073,
+    "lng": 106.683494,
+    "label": "Nam Kỳ Khởi Nghĩa (Q.3)",
     "locationName": "Đường Nam Kỳ Khởi Nghĩa",
     "locationType": "Street",
     "fullAddress": "Đường Nam Kỳ Khởi Nghĩa, Phường Võ Thị Sáu, Quận 3",
@@ -5480,23 +4505,19 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa & Triều"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2012
-    ]
+    "years": [2012]
   },
   {
     "id": "ird_243",
-    "lat": 10.946235,
-    "lng": 106.688028,
+    "lat": 10.945355,
+    "lng": 106.689626,
     "label": "Phường An Thạnh",
     "locationName": "Phường An Thạnh",
     "locationType": "Residential area",
-    "fullAddress": "Phường An Thạnh, Phường Thuận An, Bình Dương",
-    "district": "Phường Thuận An",
+    "fullAddress": "Phường An Thạnh, Thuận An (Bình Dương)",
+    "district": "Thuận An (Bình Dương)",
     "ward": "Phường An Thạnh",
     "province": "Bình Dương",
     "type": "flood",
@@ -5506,18 +4527,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2023
-    ]
+    "years": [2023]
   },
   {
     "id": "ird_245",
-    "lat": 10.779578,
-    "lng": 106.703439,
+    "lat": 10.778557,
+    "lng": 106.705222,
     "label": "Nguyễn Siêu",
     "locationName": "Đường Nguyễn Siêu",
     "locationType": "Street",
@@ -5532,18 +4549,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2016
-    ]
+    "years": [2016]
   },
   {
     "id": "ird_250",
-    "lat": 10.775377,
-    "lng": 106.675558,
+    "lat": 10.774395,
+    "lng": 106.677365,
     "label": "Cao Thắng",
     "locationName": "Đường Cao Thắng",
     "locationType": "Street",
@@ -5558,18 +4571,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2016
-    ]
+    "years": [2016]
   },
   {
     "id": "ird_251",
-    "lat": 10.771582,
-    "lng": 106.654932,
+    "lat": 10.770578,
+    "lng": 106.656717,
     "label": "Lữ Gia",
     "locationName": "Đường Lữ Gia",
     "locationType": "Street",
@@ -5584,18 +4593,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2016
-    ]
+    "years": [2016]
   },
   {
     "id": "ird_252",
-    "lat": 10.780026,
-    "lng": 106.672057,
+    "lat": 10.779026,
+    "lng": 106.673831,
     "label": "Hòa Hưng",
     "locationName": "Đường Hòa Hưng",
     "locationType": "Street",
@@ -5610,18 +4615,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2016
-    ]
+    "years": [2016]
   },
   {
     "id": "ird_310",
-    "lat": 10.848173,
-    "lng": 106.72004,
+    "lat": 10.847194,
+    "lng": 106.721843,
     "label": "Hiệp Bình",
     "locationName": "Đường Hiệp Bình",
     "locationType": "Street",
@@ -5636,18 +4637,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2024
-    ]
+    "years": [2024]
   },
   {
     "id": "ird_311",
-    "lat": 10.875795,
-    "lng": 106.730123,
+    "lat": 10.874769,
+    "lng": 106.731886,
     "label": "Tỉnh Lộ 43",
     "locationName": "Tỉnh Lộ 43",
     "locationType": "Provincial Road",
@@ -5662,18 +4659,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2024
-    ]
+    "years": [2024]
   },
   {
     "id": "ird_317",
-    "lat": 10.81043,
-    "lng": 106.651218,
+    "lat": 10.809402,
+    "lng": 106.652988,
     "label": "Sân bay Tân Sơn Nhất",
     "locationName": "Sân bay Tân Sơn Nhất",
     "locationType": "Parking",
@@ -5688,22 +4681,18 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2016
-    ]
+    "years": [2016]
   },
   {
     "id": "ird_318",
-    "lat": 10.817643,
-    "lng": 106.729333,
-    "label": "(ĐTCK) Khu biệt thự Thảo Điền",
-    "locationName": "(ĐTCK) Khu biệt thự Thảo Điền",
+    "lat": 10.816615,
+    "lng": 106.73114,
+    "label": "Khu biệt thự Thảo Điền",
+    "locationName": "Khu biệt thự Thảo Điền",
     "locationType": "Residential area",
-    "fullAddress": "(ĐTCK) Khu biệt thự Thảo Điền, Phường Thảo Điền, TP. Thủ Đức (Quận 2 cũ)",
+    "fullAddress": "Khu biệt thự Thảo Điền, Phường Thảo Điền, TP. Thủ Đức (Quận 2 cũ)",
     "district": "TP. Thủ Đức (Quận 2 cũ)",
     "ward": "Phường Thảo Điền",
     "province": null,
@@ -5714,22 +4703,18 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_319",
-    "lat": 10.816606,
-    "lng": 106.72552,
-    "label": "Biệt thự dân cư trên đường Nguyễn Văn Hương",
-    "locationName": "Biệt thự dân cư trên đường Nguyễn Văn Hương",
+    "lat": 10.815576,
+    "lng": 106.72731,
+    "label": "KDC Nguyễn Văn Hưởng",
+    "locationName": "Khu biệt thự đường Nguyễn Văn Hưởng",
     "locationType": "Residential area",
-    "fullAddress": "Biệt thự dân cư trên đường Nguyễn Văn Hương, Phường Thảo Điền, TP. Thủ Đức (Quận 2 cũ)",
+    "fullAddress": "Khu biệt thự đường Nguyễn Văn Hưởng, Phường Thảo Điền, TP. Thủ Đức (Quận 2 cũ)",
     "district": "TP. Thủ Đức (Quận 2 cũ)",
     "ward": "Phường Thảo Điền",
     "province": null,
@@ -5740,18 +4725,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_322",
-    "lat": 10.740283,
-    "lng": 106.696049,
+    "lat": 10.739372,
+    "lng": 106.69785,
     "label": "Khu phố Him Lam",
     "locationName": "Khu phố Him Lam",
     "locationType": "Residential area",
@@ -5766,18 +4747,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_323",
-    "lat": 10.734928,
-    "lng": 106.690419,
+    "lat": 10.733816,
+    "lng": 106.692272,
     "label": "Khu Dân Cư Trung Sơn",
     "locationName": "Khu Dân Cư Trung Sơn",
     "locationType": "Residential area",
@@ -5792,23 +4769,19 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_324",
-    "lat": 10.756684,
-    "lng": 106.690576,
+    "lat": 10.758652,
+    "lng": 106.698848,
     "label": "Khu Hoàng Diệu",
     "locationName": "Khu Hoàng Diệu",
     "locationType": "Residential area",
-    "fullAddress": "Khu Hoàng Diệu, Quận 7",
-    "district": "Quận 7",
+    "fullAddress": "Khu Hoàng Diệu, Quận 4",
+    "district": "Quận 4",
     "ward": null,
     "province": null,
     "type": "flood",
@@ -5818,19 +4791,15 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_326",
-    "lat": 10.739069,
-    "lng": 106.701481,
-    "label": "Lê Văn Lương",
+    "lat": 10.738054,
+    "lng": 106.703236,
+    "label": "Lê Văn Lương (Tân Quy)",
     "locationName": "Đường Lê Văn Lương",
     "locationType": "Residential area",
     "fullAddress": "Đường Lê Văn Lương, Phường Tân Quy, Quận 7",
@@ -5844,18 +4813,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_327",
-    "lat": 10.731176,
-    "lng": 106.739725,
+    "lat": 10.73019,
+    "lng": 106.741508,
     "label": "Gò Ô Môi",
     "locationName": "Đường Gò Ô Môi",
     "locationType": "Residential area",
@@ -5870,18 +4835,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_329",
-    "lat": 10.836258,
-    "lng": 106.710975,
+    "lat": 10.835118,
+    "lng": 106.713212,
     "label": "Cầu Ông Dầu",
     "locationName": "Cầu Ông Dầu",
     "locationType": "Residential area",
@@ -5896,18 +4857,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_338",
-    "lat": 10.790918,
-    "lng": 106.617505,
+    "lat": 10.789934,
+    "lng": 106.61928,
     "label": "Tân Hương",
     "locationName": "Đường Tân Hương",
     "locationType": "Street",
@@ -5922,18 +4879,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_340",
-    "lat": 10.804066,
-    "lng": 106.718161,
+    "lat": 10.803075,
+    "lng": 106.719928,
     "label": "Nguyễn Văn Thương",
     "locationName": "Đường Nguyễn Văn Thương",
     "locationType": "Street",
@@ -5948,18 +4901,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_342",
-    "lat": 10.707293,
-    "lng": 106.596192,
+    "lat": 10.706271,
+    "lng": 106.597983,
     "label": "Ấp 3 (Quốc Lộ 1)",
     "locationName": "Ấp 3 (Quốc Lộ 1)",
     "locationType": "National Highway",
@@ -5974,18 +4923,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2019
-    ]
+    "years": [2019]
   },
   {
     "id": "ird_347",
-    "lat": 10.815577,
-    "lng": 106.755568,
+    "lat": 10.814548,
+    "lng": 106.757399,
     "label": "Cầu Rạch Chiếc",
     "locationName": "Cầu Rạch Chiếc",
     "locationType": "Bridge",
@@ -6000,18 +4945,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2017
-    ]
+    "years": [2017]
   },
   {
     "id": "ird_349",
-    "lat": 10.716083,
-    "lng": 106.72844,
+    "lat": 10.715051,
+    "lng": 106.730211,
     "label": "Nguyễn Lương Bằng",
     "locationName": "Đường Nguyễn Lương Bằng",
     "locationType": "Street",
@@ -6026,19 +4967,15 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2025
-    ]
+    "years": [2025]
   },
   {
     "id": "ird_350",
-    "lat": 10.712282,
-    "lng": 106.729949,
-    "label": "15B",
+    "lat": 10.711257,
+    "lng": 106.731681,
+    "label": "Đường 15B",
     "locationName": "Đường 15B",
     "locationType": "Street",
     "fullAddress": "Đường 15B, Phường Phú Mỹ, Quận 7",
@@ -6052,18 +4989,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2025
-    ]
+    "years": [2025]
   },
   {
     "id": "ird_352",
-    "lat": 10.764604,
-    "lng": 106.625184,
+    "lat": 10.763584,
+    "lng": 106.627002,
     "label": "Tô Hiệu",
     "locationName": "Đường Tô Hiệu",
     "locationType": "Street",
@@ -6078,18 +5011,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2015
-    ]
+    "years": [2015]
   },
   {
     "id": "ird_353",
-    "lat": 10.757999,
-    "lng": 106.630005,
+    "lat": 10.756978,
+    "lng": 106.631785,
     "label": "Tân Hòa Đông",
     "locationName": "Đường Tân Hòa Đông",
     "locationType": "Street",
@@ -6104,23 +5033,19 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2015
-    ]
+    "years": [2015]
   },
   {
     "id": "ird_355",
-    "lat": 10.80831,
-    "lng": 106.709812,
-    "label": "Xô Viết Nghệ Tĩnh",
+    "lat": 10.80729,
+    "lng": 106.711588,
+    "label": "Xô Viết Nghệ Tĩnh (Đài Liệt Sĩ)",
     "locationName": "Đường Xô Viết Nghệ Tĩnh",
     "locationType": "Street",
-    "fullAddress": "Đường Xô Viết Nghệ Tĩnh, Phường 25, Bình Tân",
-    "district": "Bình Tân",
+    "fullAddress": "Đường Xô Viết Nghệ Tĩnh, Phường 25, Bình Thạnh",
+    "district": "Bình Thạnh",
     "ward": "Phường 25",
     "province": null,
     "type": "flood",
@@ -6130,18 +5055,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2008
-    ]
+    "years": [2008]
   },
   {
     "id": "ird_357",
-    "lat": 10.800768,
-    "lng": 106.730835,
+    "lat": 10.799764,
+    "lng": 106.732613,
     "label": "Xa Lộ Hà Nội",
     "locationName": "Đường Xa Lộ Hà Nội",
     "locationType": "National Highway",
@@ -6156,18 +5077,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2008
-    ]
+    "years": [2008]
   },
   {
     "id": "ird_359",
-    "lat": 10.810904,
-    "lng": 106.710581,
+    "lat": 10.809785,
+    "lng": 106.71245,
     "label": "Mũi tàu Đài Liệt sĩ",
     "locationName": "Mũi tàu Đài Liệt sĩ",
     "locationType": "Historical monument",
@@ -6182,22 +5099,18 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2008
-    ]
+    "years": [2008]
   },
   {
     "id": "ird_368",
-    "lat": 10.852589,
-    "lng": 106.722686,
-    "label": "Khu Phố 4",
-    "locationName": "Khu Phố 4",
+    "lat": 10.85165,
+    "lng": 106.724512,
+    "label": "KP4 Hiệp Bình Phước",
+    "locationName": "Khu phố 4, Phường Hiệp Bình Phước",
     "locationType": "Street",
-    "fullAddress": "Khu Phố 4, Phường Hiệp Bình Phước, TP. Thủ Đức",
+    "fullAddress": "Khu phố 4, Phường Hiệp Bình Phước, TP. Thủ Đức",
     "district": "TP. Thủ Đức",
     "ward": "Phường Hiệp Bình Phước",
     "province": null,
@@ -6208,18 +5121,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Triều cường"
-    ],
+    "causes": ["Triều cường"],
     "primaryCause": "Triều cường",
-    "years": [
-      2008
-    ]
+    "years": [2008]
   },
   {
     "id": "ird_370",
-    "lat": 10.804235,
-    "lng": 106.729923,
+    "lat": 10.803204,
+    "lng": 106.731707,
     "label": "Xuân Thủy",
     "locationName": "Đường Xuân Thủy",
     "locationType": "Street",
@@ -6234,19 +5143,15 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2026
-    ]
+    "years": [2026]
   },
   {
     "id": "ird_372",
-    "lat": 10.778665,
-    "lng": 106.711978,
-    "label": "R12",
+    "lat": 10.777649,
+    "lng": 106.713763,
+    "label": "Đường R12",
     "locationName": "Đường R12",
     "locationType": "Street",
     "fullAddress": "Đường R12, Phường Thủ Thiêm, TP. Thủ Đức (Quận 2 cũ)",
@@ -6260,18 +5165,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2026
-    ]
+    "years": [2026]
   },
   {
     "id": "ird_373",
-    "lat": 10.811889,
-    "lng": 106.70476,
+    "lat": 10.810798,
+    "lng": 106.706531,
     "label": "Chu Văn An",
     "locationName": "Đường Chu Văn An",
     "locationType": "Street",
@@ -6286,18 +5187,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2025
-    ]
+    "years": [2025]
   },
   {
     "id": "ird_378",
-    "lat": 10.725444,
-    "lng": 106.614161,
+    "lat": 10.72448,
+    "lng": 106.615914,
     "label": "Võ Văn Kiệt",
     "locationName": "Đường Võ Văn Kiệt",
     "locationType": "Street",
@@ -6312,18 +5209,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2025
-    ]
+    "years": [2025]
   },
   {
     "id": "ird_380",
-    "lat": 10.764041,
-    "lng": 106.602703,
+    "lat": 10.76302,
+    "lng": 106.604482,
     "label": "Mã Lò",
     "locationName": "Đường Mã Lò",
     "locationType": "Street",
@@ -6338,18 +5231,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2025
-    ]
+    "years": [2025]
   },
   {
     "id": "ird_383",
-    "lat": 10.75813,
-    "lng": 106.632603,
+    "lat": 10.757126,
+    "lng": 106.634375,
     "label": "Đặng Nguyên Cẩn",
     "locationName": "Đường Đặng Nguyên Cẩn",
     "locationType": "Street",
@@ -6364,19 +5253,15 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2013
-    ]
+    "years": [2013]
   },
   {
     "id": "ird_385",
-    "lat": 10.75423,
-    "lng": 106.631547,
-    "label": "Kinh Dương Vương",
+    "lat": 10.753176,
+    "lng": 106.633352,
+    "label": "Kinh Dương Vương (Q.6)",
     "locationName": "Đường Kinh Dương Vương",
     "locationType": "Street",
     "fullAddress": "Đường Kinh Dương Vương, Phường 13, Quận 6",
@@ -6390,18 +5275,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2013
-    ]
+    "years": [2013]
   },
   {
     "id": "ird_388",
-    "lat": 10.791011,
-    "lng": 106.63838,
+    "lat": 10.790004,
+    "lng": 106.640201,
     "label": "Âu Cơ",
     "locationName": "Đường Âu Cơ",
     "locationType": "Street",
@@ -6416,18 +5297,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2013
-    ]
+    "years": [2013]
   },
   {
     "id": "ird_389",
-    "lat": 10.77717,
-    "lng": 106.647228,
+    "lat": 10.776148,
+    "lng": 106.649012,
     "label": "Lạc Long Quân",
     "locationName": "Đường Lạc Long Quân",
     "locationType": "Street",
@@ -6442,18 +5319,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2013
-    ]
+    "years": [2013]
   },
   {
     "id": "ird_390",
-    "lat": 10.803582,
-    "lng": 106.638302,
+    "lat": 10.802589,
+    "lng": 106.640086,
     "label": "Cộng Hoà",
     "locationName": "Đường Cộng Hoà",
     "locationType": "Street",
@@ -6468,18 +5341,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2013
-    ]
+    "years": [2013]
   },
   {
     "id": "ird_394",
-    "lat": 10.776184,
-    "lng": 106.637108,
+    "lat": 10.775172,
+    "lng": 106.638874,
     "label": "Khuông Việt",
     "locationName": "Đường Khuông Việt",
     "locationType": "Street",
@@ -6494,18 +5363,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2013
-    ]
+    "years": [2013]
   },
   {
     "id": "ird_396",
-    "lat": 10.791568,
-    "lng": 106.641656,
+    "lat": 10.790549,
+    "lng": 106.643435,
     "label": "Đồng Đen",
     "locationName": "Đường Đồng Đen",
     "locationType": "Street",
@@ -6520,18 +5385,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2013
-    ]
+    "years": [2013]
   },
   {
     "id": "ird_403",
-    "lat": 10.774548,
-    "lng": 106.700734,
+    "lat": 10.773536,
+    "lng": 106.702513,
     "label": "Tôn Thất Thiệp",
     "locationName": "Đường Tôn Thất Thiệp",
     "locationType": "Street",
@@ -6546,18 +5407,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2010
-    ]
+    "years": [2010]
   },
   {
     "id": "ird_404",
-    "lat": 10.773064,
-    "lng": 106.701158,
+    "lat": 10.772046,
+    "lng": 106.702944,
     "label": "Tôn Thất Đạm",
     "locationName": "Đường Tôn Thất Đạm",
     "locationType": "Street",
@@ -6572,18 +5429,14 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2010
-    ]
+    "years": [2010]
   },
   {
     "id": "ird_420",
-    "lat": 10.725683,
-    "lng": 106.594263,
+    "lat": 10.724697,
+    "lng": 106.596059,
     "label": "Trần Đại Nghĩa",
     "locationName": "Đường Trần Đại Nghĩa",
     "locationType": "Street",
@@ -6598,22 +5451,18 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2010
-    ]
+    "years": [2010]
   },
   {
     "id": "ird_421",
-    "lat": 10.806726,
-    "lng": 106.707739,
-    "label": "Đinh Bộ Lĩn",
-    "locationName": "Đường Đinh Bộ Lĩn",
+    "lat": 10.805705,
+    "lng": 106.709502,
+    "label": "Đinh Bộ Lĩnh (P.24)",
+    "locationName": "Đường Đinh Bộ Lĩnh",
     "locationType": "Street",
-    "fullAddress": "Đường Đinh Bộ Lĩn, Phường 24, Bình Thạnh",
+    "fullAddress": "Đường Đinh Bộ Lĩnh, Phường 24, Bình Thạnh",
     "district": "Bình Thạnh",
     "ward": "Phường 24",
     "province": null,
@@ -6624,22 +5473,18 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa & Triều"
-    ],
+    "causes": ["Mưa & Triều"],
     "primaryCause": "Mưa & Triều",
-    "years": [
-      2010
-    ]
+    "years": [2010]
   },
   {
     "id": "ird_425",
-    "lat": 10.788892,
-    "lng": 106.690166,
-    "label": "Võ Thị Sáu - Dinh Tien Hoang",
-    "locationName": "Đường Võ Thị Sáu - Dinh Tien Hoang",
+    "lat": 10.790538,
+    "lng": 106.695358,
+    "label": "Võ Thị Sáu - Đinh Tiên Hoàng",
+    "locationName": "Ngã tư Võ Thị Sáu - Đinh Tiên Hoàng",
     "locationType": "Street",
-    "fullAddress": "Đường Võ Thị Sáu - Dinh Tien Hoang, Phường Tân Định, Quận 1",
+    "fullAddress": "Ngã tư Võ Thị Sáu - Đinh Tiên Hoàng, Phường Tân Định, Quận 1",
     "district": "Quận 1",
     "ward": "Phường Tân Định",
     "province": null,
@@ -6650,12 +5495,8 @@
     "maxDepth": null,
     "minDepth": null,
     "depth": null,
-    "causes": [
-      "Mưa lớn"
-    ],
+    "causes": ["Mưa lớn"],
     "primaryCause": "Mưa lớn",
-    "years": [
-      2010
-    ]
+    "years": [2010]
   }
 ]
