@@ -10,6 +10,21 @@ describe("JourneyService", () => {
       {} as any,
       {} as any,
       {} as any,
+      undefined,
+      {
+        findAllPoints: jest.fn().mockResolvedValue([
+          {
+            id: "p1",
+            lat: 10.77,
+            lng: 106.68,
+            type: "flood",
+            severity: "critical",
+            label: "Điểm ngập thử nghiệm",
+            rainfall: 60,
+            depth: 35,
+          },
+        ]),
+      } as any,
     );
   });
 

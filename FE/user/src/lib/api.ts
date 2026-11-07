@@ -588,15 +588,20 @@ export async function fetchMapPointsApi(
     }));
   }
 
-  // 2. Chế độ chẩn đoán thời gian thực theo lượng mưa thực tế
+  // 2. Chế độ chẩn đoán thời gian thực theo lượng mưa thực tế (Thuật toán Thủy văn & Địa hình thực tế)
   const actualRain = rainMm ?? 0;
-  const vnHour = new Date(
+  const vnDate = new Date(
     new Date().toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" }),
-  ).getHours();
-  const isTidePeak = (vnHour >= 16 && vnHour <= 19) || (vnHour >= 4 && vnHour <= 7);
+  );
+  const vnHour = vnDate.getHours();
+  const vnMinute = vnDate.getMinutes();
+  const timeDecimal = vnHour + vnMinute / 60;
+  const isTidePeak =
+    (timeDecimal >= 16.5 && timeDecimal <= 19.5) ||
+    (timeDecimal >= 4.5 && timeDecimal <= 7.5);
 
-  // Nếu trời khô ráo (mưa < 5mm) và ngoài giờ triều cường: ĐƯỜNG KHÔ RÁO HOÀN TOÀN!
-  if (actualRain < 5 && !isTidePeak) {
+  // Nếu trời khô ráo (mưa < 3mm) và ngoài giờ triều cường: ĐƯỜNG KHÔ RÁO HOÀN TOÀN!
+  if (actualRain < 3 && !isTidePeak) {
     return [];
   }
 
@@ -604,35 +609,71 @@ export async function fetchMapPointsApi(
 
   for (const h of allHotspots) {
     const elevation = h.elevationM || 2.0;
-    const terrainFactor = elevation <= 1.5 ? 1.4 : elevation <= 3.0 ? 1.0 : 0.7;
-    const effectiveRain = actualRain * terrainFactor;
+    const terrainFactor =
+      elevation <= 1.4
+        ? 1.45
+        : elevation <= 1.8
+          ? 1.30
+          : elevation <= 2.5
+            ? 1.15
+            : elevation <= 4.0
+              ? 1.00
+              : 0.80;
+
+    const histCount = h.historyCount || 5;
+    const histFactor = 1 + Math.min(0.35, histCount * 0.015);
+    const effectiveRain = actualRain * terrainFactor * histFactor;
     const threshold = h.rainfallThresholdMm || 35;
 
-    const isRainFlooded = actualRain >= 5 && effectiveRain >= threshold;
-    const isTideFlooded =
-      isTidePeak &&
-      (h.district?.includes("7") ||
-        h.district?.includes("Nhà Bè") ||
-        h.district?.includes("Bình Thạnh") ||
-        h.district?.includes("Thủ Đức")) &&
-      elevation <= 1.5;
+    const cleanDistrict = (h.district || "").toLowerCase();
+    let tideDepth = 0;
+    const isRiversideLowland =
+      elevation <= 1.6 &&
+      (cleanDistrict.includes("7") ||
+        cleanDistrict.includes("nhà bè") ||
+        cleanDistrict.includes("bình thạnh") ||
+        cleanDistrict.includes("thủ đức") ||
+        cleanDistrict.includes("8") ||
+        cleanDistrict.includes("4"));
 
-    if (!isRainFlooded && !isTideFlooded) continue;
-
-    let dynamicDepth = 15;
-    if (isRainFlooded) {
-      dynamicDepth = Math.min(h.depth || 40, Math.round((effectiveRain - threshold) * 0.75 + 15));
-    } else if (isTideFlooded) {
-      const histDepth = h.depth && h.depth >= 20 ? h.depth : 35;
-      const tideLevel =
-        vnHour === 17 || vnHour === 5 ? 1.7 : vnHour === 18 || vnHour === 6 ? 1.62 : 1.55;
-      dynamicDepth = Math.max(
-        16,
-        Math.min(histDepth, Math.round((tideLevel - elevation) * 75 + histDepth * 0.3)),
-      );
+    if (isTidePeak && isRiversideLowland) {
+      const tidePeakHeight =
+        (timeDecimal >= 17 && timeDecimal <= 18.5) ||
+        (timeDecimal >= 5 && timeDecimal <= 6.5)
+          ? 1.68
+          : 1.58;
+      tideDepth = Math.max(0, Math.round((tidePeakHeight - elevation) * 70));
     }
 
-    const severity = dynamicDepth >= 35 ? "critical" : dynamicDepth >= 20 ? "high" : "medium";
+    const isRainFlooded = actualRain >= 5 && effectiveRain >= threshold;
+    const isTideFlooded = tideDepth >= 15;
+    const isAtRisk =
+      !isRainFlooded &&
+      !isTideFlooded &&
+      ((actualRain >= 3 && effectiveRain >= threshold * 0.65) || tideDepth >= 10);
+
+    if (!isRainFlooded && !isTideFlooded && !isAtRisk) continue;
+
+    let dynamicDepth = 0;
+    let calculatedType: "flood" | "risk" = "risk";
+
+    if (isRainFlooded || isTideFlooded) {
+      calculatedType = "flood";
+      if (isRainFlooded) {
+        const rainDepth = Math.round((effectiveRain - threshold) * 0.85 + 15);
+        dynamicDepth = Math.max(15, rainDepth + Math.round(tideDepth * 0.5));
+      } else {
+        dynamicDepth = Math.max(16, tideDepth + 10);
+      }
+      const maxLimit = h.depth && h.depth > 20 ? h.depth : 65;
+      dynamicDepth = Math.min(maxLimit, dynamicDepth);
+    } else if (isAtRisk) {
+      calculatedType = "risk";
+      dynamicDepth = 0;
+    }
+
+    const severity =
+      dynamicDepth >= 35 ? "critical" : dynamicDepth >= 20 ? "high" : "medium";
 
     predictedPoints.push({
       id: h.id,
@@ -640,7 +681,7 @@ export async function fetchMapPointsApi(
       lng: h.lng,
       label: h.label,
       district: h.district,
-      type: "flood",
+      type: calculatedType,
       severity,
       depth: dynamicDepth,
       rainfall: actualRain,

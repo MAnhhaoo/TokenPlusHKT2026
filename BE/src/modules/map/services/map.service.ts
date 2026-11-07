@@ -78,23 +78,36 @@ export class MapService {
       return allPoints;
     }
 
-    // 2. Chế độ chẩn đoán ngập theo thời tiết thời gian thực (Realtime AI Inference)
-    let rainMm = query.rainMm !== undefined ? Number(query.rainMm) : undefined;
-    if (rainMm === undefined) {
+    // 2. Chế độ chẩn đoán ngập theo thời tiết thời gian thực (Thuật toán Thủy văn & Địa hình thực tế)
+    let cityRainMm = 0;
+    let districtRainMap: Map<string, number> = new Map();
+
+    if (query.rainMm !== undefined) {
+      cityRainMm = Number(query.rainMm);
+    } else {
       try {
-        const weather = await this.weatherService.getCurrentWeather();
-        rainMm = Number(weather?.currentRainMm ?? 0);
+        const [weather, rainMap] = await Promise.all([
+          this.weatherService.getCurrentWeather(),
+          this.weatherService.getRealtimeDistrictRainMap(),
+        ]);
+        cityRainMm = Number(weather?.currentRainMm ?? 0);
+        districtRainMap = rainMap;
       } catch {
-        rainMm = 0;
+        cityRainMm = 0;
       }
     }
 
-    // Tính chu kỳ triều cường sông Sài Gòn (thường đạt đỉnh 16h30-19h00 chiều hoặc 04h30-07h00 sáng)
+    // Tính chu kỳ triều cường sông Sài Gòn (thường đạt đỉnh 16h30-19h30 chiều hoặc 04h30-07h30 sáng)
     const vnHour = new Date(
       new Date().toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" }),
     ).getHours();
+    const vnMinute = new Date(
+      new Date().toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" }),
+    ).getMinutes();
+    const timeDecimal = vnHour + vnMinute / 60;
     const isTidePeak =
-      (vnHour >= 16 && vnHour <= 19) || (vnHour >= 4 && vnHour <= 7);
+      (timeDecimal >= 16.5 && timeDecimal <= 19.5) ||
+      (timeDecimal >= 4.5 && timeDecimal <= 7.5);
 
     const activeLayers = query.layers
       ? query.layers.split(",").map((s) => s.trim())
@@ -115,7 +128,7 @@ export class MapService {
         continue;
       }
 
-      if (point.type === "pending") {
+      if (point.linkedReportId || point.type === "pending") {
         if (
           (activeLayers.includes("flood") || activeLayers.includes("risk")) &&
           (!query.severity ||
@@ -127,27 +140,79 @@ export class MapService {
         continue;
       }
 
+      // Tra cứu lượng mưa thực tế theo từng quận từ Open-Meteo
+      const cleanDistrict = (point.district || "").toLowerCase().trim();
+      let localRain = query.rainMm !== undefined ? cityRainMm : 0;
+      if (query.rainMm === undefined) {
+        if (districtRainMap.has(cleanDistrict)) {
+          localRain = districtRainMap.get(cleanDistrict)!;
+        } else {
+          // Khớp mờ tên quận
+          for (const [distKey, rVal] of districtRainMap.entries()) {
+            if (cleanDistrict.includes(distKey) || distKey.includes(cleanDistrict)) {
+              localRain = rVal;
+              break;
+            }
+          }
+          if (localRain === 0 && cityRainMm > 0) {
+            localRain = cityRainMm;
+          }
+        }
+      }
+
+      // 1. Hệ số địa hình trũng thấp (Topographic Vulnerability Index)
       const elevation = point.elevationM || 2.0;
       const terrainFactor =
-        elevation <= 1.5 ? 1.4 : elevation <= 3.0 ? 1.0 : 0.7;
+        elevation <= 1.4
+          ? 1.45
+          : elevation <= 1.8
+            ? 1.30
+            : elevation <= 2.5
+              ? 1.15
+              : elevation <= 4.0
+                ? 1.00
+                : 0.80;
+
+      // 2. Hệ số tổn thương tần suất ngập lịch sử (Historical Vulnerability Factor)
+      const histCount = point.historyCount || 5;
+      const histFactor = 1 + Math.min(0.35, histCount * 0.015);
+
+      // 3. Lượng mưa hiệu dụng tích lũy tại mặt đường
+      const effectiveRain = localRain * terrainFactor * histFactor;
       const threshold = point.rainfall || 35;
-      const effectiveRain = rainMm * terrainFactor;
 
-      const isRainFlooded = rainMm >= 5 && effectiveRain >= threshold;
-      const isTideFlooded =
-        isTidePeak &&
-        (point.district?.includes("7") ||
-          point.district?.includes("Nhà Bè") ||
-          point.district?.includes("Bình Thạnh") ||
-          point.district?.includes("Thủ Đức")) &&
-        elevation <= 1.5;
+      // 4. Mực nước dâng do triều cường sông Sài Gòn
+      let tideDepth = 0;
+      const isRiversideLowland =
+        elevation <= 1.6 &&
+        (cleanDistrict.includes("7") ||
+          cleanDistrict.includes("nhà bè") ||
+          cleanDistrict.includes("bình thạnh") ||
+          cleanDistrict.includes("thủ đức") ||
+          cleanDistrict.includes("8") ||
+          cleanDistrict.includes("4"));
 
-      // Nếu không có mưa và không trong giờ triều cường: ĐƯỜNG KHÔ RÁO
-      if (!isRainFlooded && !isTideFlooded) {
-        // Chỉ thêm vào nếu người dùng cố ý bật lớp xem 'history' (lịch sử)
+      if (isTidePeak && isRiversideLowland) {
+        const tidePeakHeight =
+          (timeDecimal >= 17 && timeDecimal <= 18.5) ||
+          (timeDecimal >= 5 && timeDecimal <= 6.5)
+            ? 1.68
+            : 1.58;
+        tideDepth = Math.max(0, Math.round((tidePeakHeight - elevation) * 70));
+      }
+
+      const isRainFlooded = localRain >= 5 && effectiveRain >= threshold;
+      const isTideFlooded = tideDepth >= 15;
+      const isAtRisk =
+        !isRainFlooded &&
+        !isTideFlooded &&
+        ((localRain >= 3 && effectiveRain >= threshold * 0.65) || tideDepth >= 10);
+
+      // Nếu không có mưa và không triều cường: ĐƯỜNG KHÔ RÁO HOÀN TOÀN
+      if (!isRainFlooded && !isTideFlooded && !isAtRisk) {
         if (
           activeLayers.includes("history") &&
-          point.historyCount >= 5 &&
+          histCount >= 8 &&
           (!query.severity ||
             query.severity === "all" ||
             point.severity === query.severity)
@@ -161,28 +226,23 @@ export class MapService {
         continue;
       }
 
-      // Có ngập thực tế theo lượng mưa thời gian thực: tính độ sâu động
-      let dynamicDepth = 15;
-      if (isRainFlooded) {
-        dynamicDepth = Math.min(
-          point.depth || 40,
-          Math.round((effectiveRain - threshold) * 0.75 + 15),
-        );
-      } else if (isTideFlooded) {
-        const histDepth = point.depth && point.depth >= 20 ? point.depth : 35;
-        const tideLevel =
-          vnHour === 17 || vnHour === 5
-            ? 1.7
-            : vnHour === 18 || vnHour === 6
-              ? 1.62
-              : 1.55;
-        dynamicDepth = Math.max(
-          16,
-          Math.min(
-            histDepth,
-            Math.round((tideLevel - elevation) * 75 + histDepth * 0.3),
-          ),
-        );
+      // Tính toán mực nước ngập ước tính theo thuật toán thủy văn
+      let dynamicDepth = 0;
+      let calculatedType: "flood" | "risk" = "risk";
+
+      if (isRainFlooded || isTideFlooded) {
+        calculatedType = "flood";
+        if (isRainFlooded) {
+          const rainDepth = Math.round((effectiveRain - threshold) * 0.85 + 15);
+          dynamicDepth = Math.max(15, rainDepth + Math.round(tideDepth * 0.5));
+        } else {
+          dynamicDepth = Math.max(16, tideDepth + 10);
+        }
+        const maxLimit = point.depth && point.depth > 20 ? point.depth : 65;
+        dynamicDepth = Math.min(maxLimit, dynamicDepth);
+      } else if (isAtRisk) {
+        calculatedType = "risk";
+        dynamicDepth = 0;
       }
 
       const severity: PointSeverity =
@@ -191,6 +251,7 @@ export class MapService {
           : dynamicDepth >= 20
             ? "high"
             : "medium";
+
       if (
         query.severity &&
         query.severity !== "all" &&
@@ -199,11 +260,19 @@ export class MapService {
         continue;
       }
 
+      if (
+        (calculatedType === "flood" && !activeLayers.includes("flood")) ||
+        (calculatedType === "risk" && !activeLayers.includes("risk"))
+      ) {
+        continue;
+      }
+
       dynamicPoints.push({
         ...point,
+        rainfall: localRain,
         depth: dynamicDepth,
+        type: calculatedType,
         severity,
-        type: "flood",
       });
     }
 

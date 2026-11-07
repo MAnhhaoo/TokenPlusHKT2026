@@ -1,5 +1,15 @@
 # HCMC road flood susceptibility research
 
+> [!NOTE]
+> **Chuyển đổi Kiến trúc (Production Architecture Evolution):**
+> Các mô hình nghiên cứu thực nghiệm ngoại tuyến (Colab / W&B / MCDA) trong thư mục `ml/` này được bảo lưu cho mục đích đối chiếu học thuật.
+> Đối với hệ thống vận hành thực tế (Production Live System), dự án **SaigonDrain AI** đã chuyển sang áp dụng **Thuật toán Thủy văn & Địa hình thực tế (Deterministic Hydrological & Elevation Risk Algorithm)** tại `BE/src/modules/map/services/map.service.ts` kết hợp **Open-Meteo Multi-location API** (`BE/src/modules/weather/services/weather.service.ts`):
+> - **100% Dữ liệu thực tế:** Lấy lượng mưa thời gian thực chính xác theo từng quận/huyện từ Open-Meteo, đối chiếu với 250 điểm đen lịch sử IRD kèm cao độ địa hình (`elevationM`) và ngưỡng thoát nước (`rainfallThresholdMm`).
+> - **Không phát sinh dữ liệu giả (Zero Synthetic Data):** Khi thời tiết khô ráo, hệ thống phản ánh đúng hiện trạng khô ráo, không tự ý suy đoán ảo.
+> - **Định tuyến an toàn OSRM:** Tự động né các điểm ngập thực tế trên lộ trình di chuyển.
+> - **Google Gemini Vision:** Tiếp tục phụ trách phân tích và kiểm chứng tự động ảnh ngập do người dân gửi về.
+
+
 This repository builds a reproducible, reviewable baseline for relative flood
 susceptibility of road segments inside pre-2025 Ho Chi Minh City. It retains
 unreviewed flood reports as unknown evidence and does not interpret them as
