@@ -2364,6 +2364,147 @@ h3 {
   opacity: 0;
 }
 
+/* AI Gemini Vision Analysis inside ReportModal */
+.ai-analyzing-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  margin-top: 10px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(11, 79, 74, 0.08) 0%, rgba(13, 148, 136, 0.12) 100%);
+  border: 1px dashed var(--teal);
+  animation: pulse-glow 2s infinite ease-in-out;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.95; }
+  50% { opacity: 0.65; }
+}
+
+.ai-spin-icon {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border-radius: 8px;
+  background: var(--teal);
+  color: #fff;
+}
+
+.ai-analyzing-card strong {
+  display: block;
+  font-size: 12px;
+  color: var(--teal);
+  font-weight: 700;
+}
+
+.ai-analyzing-card small {
+  display: block;
+  font-size: 10.5px;
+  color: var(--ink-soft);
+}
+
+.ai-result-card {
+  margin-top: 10px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: #f8fbf9;
+  border: 1px solid #d4e7de;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ai-result-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.ai-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #0b4f4a;
+  background: #e2f2ea;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.ai-severity-tag {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.ai-severity-tag.critical {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.ai-severity-tag.high {
+  background: #ffedd5;
+  color: #c2410c;
+}
+
+.ai-severity-tag.medium {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.ai-severity-tag.low {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.ai-metrics-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  background: #ffffff;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid #e1eee7;
+}
+
+.ai-metric small {
+  display: block;
+  font-size: 9.5px;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.ai-metric strong {
+  display: block;
+  font-size: 12px;
+  color: var(--ink);
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.ai-summary-text {
+  font-size: 11.5px;
+  color: #1e293b;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.ai-recommendation-box {
+  background: #eff6ff;
+  border-left: 3px solid #3b82f6;
+  padding: 7px 10px;
+  border-radius: 0 6px 6px 0;
+  font-size: 11px;
+  color: #1e40af;
+  line-height: 1.4;
+}
+
 .report-location {
   display: flex;
   align-items: center;

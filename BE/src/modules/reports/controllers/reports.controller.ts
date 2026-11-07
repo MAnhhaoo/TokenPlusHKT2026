@@ -11,6 +11,7 @@ import {
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { ReportsService } from "../services/reports.service";
 import { CreateReportDto } from "../dtos/create-report.dto";
+import { AnalyzeImageDto } from "../dtos/analyze-image.dto";
 import { RejectReportDto } from "../dtos/review-report.dto";
 import { QueryReportDto } from "../dtos/query-report.dto";
 import { OperatorAuthGuard } from "../../../common/guards/operator-auth.guard";
@@ -19,6 +20,18 @@ import { OperatorAuthGuard } from "../../../common/guards/operator-auth.guard";
 @Controller("reports")
 export class ReportsController {
   constructor(private readonly reportsService: ReportsService) {}
+
+  /**
+   * Phân tích ảnh hiện trường bằng mô hình Google Gemini 1.5 Flash Vision.
+   */
+  @Post("analyze-image")
+  @ApiOperation({
+    summary:
+      "Phân tích ảnh hiện trường bằng Google Gemini Multimodal AI (ước tính mực nước, thời tiết, tình trạng cống, đánh giá rủi ro)",
+  })
+  analyzeImage(@Body() dto: AnalyzeImageDto) {
+    return this.reportsService.analyzeImage(dto);
+  }
 
   /**
    * Lấy danh sách báo cáo ngập cộng đồng theo bộ lọc.

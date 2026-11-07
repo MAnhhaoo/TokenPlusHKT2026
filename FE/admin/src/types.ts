@@ -29,6 +29,8 @@ export type FloodReport = {
   visual: "street" | "drain" | "night" | "traffic"
   photoUrl?: string
   reporterId?: string
+  aiSummary?: string
+  recommendation?: string
 }
 
 export type AreaAlert = {

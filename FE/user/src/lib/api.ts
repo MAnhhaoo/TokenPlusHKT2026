@@ -1032,6 +1032,38 @@ export async function fetchJourneyRoutes(
   };
 }
 
+export interface FloodAiAnalysis {
+  hasFlooding: boolean;
+  estimatedDepthCm: number;
+  reportType: "flood" | "drain";
+  severity: "critical" | "high" | "medium" | "low";
+  weatherCondition: string;
+  drainStatus: string;
+  visual: "street" | "drain" | "traffic" | "night";
+  confidence: number;
+  aiSummary: string;
+  recommendation: string;
+  provider: string;
+}
+
+export async function analyzeReportImageApi(payload: {
+  image: string;
+  location?: string;
+  description?: string;
+}): Promise<FloodAiAnalysis | null> {
+  try {
+    const res = await fetch(`${API_BASE}/reports/analyze-image`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
+
 export async function createCitizenReport(payload: {
   reportType: ReportType;
   severity: Severity;
@@ -1043,6 +1075,8 @@ export async function createCitizenReport(payload: {
   lat?: number;
   lng?: number;
   reporterId?: string;
+  aiSummary?: string;
+  recommendation?: string;
 }): Promise<{ id: string; aiDepth?: number; aiConfidence?: number } | null> {
   try {
     const res = await fetch(`${API_BASE}/reports`, {

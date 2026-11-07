@@ -23,12 +23,28 @@ describe("ReportsService", () => {
     mockMapService = {
       reverseGeocode: jest.fn(),
     };
+    const mockGeminiVisionService = {
+      analyzeImage: jest.fn().mockResolvedValue({
+        hasFlooding: true,
+        estimatedDepthCm: 32,
+        reportType: "flood",
+        severity: "critical",
+        weatherCondition: "Trời đang mưa to",
+        drainStatus: "Bình thường",
+        visual: "traffic",
+        confidence: 94,
+        aiSummary: "Nước ngập ngang bánh xe máy.",
+        recommendation: "Hạn chế lưu thông.",
+        provider: "Google Gemini 1.5 Flash Vision",
+      }),
+    };
 
     service = new ReportsService(
       mockReportRepo,
       mockMapPointRepo,
       mockUserRepo,
       mockMapService,
+      mockGeminiVisionService as any,
     );
   });
 

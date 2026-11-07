@@ -80,4 +80,18 @@ export class CreateReportDto {
   @IsOptional()
   @IsString()
   reporterId?: string;
+
+  @ApiPropertyOptional({
+    example: "Hệ thống AI Gemini phát hiện ngập sâu ~32 cm tại làn xe máy.",
+  })
+  @IsOptional()
+  @IsString()
+  aiSummary?: string;
+
+  @ApiPropertyOptional({
+    example: "Xe máy nên chuyển sang làn giữa tim đường hoặc chọn lộ trình thay thế.",
+  })
+  @IsOptional()
+  @IsString()
+  recommendation?: string;
 }
