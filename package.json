@@ -1,0 +1,22 @@
+{
+  "name": "saigondrain",
+  "private": true,
+  "version": "1.0.0",
+  "packageManager": "pnpm@12.15.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "pnpm --filter \"./FE/*\" --parallel run dev",
+    "dev:user": "pnpm --filter @saigondrain/user dev",
+    "dev:admin": "pnpm --filter @saigondrain/admin dev",
+    "dev:be": "pnpm --filter saigondrain-be start:dev",
+    "build": "pnpm --filter @saigondrain/user build && node -e \"require('fs').cpSync('FE/user/dist', 'dist', {recursive: true})\"",
+    "build:user": "pnpm --filter @saigondrain/user build",
+    "build:admin": "pnpm --filter @saigondrain/admin build",
+    "build:be": "pnpm --filter saigondrain-be build",
+    "preview:user": "pnpm --filter @saigondrain/user preview",
+    "preview:admin": "pnpm --filter @saigondrain/admin preview",
+    "typecheck": "pnpm -r run typecheck"
+  }
+}

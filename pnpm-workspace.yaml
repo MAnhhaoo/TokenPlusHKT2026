@@ -1,0 +1,4 @@
+packages:
+  - "FE/*"
+  - "BE"
+  - "contracts"
