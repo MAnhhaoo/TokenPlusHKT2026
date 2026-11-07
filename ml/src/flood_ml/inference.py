@@ -16,6 +16,7 @@ class FloodSusceptibilityNet(nn.Module):
     """Kiến trúc Residual Tabular MLP đã chuẩn hóa chống Overfitting."""
 
     def __init__(self, in_features: int, hidden_dim: int = 64):
+        """Khởi tạo các tầng ẩn và khối Residual của mạng MLP dự đoán nhạy cảm ngập."""
         super().__init__()
         self.input_layer = nn.Sequential(
             nn.Linear(in_features, hidden_dim),
@@ -40,6 +41,7 @@ class FloodSusceptibilityNet(nn.Module):
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Tính toán logit dự đoán nguy cơ ngập từ tensor đặc trưng đầu vào."""
         h = self.input_layer(x)
         h = h + 0.5 * self.res_block(h)
         return self.head(h).squeeze(-1)
@@ -49,6 +51,7 @@ class FloodSusceptibilityPredictor:
     """Nạp trọn bộ Model + Preprocessing Scaler + Cấu hình ngưỡng nguy cơ từ thư mục đóng gói."""
 
     def __init__(self, bundle_dir: str | Path, device: str | None = None):
+        """Khởi tạo bộ dự đoán từ thư mục đóng gói mô hình và thiết bị tính toán."""
         self.bundle_dir = Path(bundle_dir)
         self.device = torch.device(
             device or ("cuda" if torch.cuda.is_available() else "cpu")

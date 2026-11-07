@@ -3,17 +3,6 @@ name: CI
 on:
   pull_request:
     branches: [master]
-    paths:
-      - '.github/workflows/**'
-      - 'BE/**'
-      - 'FE/user/**'
-      - 'FE/admin/**'
-      - 'ML/**'
-      - 'ml/**'
-      - 'package.json'
-      - 'pnpm-lock.yaml'
-      - 'pnpm-workspace.yaml'
-      - 'firebase.json'
   workflow_call:
     outputs:
       backend:
@@ -49,8 +38,8 @@ permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  group: ci-${{ github.event.pull_request.number || format('{0}-{1}', github.ref, github.sha) }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   changes:

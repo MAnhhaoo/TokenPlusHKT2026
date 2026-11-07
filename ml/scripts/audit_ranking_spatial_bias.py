@@ -16,6 +16,7 @@ matplotlib.use("Agg")
 
 
 def run_audit(processed_dir: Path, run_out_dir: Path, run_id: str) -> dict:
+    """Kiểm định xếp hạng nguy cơ, phân vùng không gian và bias theo cấp đường."""
     df_feat = pd.read_parquet(processed_dir / "road_features.parquet")
     df_part = pd.read_parquet(processed_dir / "road_partitions.parquet")
     df_mcda = pd.read_parquet(processed_dir / "road_susceptibility.parquet")
@@ -229,6 +230,7 @@ def run_audit(processed_dir: Path, run_out_dir: Path, run_id: str) -> dict:
 
 
 def main() -> int:
+    """Điểm vào CLI để chạy kiểm định xếp hạng nguy cơ và xuất báo cáo JSON."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--processed-dir", type=Path, required=True)
     parser.add_argument("--run-out-dir", type=Path, required=True)

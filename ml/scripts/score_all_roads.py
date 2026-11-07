@@ -23,6 +23,7 @@ def score_entire_study_area(
     bundle_dir: Path,
     output_dir: Path,
 ) -> pd.DataFrame:
+    """Chấm điểm nguy cơ ngập lụt và xuất dữ liệu GIS cho toàn bộ đường bộ AOI."""
     output_dir.mkdir(parents=True, exist_ok=True)
     predictor = FloodSusceptibilityPredictor(bundle_dir)
 
@@ -205,6 +206,7 @@ def score_entire_study_area(
 
 
 def main() -> int:
+    """Điểm vào CLI để chấm điểm nguy cơ ngập lụt cho toàn bộ đoạn đường trong AOI."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--processed-dir", type=Path, required=True)
     parser.add_argument("--interim-dir", type=Path, required=True)

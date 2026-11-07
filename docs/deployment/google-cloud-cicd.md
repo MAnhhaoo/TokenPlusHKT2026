@@ -7,11 +7,11 @@ This repository is being migrated from the earlier SaigonDrain project in small 
 | Event | Result |
 | --- | --- |
 | Pull request to `master` | Run CI for changed application packages. Same-repository frontend PRs can publish a seven-day Firebase preview when `GCP_PREVIEW_ENABLED=true`. Fork PRs never receive Google credentials. |
-| Push to `master` | Run full validation on migrated packages. If application code changed and staging is configured, deploy only changed services to the `staging` environment. |
+| Push to `master` | Run full validation on migrated packages. When staging is configured, compute deployable changes since the last successful staging deployment and deploy the affected services to the `staging` environment. |
 | Published GitHub release | Run full validation, deploy the release commit to staging, then deploy that same source revision to production only when `GCP_DEPLOY_PRODUCTION=true` and the `production` Environment gate allows it. |
 | No migrated application source | Report that application checks or deployment were skipped; do not report the repository as application-validated. |
 
-Staging and production use separate GitHub concurrency groups. Deploys to the same environment queue without canceling a deployment already in progress. A staging push checks the current `master` SHA after it reaches the queue and skips if superseded; a production deploy does the same against the latest published release.
+Staging and production use separate GitHub concurrency groups. Deploys to the same environment queue without canceling a deployment already in progress. After acquiring the staging concurrency lock, a staging push checks the current `master` SHA, skips if superseded, computes deployable service scope from the last successfully deployed staging SHA (so changes from superseded or replaced runs are carried forward), and records the new staging SHA only after all selected services deploy successfully; a production deploy checks the latest published release before deploying.
 
 The deploy workflow runs from the default branch after CI completes. For PR previews it reads only validated frontend booleans from the artifact, takes the PR number from the trusted `workflow_run` event, and downloads static build output; it rejects symbolic links and does not check out or execute PR workflow code. The trusted workflow uses the Firebase configuration from `master`. GitHub documents that `workflow_run` workflows can access secrets and write tokens even when the preceding workflow cannot, and warns against running untrusted code on this event; keep this trust boundary intact. See [GitHub's `workflow_run` security guidance](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#workflow_run).
 
@@ -84,7 +84,7 @@ Use GitHub's OIDC provider `https://token.actions.githubusercontent.com` and Wor
    attribute.environment=assertion.environment
    ```
 
-3. Restrict the provider condition to this repository's immutable numeric `repository_id`, the trusted workflow `MAnhhaoo/TokenPlusHKT2026/.github/workflows/deploy.yml`, and the allowed refs and GitHub Environments. Use `refs/heads/master` for staging; permit release tags only for production. For previews, permit only the `preview` Environment and the `workflow_run` event. Do not grant access based only on a repository name or branch supplied by an untrusted PR.
+3. Restrict the provider condition to this repository's immutable numeric `repository_id`, the trusted workflow `MAnhhaoo/TokenPlusHKT2026/.github/workflows/deploy.yml`, and the allowed refs and GitHub Environments. For staging, permit `refs/heads/master` on `push` and release tags (`refs/tags/*`) on `release`, because releases deploy to staging first. For production, permit release tags only. For previews, permit only the `preview` Environment and the `workflow_run` event. Do not grant access based only on a repository name or branch supplied by an untrusted PR.
 4. Allow the matching federated principal to impersonate the deploy service account with `roles/iam.workloadIdentityUser`. Bind separate staging, production, and preview service accounts or use separate narrowly scoped bindings where practical.
 5. Put the provider resource name and service-account email in that GitHub Environment's variables.
 

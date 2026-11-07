@@ -39,6 +39,7 @@ FABDEM_TILES = {
 
 
 def _download_file(url: str, destination: Path) -> None:
+    """Tải file từ URL về đường dẫn đích thông qua file tạm nguyên tử."""
     destination.parent.mkdir(parents=True, exist_ok=True)
     tmp_path = destination.with_suffix(destination.suffix + ".part")
     print(f"Đang tải: {url} -> {destination} ...")
@@ -50,6 +51,7 @@ def _download_file(url: str, destination: Path) -> None:
 
 
 def prepare_raw_directory(raw_root: Path, manifest_path: Path | None = None) -> None:
+    """Chuẩn bị thư mục dữ liệu gốc, tải file thiếu và đồng bộ manifest."""
     raw_root = raw_root.resolve()
     raw_root.mkdir(parents=True, exist_ok=True)
 
@@ -120,6 +122,7 @@ def prepare_raw_directory(raw_root: Path, manifest_path: Path | None = None) -> 
 
 
 def main() -> int:
+    """Điểm vào CLI để chuẩn bị dữ liệu gốc và đồng bộ manifest."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--raw-root",
