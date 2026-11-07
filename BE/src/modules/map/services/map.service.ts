@@ -135,7 +135,52 @@ export class MapService {
             query.severity === "all" ||
             point.severity === query.severity)
         ) {
-          dynamicPoints.push(point);
+          // Tính toán suy giảm mực nước theo thời gian thực tế đã trôi qua (Hydrological Water Recession)
+          let dynamicDepth = point.depth;
+          let calculatedSeverity = point.severity;
+          let isCleared = false;
+
+          if (point.updatedAt && point.drainageRateCmPerMin && point.depth > 0) {
+            const minutesElapsed = Math.max(
+              0,
+              Math.floor((Date.now() - new Date(point.updatedAt).getTime()) / 60000),
+            );
+            // Nếu lượng mưa tại thành phố/quận nhỏ (< 3mm) nghĩa là trời đã tạnh hoặc mưa rất nhỏ
+            if (cityRainMm < 3) {
+              const recededDepth = Math.round(
+                point.depth - point.drainageRateCmPerMin * minutesElapsed,
+              );
+              dynamicDepth = Math.max(0, recededDepth);
+            }
+
+            if (dynamicDepth <= 3) {
+              isCleared = true;
+              dynamicDepth = 0;
+            } else if (dynamicDepth >= 35) {
+              calculatedSeverity = "critical";
+            } else if (dynamicDepth >= 20) {
+              calculatedSeverity = "high";
+            } else {
+              calculatedSeverity = "medium";
+            }
+          }
+
+          if (isCleared) {
+            if (activeLayers.includes("history") || activeLayers.includes("risk")) {
+              dynamicPoints.push({
+                ...point,
+                depth: 0,
+                type: "risk",
+                label: `${point.label} (Đã rút hết nước)`,
+              });
+            }
+          } else {
+            dynamicPoints.push({
+              ...point,
+              depth: dynamicDepth,
+              severity: calculatedSeverity,
+            });
+          }
         }
         continue;
       }
@@ -267,16 +312,70 @@ export class MapService {
         continue;
       }
 
+      let durationMin = point.estimatedDurationMin;
+      let clearTimeStr = point.estimatedClearAt;
+      let drainRate = point.drainageRateCmPerMin;
+
+      if (dynamicDepth > 0 && (!durationMin || !clearTimeStr)) {
+        const pointDrainageRate =
+          elevation <= 1.4
+            ? 0.35
+            : elevation <= 1.8
+              ? 0.45
+              : elevation <= 2.5
+                ? 0.65
+                : 0.85;
+        drainRate =
+          (point.historyCount || 0) >= 10
+            ? Math.round(pointDrainageRate * 0.8 * 100) / 100
+            : pointDrainageRate;
+        durationMin = Math.round(dynamicDepth / drainRate);
+        if (localRain >= 15) durationMin += 45;
+        else if (localRain >= 5) durationMin += 25;
+        if (isTidePeak && isRiversideLowland) durationMin += 35;
+        durationMin = Math.max(15, durationMin);
+
+        const clearDate = new Date(Date.now() + durationMin * 60 * 1000);
+        const clearHourStr = String(clearDate.getHours()).padStart(2, "0");
+        const clearMinStr = String(clearDate.getMinutes()).padStart(2, "0");
+        clearTimeStr = `${clearHourStr}:${clearMinStr}, ${String(
+          clearDate.getDate(),
+        ).padStart(2, "0")}/${String(clearDate.getMonth() + 1).padStart(2, "0")}/${clearDate.getFullYear()}`;
+      }
+
       dynamicPoints.push({
         ...point,
         rainfall: localRain,
         depth: dynamicDepth,
         type: calculatedType,
         severity,
+        estimatedDurationMin: durationMin,
+        estimatedClearAt: clearTimeStr,
+        drainageRateCmPerMin: drainRate,
       });
     }
 
     return dynamicPoints;
+  }
+
+  /**
+   * Tra cứu lượng mưa hiện tại theo từng quận từ Open-Meteo
+   */
+  async getCurrentRainForDistrict(district: string): Promise<number> {
+    try {
+      const clean = (district || "").toLowerCase().trim();
+      const rainMap = await this.weatherService.getRealtimeDistrictRainMap();
+      if (rainMap.has(clean)) return rainMap.get(clean)!;
+      for (const [distKey, rVal] of rainMap.entries()) {
+        if (clean.includes(distKey) || distKey.includes(clean)) {
+          return rVal;
+        }
+      }
+      const currentWeather = await this.weatherService.getCurrentWeather();
+      return Number(currentWeather?.currentRainMm ?? 0);
+    } catch {
+      return 0;
+    }
   }
 
   /**
@@ -510,10 +609,91 @@ export class MapService {
     return results.slice(0, limit);
   }
 
+  private getClosestDistrictName(lat: number, lng: number): string {
+    const districts = [
+      { name: "Quận 1", lat: 10.7756, lng: 106.7004 },
+      { name: "Quận 3", lat: 10.7844, lng: 106.6844 },
+      { name: "Quận 4", lat: 10.7644, lng: 106.7044 },
+      { name: "Quận 5", lat: 10.7554, lng: 106.6664 },
+      { name: "Quận 6", lat: 10.7484, lng: 106.6354 },
+      { name: "Quận 7", lat: 10.7344, lng: 106.7214 },
+      { name: "Quận 8", lat: 10.7244, lng: 106.6284 },
+      { name: "Quận 10", lat: 10.7714, lng: 106.6684 },
+      { name: "Quận 11", lat: 10.7674, lng: 106.6494 },
+      { name: "Quận 12", lat: 10.8674, lng: 106.6414 },
+      { name: "Bình Thạnh", lat: 10.8014, lng: 106.7114 },
+      { name: "Gò Vấp", lat: 10.8384, lng: 106.6654 },
+      { name: "Phú Nhuận", lat: 10.7994, lng: 106.6814 },
+      { name: "Tân Bình", lat: 10.7984, lng: 106.6544 },
+      { name: "Tân Phú", lat: 10.7904, lng: 106.6284 },
+      { name: "Bình Tân", lat: 10.7654, lng: 106.6054 },
+      { name: "Thành phố Thủ Đức", lat: 10.8494, lng: 106.7714 },
+      { name: "Huyện Bình Chánh", lat: 10.6874, lng: 106.5914 },
+      { name: "Huyện Hóc Môn", lat: 10.8844, lng: 106.5944 },
+      { name: "Huyện Củ Chi", lat: 11.0064, lng: 106.5134 },
+      { name: "Huyện Nhà Bè", lat: 10.6954, lng: 106.7354 },
+      { name: "Huyện Cần Giờ", lat: 10.4114, lng: 106.9634 },
+    ];
+    let closest = districts[0];
+    let minD = Infinity;
+    for (const d of districts) {
+      const dist = (d.lat - lat) ** 2 + (d.lng - lng) ** 2;
+      if (dist < minD) {
+        minD = dist;
+        closest = d;
+      }
+    }
+    return closest.name;
+  }
+
   /**
-   * Reverse Geocoding: Đổi tọa độ GPS sang tên đường, Quận/Huyện qua Nominatim OSM API
+   * Reverse Geocoding: Đổi tọa độ GPS sang tên đường, Quận/Huyện qua ArcGIS & Nominatim OSM
    */
   async reverseGeocode(lat: number, lng: number) {
+    const fallbackDistrict = this.getClosestDistrictName(lat, lng);
+
+    // 1. Thử gọi ArcGIS World Geocoding Reverse API (tốc độ cao, không chặn IP Việt Nam)
+    try {
+      const arcgisUrl =
+        "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/reverseGeocode";
+      const arcgisRes = await firstValueFrom(
+        this.httpService.get(arcgisUrl, {
+          params: {
+            location: `${lng},${lat}`,
+            f: "json",
+          },
+          timeout: 3000,
+        }),
+      ).catch(() => null);
+
+      if (arcgisRes?.data?.address) {
+        const addr = arcgisRes.data.address;
+        const street =
+          addr.Address ||
+          addr.ShortLabel ||
+          addr.PlaceName ||
+          addr.Match_addr?.split(",")?.[0]?.trim();
+        const district =
+          addr.Neighborhood ||
+          addr.District ||
+          addr.Subregion ||
+          fallbackDistrict;
+
+        if (street) {
+          return {
+            lat,
+            lng,
+            location: street,
+            district: district || fallbackDistrict,
+            displayName: `${street}, ${district || fallbackDistrict}, TP.HCM`,
+          };
+        }
+      }
+    } catch {
+      // Tiếp tục fallback bên dưới
+    }
+
+    // 2. Thử gọi Nominatim OpenStreetMap API
     const nominatimBase = this.configService.get<string>(
       "NOMINATIM_BASE_URL",
       "https://nominatim.openstreetmap.org",
@@ -530,20 +710,18 @@ export class MapService {
           headers: {
             "User-Agent": "SaigonDrainAI-Hackathon/1.0",
           },
-          timeout: 4500,
+          timeout: 3500,
         }),
       );
       const addr = response.data?.address ?? {};
-      const location =
-        [addr.house_number, addr.road].filter(Boolean).join(" ") ||
-        response.data?.name ||
-        "105 Bà Huyện Thanh Quan";
       const district =
         addr.suburb ||
         addr.city_district ||
         addr.county ||
-        addr.city ||
-        "Quận 3";
+        addr.district ||
+        fallbackDistrict;
+      const road = [addr.house_number, addr.road].filter(Boolean).join(" ");
+      const location = road || response.data?.name || `Khu vực ${district}`;
 
       return {
         lat,
@@ -557,9 +735,9 @@ export class MapService {
       return {
         lat,
         lng,
-        location: "105 Bà Huyện Thanh Quan",
-        district: "Quận 3",
-        displayName: "105 Bà Huyện Thanh Quan, Quận 3, TP. Hồ Chí Minh",
+        location: `Khu vực ${fallbackDistrict}`,
+        district: fallbackDistrict,
+        displayName: `Khu vực ${fallbackDistrict}, TP. Hồ Chí Minh`,
       };
     }
   }

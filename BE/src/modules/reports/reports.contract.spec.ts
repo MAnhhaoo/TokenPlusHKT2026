@@ -18,11 +18,13 @@ describe("Report lifecycle contracts", () => {
     reports = repo();
     points = repo();
     users = repo();
+    const alerts = repo();
     events = { broadcast: jest.fn() };
     service = new ReportsService(
       reports,
       points,
       users,
+      alerts as any,
       {
         reverseGeocode: jest
           .fn()

@@ -2,6 +2,7 @@ import { DataSource } from "typeorm";
 import { FloodReportEntity } from "../src/modules/reports/models/flood-report.entity";
 import { MapPointEntity } from "../src/modules/map/models/map-point.entity";
 import { CommunityUserEntity } from "../src/modules/users/models/community-user.entity";
+import { AreaAlertEntity } from "../src/modules/alerts/models/area-alert.entity";
 import { ReportsService } from "../src/modules/reports/services/reports.service";
 // Fixed loopback address and dedicated database: never consume DATABASE_URL or production settings.
 describe("Isolated PostgreSQL report transactions", () => {
@@ -12,7 +13,7 @@ describe("Isolated PostgreSQL report transactions", () => {
     username: "saigondrain_test",
     password: "local_test_only",
     database: "saigondrain_isolated_test",
-    entities: [FloodReportEntity, MapPointEntity, CommunityUserEntity],
+    entities: [FloodReportEntity, MapPointEntity, CommunityUserEntity, AreaAlertEntity],
     synchronize: true,
     dropSchema: true,
     connectTimeoutMS: 2000,
@@ -24,6 +25,7 @@ describe("Isolated PostgreSQL report transactions", () => {
       ds.getRepository(FloodReportEntity),
       ds.getRepository(MapPointEntity),
       ds.getRepository(CommunityUserEntity),
+      ds.getRepository(AreaAlertEntity),
       {
         reverseGeocode: async () => ({
           location: "Test street",
