@@ -65,7 +65,7 @@
 
 - [ ] Define Firebase Hosting targets `user` and `admin` with public directories `FE/user/dist` and `FE/admin/dist`.
 - [ ] Configure staging after successful reusable CI on merge to `master`, production on a published release after staging and the protected environment gate, and Firebase PR preview from the trusted deploy workflow after CI succeeds.
-- [ ] Pass only PR number and changed-frontend booleans plus static build artifacts from same-repository PR checks; do not give PR jobs OIDC access or execute downloaded artifact contents in the trusted workflow.
+- [ ] Take the PR number from the trusted `workflow_run` payload; validate artifact frontend flags as JSON booleans and never execute downloaded artifact contents in the trusted workflow.
 - [ ] Authenticate with `google-github-actions/auth@v3` and Workload Identity Federation; grant `contents: read` and `id-token: write` to deploy jobs, with `actions: read` only on the trusted preview jobs that download CI artifacts.
 - [ ] Deploy the API to Cloud Run from `BE/`; deploy ML only when a serving entrypoint exists. Do not deploy training notebooks or datasets.
 - [ ] Document the required Google APIs, WIF provider/service-account roles, GitHub Environment variables, Firebase site targets, and the manual owner-side environment protection step.

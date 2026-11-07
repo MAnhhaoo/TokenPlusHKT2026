@@ -11,7 +11,7 @@ This repository is being migrated from the earlier SaigonDrain project in small 
 | Published GitHub release | Run full validation, deploy the release commit to staging, then deploy that same source revision to production only when `GCP_DEPLOY_PRODUCTION=true` and the `production` Environment gate allows it. |
 | No migrated application source | Report that application checks or deployment were skipped; do not report the repository as application-validated. |
 
-The deploy workflow runs from the default branch after CI completes. For PR previews it reads a small scope manifest and downloads static build output only; it does not check out or execute PR workflow code. The trusted workflow uses the Firebase configuration from `master`. GitHub documents that `workflow_run` workflows can access secrets and write tokens even when the preceding workflow cannot, and warns against running untrusted code on this event; keep this trust boundary intact. See [GitHub's `workflow_run` security guidance](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#workflow_run).
+The deploy workflow runs from the default branch after CI completes. For PR previews it reads only validated frontend booleans from the artifact, takes the PR number from the trusted `workflow_run` event, and downloads static build output; it does not check out or execute PR workflow code. The trusted workflow uses the Firebase configuration from `master`. GitHub documents that `workflow_run` workflows can access secrets and write tokens even when the preceding workflow cannot, and warns against running untrusted code on this event; keep this trust boundary intact. See [GitHub's `workflow_run` security guidance](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#workflow_run).
 
 ## GitHub configuration
 
@@ -107,7 +107,7 @@ Same-repository PR previews use the `hosting-user` / `hosting-admin` artifacts f
 
 - **API:** `BE/` must become a runnable Node package with a start command that listens on the Cloud Run-provided `PORT`. CI requires `package.json`, the workspace files, and `build`, `typecheck`, `lint`, and `test` scripts before validating a changed package.
 - **User/admin frontend:** `FE/user/` and `FE/admin/` must be pnpm workspace packages with the same required scripts and build to `dist/`.
-- **ML:** `ML/` must provide `pyproject.toml` and `uv.lock`; CI runs frozen dependency sync, Ruff, and pytest. Training code, notebooks, and datasets are never deployed. A Cloud Run inference service is deployed only when a changed ML package contains `ML/serving/Dockerfile`; that directory must contain a working HTTP service.
+- **ML:** `ML/` must provide `pyproject.toml` and `uv.lock`; CI runs frozen dependency sync, Ruff, and pytest. Training code, notebooks, and datasets are never deployed. A Cloud Run inference service is deployed only when a changed ML package contains `ML/serving/Dockerfile`; that directory must contain a working HTTP service and the Cloud Run service is kept private.
 
 ## Enablement checklist
 

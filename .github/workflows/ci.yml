@@ -150,12 +150,8 @@ jobs:
             echo "node_components=$node_json"
           } >> "$GITHUB_OUTPUT"
 
-          pr_number=0
-          if [[ "$GITHUB_EVENT_NAME" == pull_request ]]; then
-            pr_number="$(jq -r '.pull_request.number' "$GITHUB_EVENT_PATH")"
-          fi
-          printf '{"backend":%s,"user":%s,"admin":%s,"ml":%s,"any_application":%s,"pr_number":%s}\n' \
-            "$backend" "$user" "$admin" "$ml" "$any_application" "$pr_number" > "$RUNNER_TEMP/ci-scope.json"
+          printf '{"backend":%s,"user":%s,"admin":%s,"ml":%s,"any_application":%s}\n' \
+            "$backend" "$user" "$admin" "$ml" "$any_application" > "$RUNNER_TEMP/ci-scope.json"
 
       - name: Upload CI scope for trusted preview workflow
         if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && vars.GCP_PREVIEW_ENABLED == 'true'
