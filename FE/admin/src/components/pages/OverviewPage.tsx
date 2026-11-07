@@ -1,5 +1,5 @@
 import { useMemo } from "react"
-import { Bell, Droplets, Radar, TriangleAlert } from "lucide-react"
+import { Bell, Droplets, Sparkles, TriangleAlert } from "lucide-react"
 import Button from "@/components/ui/Button"
 import FloodStatusHero from "@/components/overview/FloodStatusHero"
 import MetricCard from "@/components/overview/MetricCard"
@@ -56,8 +56,8 @@ function OverviewPage({
   onEditAlert: (alert: AreaAlert) => void
   onEndAlert: (alert: AreaAlert) => void
 }) {
-  const pendingCount = reports.filter(
-    (report) => report.status === "pending",
+  const verifiedCount = reports.filter(
+    (report) => report.status === "verified",
   ).length
   const activeAlerts = alerts.filter((alert) => alert.status === "active")
   const highRiskCount = points.filter(
@@ -101,15 +101,16 @@ function OverviewPage({
         data: [9, 12, 8, 15, 17, 19, 18],
       },
       {
-        icon: <Radar size={20} />,
-        tone: "amber",
-        value: pendingCount,
-        label: "Chờ xác minh",
+        icon: <Sparkles size={20} />,
+        tone: "teal",
+        value: verifiedCount,
+        label: "Báo cáo AI duyệt",
         meta: (
           <>
-            {pendingCount > 0
-              ? `${pendingCount} tin cần duyệt ngay`
-              : "Hàng chờ đã xử lý hết"}
+            <span className="urgent-dot" style={{ background: "#10b981" }} />{" "}
+            {verifiedCount > 0
+              ? `${verifiedCount} báo cáo đang phát trực tiếp`
+              : "Chưa có báo cáo mới"}
           </>
         ),
         data: [16, 13, 18, 12, 10, 7, 5],
@@ -134,7 +135,7 @@ function OverviewPage({
       alertAreasCount,
       criticalPointsCount,
       highRiskCount,
-      pendingCount,
+      verifiedCount,
       totalReports,
     ],
   )
@@ -145,7 +146,7 @@ function OverviewPage({
         activeAlertCount={activeAlerts.length}
         onViewAlerts={() => onNavigate("alerts")}
         onViewMap={() => onNavigate("map")}
-        pendingCount={pendingCount}
+        pendingCount={verifiedCount}
         weather={weather}
       />
 

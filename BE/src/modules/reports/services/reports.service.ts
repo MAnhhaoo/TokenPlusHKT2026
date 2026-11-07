@@ -207,7 +207,8 @@ export class ReportsService {
       aiDepth,
       aiConfidence,
       severity: normalizedSeverity,
-      status: "pending",
+      // Báo cáo được Gemini AI tự động phân tích và duyệt ngay lập tức
+      status: "verified",
       priority: dto.reportType === "drain" ? "Cống tắc" : "Trục đường chính",
       coordinates: dto.coordinates || `${lat.toFixed(4)}, ${lng.toFixed(4)}`,
       historyCount: 6,
@@ -228,7 +229,8 @@ export class ReportsService {
       lat,
       lng,
       elevationM: 2.5,
-      type: "pending",
+      // Điểm ngập được tự động hiển thị trực tiếp lên bản đồ cộng đồng
+      type: "flood",
       severity: normalizedSeverity,
       label: location,
       district,
@@ -239,16 +241,33 @@ export class ReportsService {
     });
     const savedPoint = await this.mapPointRepo.save(newPoint);
 
+    // Tự động ghi nhận đóng góp tích cực cho người dân
+    if (dto.reporterId) {
+      const user = await this.userRepo.findOne({
+        where: { id: dto.reporterId },
+      });
+      if (user) {
+        user.reports += 1;
+        user.verifiedReports += 1;
+        user.trustScore = Math.min(100, user.trustScore + 2);
+        await this.userRepo.save(user);
+      }
+    }
+
     this.realtimeService?.broadcast("report.created", {
       report: saved,
       mapPoint: savedPoint,
+    });
+    this.realtimeService?.broadcast("report.approved", {
+      report: saved,
+      updatedMapPoint: savedPoint,
     });
 
     return saved;
   }
 
   /**
-   * Duyệt báo cáo đang chờ (pending -> verified), cập nhật điểm ngập trên bản đồ và cộng điểm tin cậy trong 1 transaction.
+   * Mở lại / Xác nhận báo cáo (chuyển sang verified), hiển thị lại điểm ngập trên bản đồ.
    */
   async approve(id: string) {
     const { saved, linkedPoint } = await this.withTransaction(
@@ -257,13 +276,9 @@ export class ReportsService {
         if (!report) {
           throw new NotFoundException(`Không tìm thấy báo cáo ${id}`);
         }
-        if (report.status !== "pending") {
-          throw new ConflictException(
-            `Báo cáo ${id} đã ở trạng thái ${report.status}, chỉ cho phép duyệt từ trạng thái pending.`,
-          );
-        }
 
         report.status = "verified";
+        report.rejectReason = undefined;
         const savedReport = await reportRepo.save(report);
 
         const point = await mapPointRepo.findOne({
@@ -271,7 +286,7 @@ export class ReportsService {
         });
         if (point) {
           point.type = "flood";
-          point.depth = report.aiDepth || report.reportedDepth;
+          point.depth = report.aiDepth || report.reportedDepth || 25;
           await mapPointRepo.save(point);
         }
 
@@ -291,7 +306,7 @@ export class ReportsService {
     );
 
     const result = {
-      message: `Đã xác nhận báo cáo ${id} và cập nhật bản đồ.`,
+      message: `Đã mở khóa báo cáo ${id} và hiển thị lại trên bản đồ.`,
       report: saved,
       updatedMapPoint: linkedPoint,
     };
@@ -302,29 +317,24 @@ export class ReportsService {
   }
 
   /**
-   * Từ chối báo cáo đang chờ (pending -> rejected), cập nhật số lần từ chối và hạ trạng thái điểm bản đồ liên kết.
+   * Khóa báo cáo (chuyển sang rejected), ẩn điểm ngập khỏi bản đồ công khai.
    */
   async reject(id: string, reason?: string) {
-    const saved = await this.withTransaction(
+    const { saved, linkedPoint } = await this.withTransaction(
       async ({ reportRepo, mapPointRepo, userRepo }) => {
         const report = await reportRepo.findOne({ where: { id } });
         if (!report) {
           throw new NotFoundException(`Không tìm thấy báo cáo ${id}`);
         }
-        if (report.status !== "pending") {
-          throw new ConflictException(
-            `Báo cáo ${id} đã ở trạng thái ${report.status}, chỉ cho phép từ chối từ trạng thái pending.`,
-          );
-        }
 
         report.status = "rejected";
-        report.rejectReason = reason || "Không đủ cơ sở xác minh";
+        report.rejectReason = reason || "Quản trị viên đã khóa báo cáo này";
         const savedReport = await reportRepo.save(report);
 
         const point = await mapPointRepo.findOne({
           where: { linkedReportId: id },
         });
-        if (point && (point.type === "pending" || point.type === "flood")) {
+        if (point) {
           point.type = "risk";
           point.depth = 0;
           await mapPointRepo.save(point);
@@ -336,21 +346,39 @@ export class ReportsService {
           });
           if (user) {
             user.rejectedReports += 1;
+            user.trustScore = Math.max(30, user.trustScore - 5);
             await userRepo.save(user);
           }
         }
 
-        return savedReport;
+        return { saved: savedReport, linkedPoint: point ?? null };
       },
     );
 
     const result = {
-      message: `Đã từ chối báo cáo ${id}${reason ? `: ${reason}` : ""}.`,
+      message: `Đã khóa báo cáo ${id}${reason ? `: ${reason}` : ""}.`,
       report: saved,
+      updatedMapPoint: linkedPoint,
     };
 
     this.realtimeService?.broadcast("report.rejected", result);
 
     return result;
+  }
+
+  /**
+   * Chuyển đổi trạng thái Khóa / Mở khóa của báo cáo (Toggle Lock).
+   */
+  async toggleLock(id: string, reason?: string) {
+    const report = await this.reportRepo.findOne({ where: { id } });
+    if (!report) {
+      throw new NotFoundException(`Không tìm thấy báo cáo ${id}`);
+    }
+
+    if (report.status === "rejected") {
+      return this.approve(id);
+    } else {
+      return this.reject(id, reason || "Quản trị viên đã tạm khóa báo cáo này");
+    }
   }
 }

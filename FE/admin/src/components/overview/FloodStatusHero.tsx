@@ -1,4 +1,4 @@
-import { BellRing, CloudRain, Map, TriangleAlert } from "lucide-react"
+import { BellRing, CloudRain, Map, Sparkles } from "lucide-react"
 import Button from "@/components/ui/Button"
 import StatusPill from "@/components/ui/StatusPill"
 import WaterGauge from "@/components/ui/WaterGauge"
@@ -53,8 +53,8 @@ function FloodStatusHero({
           </Button>
         </div>
         <div className="hero-chips">
-          <StatusPill tone="watch" icon={<TriangleAlert size={13} />}>
-            {pendingCount} báo cáo chờ xác minh
+          <StatusPill tone="safe" icon={<Sparkles size={13} />}>
+            {pendingCount} báo cáo AI tự động duyệt
           </StatusPill>
           <StatusPill tone="danger">
             {activeAlertCount} cảnh báo đang phát

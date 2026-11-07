@@ -1,11 +1,12 @@
 import { useMemo, useState } from "react"
 import {
-  CheckCircle2,
   ChevronDown,
   Clock3,
+  Lock,
   Search,
   ShieldCheck,
-  XCircle,
+  Sparkles,
+  Unlock,
 } from "lucide-react"
 import Button from "@/components/ui/Button"
 import EmptyState from "@/components/ui/EmptyState"
@@ -57,9 +58,9 @@ const statusTone: Record<
 }
 
 const statusLabel: Record<ReportStatus, string> = {
-  pending: "Chờ xác minh",
-  verified: "Đã xác minh",
-  rejected: "Từ chối",
+  pending: "Chờ duyệt",
+  verified: "⚡ Đang hiển thị (AI duyệt)",
+  rejected: "🔒 Đã khóa / Ẩn",
 }
 
 function ReportsPage({
@@ -112,30 +113,30 @@ function ReportsPage({
   return (
     <div className="page-stack">
       <SectionHeader
-        description="Xác minh báo cáo hiện trường trước khi đưa lên bản đồ công khai."
-        title="Hàng chờ báo cáo cộng đồng"
+        description="Báo cáo được AI Gemini thẩm định và tự động duyệt lên bản đồ. Admin có thể xem chi tiết hoặc khóa báo cáo."
+        title="Quản lý báo cáo cộng đồng"
       />
 
       <div className="report-stat-row">
         <div className="report-stat">
-          <Clock3 size={18} />
-          <div>
-            <strong>{counts.pending}</strong>
-            <span>Chờ xác minh</span>
-          </div>
-        </div>
-        <div className="report-stat">
-          <CheckCircle2 size={18} />
+          <Sparkles size={18} style={{ color: "#10b981" }} />
           <div>
             <strong>{counts.verified}</strong>
-            <span>Đã xác minh</span>
+            <span>AI tự động duyệt</span>
           </div>
         </div>
         <div className="report-stat">
-          <XCircle size={18} />
+          <Lock size={18} style={{ color: "#ef4444" }} />
           <div>
             <strong>{counts.rejected}</strong>
-            <span>Đã từ chối</span>
+            <span>Đã khóa / Ẩn</span>
+          </div>
+        </div>
+        <div className="report-stat">
+          <Clock3 size={18} style={{ color: "#f59e0b" }} />
+          <div>
+            <strong>{counts.pending}</strong>
+            <span>Chờ duyệt</span>
           </div>
         </div>
         <div className="report-stat">
@@ -154,9 +155,9 @@ function ReportsPage({
             onChange={setStatus}
             options={[
               { value: "all", label: "Tất cả" },
-              { value: "pending", label: "Chờ xác minh" },
-              { value: "verified", label: "Đã xác minh" },
-              { value: "rejected", label: "Từ chối" },
+              { value: "verified", label: "⚡ Đang hiển thị" },
+              { value: "rejected", label: "🔒 Đã khóa" },
+              { value: "pending", label: "Chờ duyệt" },
             ]}
             value={status}
           />
@@ -269,15 +270,20 @@ function ReportsPage({
                       </StatusPill>
                     </td>
                     <td data-label="Thao tác">
-                      {report.status === "pending" ? (
+                      {report.status === "rejected" ? (
                         <Button
                           variant="secondary"
                           onClick={() => onReview(report)}
                         >
-                          Xác minh
+                          <Unlock size={14} /> Mở khóa
                         </Button>
                       ) : (
-                        <span className="cell-note">Đã xử lý</span>
+                        <Button
+                          variant="danger"
+                          onClick={() => onReview(report)}
+                        >
+                          <Lock size={14} /> Khóa
+                        </Button>
                       )}
                     </td>
                   </tr>
