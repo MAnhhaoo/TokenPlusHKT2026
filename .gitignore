@@ -1,3 +1,28 @@
+node_modules/
+dist/
+build/
+coverage/
+.cache/
+.env
+.env.*
+!.env.example
+.vite/
+*.tsbuildinfo
+*-debug.log*
+logs/
+*.log
+.DS_Store
+*.zip
+.idea/
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+ml/data/interim/
+ml/data/processed/
+ml/artifacts/
+ml/wandb/
+
 # Google Workload Identity Federation credential files generated in CI.
 gha-creds-*.json
 

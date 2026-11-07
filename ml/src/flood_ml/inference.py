@@ -9,14 +9,13 @@ from typing import Any
 import numpy as np
 import pandas as pd
 import torch
-from torch import nn
+import torch.nn as nn
 
 
 class FloodSusceptibilityNet(nn.Module):
     """Kiến trúc Residual Tabular MLP đã chuẩn hóa chống Overfitting."""
 
     def __init__(self, in_features: int, hidden_dim: int = 64):
-        """Khởi tạo các tầng ẩn và khối Residual của mạng MLP dự đoán nhạy cảm ngập."""
         super().__init__()
         self.input_layer = nn.Sequential(
             nn.Linear(in_features, hidden_dim),
@@ -41,7 +40,6 @@ class FloodSusceptibilityNet(nn.Module):
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """Tính toán logit dự đoán nguy cơ ngập từ tensor đặc trưng đầu vào."""
         h = self.input_layer(x)
         h = h + 0.5 * self.res_block(h)
         return self.head(h).squeeze(-1)
@@ -51,7 +49,6 @@ class FloodSusceptibilityPredictor:
     """Nạp trọn bộ Model + Preprocessing Scaler + Cấu hình ngưỡng nguy cơ từ thư mục đóng gói."""
 
     def __init__(self, bundle_dir: str | Path, device: str | None = None):
-        """Khởi tạo bộ dự đoán từ thư mục đóng gói mô hình và thiết bị tính toán."""
         self.bundle_dir = Path(bundle_dir)
         self.device = torch.device(
             device or ("cuda" if torch.cuda.is_available() else "cpu")
@@ -64,7 +61,9 @@ class FloodSusceptibilityPredictor:
         if not ckpt_path.is_file():
             ckpt_path = self.bundle_dir / "best_model_a100.pt"
 
-        checkpoint = torch.load(ckpt_path, map_location=self.device, weights_only=False)
+        checkpoint = torch.load(
+            ckpt_path, map_location=self.device, weights_only=False
+        )
 
         if prep_path.is_file():
             self.prep_config = json.loads(prep_path.read_text(encoding="utf-8"))
@@ -80,10 +79,7 @@ class FloodSusceptibilityPredictor:
             self.model_config = json.loads(cfg_path.read_text(encoding="utf-8"))
         else:
             self.model_config = {
-                "architecture": {
-                    "in_features": len(self.prep_config["feature_columns"]),
-                    "hidden_dim": 64,
-                },
+                "architecture": {"in_features": len(self.prep_config["feature_columns"]), "hidden_dim": 64},
                 "thresholds": {"default": 0.5, "top_10_pct": 0.45, "top_5_pct": 0.52},
             }
 
@@ -151,3 +147,4 @@ class FloodSusceptibilityPredictor:
             "flood_susceptibility_prob": float(res["flood_susceptibility_prob"]),
             "risk_tier": str(res["risk_tier"]),
         }
+

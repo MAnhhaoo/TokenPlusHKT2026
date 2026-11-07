@@ -13,10 +13,10 @@ from scipy.stats import spearmanr
 from sklearn.metrics import roc_auc_score
 
 matplotlib.use("Agg")
+import matplotlib.pyplot as plt
 
 
 def run_audit(processed_dir: Path, run_out_dir: Path, run_id: str) -> dict:
-    """Kiểm định xếp hạng nguy cơ, phân vùng không gian và bias theo cấp đường."""
     df_feat = pd.read_parquet(processed_dir / "road_features.parquet")
     df_part = pd.read_parquet(processed_dir / "road_partitions.parquet")
     df_mcda = pd.read_parquet(processed_dir / "road_susceptibility.parquet")
@@ -209,7 +209,9 @@ def run_audit(processed_dir: Path, run_out_dir: Path, run_id: str) -> dict:
                 "Hệ số Reporting Bias (so với TB)": round(
                     obs_rate / max(overall_pos_rate, 1e-6), 2
                 ),
-                "Điểm MLP TB": round(float(grp["flood_susceptibility_prob"].mean()), 4),
+                "Điểm MLP TB": round(
+                    float(grp["flood_susceptibility_prob"].mean()), 4
+                ),
                 "Điểm MCDA TB (0-100)": round(float(grp["score"].mean()), 2),
                 "Tỷ lệ vào Top-10% Nguy cơ (MLP %)": round(mlp_top10_rate * 100, 2),
                 "Tỷ lệ vào Top-10% Nguy cơ (MCDA %)": round(mcda_top10_rate * 100, 2),
@@ -230,20 +232,16 @@ def run_audit(processed_dir: Path, run_out_dir: Path, run_id: str) -> dict:
 
 
 def main() -> int:
-    """Điểm vào CLI để chạy kiểm định xếp hạng nguy cơ và xuất báo cáo JSON."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--processed-dir", type=Path, required=True)
     parser.add_argument("--run-out-dir", type=Path, required=True)
     parser.add_argument("--run-id", default="local_audit")
     args = parser.parse_args()
     report = run_audit(args.processed_dir, args.run_out_dir, args.run_id)
-    print(
-        json.dumps(
-            report["risk_ranking_accuracy_holdout"], indent=2, ensure_ascii=False
-        )
-    )
+    print(json.dumps(report["risk_ranking_accuracy_holdout"], indent=2, ensure_ascii=False))
     return 0
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
+

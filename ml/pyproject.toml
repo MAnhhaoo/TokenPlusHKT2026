@@ -25,5 +25,4 @@ pythonpath = ["src"]
 
 [tool.ruff]
 target-version = "py311"
-# Interactive research notebooks are excluded; lint and format gates cover Python source and scripts.
-include = ["*.py", "*.pyi", "pyproject.toml"]
+include = ["*.py", "*.pyi", "*.ipynb", "pyproject.toml"]
