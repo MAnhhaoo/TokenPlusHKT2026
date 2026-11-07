@@ -102,7 +102,6 @@ function OverviewPage({
               : "Không có điểm nghiêm trọng"}
           </>
         ),
-        data: [criticalPointsCount, highRiskCount],
       },
       {
         icon: <Sparkles size={20} />,
@@ -117,7 +116,6 @@ function OverviewPage({
               : "Chưa có báo cáo mới"}
           </>
         ),
-        data: [0, verifiedCount],
       },
       {
         icon: <Bell size={20} />,
@@ -131,7 +129,6 @@ function OverviewPage({
               : "Hệ thống an toàn"}
           </>
         ),
-        data: [0, activeAlerts.length],
       },
     ],
     [

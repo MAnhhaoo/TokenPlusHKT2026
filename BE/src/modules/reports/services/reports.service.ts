@@ -200,6 +200,8 @@ export class ReportsService {
           ? "critical"
           : detectedSeverity;
 
+    const isAutoVerified = Boolean(dto.photoUrl || dto.aiSummary || dto.recommendation);
+
     const report = this.reportRepo.create({
       id: nextId,
       location,
@@ -217,8 +219,8 @@ export class ReportsService {
       aiDepth,
       aiConfidence,
       severity: normalizedSeverity,
-      // Báo cáo được Gemini AI tự động phân tích và duyệt ngay lập tức
-      status: "verified",
+      // Báo cáo có ảnh/AI tự động duyệt ngay lập tức, báo cáo thủ công chờ duyệt
+      status: isAutoVerified ? "verified" : "pending",
       priority: dto.reportType === "drain" ? "Cống tắc" : "Trục đường chính",
       coordinates: dto.coordinates || `${lat.toFixed(4)}, ${lng.toFixed(4)}`,
       historyCount: 1,
@@ -238,8 +240,8 @@ export class ReportsService {
       lat,
       lng,
       elevationM: 2.5,
-      // Điểm ngập được tự động hiển thị trực tiếp lên bản đồ cộng đồng
-      type: "flood",
+      // Điểm ngập được tự động hiển thị trực tiếp lên bản đồ cộng đồng khi đã xác nhận
+      type: isAutoVerified ? "flood" : "pending",
       severity: normalizedSeverity,
       label: location,
       district,
@@ -284,6 +286,9 @@ export class ReportsService {
         const report = await reportRepo.findOne({ where: { id } });
         if (!report) {
           throw new NotFoundException(`Không tìm thấy báo cáo ${id}`);
+        }
+        if (report.status === "verified") {
+          throw new ConflictException(`Báo cáo ${id} đã được xác nhận.`);
         }
 
         report.status = "verified";
@@ -334,6 +339,9 @@ export class ReportsService {
         const report = await reportRepo.findOne({ where: { id } });
         if (!report) {
           throw new NotFoundException(`Không tìm thấy báo cáo ${id}`);
+        }
+        if (report.status === "verified") {
+          throw new ConflictException(`Báo cáo ${id} đã được xác nhận.`);
         }
 
         report.status = "rejected";

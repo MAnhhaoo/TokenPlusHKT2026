@@ -15,6 +15,7 @@ import ConfirmDialog from "@/components/ui/ConfirmDialog"
 import UserDetailModal from "@/components/users/UserDetailModal"
 import {
   approveReportApi,
+  buildRealtimeAdminMapPoints,
   createAlertApi,
   endAlertApi,
   fetchAdminInitialData,
@@ -26,14 +27,6 @@ import {
   updateAlertApi,
   updateUserStatusApi,
 } from "@/lib/api"
-import {
-  mockAlerts,
-  mockPoints,
-  mockReports,
-  mockTrends,
-  mockUsers,
-  mockWeather,
-} from "@/data/mockData"
 import type {
   AlertDraft,
   AreaAlert,
@@ -48,14 +41,22 @@ import type {
   WeatherSnapshot,
 } from "@/types"
 
+const EMPTY_TRENDS: TrendsMap = {
+  "24h": { labels: [], reports: [], rain: [], insight: "Chưa có dữ liệu xu hướng" },
+  "7d": { labels: [], reports: [], rain: [], insight: "Chưa có dữ liệu xu hướng" },
+  "30d": { labels: [], reports: [], rain: [], insight: "Chưa có dữ liệu xu hướng" },
+}
+
 export default function App() {
-  const [reports, setReports] = useState<FloodReport[]>(mockReports)
-  const [alerts, setAlerts] = useState<AreaAlert[]>(mockAlerts)
-  const [mapPoints, setMapPoints] = useState<MapPoint[]>(mockPoints)
-  const [trendsData, setTrendsData] = useState<TrendsMap>(mockTrends)
-  const [weather, setWeather] = useState<WeatherSnapshot | null>(mockWeather)
+  const [reports, setReports] = useState<FloodReport[]>([])
+  const [alerts, setAlerts] = useState<AreaAlert[]>([])
+  const [mapPoints, setMapPoints] = useState<MapPoint[]>(() =>
+    buildRealtimeAdminMapPoints([], [], null),
+  )
+  const [trendsData, setTrendsData] = useState<TrendsMap>(EMPTY_TRENDS)
+  const [weather, setWeather] = useState<WeatherSnapshot | null>(null)
   const [isLiveBackend, setIsLiveBackend] = useState(false)
-  const [selectedMapPoint, setSelectedMapPoint] = useState<string | null>("p1")
+  const [selectedMapPoint, setSelectedMapPoint] = useState<string | null>(null)
   const [layers, setLayers] = useState<MapLayer[]>([
     "flood",
     "risk",
@@ -74,7 +75,7 @@ export default function App() {
   const [toast, setToast] = useState<string | null>(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [page, setPage] = useState<Page>("overview")
-  const [users, setUsers] = useState<CommunityUser[]>(mockUsers)
+  const [users, setUsers] = useState<CommunityUser[]>([])
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null)
 
   useEffect(() => {

@@ -56,18 +56,18 @@ export class WeatherSnapshotEntity {
   currentRainMm: number;
 
   @ApiProperty({ example: "Mưa rào" })
-  @Column()
+  @Column({ nullable: true, default: "Mưa rào" })
   weatherCondition: string;
 
   @ApiProperty({
     example: "Cao",
     enum: ["Thấp", "Trung bình", "Cao", "Rất cao"],
   })
-  @Column()
+  @Column({ nullable: true, default: "Thấp" })
   floodRiskLevel: "Thấp" | "Trung bình" | "Cao" | "Rất cao";
 
   @ApiProperty({ type: "array", isArray: true })
-  @Column({ type: "simple-json" })
+  @Column({ type: "simple-json", nullable: true })
   hourlyForecast: HourlyWeatherItem[];
 
   @ApiProperty()

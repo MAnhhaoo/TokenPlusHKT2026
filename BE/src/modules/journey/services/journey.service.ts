@@ -1,5 +1,6 @@
 import { Injectable, Logger, Optional } from "@nestjs/common";
 import { WeatherService } from "../../weather/services/weather.service";
+import { MapService } from "../../map/services/map.service";
 import { HttpService } from "@nestjs/axios";
 import { ConfigService } from "@nestjs/config";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -30,6 +31,7 @@ export class JourneyService {
     @InjectRepository(MapPointEntity)
     private readonly mapPointRepo: Repository<MapPointEntity>,
     @Optional() private readonly weatherService?: WeatherService,
+    @Optional() private readonly mapService?: MapService,
   ) {}
 
   /**
@@ -106,7 +108,20 @@ export class JourneyService {
       "OSRM_BASE_URL",
       "https://router.project-osrm.org",
     );
-    const floodPoints = await this.mapPointRepo.find();
+    // Lấy danh sách điểm ngập thời gian thực theo thuật toán thủy văn (Open-Meteo rain + địa hình + triều cường + ngưỡng lịch sử)
+    let floodPoints: MapPointEntity[] = [];
+    if (this.mapService) {
+      try {
+        floodPoints = await this.mapService.findAllPoints({ mode: "realtime" });
+      } catch (err) {
+        this.logger.warn(
+          `Lỗi lấy điểm ngập thời gian thực từ MapService: ${(err as Error).message}`,
+        );
+        floodPoints = await this.mapPointRepo.find();
+      }
+    } else {
+      floodPoints = await this.mapPointRepo.find();
+    }
 
     try {
       const isCar = dto.mode === "car" || (dto as any).vehicleType === "car";
@@ -144,8 +159,6 @@ export class JourneyService {
 
         // Tự động kết nối vị trí hẻm với trục đường
         if (coords.length > 0) {
-          // startDist is computed above
-          // Khong chen diem chim bay dam xuyen nha
           const endDist = this.haversineMeters(
             toLat,
             toLng,
@@ -164,13 +177,15 @@ export class JourneyService {
           if (fp.type !== "flood" && fp.type !== "pending") continue;
           const hit = coords.some(
             ([lng, lat]) =>
-              this.haversineMeters(lat, lng, fp.lat, fp.lng) <= 300,
+              this.haversineMeters(lat, lng, fp.lat, fp.lng) <= 220,
           );
           if (!hit) continue;
           const penalty =
             fp.severity === "critical" ? 50 : fp.severity === "high" ? 30 : 15;
           riskPenalty += penalty;
-          nearbyFloodLabels.add(fp.label);
+          const depthInfo = fp.depth ? `sâu ~${fp.depth} cm` : "ngập";
+          const rainInfo = fp.rainfall ? ` (mưa ${fp.rainfall} mm)` : "";
+          nearbyFloodLabels.add(`${fp.label} (${depthInfo}${rainInfo})`);
         }
 
         const durationMinutes = Math.max(
@@ -243,6 +258,28 @@ export class JourneyService {
       const safest = scoredRoutes[0];
       const alternative = scoredRoutes[1] ?? scoredRoutes[0];
 
+      const safeBadge =
+        safest.riskPenalty === 0
+          ? "Tối ưu & Khô ráo"
+          : safest.riskPenalty <= 20
+            ? "Rủi ro thấp"
+            : "Lưu ý điểm ngập";
+
+      const safeDetail =
+        safest.avoidedOrNearbyFloods.length === 0
+          ? "Lộ trình hoàn toàn khô ráo, không cắt qua điểm ngập nào theo dữ liệu khí tượng Open-Meteo thời gian thực."
+          : `Lộ trình tối ưu nhưng cần lưu ý: ${safest.avoidedOrNearbyFloods.slice(0, 2).join("; ")}.`;
+
+      const altBadge =
+        alternative.riskPenalty === 0
+          ? "Tuyến phụ khô ráo"
+          : "Tuyến dự phòng";
+
+      const altDetail =
+        alternative.avoidedOrNearbyFloods.length === 0
+          ? "Tuyến dự phòng an toàn, hoàn toàn khô ráo."
+          : `Tuyến thay thế dự phòng, lưu ý đoạn: ${alternative.avoidedOrNearbyFloods.slice(0, 2).join("; ")}.`;
+
       return {
         provider: "osrm-live",
         origin: [fromLng, fromLat],
@@ -250,20 +287,16 @@ export class JourneyService {
         safeRoute: {
           id: "safe",
           name: "Tuyến đề xuất",
-          badge: safest.riskPenalty === 0 ? "An toàn nhất" : "Nhanh nhất",
+          badge: safeBadge,
           ...safest,
-          detail:
-            safest.avoidedOrNearbyFloods.length === 0
-              ? "Lộ trình khô ráo, không đi qua điểm ngập nào đã ghi nhận."
-              : `Cần lưu ý khu vực: ${safest.avoidedOrNearbyFloods.join(", ")}.`,
+          detail: safeDetail,
         },
         balancedRoute: {
           id: "balanced",
           name: "Tuyến dự phòng",
-          badge: "Ít điểm ngập",
+          badge: altBadge,
           ...alternative,
-          detail:
-            "Tuyến dự phòng được sử dụng khi hệ thống ghi nhận ngập trên lộ trình chính.",
+          detail: altDetail,
         },
       };
     } catch (error) {

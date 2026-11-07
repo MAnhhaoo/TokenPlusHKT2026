@@ -1,7 +1,6 @@
 packages:
   - "FE/*"
   - "BE"
-  - "contracts"
 
 allowBuilds:
   '@scarf/scarf': false

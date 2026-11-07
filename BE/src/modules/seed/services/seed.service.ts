@@ -41,28 +41,21 @@ export class SeedService implements OnApplicationBootstrap {
   ) {}
 
   /**
-   * Tự động khởi tạo dữ liệu mẫu khi các bảng đang trống hoặc khi bật cờ SEED_ON_BOOTSTRAP=true.
+   * Tự động khởi tạo dữ liệu bản đồ 250 điểm IRD và khung dự báo khi cơ sở dữ liệu mới khởi tạo.
    */
   async onApplicationBootstrap() {
     const forceSeed = process.env.SEED_ON_BOOTSTRAP === "true";
-    const [pointCount, forecastCount, reportCount, userCount] =
-      await Promise.all([
-        this.mapPointRepo.count(),
-        this.forecastRepo.count(),
-        this.reportRepo.count(),
-        this.userRepo.count(),
-      ]);
-    const isEmpty =
-      pointCount === 0 &&
-      forecastCount === 0 &&
-      reportCount === 0 &&
-      userCount === 0;
+    const [pointCount, forecastCount] = await Promise.all([
+      this.mapPointRepo.count(),
+      this.forecastRepo.count(),
+    ]);
+    const isEmpty = pointCount === 0 && forecastCount === 0;
 
     if (forceSeed || isEmpty) {
       this.logger.log(
         forceSeed
-          ? "SEED_ON_BOOTSTRAP=true — đang làm mới và nạp lại dữ liệu chuẩn..."
-          : "Cơ sở dữ liệu đang trống — đang khởi tạo dữ liệu chuẩn lần đầu...",
+          ? "SEED_ON_BOOTSTRAP=true — đang làm mới dữ liệu bản đồ IRD..."
+          : "Cơ sở dữ liệu bản đồ đang trống — đang khởi tạo 250 điểm thực nghiệm IRD...",
       );
       if (forceSeed) {
         await this.mapPointRepo.createQueryBuilder().delete().execute();
@@ -97,13 +90,13 @@ export class SeedService implements OnApplicationBootstrap {
     await this.seedAll();
 
     return {
-      message: "Đã khôi phục toàn bộ dữ liệu mẫu SaigonDrain AI thành công.",
+      message: "Đã làm sạch dữ liệu và nạp 250 điểm ngập IRD thành công.",
       seededAt: new Date().toISOString(),
     };
   }
 
   /**
-   * Nạp dữ liệu chuẩn (250 điểm đen lịch sử IRD và cấu hình khởi tạo bằng 0) cho hệ thống SaigonDrain AI.
+   * Nạp 250 điểm đen ngập lụt IRD và khung dự báo thời tiết khởi tạo bằng 0.
    */
   private async seedAll() {
     let mapPoints: Partial<MapPointEntity>[] = [];

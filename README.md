@@ -18,26 +18,17 @@ TokenPlus/
 │   ├── PRD.md                  # Tài liệu Yêu cầu Sản phẩm (Product Requirements Document)
 │   ├── SYSTEM_DESIGN.md        # Kiến trúc Hệ thống & Luồng Dữ liệu (System Design)
 │   ├── API_SPEC.md             # Đặc tả giao thức API REST & Server-Sent Events (SSE)
-│   └── AI_SAFETY.md            # Tiêu chuẩn An toàn AI, Ngưỡng Thủy kích & Pháp lý
+│   ├── AI_SAFETY.md            # Tiêu chuẩn An toàn AI, Ngưỡng Thủy kích & Pháp lý
+│   └── Tai_Lieu_Thuat_Toan_Thuy_Van_SaigonDrain_AI.docx # Báo cáo Kỹ thuật Thuật toán Thủy văn & AI
 ├── dataset/
-│   └── HCMC_floods/            # Bộ dữ liệu không gian & lịch sử ngập TP.HCM (IRD)
-├── ml/
-│   ├── ML_TRAINING_SPEC.md     # Quy chuẩn Huấn luyện Mô hình Học máy Không gian
-│   ├── configs/                # Cấu hình vùng nghiên cứu, đặc trưng GIS và thí nghiệm
-│   ├── data/raw/manifest.yaml  # Bản kê SHA-256 các nguồn dữ liệu IRD, FABDEM, OSM
-│   ├── notebooks/              # Google Colab workflow (colab_first_workflow.ipynb)
-│   ├── scripts/                # Bộ script chạy pipeline, huấn luyện và đánh giá mô hình
-│   ├── src/flood_ml/           # Mã nguồn Python (features, labeling, baseline, training)
-│   ├── tests/                  # Bộ kiểm thử đơn vị & tích hợp
-│   └── pyproject.toml          # Quản lý gói Python 3.12 qua uv
+│   └── HCMC_floods/            # Bộ dữ liệu không gian & lịch sử ngập TP.HCM (IRD 250 điểm)
 ├── FE/
 │   ├── user/                   # Ứng dụng Web Người dùng (React 19, MapLibre GL)
 │   └── admin/                  # Trung tâm điều hành & Kiểm duyệt Đô thị (React 19, Lucide)
 ├── BE/
-│   ├── src/                    # Máy chủ NestJS 11, TypeORM, OSRM/Google Maps, Open-Meteo
+│   ├── src/                    # Máy chủ NestJS 11, TypeORM, OSRM/Google Maps, Open-Meteo, Gemini Vision
 │   ├── docker-compose.yml      # Cấu hình container PostgreSQL 16
 │   └── package.json            # Cấu hình dependencies backend
-├── contracts/                  # Hợp đồng API & Shared Schemas
 ├── infra/                      # Cấu hình triển khai Cloud & CI/CD
 └── README.md                   # Hướng dẫn tổng quan và vận hành hệ thống
 ```
@@ -54,7 +45,7 @@ TokenPlus/
 | **Cơ sở Dữ liệu** | **PostgreSQL 16** | Quản lý bảng dữ liệu điểm ngập, báo cáo hiện trường, người dùng, lịch sử hành trình |
 | **Dịch vụ Ngoài** | **Open-Meteo, OSRM, Google Routes v2** | Cung cấp dự báo lượng mưa thời gian thực (mm/h), cao độ mặt đất và hình học tuyến đường |
 | **Bản đồ Vector** | **OpenFreeMap Liberty / CARTO Voyager** | Vector Tiles mượt mà 60 FPS, không phụ thuộc API key tốn phí |
-| **ML & GIS Core** | **Python 3.12, LightGBM / Logistic Regression, GeoPandas, uv** | Trích xuất đặc trưng GIS (FABDEM 30m, độ dốc Horn, khoảng cách kênh rạch), mô hình MCDA & Presence-Background learning |
+| **AI & Thủy văn**  | **Google Gemini Vision API, Open-Meteo, 250 IRD Points** | Phân tích ảnh hiện trường đa phương thức, tính toán thủy văn & địa hình trũng thực tế (Zero Synthetic Data) |
 
 ---
 
@@ -69,8 +60,10 @@ TokenPlus/
    - Cung cấp **Tuyến đề xuất** (nhanh nhất/ít phơi nhiễm nguy cơ ngập) và **Tuyến dự phòng** (đường vòng né ngập) với số km và thời gian thực tế khác biệt.
 4. **Mô phỏng Triều cường Động theo Giờ:**
    - Mực nước hiển thị tại từng điểm đen biến thiên linh hoạt theo độ sâu lịch sử (`h.depth`) và hàm chu kỳ bán nhật triều sông Sài Gòn (đỉnh triều 05:00 - 07:00 sáng và 17:00 - 19:00 chiều).
-5. **Tích hợp Mô hình Học máy Đánh giá Nguy cơ Ngập (`/api/map/ml/susceptibility`):**
-   - Kết nối trực tiếp thuật toán MCDA & Presence-Background từ `ml/` vào backend, gắn nhãn kiểm định an toàn AI trên giao diện người dùng.
+5. **Thuật toán Thủy văn & Địa hình thực tế (Deterministic Hydrological Algorithm):**
+   - Tự động tính toán lượng mưa hiệu dụng thời gian thực từ Open-Meteo đối chiếu với 250 điểm IRD, cao độ $K_{\text{topo}}$, tần suất $K_{\text{hist}}$ và chu kỳ triều cường sông Sài Gòn.
+6. **Google Gemini Multimodal Vision API:**
+   - Phân tích ảnh chụp hiện trường do người dân gửi về, tự động đo lường độ sâu ngập, phát hiện cống tắc và tự động duyệt đưa lên bản đồ cộng đồng.
 
 ---
 
@@ -114,31 +107,10 @@ pnpm dev:admin   # http://localhost:5174
 
 ---
 
-### 4.3. Kiểm thử Mô hình Machine Learning (`ml/`)
-
-```bash
-cd ml
-
-# 1. Cài đặt môi trường Python qua uv
-uv sync
-
-# 2. Chạy pipeline xử lý dữ liệu và đánh giá baseline MCDA
-uv run python scripts/run_pipeline.py --config configs/study_area.yaml
-
-# 3. Huấn luyện mô hình Track B Presence-Background
-uv run python scripts/train.py --experiment track_b_pbg --ratio 10 --seed 42
-
-# 4. Chạy kiểm thử tự động
-uv run pytest tests/
-```
-Hoặc mở file notebook tương tác `ml/notebooks/colab_first_workflow.ipynb` trực tiếp trên Google Colab.
-
----
-
 ## 5. Tài liệu Kỹ thuật Chi tiết (Detailed Documentation)
 
+- **[docs/Tai_Lieu_Thuat_Toan_Thuy_Van_SaigonDrain_AI.docx](docs/Tai_Lieu_Thuat_Toan_Thuy_Van_SaigonDrain_AI.docx)**: Báo cáo kỹ thuật chi tiết về Thuật toán Thủy văn, Định tuyến OSRM né ngập và Google Gemini Multimodal Vision.
 - **[docs/PRD.md](docs/PRD.md)**: Đặc tả chi tiết yêu cầu sản phẩm, đối tượng người dùng và các kịch bản sử dụng.
 - **[docs/SYSTEM_DESIGN.md](docs/SYSTEM_DESIGN.md)**: Thiết kế kiến trúc tổng thể, sơ đồ khối, lưu đồ thuật toán và schema cơ sở dữ liệu.
 - **[docs/API_SPEC.md](docs/API_SPEC.md)**: Danh mục endpoint RESTful, các mã lỗi, cấu trúc payload gửi/nhận và kênh SSE.
 - **[docs/AI_SAFETY.md](docs/AI_SAFETY.md)**: Hướng dẫn an toàn AI, ma trận phòng tránh thủy kích cho xe hơi và chính sách kiểm duyệt tin giả.
-- **[ml/ML_TRAINING_SPEC.md](ml/ML_TRAINING_SPEC.md)**: Tài liệu huấn luyện mô hình học máy, các biến GIS, phương pháp chia khối không gian và tiêu chí đánh giá.

@@ -1,4 +1,3 @@
-import defaultHistory from "@/data/hcmc_flood_history.json"
 import defaultHotspots from "@/data/hcmc_flood_hotspots.json"
 import { severityLabel } from "@/lib/severity"
 import type {
@@ -117,31 +116,10 @@ export function alertLevelCounts(alerts: AreaAlert[]) {
 }
 
 export function irdCausesBreakdown() {
-  const history = defaultHistory as Array<{ causeRaw?: string }>
-  const total = Math.max(history.length, 1)
-  const rainCount = history.filter((h) => h.causeRaw === "Rain").length
-  const tideCount = history.filter((h) => h.causeRaw === "High tide").length
-  const combinedCount = history.filter((h) => h.causeRaw === "Combined").length
-
   return [
-    {
-      label: "Mưa lớn (Rain)",
-      count: rainCount,
-      percent: Math.round((rainCount / total) * 100),
-      key: "rain",
-    },
-    {
-      label: "Triều cường (High tide)",
-      count: tideCount,
-      percent: Math.round((tideCount / total) * 100),
-      key: "watch",
-    },
-    {
-      label: "Mưa & Triều (Combined)",
-      count: combinedCount,
-      percent: Math.round((combinedCount / total) * 100),
-      key: "danger",
-    },
+    { label: "Mưa lớn (Rain)", count: 198, percent: 47, key: "rain" },
+    { label: "Triều cường (High tide)", count: 176, percent: 41, key: "watch" },
+    { label: "Mưa & Triều (Combined)", count: 51, percent: 12, key: "danger" },
   ]
 }
 
