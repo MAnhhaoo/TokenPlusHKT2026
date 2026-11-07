@@ -161,6 +161,10 @@ export class MapService {
         continue;
       }
 
+      if (!activeLayers.includes("flood")) {
+        continue;
+      }
+
       // Có ngập thực tế theo lượng mưa thời gian thực: tính độ sâu động
       let dynamicDepth = 15;
       if (isRainFlooded) {

@@ -41,6 +41,11 @@ export class OperatorAuthGuard implements CanActivate {
           "Token xác thực không hợp lệ hoặc đã hết hạn.",
         );
       }
+      if (verified.role !== "operator" && verified.role !== "coordinator") {
+        throw new ForbiddenException(
+          "Yêu cầu quyền Điều phối viên để thực hiện thao tác này.",
+        );
+      }
       request.operator = verified;
       return true;
     }

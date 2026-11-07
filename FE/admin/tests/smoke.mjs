@@ -7,6 +7,7 @@ const browser = await chromium.launch({ headless: true })
 const context = await browser.newContext({viewport:{width:1440,height:1000}})
 const external = [], errors = [], checks = []
 await context.route('**/*', route => {
+ if (route.request().url().startsWith(base+'/api/')) return route.abort()
  if (!route.request().url().startsWith(base+'/')) {external.push(route.request().url()); return route.abort()}
  return route.continue()
 })

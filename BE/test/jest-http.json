@@ -1,0 +1,9 @@
+{
+  "rootDir": "..",
+  "testEnvironment": "node",
+  "testRegex": ".*\\.http-spec\\.ts$",
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "setupFilesAfterEnv": ["<rootDir>/test/offline.setup.ts"]
+}
