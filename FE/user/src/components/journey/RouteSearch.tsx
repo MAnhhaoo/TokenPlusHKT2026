@@ -1,3 +1,4 @@
+
 import { useEffect, useRef, useState } from "react";
 import Icon from "@/components/ui/Icon";
 import { matchDynamicPlacePool, reverseGeocodeApi, searchPlacesApi } from "@/lib/api";
@@ -72,6 +73,44 @@ function RouteSearch({
         };
         onSelectOrigin(place);
         setOriginText(label);
+        setActiveField(null);
+        setSuggestions([]);
+      }
+    } finally {
+      setGpsLoading(false);
+    }
+  };
+
+  const handleGetDestGps = async () => {
+    setGpsLoading(true);
+    try {
+      const { latitude, longitude, isIpFallback } = await getUserLocation();
+      const locationLabel = isIpFallback ? "Vị trí gần đúng" : "Vị trí của bạn";
+      try {
+        const geo = await reverseGeocodeApi(latitude, longitude);
+        const street =
+          geo.location || (geo.district ? `${geo.district}, TP.HCM` : "Vị trí của bạn");
+        const label = `${locationLabel} · ${street}`;
+        const place: RouteEndpoint = {
+          label,
+          address: geo.location,
+          district: geo.district,
+          coords: [longitude, latitude],
+          isCurrentLocation: !isIpFallback,
+        };
+        onSelectDestination(place);
+        setDestText(label);
+        setActiveField(null);
+        setSuggestions([]);
+      } catch {
+        const label = `${locationLabel} (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`;
+        const place: RouteEndpoint = {
+          label,
+          coords: [longitude, latitude],
+          isCurrentLocation: !isIpFallback,
+        };
+        onSelectDestination(place);
+        setDestText(label);
         setActiveField(null);
         setSuggestions([]);
       }
@@ -272,7 +311,7 @@ function RouteSearch({
           <span className="point-destination" />
         </div>
         <div className="search-values">
-          <label className="search-value">
+          <div className="search-value">
             <div className="search-input-row">
               <input
                 aria-label="Nhập điểm đi"
@@ -286,6 +325,7 @@ function RouteSearch({
                 onFocus={() => setActiveField("origin")}
                 onBlur={() => {
                   window.setTimeout(async () => {
+                    if (wrapRef.current?.contains(document.activeElement)) return;
                     const text = originText.trim();
                     if (text && (!origin || origin.label !== text)) {
                       const res = await searchPlaces(text);
@@ -293,28 +333,27 @@ function RouteSearch({
                         commitPlace(res[0], "origin");
                       }
                     }
-                  }, 60);
+                  }, 180);
                 }}
                 onKeyDown={(e) => handleKeyDown(e, "origin")}
                 placeholder="Chọn điểm đi hoặc bấm GPS…"
                 type="text"
                 value={originText}
               />
-              {originText && (
-                <button
-                  aria-label="Xóa điểm đi"
-                  className="search-clear-btn"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setOriginText("");
-                    onSelectOrigin(null);
-                    setSuggestions([]);
-                  }}
-                  type="button"
-                >
-                  <Icon name="close" size={13} />
-                </button>
-              )}
+              <button
+                aria-label="Xóa điểm đi"
+                className="search-clear-btn"
+                style={{ display: originText ? "inline-flex" : "none" }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setOriginText("");
+                  onSelectOrigin(null);
+                  setSuggestions([]);
+                }}
+                type="button"
+              >
+                <Icon name="close" size={13} />
+              </button>
               <button
                 aria-label="Lấy vị trí GPS hiện tại làm điểm xuất phát"
                 className={`search-gps-btn ${gpsLoading ? "is-loading" : ""}`}
@@ -332,9 +371,9 @@ function RouteSearch({
                 )}
               </button>
             </div>
-          </label>
+          </div>
           <span aria-hidden="true" className="search-divider" />
-          <label className="search-value">
+          <div className="search-value">
             <div className="search-input-row">
               <input
                 aria-label="Nhập điểm đến"
@@ -348,6 +387,7 @@ function RouteSearch({
                 onFocus={() => setActiveField("dest")}
                 onBlur={() => {
                   window.setTimeout(async () => {
+                    if (wrapRef.current?.contains(document.activeElement)) return;
                     const text = destText.trim();
                     if (text && (!destination || destination.label !== text)) {
                       const res = await searchPlaces(text);
@@ -355,30 +395,45 @@ function RouteSearch({
                         commitPlace(res[0], "dest");
                       }
                     }
-                  }, 60);
+                  }, 180);
                 }}
                 onKeyDown={(e) => handleKeyDown(e, "dest")}
                 placeholder="Tìm điểm đến, tên đường, địa chỉ…"
                 type="text"
                 value={destText}
               />
-              {destText && (
-                <button
-                  aria-label="Xóa điểm đến"
-                  className="search-clear-btn"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setDestText("");
-                    onSelectDestination(null);
-                    setSuggestions([]);
-                  }}
-                  type="button"
-                >
-                  <Icon name="close" size={13} />
-                </button>
-              )}
+              <button
+                aria-label="Xóa điểm đến"
+                className="search-clear-btn"
+                style={{ display: destText ? "inline-flex" : "none" }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setDestText("");
+                  onSelectDestination(null);
+                  setSuggestions([]);
+                }}
+                type="button"
+              >
+                <Icon name="close" size={13} />
+              </button>
+              <button
+                aria-label="Lấy vị trí GPS hiện tại làm điểm đến"
+                className={`search-gps-btn ${gpsLoading ? "is-loading" : ""}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleGetDestGps();
+                }}
+                title="Lấy vị trí GPS của bạn làm điểm đến"
+                type="button"
+              >
+                {gpsLoading ? (
+                  <span className="search-gps-spinner" />
+                ) : (
+                  <Icon name="location" size={15} />
+                )}
+              </button>
             </div>
-          </label>
+          </div>
         </div>
         <button
           aria-label="Đảo chiều điểm đi và điểm đến"

@@ -30,8 +30,8 @@ function TopBar({
   alertCount?: number;
   onOpenAlerts?: () => void;
   onOpenGuide?: () => void;
-  activeMainTab?: "map" | "weather";
-  onSelectMainTab?: (tab: "map" | "weather") => void;
+  activeMainTab?: "map" | "community" | "weather";
+  onSelectMainTab?: (tab: "map" | "community" | "weather") => void;
 }) {
   const [vnTime, setVnTime] = useState(() => formatVietnamClock());
 
@@ -61,7 +61,16 @@ function TopBar({
           type="button"
         >
           <Icon name="map" size={17} />
-          <span>Bản đồ an toàn</span>
+          <span>Bản đồ</span>
+        </button>
+        <button
+          aria-current={activeMainTab === "community" ? "page" : undefined}
+          className={`top-nav-pill ${activeMainTab === "community" ? "is-active" : ""}`}
+          onClick={() => onSelectMainTab?.("community")}
+          type="button"
+        >
+          <Icon name="users" size={17} />
+          <span>Cộng đồng</span>
         </button>
         <button
           aria-current={activeMainTab === "weather" ? "page" : undefined}

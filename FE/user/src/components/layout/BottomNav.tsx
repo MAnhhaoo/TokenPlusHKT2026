@@ -20,6 +20,15 @@ function BottomNav({
         <span>Bản đồ</span>
       </button>
       <button
+        aria-current={activeTab === "community" ? "page" : undefined}
+        className={activeTab === "community" ? "is-active" : ""}
+        onClick={() => onSelect("community")}
+        type="button"
+      >
+        <Icon name="users" size={22} />
+        <span>Cộng đồng</span>
+      </button>
+      <button
         aria-current={activeTab === "tracking" ? "page" : undefined}
         className={activeTab === "tracking" ? "is-active" : ""}
         onClick={() => onSelect("tracking")}

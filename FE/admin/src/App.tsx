@@ -24,6 +24,7 @@ import {
   rejectReportApi,
   subscribeAdminRealtime,
   syncWeatherForecastsApi,
+  toggleReportLockApi,
   updateAlertApi,
   updateUserStatusApi,
 } from "@/lib/api"
@@ -292,6 +293,36 @@ export default function App() {
     )
   }
 
+  const handleToggleLock = async (report: FloodReport) => {
+    const apiResult = await toggleReportLockApi(report.id)
+    if (apiResult?.report) {
+      setReports((current) =>
+        current.map((r) => (r.id === report.id ? apiResult.report : r)),
+      )
+    }
+    if (apiResult?.updatedMapPoint) {
+      setMapPoints((current) => {
+        const exists = current.some((pt) => pt.linkedReportId === report.id)
+        if (exists) {
+          return current.map((pt) =>
+            pt.linkedReportId === report.id ? apiResult.updatedMapPoint! : pt,
+          )
+        }
+        return [...current, apiResult.updatedMapPoint!]
+      })
+    } else if (apiResult?.report?.status === "rejected") {
+      setMapPoints((current) =>
+        current.filter((pt) => pt.linkedReportId !== report.id),
+      )
+    }
+    const isLocked = (apiResult?.report?.status ?? report.status) === "rejected"
+    setToast(
+      isLocked
+        ? `Đã khóa báo cáo ${report.id} (${report.location}) và ẩn khỏi bản đồ.`
+        : `Đã mở khóa báo cáo ${report.id} (${report.location}) và hiển thị lại trên bản đồ.`,
+    )
+  }
+
   const saveAlert = async (draft: AlertDraft) => {
     if (alertModal?.mode === "edit" && alertModal.alert) {
       const targetId = alertModal.alert.id
@@ -470,7 +501,12 @@ export default function App() {
             />
           )}
           {page === "reports" && (
-            <ReportsPage onReview={setReviewing} reports={reports} />
+            <ReportsPage
+              onReview={setReviewing}
+              onToggleLock={handleToggleLock}
+              points={mapPoints}
+              reports={reports}
+            />
           )}
           {page === "alerts" && (
             <AlertsPage

@@ -129,6 +129,9 @@ export class MapService {
       }
 
       if (point.type === "pending" || Boolean(point.linkedReportId)) {
+        if (query.excludeReports === "true") {
+          continue;
+        }
         const isActiveReportPoint =
           point.type === "pending" ||
           (point.type === "flood" && (point.depth || 0) > 0);
@@ -364,6 +367,7 @@ export class MapService {
     }
 
     if (
+      query.excludeReports !== "true" &&
       typeof this.reportRepo?.find === "function" &&
       (activeLayers.includes("flood") || activeLayers.includes("risk"))
     ) {

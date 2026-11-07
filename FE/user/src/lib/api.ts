@@ -1,6 +1,7 @@
 import type {
   AreaAlertItem,
   VehicleMode,
+  CommunityReport,
   CommunityUserProfile,
   ForecastSlot,
   MapFloodPoint,
@@ -539,69 +540,33 @@ export async function fetchMapPointsApi(
   const query = new URLSearchParams();
   if (rainMm !== undefined) query.set("rainMm", String(rainMm));
   if (mode) query.set("mode", mode);
+  query.set("excludeReports", "true");
 
   try {
-    const [pointsRes, reportsRes] = await Promise.all([
-      fetch(`${API_BASE}/map/points?${query.toString()}`),
-      mode === "realtime"
-        ? fetch(`${API_BASE}/reports?status=verified`).catch(() => null)
-        : Promise.resolve(null),
-    ]);
+    const pointsRes = await fetch(`${API_BASE}/map/points?${query.toString()}`);
     if (pointsRes.ok) {
       const data = await pointsRes.json();
       if (Array.isArray(data)) {
-        const merged: MapFloodPoint[] = [...(data as MapFloodPoint[])];
-        if (reportsRes && reportsRes.ok) {
-          try {
-            const reports = await reportsRes.json();
-            if (Array.isArray(reports)) {
-              for (const r of reports) {
-                if (!r || r.status !== "verified" || !r.coordinates) continue;
-                const alreadyIncluded = merged.some(
-                  (pt) =>
-                    (pt as any).linkedReportId === r.id ||
-                    pt.id === `p_${r.id}` ||
-                    (Math.abs(pt.lat - Number(r.coordinates.split(",")[0])) < 0.0002 &&
-                      Math.abs(pt.lng - Number(r.coordinates.split(",")[1])) < 0.0002),
-                );
-                if (alreadyIncluded) continue;
-                const parts = String(r.coordinates)
-                  .split(",")
-                  .map((s) => Number.parseFloat(s.trim()));
-                if (parts.length !== 2 || Number.isNaN(parts[0]) || Number.isNaN(parts[1])) {
-                  continue;
-                }
-                const depth = Number(r.reportedDepth || r.aiDepth || 24);
-                if (depth <= 0) continue;
-                merged.push({
-                  id: `p_${r.id}`,
-                  lat: parts[0],
-                  lng: parts[1],
-                  label: r.location || "Điểm báo cáo cộng đồng",
-                  district: r.district || "TP. Hồ Chí Minh",
-                  type: "flood",
-                  severity:
-                    r.severity === "critical" || r.severity === "high" || r.severity === "medium"
-                      ? r.severity
-                      : "medium",
-                  depth,
-                  rainfall: rainMm ?? 0,
-                });
-              }
-            }
-          } catch {
-            // ignore report merge error
-          }
-        }
+        // Chỉ lấy điểm quan trắc / mô hình thủy văn thời gian thực (loại trừ hoàn toàn báo cáo người dùng)
+        const pureHydrologicalPoints: MapFloodPoint[] = (data as MapFloodPoint[]).filter(
+          (pt) => !(pt as any).linkedReportId && !pt.id.startsWith("p_RP-") && !pt.id.startsWith("report-"),
+        );
+
+        // Đăng ký các địa điểm vào search pool
         registerDynamicPlaces(
-          merged.map((pt) => ({
+          pureHydrologicalPoints.map((pt) => ({
             label: pt.district ? `${pt.label} · ${pt.district}` : pt.label,
             address: `${pt.label}, ${pt.district || "TP. Hồ Chí Minh"}`,
             district: pt.district || "TP. Hồ Chí Minh",
             coords: [pt.lng, pt.lat],
           })),
         );
-        return merged;
+
+        // Chế độ thời gian thực: chỉ hiển thị điểm có nguy cơ ngập thực tế (depth > 0)
+        if (mode === "realtime") {
+          return pureHydrologicalPoints.filter((pt) => (pt.depth || 0) > 0);
+        }
+        return pureHydrologicalPoints;
       }
     }
   } catch {
@@ -1607,10 +1572,50 @@ export async function loginUserApi(payload: { identifier: string; password: stri
   }
 }
 
+export async function fetchCommunityReportsApi(query?: {
+  status?: string;
+  severity?: string;
+  district?: string;
+}): Promise<CommunityReport[]> {
+  try {
+    const params = new URLSearchParams();
+    if (query?.status) params.set("status", query.status);
+    if (query?.severity) params.set("severity", query.severity);
+    if (query?.district && query.district !== "all") params.set("district", query.district);
+    const qs = params.toString() ? `?${params.toString()}` : "";
+    const res = await fetch(`${API_BASE}/reports${qs}`);
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        return data.map((r: any) => {
+          let lat: number | undefined;
+          let lng: number | undefined;
+          if (r.coordinates && r.coordinates.includes(",")) {
+            const parts = r.coordinates.split(",").map((s: string) => Number(s.trim()));
+            if (Number.isFinite(parts[0]) && Number.isFinite(parts[1])) {
+              lat = parts[0];
+              lng = parts[1];
+            }
+          }
+          return {
+            ...r,
+            lat,
+            lng,
+          };
+        });
+      }
+    }
+  } catch {
+    // fallback
+  }
+  return [];
+}
+
 export function subscribeUserRealtime(handlers: {
   onWeatherUpdated?: (data: { snapshot?: WeatherSnapshot; slots?: ForecastSlot[] }) => void;
   onRouteRecomputeNeeded?: () => void;
   onAlertsChanged?: () => void;
+  onReportsChanged?: () => void;
 }): () => void {
   if (typeof window === "undefined" || typeof EventSource === "undefined") {
     return () => undefined;
@@ -1636,6 +1641,7 @@ export function subscribeUserRealtime(handlers: {
   ]) {
     es.addEventListener(evt, () => {
       handlers.onRouteRecomputeNeeded?.();
+      handlers.onReportsChanged?.();
     });
   }
 

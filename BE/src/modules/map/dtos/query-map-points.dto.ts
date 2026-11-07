@@ -38,6 +38,14 @@ export class QueryMapPointsDto {
   @IsOptional()
   @IsString()
   mode?: "realtime" | "history";
+
+  @ApiPropertyOptional({
+    example: "true",
+    description: "Loại trừ các điểm xuất phát từ báo cáo cộng đồng của người dân",
+  })
+  @IsOptional()
+  @IsString()
+  excludeReports?: string;
 }
 
 export class CreateMapPointDto {

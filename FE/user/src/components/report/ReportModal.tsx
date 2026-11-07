@@ -110,6 +110,9 @@ function ReportModal({
       setShowSuggestions(false);
     } catch (err) {
       console.warn("Failed to locate position in ReportModal:", err);
+      setLocationText("TP. Hồ Chí Minh");
+      setSelectedDistrict("Quận 1");
+      setCoords([106.7009, 10.7769]);
     } finally {
       setLocatingGps(false);
     }

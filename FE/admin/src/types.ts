@@ -31,6 +31,9 @@ export type FloodReport = {
   reporterId?: string
   aiSummary?: string
   recommendation?: string
+  estimatedDurationMin?: number
+  estimatedClearAt?: string
+  drainageRateCmPerMin?: number
 }
 
 export type AreaAlert = {
