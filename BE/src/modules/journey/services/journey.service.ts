@@ -145,30 +145,6 @@ export class JourneyService {
         throw new Error("OSRM returned empty routes");
       }
 
-      // Nếu OSRM chỉ trả về 1 tuyến hoặc tuyến chính cắt qua điểm ngập nặng, tự động tính thêm tuyến vòng (detour waypoint)
-      if (rawRoutes.length < 2) {
-        const midLng = (fromLng + toLng) / 2 + 0.0055;
-        const midLat = (fromLat + toLat) / 2 - 0.0035;
-        try {
-          const detourUrl = `${osrmBase}/route/v1/${profile}/${fromLng},${fromLat};${midLng},${midLat};${toLng},${toLat}`;
-          const detourRes = await firstValueFrom(
-            this.httpService.get(detourUrl, {
-              params: {
-                steps: "true",
-                geometries: "geojson",
-                overview: "full",
-              },
-              timeout: 1500,
-            }),
-          );
-          if (detourRes.data?.routes?.[0]) {
-            rawRoutes.push(detourRes.data.routes[0]);
-          }
-        } catch {
-          // ignore detour error
-        }
-      }
-
       const scoredRoutes = rawRoutes.map((route, idx) => {
         const rawCoords: number[][] = route.geometry?.coordinates ?? [];
         const coords: number[][] = [...rawCoords];
@@ -295,9 +271,7 @@ export class JourneyService {
           : `Lộ trình tối ưu nhưng cần lưu ý: ${safest.avoidedOrNearbyFloods.slice(0, 2).join("; ")}.`;
 
       const altBadge =
-        alternative.riskPenalty === 0
-          ? "Tuyến phụ khô ráo"
-          : "Tuyến dự phòng";
+        alternative.riskPenalty === 0 ? "Tuyến phụ khô ráo" : "Tuyến dự phòng";
 
       const altDetail =
         alternative.avoidedOrNearbyFloods.length === 0

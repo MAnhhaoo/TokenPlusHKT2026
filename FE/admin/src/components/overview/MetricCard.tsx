@@ -25,7 +25,6 @@ function MetricCard({
         )
         .join(" ")
     : ""
-
   return (
     <section className="metric-card">
       <div className="metric-top">

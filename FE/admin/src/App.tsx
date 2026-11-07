@@ -83,16 +83,16 @@ export default function App() {
     async function loadInitial() {
       const data = await fetchAdminInitialData()
       if (!active || !data.live) return
-      if (Array.isArray(data.reports) && data.reports.length > 0) {
+      if (Array.isArray(data.reports)) {
         setReports(data.reports)
       }
-      if (Array.isArray(data.alerts) && data.alerts.length > 0) {
+      if (Array.isArray(data.alerts)) {
         setAlerts(data.alerts)
       }
-      if (Array.isArray(data.mapPoints) && data.mapPoints.length > 0) {
+      if (Array.isArray(data.mapPoints)) {
         setMapPoints(data.mapPoints)
       }
-      if (Array.isArray(data.users) && data.users.length > 0) {
+      if (Array.isArray(data.users)) {
         setUsers(data.users)
       }
       if (data.trends && typeof data.trends === "object") {

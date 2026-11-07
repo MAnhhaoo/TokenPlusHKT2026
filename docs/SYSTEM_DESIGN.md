@@ -15,7 +15,7 @@ Hệ thống được tổ chức theo mô hình **Unified Monorepo**, phân tá
 ```mermaid
 graph TD
     subgraph ClientLayer ["1. TẦNG GIAO DIỆN (FRONTEND)"]
-        UserApp["📱 User App (Vue 3 + Vite + MapLibre GL)<br/>Android Native via Capacitor"]
+        UserApp["🌐 User Web App (React 19 + Vite + MapLibre GL)<br/>Bản đồ cảnh báo & điều hướng né ngập"]
         AdminApp["💻 Admin Dashboard (React + Vite + Recharts)<br/>Trung tâm điều hành & kiểm duyệt"]
     end
 
@@ -63,22 +63,21 @@ graph TD
 
 ## 2. Thiết kế Chi tiết các Phân hệ (Subsystem Designs)
 
-### 2.1. Phân hệ Frontend (`frontend/`)
+### 2.1. Phân hệ Frontend (`FE/`)
 
 Cấu trúc thư mục được quy hoạch chuẩn:
 ```text
-frontend/
-├── user/      # Ứng dụng di động người dùng cuối (Vue 3 + Vite + Capacitor Android)
+FE/
+├── user/      # Ứng dụng Web người dùng cuối (React 19 + Vite + MapLibre GL)
 └── admin/     # Bảng điều khiển quản trị viên đô thị (React + Vite + Recharts)
 ```
 
-#### 2.1.1. Ứng dụng Người dùng (`frontend/user`)
-- **Framework & Công nghệ:** Vue 3 (Composition API, `<script setup lang="ts">`), Vite, Tailwind CSS, Pinia store.
-- **Bản đồ số & Điều hướng:** MapLibre GL tích hợp nguồn vector tiles miễn phí (OpenFreeMap Liberty / Bright / CARTO Voyager). Hỗ trợ định vị GPS thời gian thực (`navigator.geolocation` / Capacitor Geolocation), xoay bản đồ theo hướng di chuyển (bearing tracking), và hiển thị vệt đường ngập (polyline có phân màu rủi ro).
+#### 2.1.1. Ứng dụng Người dùng (`FE/user`)
+- **Framework & Công nghệ:** React 19, TypeScript, Vite, Tailwind CSS v4.
+- **Bản đồ số & Điều hướng:** MapLibre GL tích hợp nguồn vector tiles miễn phí (OpenFreeMap Liberty / Bright / CARTO Voyager). Hỗ trợ định vị GPS thời gian thực (`navigator.geolocation`), xoay bản đồ theo hướng di chuyển (bearing tracking), và hiển thị vệt đường ngập (polyline có phân màu rủi ro).
 - **Trải nghiệm chọn phương tiện thông minh:**
   - Tùy chọn 🛵 **Xe máy** (mặc định) và 🚗 **Xe hơi** với chip chuyển đổi trực quan.
   - Toàn bộ tùy chọn lộ trình ("Tuyến đề xuất", "Tuyến dự phòng") và nút "Bắt đầu điều hướng" chỉ xuất hiện sau khi người dùng chọn xong cả Điểm đi và Điểm đến.
-- **Cơ chế đóng gói Android Native:** Sử dụng `@capacitor/core` và `@capacitor/android`. Hỗ trợ chạy mượt mà trên thiết bị Android hoặc máy ảo Android Studio với cấu hình `capacitor.config.ts`. Đã loại bỏ hoàn toàn mã iOS dư thừa.
 
 #### 2.1.2. Bảng Điều khiển Quản trị (`frontend/admin`)
 - **Framework & Công nghệ:** React 18, TypeScript, Vite, Tailwind CSS, Lucide React, Recharts.
@@ -260,18 +259,3 @@ erDiagram
   - `start-backend.bat`: Khởi động máy chủ NestJS tại cổng 3000 (`npm run start:dev`).
   - `start-user.bat`: Khởi động ứng dụng người dùng tại cổng 5173.
   - `start-admin.bat`: Khởi động cổng quản trị tại cổng 5174.
-  - `sync-android.bat`: Đồng bộ mã nguồn web sang dự án Android Studio.
-
-### 4.2. Đóng gói Ứng dụng Di động Android
-```bash
-# 1. Build mã nguồn giao diện người dùng
-cd frontend/user
-pnpm run build
-
-# 2. Đồng bộ asset và plugins sang thư mục Android Native
-pnpm exec cap sync android
-
-# 3. Mở mã nguồn trong Android Studio để ký số và xuất APK
-pnpm exec cap open android
-```
-Tập tin Android Native nằm tại `frontend/user/android/` với đầy đủ cấu hình Gradle, quyền định vị GPS (`ACCESS_FINE_LOCATION`, `ACCESS_COARSE_LOCATION`) và giao diện hiển thị toàn màn hình.

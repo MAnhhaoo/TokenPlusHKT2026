@@ -75,20 +75,14 @@ export function analyzeImageFromCanvas(
 
       // Nhận diện nước ngập màu phù sa/nâu vàng đặc trưng TP.HCM (vùng kênh rạch, triều cường)
       const isMuddy =
-        r > 50 &&
-        g > 42 &&
-        b < 195 &&
-        r > b + 10 &&
-        g > b + 4 &&
-        Math.abs(r - g) < 55;
+        r > 50 && g > 42 && b < 195 && r > b + 10 && g > b + 4 && Math.abs(r - g) < 55;
 
       // Nhận diện mặt nước có độ bóng / phản chiếu ánh sáng bầu trời hoặc đèn xe
       const maxC = Math.max(r, g, b);
       const minC = Math.min(r, g, b);
       const sat = maxC > 0 ? (maxC - minC) / maxC : 0;
       const isReflective =
-        (sat < 0.22 && lum > 42 && lum < 215) ||
-        (isNight && lum > 135 && (r > 140 || g > 140));
+        (sat < 0.22 && lum > 42 && lum < 215) || (isNight && lum > 135 && (r > 140 || g > 140));
 
       if (isMuddy || isReflective) {
         waterPixels++;
@@ -131,8 +125,7 @@ export function analyzeImageFromCanvas(
     isDrainGratingOrTrash || textIndicatesDrain ? "drain" : "flood";
 
   // 4. Ước tính mực nước ngập (cm) dựa trên tỷ lệ diện tích và chiều cao vạch nước
-  const waterHeightFraction =
-    roadPixels > 0 ? (h - highestWaterY) / (h - bottomStart) : waterRatio;
+  const waterHeightFraction = roadPixels > 0 ? (h - highestWaterY) / (h - bottomStart) : waterRatio;
 
   let estimatedDepthCm: number;
   let severity: Severity;

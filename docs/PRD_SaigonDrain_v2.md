@@ -95,10 +95,6 @@ mindmap
 - Người dùng gửi phản ánh ngập tức thời: Tọa độ GPS tự động, chụp/tải ảnh hiện trường, ước tính mực nước (cm) và phương tiện có thể qua lại.
 - Báo cáo mới hiển thị dưới dạng icon "Chờ duyệt" (Pending) màu vàng cam; khi Ban Quản trị phê duyệt sẽ chính thức chuyển sang điểm cảnh báo màu đỏ / nâu sẫm trên bản đồ toàn hệ thống.
 
-### F-06: Ứng dụng Di động Native Android (Capacitor Bridge)
-- Đóng gói ứng dụng di động hoàn chỉnh cho hệ điều hành Android (APK / Android App Bundle).
-- Tối ưu hóa hiệu năng, loại bỏ hoàn toàn mã nguồn iOS để tập trung 100% trải nghiệm mượt mà trên các thiết bị Android phổ biến tại Việt Nam.
-
 ---
 
 ## 4. Yêu cầu Phi chức năng (Non-Functional Requirements)
@@ -106,7 +102,7 @@ mindmap
 | Tiêu chí | Chuẩn đo lường cam kết |
 |---|---|
 | **Thời gian phản hồi định tuyến (Routing Latency)** | $\le 1.5\text{ giây}$ cho lộ trình từ 5 – 25 km |
-| **Tốc độ khung hình bản đồ (Map Rendering)** | Duy trì ổn định $60\text{ FPS}$ trên thiết bị Android tầm trung |
+| **Tốc độ khung hình bản đồ (Map Rendering)** | Duy trì ổn định $60\text{ FPS}$ trên trình duyệt Web và thiết bị di động |
 | **Khả năng chịu lỗi (Resilience & Fallback)** | Khi OSRM hoặc Google Routes gặp sự cố, tự động fallback về lộ trình lưu sẵn trong cơ sở dữ liệu SQLite/PostgreSQL |
 | **Bảo mật & Quyền riêng tư (Privacy)** | Tọa độ GPS của người dùng chỉ xử lý trong phiên điều hướng cục bộ, không lưu vết danh tính người dùng |
 | **Độ phủ dữ liệu (Data Completeness)** | Khảo sát và tích hợp dữ liệu ngập trên toàn bộ 24 quận/huyện và TP. Thủ Đức |
@@ -121,5 +117,5 @@ timeline
     Giai đoạn 1 (Nền tảng) : Khảo sát 425 điểm ngập IRD : Xây dựng Backend NestJS : Thiết lập Vector Basemap MapLibre
     Giai đoạn 2 (Điều hướng & Động) : Tích hợp thời tiết Open-Meteo : Tích hợp chu kỳ triều cường : Phát triển tính năng chọn Xe máy & Xe hơi : Thuật toán Alley Extender
     Giai đoạn 3 (AI & ML) : Nhập module hcmc-road-flood-ml : Chuẩn hóa đặc trưng GIS FABDEM : Xây dựng tài liệu huấn luyện ML_TRAINING_SPEC
-    Giai đoạn 4 (Phát hành) : Hoàn thiện PRD, SYSTEM_DESIGN, API_SPEC, AI_SAFETY : Đóng gói APK Android : Kiểm thử nội bộ Local
+    Giai đoạn 4 (Phát hành) : Hoàn thiện PRD, SYSTEM_DESIGN, API_SPEC, AI_SAFETY : Kiểm thử E2E Web User & Admin
 ```

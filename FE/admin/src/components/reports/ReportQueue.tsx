@@ -48,7 +48,10 @@ function ReportQueue({
                 </span>
                 <div className="report-meta-row">
                   <span style={{ color: "var(--teal)" }}>
-                    <Sparkles size={13} /> AI {report.aiConfidence}%
+                    <Sparkles size={13} />{" "}
+                    {report.aiConfidence > 0
+                      ? `AI ${report.aiConfidence}%`
+                      : "Người dân gửi"}
                   </span>
                   <span>
                     <Droplets size={13} /> ~{report.aiDepth} cm

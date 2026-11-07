@@ -43,7 +43,7 @@ describe("Report lifecycle contracts", () => {
     expect(report).toMatchObject({
       status: "pending",
       severity: "critical",
-      aiDepth: 33,
+      aiDepth: 35,
     });
     expect(points.save.mock.calls[0][0]).toMatchObject({
       linkedReportId: report.id,

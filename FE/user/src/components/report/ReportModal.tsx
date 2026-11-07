@@ -12,7 +12,7 @@ import {
   type CitizenReportResult,
 } from "@/lib/api";
 import { processAndAnalyzeImageFile } from "@/lib/visionAnalysis";
-import type { ReportType, RouteEndpoint, Severity } from "@/types";
+import type { MapFloodPoint, ReportType, RouteEndpoint, Severity } from "@/types";
 
 function ReportModal({
   open,
@@ -23,7 +23,7 @@ function ReportModal({
   open: boolean;
   onClose: () => void;
   reporterId?: string;
-  onReportCreated?: () => void;
+  onReportCreated?: (point?: MapFloodPoint) => void;
 }) {
   const [type, setType] = useState<ReportType>("flood");
   const [severity, setSeverity] = useState<Severity>("medium");
@@ -180,10 +180,36 @@ function ReportModal({
     setSubmitting(true);
     setSubmitError(null);
     try {
-      const rawLoc = locationText.trim() || "Nguyễn Hữu Cảnh, Bình Thạnh";
-      const cleanLocation = rawLoc.split(/[·,]/)[0].trim() || rawLoc;
+      let resolvedCoords = coords;
+      let resolvedDistrict = selectedDistrict;
+      const trimmedLoc = locationText.trim();
+      if (trimmedLoc && locSuggestions.length > 0) {
+        const matched = locSuggestions[0];
+        if (matched?.coords) {
+          resolvedCoords = matched.coords;
+          if (matched.district) resolvedDistrict = matched.district;
+        }
+      } else if (trimmedLoc && typeof searchPlacesApi === "function") {
+        try {
+          const found = await searchPlacesApi(trimmedLoc);
+          if (found?.[0]?.coords) {
+            resolvedCoords = found[0].coords;
+            if (found[0].district) resolvedDistrict = found[0].district;
+          }
+        } catch {
+          // keep current coords
+        }
+      }
 
-      let submitCoords = coords;
+      const rawLoc = trimmedLoc || "Nguyễn Hữu Cảnh, Bình Thạnh";
+      const cleanLocation = rawLoc.split(/[·,]/)[0].trim() || rawLoc;
+      const defaultDepth = severity === "high" ? 35 : severity === "low" ? 12 : 24;
+      const reportedDepth =
+        aiAnalysis?.estimatedDepthCm && aiAnalysis.estimatedDepthCm > 0
+          ? aiAnalysis.estimatedDepthCm
+          : defaultDepth;
+
+      let submitCoords = resolvedCoords;
       if (hasCustomLocation && rawLoc) {
         const matches = matchDynamicPlacePool(rawLoc);
         if (matches.length > 0) {
@@ -196,14 +222,17 @@ function ReportModal({
         severity,
         photoUrl: photoDataUrl || photoName || undefined,
         location: cleanLocation,
-        district: selectedDistrict,
+        district: resolvedDistrict,
         description: description.trim() || aiAnalysis?.aiSummary || undefined,
         lat: submitCoords[1],
         lng: submitCoords[0],
         reporterId,
         aiSummary: aiAnalysis?.aiSummary,
         recommendation: aiAnalysis?.recommendation,
-        reportedDepth: aiAnalysis?.estimatedDepthCm,
+        reportedDepth,
+        aiDepth: aiAnalysis?.estimatedDepthCm,
+        aiConfidence: aiAnalysis?.confidence,
+        visual: aiAnalysis?.visual,
       });
       if (!created) {
         setSubmitError("Không thể gửi báo cáo. Vui lòng thử lại.");
@@ -212,7 +241,18 @@ function ReportModal({
       setCreatedReportId(created.id);
       setCreatedData(created);
       setSubmitted(true);
-      onReportCreated?.();
+      const createdPoint: MapFloodPoint = created.mapPoint ?? {
+        id: `p_${created.id}`,
+        lat: resolvedCoords[1],
+        lng: resolvedCoords[0],
+        label: cleanLocation,
+        district: resolvedDistrict,
+        type: "flood",
+        severity: severity === "high" ? "critical" : "medium",
+        depth: created.aiDepth && created.aiDepth > 0 ? created.aiDepth : reportedDepth,
+        rainfall: 0,
+      };
+      onReportCreated?.(createdPoint);
     } catch {
       setSubmitError("Không thể gửi báo cáo. Vui lòng thử lại.");
     } finally {
@@ -263,7 +303,7 @@ function ReportModal({
             </span>
             <h2 id="report-title">Cảnh báo đã lên bản đồ & hệ thống!</h2>
             <p id="report-description">
-              Hệ thống đã tự động đối chiếu hình ảnh, lượng mưa thực tế và lịch sử ngập tại{" "}
+              Hệ thống đã tự động đối chiếu hình ảnh AI Gemini, lượng mưa thực tế và lịch sử ngập tại{" "}
               <strong>{locationText.trim() || "khu vực bạn chọn"}</strong> để phát cảnh báo đến người đi đường.
             </p>
 

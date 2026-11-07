@@ -1,3 +1,4 @@
+import defaultHotspots from "@/data/hcmc_flood_hotspots.json"
 import { severityLabel } from "@/lib/severity"
 import type {
   AreaAlert,
@@ -123,25 +124,66 @@ export function irdCausesBreakdown() {
 }
 
 export function irdDistrictBreakdown() {
-  return [
-    { label: "TP. Thủ Đức", count: 112, percent: 45 },
-    { label: "Bình Thạnh", count: 46, percent: 18 },
-    { label: "Quận 7", count: 38, percent: 15 },
-    { label: "Nhà Bè", count: 24, percent: 10 },
-    { label: "Quận 12 & Gò Vấp", count: 20, percent: 8 },
-    { label: "Khác", count: 10, percent: 4 },
-  ]
+  const hotspots = defaultHotspots as Array<{ district?: string }>
+  const total = Math.max(hotspots.length, 1)
+  const counts = new Map<string, number>()
+
+  for (const h of hotspots) {
+    const raw = (h.district || "Khác").trim()
+    const key = raw.startsWith("TP. Thủ Đức") ? "TP. Thủ Đức" : raw
+    counts.set(key, (counts.get(key) ?? 0) + 1)
+  }
+
+  const sorted = [...counts.entries()].sort((a, b) => b[1] - a[1])
+  const top5 = sorted.slice(0, 5)
+  const restCount = sorted.slice(5).reduce((sum, [, c]) => sum + c, 0)
+
+  const result = top5.map(([label, count]) => ({
+    label,
+    count,
+    percent: Math.round((count / total) * 100),
+  }))
+
+  if (restCount > 0) {
+    result.push({
+      label: "Khác",
+      count: restCount,
+      percent: Math.round((restCount / total) * 100),
+    })
+  }
+
+  return result
 }
 
 export function irdTopSevereStreets() {
-  return [
-    { label: "Đường Quốc Hương (Thảo Điền)", count: 140, percent: 100, key: "critical" },
-    { label: "Đường Nguyễn Hữu Cảnh (Bình Thạnh)", count: 100, percent: 71, key: "critical" },
-    { label: "Đường Nguyễn Văn Hưởng (Thủ Đức)", count: 60, percent: 43, key: "high" },
-    { label: "Đường Trần Xuân Soạn (Quận 7)", count: 60, percent: 43, key: "high" },
-    { label: "Đường Lương Định Của (Thủ Đức)", count: 60, percent: 43, key: "high" },
-    { label: "Đường Huỳnh Tấn Phát (Quận 7)", count: 50, percent: 36, key: "high" },
-    { label: "Đường Ngô Tất Tố (Bình Thạnh)", count: 50, percent: 36, key: "high" },
-    { label: "Đường Ung Văn Khiêm (Bình Thạnh)", count: 40, percent: 29, key: "medium" },
-  ]
+  const hotspots = (
+    defaultHotspots as Array<{
+      locationName?: string
+      label: string
+      district: string
+      maxDepth: number | null
+      historyCount: number
+      severity: string
+    }>
+  ).filter((h) => typeof h.maxDepth === "number" && h.maxDepth > 0)
+
+  const sorted = [...hotspots]
+    .sort(
+      (a, b) =>
+        (b.maxDepth ?? 0) - (a.maxDepth ?? 0) || b.historyCount - a.historyCount,
+    )
+    .slice(0, 8)
+
+  const maxOverall = Math.max(sorted[0]?.maxDepth ?? 1, 1)
+
+  return sorted.map((h) => {
+    const depth = h.maxDepth ?? 0
+    const distShort = h.district.replace(/\s*\(.*\)/, "")
+    return {
+      label: `${h.locationName || h.label} (${distShort})`,
+      count: depth,
+      percent: Math.round((depth / maxOverall) * 100),
+      key: h.severity,
+    }
+  })
 }

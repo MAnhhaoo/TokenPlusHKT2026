@@ -1,7 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import * as maplibregl from "maplibre-gl";
-import { Capacitor } from "@capacitor/core";
-import { Geolocation } from "@capacitor/geolocation";
 import type { GeoJSONSource, Map as LibreMap } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import maplibreWorkerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?url";
@@ -60,7 +58,6 @@ function MapCanvas({
   const progressDistanceRef = useRef<number>(0);
   const trackingTickerRef = useRef<any>(null);
   const watchIdRef = useRef<number | null>(null);
-  const capWatchIdRef = useRef<string | null>(null);
   const userRealGpsRef = useRef<[number, number] | null>(null);
   const navStepIndexRef = useRef<number>(navStepIndex);
   navStepIndexRef.current = navStepIndex;
@@ -738,30 +735,7 @@ function MapCanvas({
     const isUsingRealGps = Boolean(origin?.isCurrentLocation);
 
     if (isUsingRealGps) {
-      if (typeof window !== "undefined" && Capacitor.isNativePlatform()) {
-        if (capWatchIdRef.current === null) {
-          Geolocation.watchPosition({ enableHighAccuracy: true }, (pos) => {
-            if (pos && pos.coords) {
-              handleRawGpsUpdate(
-                pos.coords.longitude,
-                pos.coords.latitude,
-                pos.coords.heading,
-                pos.coords.speed,
-              );
-            }
-          })
-            .then((id) => {
-              if (!watchActive) {
-                void Geolocation.clearWatch({ id });
-                return;
-              }
-              capWatchIdRef.current = id;
-            })
-            .catch((err) => {
-              console.warn("Capacitor watchPosition error:", err);
-            });
-        }
-      } else if (
+      if (
         watchIdRef.current === null &&
         typeof navigator !== "undefined" &&
         navigator.geolocation
@@ -799,10 +773,6 @@ function MapCanvas({
 
     return () => {
       watchActive = false;
-      if (capWatchIdRef.current !== null) {
-        Geolocation.clearWatch({ id: capWatchIdRef.current });
-        capWatchIdRef.current = null;
-      }
       if (
         watchIdRef.current !== null &&
         typeof navigator !== "undefined" &&
@@ -834,20 +804,32 @@ function MapCanvas({
 
     for (const pt of floodPoints) {
       if (pt.type !== "flood" && pt.type !== "pending" && pt.type !== "risk") continue;
-      // Không vẽ các điểm khô ráo depth <= 0
-      if ((pt.depth || 0) <= 0) continue;
+      // Không vẽ các điểm khô ráo depth <= 0 khi ở chế độ thời gian thực
+      if (mapMode !== "history" && (pt.depth || 0) <= 0) continue;
 
       const el = document.createElement("div");
       el.className = `libre-flood-marker ${pt.severity} severity-${pt.severity}`;
+      const histCount = (pt as any).historyCount;
+      const depthInfo =
+        pt.depth && pt.depth > 0 ? `Mực nước ngập: ${pt.depth} cm` : "Chưa ghi nhận độ sâu";
+      const extraInfo =
+        mapMode === "history" && histCount
+          ? ` · Lịch sử ngập: ${histCount} lần`
+          : pt.rainfall > 0
+            ? ` · Mưa: ${pt.rainfall} mm`
+            : "";
       const recessionText = pt.estimatedDurationMin
         ? ` · Dự kiến hết ngập: ~${pt.estimatedDurationMin}p (${pt.estimatedClearAt?.split(",")[0] || ""})`
         : "";
-      el.title = `${pt.label} (${pt.district}) · Mực nước ngập: ${pt.depth} cm · Mưa: ${pt.rainfall} mm${recessionText}`;
+      el.title = `${pt.label} (${pt.district}) · ${depthInfo}${extraInfo}${recessionText}`;
 
-      const etaMini = pt.estimatedDurationMin
-        ? `<span class="flood-mini-eta">~${pt.estimatedDurationMin}p</span>`
-        : "";
-      el.innerHTML = `<span class="libre-flood-pulse"></span><span class="flood-label">${pt.label}</span><span class="flood-depth">${pt.depth ? `${pt.depth}cm` : ""}</span>${etaMini}`;
+      const badgeText =
+        pt.depth && pt.depth > 0 ? `${pt.depth}cm` : histCount ? `${histCount} lần` : "";
+      const etaMini =
+        pt.estimatedDurationMin && pt.depth > 0
+          ? `<span class="flood-mini-eta">~${pt.estimatedDurationMin}p</span>`
+          : "";
+      el.innerHTML = `<span class="libre-flood-pulse"></span><span class="flood-label">${pt.label}</span><span class="flood-depth">${badgeText}</span>${etaMini}`;
       el.addEventListener("click", (ev) => {
         ev.stopPropagation();
         el.classList.toggle("is-expanded-marker");
@@ -906,7 +888,7 @@ function MapCanvas({
 
       floodMarkersRef.current.push(marker);
     }
-  }, [ready, floodPoints]);
+  }, [ready, floodPoints, mapMode]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -955,19 +937,6 @@ function MapCanvas({
       }
     }
   }, [mapLayer, ready]);
-
-  const statusText =
-    routeStatus === "idle"
-      ? mapMode === "history"
-        ? "📚 Đang hiển thị 250 điểm đen ngập lụt lịch sử TP.HCM (IRD 2002–2026)"
-        : floodPoints.length === 0
-          ? "☀️ TP.HCM khô ráo (0 mm mưa) · Các tuyến đường thông thoáng không ngập"
-          : `🌧️ Chẩn đoán ${floodPoints.length} tuyến đường có nguy cơ ngập theo thời tiết thực`
-      : routeStatus === "live"
-        ? `Tuyến thực tế · ${routesData[route].distance} · ${routesData[route].time}`
-        : routeStatus === "fallback"
-          ? "Tuyến dự phòng ngoại tuyến"
-          : "Đang tính toán lộ trình…";
 
   return (
     <div className="libre-map-shell">
@@ -1107,11 +1076,6 @@ function MapCanvas({
             </div>
           )}
         </div>
-      </div>
-
-      <div className="libre-route-status">
-        <span />
-        {statusText}
       </div>
     </div>
   );

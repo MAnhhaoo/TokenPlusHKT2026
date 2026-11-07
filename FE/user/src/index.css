@@ -1195,33 +1195,6 @@ h3 {
   white-space: nowrap;
 }
 
-.libre-route-status {
-  position: absolute;
-  z-index: 6;
-  bottom: calc(340px + env(safe-area-inset-bottom));
-  left: 12px;
-  display: flex;
-  max-width: calc(100% - 150px);
-  align-items: center;
-  gap: 7px;
-  padding: 7px 11px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: rgb(247 250 248 / 94%);
-  box-shadow: var(--shadow-sm);
-  color: var(--ink-soft);
-  font-size: 10.5px;
-  font-weight: 600;
-}
-
-.libre-route-status > span {
-  width: 7px;
-  height: 7px;
-  flex: none;
-  border-radius: 50%;
-  background: var(--teal-bright);
-}
-
 .report-fab {
   position: absolute;
   z-index: 20;
@@ -1265,26 +1238,8 @@ h3 {
 
 /* The navigation strip makes the collapsed sheet taller, so map controls
    that sit above it move up in step instead of slipping underneath. */
-.app-shell.is-navigating .report-fab,
-.app-shell.is-navigating .libre-route-status {
+.app-shell.is-navigating .report-fab {
   bottom: calc(384px + env(safe-area-inset-bottom));
-}
-
-.app-shell.is-navigating .demo-label {
-  bottom: calc(422px + env(safe-area-inset-bottom));
-}
-
-.demo-label {
-  position: absolute;
-  z-index: 5;
-  bottom: calc(378px + env(safe-area-inset-bottom));
-  left: 12px;
-  padding: 3px 8px;
-  border-radius: 999px;
-  background: rgb(247 250 248 / 82%);
-  color: var(--ink-soft);
-  font-size: 9.5px;
-  font-weight: 600;
 }
 
 .map-legend {
@@ -2530,11 +2485,23 @@ h3 {
   color: var(--ink-soft);
 }
 
-.report-location > span:nth-child(2) {
+.report-location > span:nth-child(2),
+.report-location-input-wrap {
   display: flex;
   min-width: 0;
   flex: 1;
   flex-direction: column;
+  gap: 3px;
+}
+
+.report-location-input {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-size: 12.5px;
+  font-weight: 600;
+  outline: none;
 }
 
 .report-location small {
@@ -3031,11 +2998,6 @@ h3 {
     width: 430px;
   }
 
-  .libre-route-status {
-    bottom: 18px;
-    left: 18px;
-  }
-
   .libre-map .maplibregl-ctrl-bottom-right {
     bottom: 14px;
   }
@@ -3044,17 +3006,6 @@ h3 {
   .app-shell.is-navigating .report-fab {
     right: 18px;
     bottom: 18px;
-  }
-
-  .libre-route-status,
-  .app-shell.is-navigating .libre-route-status {
-    bottom: 18px;
-  }
-
-  .demo-label,
-  .app-shell.is-navigating .demo-label {
-    bottom: 18px;
-    left: 236px;
   }
 
   .map-legend {
@@ -4549,10 +4500,6 @@ body:has(.in-weather-view.theme-night) {
   display: none !important;
 }
 
-.app-shell.is-navigating .demo-label {
-  display: none !important;
-}
-
 .app-shell.is-navigating .map-legend {
   bottom: 110px !important;
   left: 20px !important;
@@ -5588,12 +5535,6 @@ body:has(.in-weather-view.theme-night) {
   .report-fab span {
     width: 26px;
     height: 26px;
-  }
-
-  /* Hide redundant floating status pills on small screens to maximize map canvas */
-  .demo-label,
-  .libre-route-status {
-    display: none;
   }
 
   .libre-map .maplibregl-ctrl-bottom-right {

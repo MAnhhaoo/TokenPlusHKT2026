@@ -173,6 +173,7 @@ export const HCMC_DISTRICTS = [
 @Injectable()
 export class WeatherService {
   private readonly logger = new Logger(WeatherService.name);
+  private latestMinutely15Slots: [number, number, number, number] | null = null;
 
   constructor(
     private readonly httpService: HttpService,
@@ -271,10 +272,11 @@ export class WeatherService {
               longitude: targetLng,
               current:
                 "temperature_2m,relative_humidity_2m,precipitation,rain,weather_code,wind_speed_10m",
+              minutely_15: "precipitation,rain",
               hourly:
                 "temperature_2m,precipitation_probability,precipitation,rain",
               timezone: "Asia/Bangkok",
-              forecast_days: 1,
+              forecast_days: 2,
             },
             timeout: 5000,
           }),
@@ -289,6 +291,25 @@ export class WeatherService {
       const humidityPercent = Number(current.relative_humidity_2m ?? 82);
       const windSpeedKmh = Number(current.wind_speed_10m ?? 12.4);
       const weatherCode = Number(current.weather_code ?? 61);
+
+      const min15Times: string[] = data?.minutely_15?.time ?? [];
+      const min15Precip: number[] =
+        data?.minutely_15?.rain ?? data?.minutely_15?.precipitation ?? [];
+      if (min15Times.length > 0 && min15Precip.length > 0) {
+        const curTimeStr = String(current.time ?? "");
+        const mIdx = Math.max(
+          0,
+          curTimeStr ? min15Times.findIndex((t) => t === curTimeStr) : 0,
+        );
+        this.latestMinutely15Slots = [
+          Math.round(currentRainMm * 10) / 10,
+          Math.round(Number(min15Precip[mIdx + 2] ?? 0) * 10) / 10,
+          Math.round(Number(min15Precip[mIdx + 4] ?? 0) * 10) / 10,
+          Math.round(Number(min15Precip[mIdx + 6] ?? 0) * 10) / 10,
+        ];
+      } else {
+        this.latestMinutely15Slots = null;
+      }
 
       const hourlyTimes: string[] = data?.hourly?.time ?? [];
       const hourlyRain: number[] = data?.hourly?.precipitation ?? [];
@@ -440,7 +461,9 @@ export class WeatherService {
       });
       return rainMap;
     } catch (err) {
-      this.logger.warn(`Lỗi lấy mưa quận Open-Meteo: ${(err as Error).message}`);
+      this.logger.warn(
+        `Lỗi lấy mưa quận Open-Meteo: ${(err as Error).message}`,
+      );
       try {
         const cityWeather = await this.getCurrentWeather();
         const baseRain = Number(cityWeather?.currentRainMm ?? 0);
@@ -464,7 +487,7 @@ export class WeatherService {
       this.getRealtimeDistrictRainMap(),
     ]);
 
-    return HCMC_DISTRICTS.map((item, idx) => {
+    return HCMC_DISTRICTS.map((item) => {
       const rainMm =
         districtRainMap.get(item.district.toLowerCase()) ??
         baseSnapshot.currentRainMm;
@@ -476,12 +499,12 @@ export class WeatherService {
         lat: item.lat,
         lng: item.lng,
         elevationM: item.defaultElevationM,
-        temperatureC:
-          Math.round((baseSnapshot.temperatureC - idx * 0.1) * 10) / 10,
-        humidityPercent: Math.min(99, baseSnapshot.humidityPercent + (idx % 3)),
+        temperatureC: Math.round(baseSnapshot.temperatureC * 10) / 10,
+        humidityPercent: Math.round(baseSnapshot.humidityPercent),
         windSpeedKmh: baseSnapshot.windSpeedKmh,
         currentRainMm: rainMm,
-        weatherCondition: this.describeWmoCode(0, rainMm),
+        weatherCondition:
+          baseSnapshot.weatherCondition || this.describeWmoCode(0, rainMm),
         floodRiskLevel: risk.level,
         riskScore: risk.score,
       };
@@ -495,12 +518,13 @@ export class WeatherService {
     const snapshot = await this.getCurrentWeather();
     const hourly = snapshot.hourlyForecast ?? [];
 
-    const nowRain = Math.round((snapshot.currentRainMm || 0) * 10) / 10;
-    const slot30Rain =
-      Math.round((hourly[1]?.rainMm ?? (snapshot.currentRainMm || 0)) * 10) /
-      10;
-    const slot60Rain = Math.round((hourly[2]?.rainMm ?? 0) * 10) / 10;
-    const slot90Rain = Math.round((hourly[3]?.rainMm ?? 0) * 10) / 10;
+    const [nowRain, slot30Rain, slot60Rain, slot90Rain] = this
+      .latestMinutely15Slots ?? [
+      Math.round((snapshot.currentRainMm || 0) * 10) / 10,
+      Math.round((hourly[1]?.rainMm ?? 0) * 10) / 10,
+      Math.round((hourly[2]?.rainMm ?? 0) * 10) / 10,
+      Math.round((hourly[3]?.rainMm ?? 0) * 10) / 10,
+    ];
 
     const riskNow = this.calculateFloodRisk(nowRain, snapshot.elevationM);
     const risk30 = this.calculateFloodRisk(slot30Rain, snapshot.elevationM);

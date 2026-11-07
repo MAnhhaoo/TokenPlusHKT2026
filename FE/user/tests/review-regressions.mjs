@@ -312,7 +312,7 @@ assert.equal(selectedOrigin.isCurrentLocation, false);
 assert.ok(selectedOrigin.label.startsWith("Vị trí gần đúng"));
 search.unmount();
 
-// Run the native watch registration/cleanup blocks with a delayed Capacitor promise.
+// Run the web geolocation watch registration/cleanup blocks.
 const mapSource = readFileSync(resolve(root, "src/components/map/MapCanvas.tsx"), "utf8");
 const registration = mapSource.slice(
   mapSource.lastIndexOf("    if (isUsingRealGps) {"),
@@ -320,18 +320,16 @@ const registration = mapSource.slice(
 );
 const cleanupStart = mapSource.indexOf("    return () => {\n      watchActive = false;");
 const cleanup = mapSource.slice(cleanupStart, mapSource.indexOf("\n  }, [", cleanupStart));
-for (const late of [true, false]) {
-  let resolveWatch, callback;
+{
+  let callback;
   const cleared = [],
-    ref = { current: null };
-  const native = {
-    watchPosition(_, cb) {
+    watchIdRef = { current: null };
+  const geolocation = {
+    watchPosition(cb) {
       callback = cb;
-      return new Promise((resolve) => {
-        resolveWatch = resolve;
-      });
+      return 42;
     },
-    clearWatch({ id }) {
+    clearWatch(id) {
       cleared.push(id);
     },
   };
@@ -341,21 +339,17 @@ for (const late of [true, false]) {
     {
       exports,
       window: {},
+      navigator: { geolocation },
       console,
-      Capacitor: { isNativePlatform: () => true },
-      Geolocation: native,
-      capWatchIdRef: ref,
-      watchIdRef: { current: null },
+      watchIdRef,
       handleRawGpsUpdate() {},
     },
   );
   const dispose = exports.start();
-  if (late) dispose();
-  resolveWatch("synthetic-watch");
-  await tick();
-  if (!late) dispose();
-  assert.deepEqual(cleared, ["synthetic-watch"]);
-  assert.equal(ref.current, null);
+  assert.equal(watchIdRef.current, 42);
+  dispose();
+  assert.deepEqual(cleared, [42]);
+  assert.equal(watchIdRef.current, null);
   assert.ok(callback);
 }
 // The callback processor itself must reject obsolete updates before touching navigation state.

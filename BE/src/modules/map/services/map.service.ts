@@ -128,8 +128,12 @@ export class MapService {
         continue;
       }
 
-      if (point.linkedReportId || point.type === "pending") {
+      if (point.type === "pending" || Boolean(point.linkedReportId)) {
+        const isActiveReportPoint =
+          point.type === "pending" ||
+          (point.type === "flood" && (point.depth || 0) > 0);
         if (
+          isActiveReportPoint &&
           (activeLayers.includes("flood") || activeLayers.includes("risk")) &&
           (!query.severity ||
             query.severity === "all" ||
@@ -194,7 +198,10 @@ export class MapService {
         } else {
           // Khớp mờ tên quận
           for (const [distKey, rVal] of districtRainMap.entries()) {
-            if (cleanDistrict.includes(distKey) || distKey.includes(cleanDistrict)) {
+            if (
+              cleanDistrict.includes(distKey) ||
+              distKey.includes(cleanDistrict)
+            ) {
               localRain = rVal;
               break;
             }
@@ -211,12 +218,12 @@ export class MapService {
         elevation <= 1.4
           ? 1.45
           : elevation <= 1.8
-            ? 1.30
+            ? 1.3
             : elevation <= 2.5
               ? 1.15
               : elevation <= 4.0
-                ? 1.00
-                : 0.80;
+                ? 1.0
+                : 0.8;
 
       // 2. Hệ số tổn thương tần suất ngập lịch sử (Historical Vulnerability Factor)
       const histCount = point.historyCount || 5;
@@ -251,7 +258,8 @@ export class MapService {
       const isAtRisk =
         !isRainFlooded &&
         !isTideFlooded &&
-        ((localRain >= 3 && effectiveRain >= threshold * 0.65) || tideDepth >= 10);
+        ((localRain >= 3 && effectiveRain >= threshold * 0.65) ||
+          tideDepth >= 10);
 
       // Nếu không có mưa và không triều cường: ĐƯỜNG KHÔ RÁO HOÀN TOÀN
       if (!isRainFlooded && !isTideFlooded && !isAtRisk) {
@@ -353,6 +361,65 @@ export class MapService {
         estimatedClearAt: clearTimeStr,
         drainageRateCmPerMin: drainRate,
       });
+    }
+
+    if (
+      typeof this.reportRepo?.find === "function" &&
+      (activeLayers.includes("flood") || activeLayers.includes("risk"))
+    ) {
+      try {
+        const verifiedReports = await this.reportRepo.find({
+          where: { status: "verified" },
+        });
+        for (const r of verifiedReports) {
+          if (dynamicPoints.some((p) => p.linkedReportId === r.id)) continue;
+          if (!r.coordinates) continue;
+          const parts = r.coordinates
+            .split(",")
+            .map((s) => Number.parseFloat(s.trim()));
+          if (
+            parts.length !== 2 ||
+            Number.isNaN(parts[0]) ||
+            Number.isNaN(parts[1])
+          ) {
+            continue;
+          }
+          const depth = r.reportedDepth || r.aiDepth || 24;
+          if (depth <= 0) continue;
+          const severity: PointSeverity =
+            r.severity === "critical" ||
+            r.severity === "high" ||
+            r.severity === "medium"
+              ? r.severity
+              : "medium";
+          if (
+            query.severity &&
+            query.severity !== "all" &&
+            severity !== query.severity
+          ) {
+            continue;
+          }
+          dynamicPoints.push({
+            id: `p_${r.id}`,
+            x: 50,
+            y: 50,
+            lat: parts[0],
+            lng: parts[1],
+            elevationM: 2.5,
+            type: "flood",
+            severity,
+            label: r.location,
+            district: r.district,
+            rainfall: cityRainMm ?? 0,
+            depth,
+            historyCount: r.historyCount || 1,
+            linkedReportId: r.id,
+            updatedAt: new Date(),
+          });
+        }
+      } catch {
+        // Bỏ qua nếu không truy vấn được bảng báo cáo
+      }
     }
 
     return dynamicPoints;
@@ -698,6 +765,7 @@ export class MapService {
       "NOMINATIM_BASE_URL",
       "https://nominatim.openstreetmap.org",
     );
+
     try {
       const response = await firstValueFrom(
         this.httpService.get(`${nominatimBase}/reverse`, {
@@ -714,14 +782,24 @@ export class MapService {
         }),
       );
       const addr = response.data?.address ?? {};
+      const road = [addr.house_number, addr.road]
+        .filter(Boolean)
+        .join(" ")
+        .trim();
+      const ward = addr.suburb || addr.quarter || addr.neighbourhood || "";
+      const rawDistrict =
+        addr.city_district || addr.district || addr.county || "";
       const district =
-        addr.suburb ||
-        addr.city_district ||
-        addr.county ||
-        addr.district ||
-        fallbackDistrict;
-      const road = [addr.house_number, addr.road].filter(Boolean).join(" ");
-      const location = road || response.data?.name || `Khu vực ${district}`;
+        !rawDistrict ||
+        rawDistrict === "Thành phố Hồ Chí Minh" ||
+        rawDistrict.toLowerCase().startsWith("phường") ||
+        rawDistrict.toLowerCase().startsWith("xã")
+          ? fallbackDistrict
+          : rawDistrict;
+      const location =
+        [road, ward].filter(Boolean).join(", ") ||
+        response.data?.name ||
+        `Khu vực ${district}`;
 
       return {
         lat,
@@ -763,43 +841,32 @@ export class MapService {
   }
 
   /**
-   * Tính toán và trả về chỉ số nhạy cảm ngập lụt theo mô hình MCDA & Machine Learning
-   * dựa trên 5 đặc trưng GIS chuẩn: elevation_median_m, relative_elevation_m, slope_mean_deg, dist_water_m, builtup_ratio_250m
+   * Tính toán chỉ số nhạy cảm ngập lụt thực tế từ dữ liệu quan trắc lịch sử IRD và cao độ thực tế (elevationM, historyCount, depth).
    */
   async getMlSusceptibility() {
     const points = await this.mapPointRepo.find();
 
     const evaluated = points.map((p) => {
-      const elev = p.elevationM || 2.0;
-      const distWater = Math.max(20, Math.min(1000, 150 + (elev - 1.0) * 120));
-      const slope = Math.max(0.2, Math.min(5.0, 0.4 + elev * 0.3));
-      const builtup = 0.85;
-      const relElev = elev - 2.5;
+      const elev = typeof p.elevationM === "number" ? p.elevationM : null;
+      const historyCount = p.historyCount || 0;
+      const depth = p.depth || 0;
 
-      const normElev = Math.max(0, Math.min(1, (elev - 0.5) / 4.0));
-      const sElev = 1.0 - normElev;
-      const sWater = Math.max(0, Math.min(1, 1.0 - distWater / 1000));
-      const sSlope = Math.max(0, Math.min(1, 1.0 - slope / 5.0));
-      const sBuiltup = builtup;
-      const sRel = Math.max(0, Math.min(1, 1.0 - (relElev + 2.0) / 4.0));
+      const sElev =
+        elev !== null ? Math.max(0, Math.min(1, 1.0 - (elev - 0.5) / 4.0)) : 0;
+      const sHistory = Math.max(0, Math.min(1, historyCount / 10));
+      const sDepth = Math.max(0, Math.min(1, depth / 60));
 
       const score = Number(
-        (
-          0.35 * sElev +
-          0.25 * sRel +
-          0.15 * sWater +
-          0.15 * sSlope +
-          0.1 * sBuiltup
-        ).toFixed(3),
+        (0.4 * sElev + 0.35 * sHistory + 0.25 * sDepth).toFixed(3),
       );
 
       const riskTier =
         score >= 0.75
-          ? "Rất cao (Top 5%)"
+          ? "Rất cao"
           : score >= 0.55
-            ? "Cao (Top 10%)"
+            ? "Cao"
             : score >= 0.35
-              ? "Trung bình (Top 20%)"
+              ? "Trung bình"
               : "Thấp";
 
       return {
@@ -809,25 +876,22 @@ export class MapService {
         lat: p.lat,
         lng: p.lng,
         elevationMedianM: elev,
-        relativeElevationM: Number(relElev.toFixed(2)),
-        slopeMeanDeg: Number(slope.toFixed(2)),
-        distWaterM: Math.round(distWater),
-        builtupRatio250m: builtup,
+        historyCount,
+        depthCm: depth,
         susceptibilityScore: score,
         riskTier,
-        primaryHazard: elev <= 1.5 ? "Triều cường & Mưa lớn" : "Mưa cục bộ",
+        primaryHazard:
+          elev !== null && elev <= 1.5 ? "Triều cường & Mưa lớn" : "Mưa lớn",
       };
     });
 
     return {
       modelVersion: "2.0.0",
-      algorithm: "MCDA-LightGBM-PU-Ensemble",
+      algorithm: "IRD-Empirical-Observation-Score",
       featureSpec: {
         elevation_median_m: "lower_is_higher_risk",
-        relative_elevation_m: "lower_is_higher_risk",
-        slope_mean_deg: "lower_is_higher_risk",
-        dist_water_m: "lower_is_higher_risk",
-        builtup_ratio_250m: "higher_is_higher_risk",
+        history_count: "higher_is_higher_risk",
+        depth_cm: "higher_is_higher_risk",
       },
       totalPointsEvaluated: evaluated.length,
       segments: evaluated,
