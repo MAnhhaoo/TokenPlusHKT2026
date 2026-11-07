@@ -198,38 +198,61 @@ export class JourneyService {
 
         const rawSteps: any[] = route.legs?.[0]?.steps ?? [];
 
-        const mainSteps: NavigationStepItem[] = rawSteps
-          .filter((s) => s.name || s.distance > 15)
-          .map((s) => {
-            const modifier: string = s.maneuver?.modifier || "";
-            const icon: "turn-left" | "turn-right" | "straight" =
-              modifier.includes("left")
-                ? "turn-left"
-                : modifier.includes("right")
-                  ? "turn-right"
-                  : "straight";
-            const instruction =
-              icon === "turn-left"
-                ? "Rẽ trái vào"
-                : icon === "turn-right"
-                  ? "Rẽ phải vào"
-                  : "Đi theo";
-            const distM = Math.max(30, Math.round(s.distance ?? 100));
-            const loc = Array.isArray(s.maneuver?.location)
-              ? ([
-                  Number(s.maneuver.location[0]),
-                  Number(s.maneuver.location[1]),
-                ] as [number, number])
-              : undefined;
-            return {
-              icon,
-              instruction,
-              street: s.name || "Trục đường chính",
-              distance: `${distM} m`,
-              distanceMeters: distM,
-              ...(loc ? { coords: loc } : {}),
-            };
+        const mainSteps: NavigationStepItem[] = [];
+        for (const s of rawSteps) {
+          const isArrive = s.maneuver?.type === "arrive";
+          if (!isArrive && !s.name && (s.distance ?? 0) <= 15) continue;
+
+          const modifier: string = s.maneuver?.modifier || "";
+          const icon: "turn-left" | "turn-right" | "straight" = isArrive
+            ? "straight"
+            : modifier.includes("left")
+              ? "turn-left"
+              : modifier.includes("right")
+                ? "turn-right"
+                : "straight";
+          const instruction = isArrive
+            ? "Đến điểm đích tại"
+            : icon === "turn-left"
+              ? "Rẽ trái vào"
+              : icon === "turn-right"
+                ? "Rẽ phải vào"
+                : "Đi theo";
+          const distM = isArrive
+            ? 0
+            : Math.max(20, Math.round(s.distance ?? 100));
+          const streetName =
+            s.name || (isArrive ? "Điểm đến đã chọn" : "Trục đường chính");
+          const loc = Array.isArray(s.maneuver?.location)
+            ? ([
+                Number(s.maneuver.location[0]),
+                Number(s.maneuver.location[1]),
+              ] as [number, number])
+            : undefined;
+
+          const prev = mainSteps[mainSteps.length - 1];
+          if (
+            !isArrive &&
+            prev &&
+            prev.icon === "straight" &&
+            icon === "straight" &&
+            prev.street === streetName
+          ) {
+            const combined = (prev.distanceMeters ?? 0) + distM;
+            prev.distanceMeters = combined;
+            prev.distance = `${combined} m`;
+            continue;
+          }
+
+          mainSteps.push({
+            icon,
+            instruction,
+            street: streetName,
+            distance: `${distM} m`,
+            distanceMeters: distM,
+            ...(loc ? { coords: loc } : {}),
           });
+        }
 
         let navigationSteps: NavigationStepItem[] = [];
         if (startDist > 8) {
@@ -244,7 +267,7 @@ export class JourneyService {
             coords: [fromLng, fromLat],
           });
         }
-        navigationSteps = [...navigationSteps, ...mainSteps].slice(0, 15);
+        navigationSteps = [...navigationSteps, ...mainSteps];
 
         return {
           index: idx,

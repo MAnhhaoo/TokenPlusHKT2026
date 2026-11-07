@@ -31,8 +31,8 @@ export class ReportsService {
     private readonly alertRepo: Repository<AreaAlertEntity>,
     private readonly mapService: MapService,
     private readonly geminiVisionService: GeminiVisionService,
-    @Optional() private readonly weatherService?: WeatherService,
     @Optional() private readonly realtimeService?: RealtimeService,
+    @Optional() private readonly weatherService?: WeatherService,
   ) {}
 
   /**
@@ -148,21 +148,23 @@ export class ReportsService {
         const clearMinStr = String(newClearDate.getMinutes()).padStart(2, "0");
         const newClearAt = `${clearHourStr}:${clearMinStr}, ${String(
           newClearDate.getDate(),
-        ).padStart(2, "0")}/${String(newClearDate.getMonth() + 1).padStart(2, "0")}/${newClearDate.getFullYear()}`;
+        ).padStart(
+          2,
+          "0",
+        )}/${String(newClearDate.getMonth() + 1).padStart(2, "0")}/${newClearDate.getFullYear()}`;
 
         report.estimatedDurationMin = additionalMinutes;
         report.estimatedClearAt = newClearAt;
         if (!report.description?.includes("Tự động gia hạn")) {
-          report.description = `${report.description || ""} (Đang tiếp tục mưa ${currentRain.toFixed(1)}mm/h, AI tự động gia hạn thời gian rút nước thêm ~${additionalMinutes} phút).`.trim();
+          report.description =
+            `${report.description || ""} (Đang tiếp tục mưa ${currentRain.toFixed(1)}mm/h, AI tự động gia hạn thời gian rút nước thêm ~${additionalMinutes} phút).`.trim();
         }
       } else {
         // TRỜI ĐÃ TẠNH MƯA: Tính toán lượng nước đã tiêu thoát theo tốc độ cống
         const elapsedMinutes = Math.max(
           0,
           (now -
-            (report.createdAt
-              ? new Date(report.createdAt).getTime()
-              : now)) /
+            (report.createdAt ? new Date(report.createdAt).getTime() : now)) /
             60000,
         );
         const recededDepth = Math.max(
@@ -182,10 +184,16 @@ export class ReportsService {
           report.estimatedDurationMin = remainingMins;
           const newClearDate = new Date(now + remainingMins * 60000);
           const clearHourStr = String(newClearDate.getHours()).padStart(2, "0");
-          const clearMinStr = String(newClearDate.getMinutes()).padStart(2, "0");
+          const clearMinStr = String(newClearDate.getMinutes()).padStart(
+            2,
+            "0",
+          );
           report.estimatedClearAt = `${clearHourStr}:${clearMinStr}, ${String(
             newClearDate.getDate(),
-          ).padStart(2, "0")}/${String(newClearDate.getMonth() + 1).padStart(2, "0")}/${newClearDate.getFullYear()}`;
+          ).padStart(
+            2,
+            "0",
+          )}/${String(newClearDate.getMonth() + 1).padStart(2, "0")}/${newClearDate.getFullYear()}`;
           report.reportedDepth = recededDepth;
           report.aiDepth = recededDepth;
         }

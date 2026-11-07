@@ -59,7 +59,7 @@ describe("Map layer and provider contracts", () => {
     expect(weather.getCurrentWeather).toHaveBeenCalledTimes(1);
     expect(
       await service.findAllPoints({ layers: "history", rainMm: 0 }),
-    ).toEqual([{ ...basePoint, depth: 0, type: "risk" }]);
+    ).toEqual([{ ...basePoint, depth: 0, type: "history" }]);
     expect(basePoint).toEqual(original);
   });
 

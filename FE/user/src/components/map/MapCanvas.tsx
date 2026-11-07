@@ -909,7 +909,8 @@ function MapCanvas({
     for (const pt of floodPoints) {
       if (pt.type !== "flood" && pt.type !== "pending" && pt.type !== "risk") continue;
       // Tab Bản đồ chỉ hiển thị các điểm nguy cơ ngập thời gian thực, loại bỏ hoàn toàn báo cáo cộng đồng
-      if ((pt as any).linkedReportId || pt.id.startsWith("p_RP-") || pt.id.startsWith("report-")) continue;
+      if ((pt as any).linkedReportId || pt.id.startsWith("p_RP-") || pt.id.startsWith("report-"))
+        continue;
       // Không vẽ các điểm khô ráo depth <= 0 khi ở chế độ thời gian thực
       if (mapMode !== "history" && (pt.depth || 0) <= 0) continue;
 

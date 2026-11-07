@@ -41,7 +41,8 @@ export class QueryMapPointsDto {
 
   @ApiPropertyOptional({
     example: "true",
-    description: "Loại trừ các điểm xuất phát từ báo cáo cộng đồng của người dân",
+    description:
+      "Loại trừ các điểm xuất phát từ báo cáo cộng đồng của người dân",
   })
   @IsOptional()
   @IsString()

@@ -342,7 +342,8 @@ export default function CommunityPage({
                         <span className="hydro-label">Mực nước:</span>
                         <strong className={`hydro-val ${report.severity}`}>{depth} cm</strong>
                       </div>
-                      {report.estimatedClearAt === "Đã rút hết nước" || report.estimatedDurationMin === 0 ? (
+                      {report.estimatedClearAt === "Đã rút hết nước" ||
+                      report.estimatedDurationMin === 0 ? (
                         <div className="hydro-item">
                           <span className="hydro-label">Hiện trạng:</span>
                           <strong className="hydro-val" style={{ color: "#10b981" }}>

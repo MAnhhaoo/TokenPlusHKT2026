@@ -655,7 +655,9 @@ function App() {
 
       {!isNavigating && (
         <BottomNav
-          activeTab={mainView === "weather" ? "weather" : mainView === "community" ? "community" : activeTab}
+          activeTab={
+            mainView === "weather" ? "weather" : mainView === "community" ? "community" : activeTab
+          }
           onSelect={selectTab}
         />
       )}

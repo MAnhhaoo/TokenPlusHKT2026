@@ -820,7 +820,10 @@ export async function fetchMapPointsApi(
       if (Array.isArray(data)) {
         // Chỉ lấy điểm quan trắc / mô hình thủy văn thời gian thực (loại trừ hoàn toàn báo cáo người dùng)
         const pureHydrologicalPoints: MapFloodPoint[] = (data as MapFloodPoint[]).filter(
-          (pt) => !(pt as any).linkedReportId && !pt.id.startsWith("p_RP-") && !pt.id.startsWith("report-"),
+          (pt) =>
+            !(pt as any).linkedReportId &&
+            !pt.id.startsWith("p_RP-") &&
+            !pt.id.startsWith("report-"),
         );
 
         // Đăng ký các địa điểm vào search pool
@@ -1231,37 +1234,55 @@ export async function fetchJourneyRoutes(
         // Giữ trọn vẹn từng khúc rẽ trong hẻm, không vẽ đường chim bay đâm xuyên nhà
 
         const rawSteps: any[] = primaryRoute.legs?.[0]?.steps ?? [];
-        const mainSteps: NavigationStep[] = rawSteps
-          .filter((s) => s.name || s.distance > 15)
-          .map((s) => {
-            const modifier: string = s.maneuver?.modifier || "";
-            const icon = modifier.includes("left")
+        const mainSteps: NavigationStep[] = [];
+        for (const s of rawSteps) {
+          const isArrive = s.maneuver?.type === "arrive";
+          if (!isArrive && !s.name && (s.distance ?? 0) <= 15) continue;
+
+          const modifier: string = s.maneuver?.modifier || "";
+          const icon = isArrive
+            ? "straight"
+            : modifier.includes("left")
               ? "turn-left"
               : modifier.includes("right")
                 ? "turn-right"
                 : "straight";
-            const instruction =
-              icon === "turn-left"
-                ? "Rẽ trái vào"
-                : icon === "turn-right"
-                  ? "Rẽ phải vào"
-                  : "Đi theo";
-            const distM = Math.max(30, Math.round(s.distance ?? 100));
-            const loc = Array.isArray(s.maneuver?.location)
-              ? ([Number(s.maneuver.location[0]), Number(s.maneuver.location[1])] as [
-                  number,
-                  number,
-                ])
-              : undefined;
-            return {
-              icon,
-              instruction,
-              street: s.name || "Trục đường chính",
-              distance: `${distM} m`,
-              distanceMeters: distM,
-              ...(loc ? { coords: loc } : {}),
-            };
+          const instruction = isArrive
+            ? "Đến điểm đích tại"
+            : icon === "turn-left"
+              ? "Rẽ trái vào"
+              : icon === "turn-right"
+                ? "Rẽ phải vào"
+                : "Đi theo";
+          const distM = isArrive ? 0 : Math.max(20, Math.round(s.distance ?? 100));
+          const streetName = s.name || (isArrive ? "Điểm đến đã chọn" : "Trục đường chính");
+          const loc = Array.isArray(s.maneuver?.location)
+            ? ([Number(s.maneuver.location[0]), Number(s.maneuver.location[1])] as [number, number])
+            : undefined;
+
+          const prev = mainSteps[mainSteps.length - 1];
+          if (
+            !isArrive &&
+            prev &&
+            prev.icon === "straight" &&
+            icon === "straight" &&
+            prev.street === streetName
+          ) {
+            const combined = (prev.distanceMeters ?? 0) + distM;
+            prev.distanceMeters = combined;
+            prev.distance = `${combined} m`;
+            continue;
+          }
+
+          mainSteps.push({
+            icon,
+            instruction,
+            street: streetName,
+            distance: `${distM} m`,
+            distanceMeters: distM,
+            ...(loc ? { coords: loc } : {}),
           });
+        }
 
         // Chỉ dẫn bước đầu tiên đi từ trong hẻm ra đường lớn
         const steps: NavigationStep[] = [];
@@ -1279,7 +1300,7 @@ export async function fetchJourneyRoutes(
             coords: originCoords,
           });
         }
-        steps.push(...mainSteps.slice(0, 15));
+        steps.push(...mainSteps);
 
         // Tính toán tốc độ di chuyển theo phương tiện: Xe máy (~32 km/h) vs Ô tô (~40 km/h)
         const speedFactor = vehicleMode === "motorcycle" ? 1.05 : 0.95;

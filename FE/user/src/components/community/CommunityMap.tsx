@@ -303,7 +303,7 @@ export default function CommunityMap({
         setGpsToast(
           isIpFallback
             ? "Đã xác định vị trí mạng của bạn"
-            : "Đã định vị thành công vị trí GPS của bạn"
+            : "Đã định vị thành công vị trí GPS của bạn",
         );
         setTimeout(() => setGpsToast(null), 3500);
       }
@@ -424,7 +424,10 @@ export default function CommunityMap({
       {/* Floating Info Pill at top */}
       <div className="community-map-live-pill">
         <span className="live-dot-pulse"></span>
-        <span>Bản đồ sự cố cộng đồng · {reports.filter((r) => r.status !== "rejected").length} điểm đang mở</span>
+        <span>
+          Bản đồ sự cố cộng đồng · {reports.filter((r) => r.status !== "rejected").length} điểm đang
+          mở
+        </span>
       </div>
     </div>
   );
