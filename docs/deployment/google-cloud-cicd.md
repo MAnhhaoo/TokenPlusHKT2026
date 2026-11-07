@@ -1,6 +1,6 @@
 # Google Cloud CI/CD setup
 
-This repository is being migrated from the earlier SaigonDrain project in small steps. The workflows validate only migrated packages under `BE/`, `FE/user/`, `FE/admin/`, and `ML/`; an empty placeholder directory is not treated as a passing application check.
+This repository is being migrated from the earlier SaigonDrain project in small steps. The workflows validate migrated packages under `BE/`, `FE/user/`, `FE/admin/`, and the existing lowercase `ml/` package; uppercase `ML/` is also recognized during migration. Empty placeholder directories are not treated as passing application checks.
 
 ## Pipeline behavior
 
@@ -11,7 +11,7 @@ This repository is being migrated from the earlier SaigonDrain project in small 
 | Published GitHub release | Run full validation, deploy the release commit to staging, then deploy that same source revision to production only when `GCP_DEPLOY_PRODUCTION=true` and the `production` Environment gate allows it. |
 | No migrated application source | Report that application checks or deployment were skipped; do not report the repository as application-validated. |
 
-The deploy workflow runs from the default branch after CI completes. For PR previews it reads only validated frontend booleans from the artifact, takes the PR number from the trusted `workflow_run` event, and downloads static build output; it does not check out or execute PR workflow code. The trusted workflow uses the Firebase configuration from `master`. GitHub documents that `workflow_run` workflows can access secrets and write tokens even when the preceding workflow cannot, and warns against running untrusted code on this event; keep this trust boundary intact. See [GitHub's `workflow_run` security guidance](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#workflow_run).
+The deploy workflow runs from the default branch after CI completes. For PR previews it reads only validated frontend booleans from the artifact, takes the PR number from the trusted `workflow_run` event, and downloads static build output; it rejects symbolic links and does not check out or execute PR workflow code. The trusted workflow uses the Firebase configuration from `master`. GitHub documents that `workflow_run` workflows can access secrets and write tokens even when the preceding workflow cannot, and warns against running untrusted code on this event; keep this trust boundary intact. See [GitHub's `workflow_run` security guidance](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#workflow_run).
 
 ## GitHub configuration
 
@@ -99,15 +99,15 @@ The identity used for Cloud Run deploys needs access to the project and runtime 
 
 Create one Firebase Hosting site for each app and record its site ID in both staging and production environments (and preview if previews are enabled). The workflows run `firebase target:apply` for the selected environment; `.firebaserc` is generated at deploy time and ignored so one environment's site mapping cannot be committed over another's. Firebase documents [multi-site targets](https://firebase.google.com/docs/hosting/multisites).
 
-Frontend packages must build successfully from the repository root with the locked pnpm workspace and write static output to their declared `dist` directory. The workflow sets `VITE_API_BASE_URL` before Vite builds. When the API deploys in the same run, the new Cloud Run URL is used; otherwise, set the environment's `VITE_API_BASE_URL` to the API URL that frontend should call.
+Frontend packages must build successfully and write static output to their declared `dist` directory. The workflow supports the current standalone npm package with its `package-lock.json` and future pnpm workspace packages with a frozen root lockfile. It sets `VITE_API_BASE_URL` before Vite builds. When the API deploys in the same run, the new Cloud Run URL is used; otherwise, set the environment's `VITE_API_BASE_URL` to the API URL that frontend should call.
 
 Same-repository PR previews use the `hosting-user` / `hosting-admin` artifacts from CI and deploy to a channel named `pr-N` that expires after seven days. Fork PRs never upload preview artifacts or receive OIDC credentials. Configure the `preview` Environment variables and WIF binding before setting `GCP_PREVIEW_ENABLED=true`.
 
 ## Application source contracts
 
-- **API:** `BE/` must become a runnable Node package with a start command that listens on the Cloud Run-provided `PORT`. CI requires `package.json`, the workspace files, and `build`, `typecheck`, `lint`, and `test` scripts before validating a changed package.
-- **User/admin frontend:** `FE/user/` and `FE/admin/` must be pnpm workspace packages with the same required scripts and build to `dist/`.
-- **ML:** `ML/` must provide `pyproject.toml` and `uv.lock`; CI runs frozen dependency sync, Ruff, and pytest. Training code, notebooks, and datasets are never deployed. A Cloud Run inference service is deployed only when a changed ML package contains `ML/serving/Dockerfile`; that directory must contain a working HTTP service and the Cloud Run service is kept private.
+- **API:** `BE/` must become a runnable Node package with a start command that listens on the Cloud Run-provided `PORT`. CI supports a standalone npm package or the locked pnpm workspace. It requires `build` and `typecheck`, plus either `lint` or `format` and either `test` or `test:smoke`.
+- **User/admin frontend:** `FE/user/` and `FE/admin/` must build to `dist/`. The current admin app uses npm, `format` as its style check, and `test:smoke` against a local Vite preview; future packages may use the pnpm workspace and standard `lint`/`test` scripts.
+- **ML:** the current package is lowercase `ml/`; uppercase `ML/` is recognized as a migration alias. Each Python package must provide `pyproject.toml` and `uv.lock`. CI runs `uv lock --check`, `uv sync --locked --group dev`, Ruff lint/format checks, and pytest on Ubuntu and Windows. Training code, notebooks, and datasets are never deployed. A Cloud Run inference service is deployed only when the changed package contains `ml/serving/Dockerfile` or `ML/serving/Dockerfile`; serving services remain private.
 
 ## Enablement checklist
 
@@ -119,4 +119,4 @@ Same-repository PR previews use the `hosting-user` / `hosting-admin` artifacts f
 6. Set `GCP_DEPLOY_STAGING=true` after staging is ready. Enable previews with `GCP_PREVIEW_ENABLED=true` only after the preview identity and site variables are ready. Set `GCP_DEPLOY_PRODUCTION=true` only after the production Environment gate and variables are ready.
 7. Confirm that a package change runs its checks and that the deployment summary names the expected target. A release is required to run the production path.
 
-At the time this workflow foundation is added, the target repository has placeholders but no application packages, and no Google Cloud resources or GitHub Environment variables have been created for it. CI therefore reports that no application code was validated, and deployments remain gated until the migration and environment setup are complete.
+At the time this workflow foundation is added, `FE/admin/` and `ml/` already contain application code, while `BE/` and `FE/user/` are still placeholders. No Google Cloud resources or GitHub Environment variables have been created for this repository, so deployment stays gated until environment setup is complete.

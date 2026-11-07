@@ -6,8 +6,8 @@ Move SaigonDrain forward without restarting: migrate working parts into `MAnhhao
 
 ## Current state
 
-- The target repository has placeholder directories (`BE`, `FE`, `contracts`, `infra`, `docs`) and the PRD, but no application manifests or GitHub Actions workflows.
-- The source repository has a pnpm/Node workspace with a NestJS backend and Vite frontends, plus a Python ML package. Its existing GitHub Actions workflow builds an Android debug APK and uploads it; it does not provide the requested lint/test/deploy pipeline.
+- The target repository now has a standalone npm/Vite admin frontend under `FE/admin/` and a lowercase Python ML research package under `ml/`, including `uv.lock` and tests. `BE/` and `FE/user/` are still placeholders, and this branch adds the first CI/deploy workflows.
+- The earlier SaigonDrain repository remains the source for gradual migration; CI must accommodate the target repository's current npm and uv lockfiles while allowing future pnpm workspace packages.
 - The target repository's default branch is `master`.
 
 ## Approaches
@@ -17,16 +17,16 @@ Move SaigonDrain forward without restarting: migrate working parts into `MAnhhao
 
 ## Proposed flow
 
-- Pull requests to `master`: run build, typecheck, lint, and tests for the packages that have been migrated. Frontend lint/test commands must be added if they remain absent from the source packages. A workflow must report missing runnable packages as not ready; it must not present an empty/no-op run as successful validation.
+- Pull requests to `master`: run build, typecheck, style/lint checks, and tests for changed migrated packages. Support package-local npm and workspace pnpm locks; use the admin app's format check and browser smoke test where standard lint/test scripts are absent. A workflow must report missing runnable packages as not ready; it must not present an empty/no-op run as successful validation.
 - Pull requests: publish Firebase Hosting preview channels after Firebase project/site configuration is available.
 - Merge to `master`: deploy migrated API and serving ML services to Cloud Run staging, and the user/admin frontends to Firebase Hosting staging.
 - Version release: after CI passes and the protected production environment is approved, deploy the same source revision to production.
 - GitHub Actions authenticates to Google Cloud with Workload Identity Federation. Long-lived service-account keys are not stored in GitHub.
-- Deploy ML to Cloud Run only if it has an HTTP inference service; training code, notebooks, and datasets stay out of the serving deployment.
+- Run the existing `ml/` package checks on Ubuntu and Windows. Deploy ML to Cloud Run only if it has an HTTP inference service; training code, notebooks, and datasets stay out of the serving deployment.
 
 ## Scope and limits
 
-This design covers the pipeline foundation and its activation path; it does not copy the entire source repository or create Google Cloud resources. The target repository needs at least one runnable migrated service before build/test/deploy jobs can be meaningfully enabled. The Google Cloud project, region, Workload Identity provider/service account, Firebase project and Hosting site IDs, and runtime secrets must be supplied through repository/environment configuration before deployment can run.
+This design covers the pipeline foundation and its activation path; it does not copy the entire source repository or create Google Cloud resources. Existing `FE/admin/` and `ml/` packages provide CI targets; Cloud Run and Firebase deployment waits for deployable services and owner-provided environment configuration. The Google Cloud project, region, Workload Identity provider/service account, Firebase project and Hosting site IDs, and runtime secrets must be supplied before deployment can run.
 
 ## Review focus
 
@@ -35,7 +35,7 @@ This design covers the pipeline foundation and its activation path; it does not 
 - Production must receive only a revision that passed CI and staging verification.
 - ML training artifacts must not be deployed as an online inference service.
 
-## Decisions needed before implementation
+## Remaining owner configuration
 
-- Confirm this architecture and the staged rollout above.
-- For real deployment, provide or create the Google Cloud and Firebase project/site configuration; workflow files can use placeholders until then.
+- The user approved Cloud Run for API/ML, Firebase Hosting for the frontend, and the staged rollout above.
+- For real deployment, create the Google Cloud and Firebase project/site configuration and GitHub Environment protections/variables; workflow files use gated variables until then.

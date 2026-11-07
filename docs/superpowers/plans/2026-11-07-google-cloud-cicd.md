@@ -6,23 +6,23 @@
 
 **Architecture:** GitHub Actions runs checks only for migrated application paths. Cloud Run hosts the API and any HTTP ML inference service; Firebase Hosting serves the user and admin frontends. GitHub Actions authenticates through Workload Identity Federation, with environment-specific staging and production settings.
 
-**Tech Stack:** GitHub Actions, Node.js 22, pnpm 12.15.0, Python 3.12 with uv, Google Cloud Run, Firebase Hosting, Workload Identity Federation.
+**Tech Stack:** GitHub Actions, Node.js 22, npm for the existing standalone admin app, pnpm 12.15.0 for future workspaces, Python 3.12 with uv, Google Cloud Run, Firebase Hosting, Workload Identity Federation.
 
 **Spec:** `docs/superpowers/specs/2026-11-07-google-cloud-cicd-design.md`
 
 ## Global Constraints
 
 - The target repository's default branch is `master`.
-- The target repository currently contains placeholders, not application packages; CI must not report an empty/no-op run as application validation.
-- Map migrated code to `BE/`, `FE/user/`, `FE/admin/`, and `ML/` using exact case on Linux runners.
+- The current repository has a standalone npm admin package and lowercase `ml/` package; `BE/` and `FE/user/` remain placeholders. CI must not report an empty/no-op run as application validation.
+- Map migrated code to `BE/`, `FE/user/`, `FE/admin/`, and the existing `ml/` package; recognize `ML/` as a migration alias on Linux runners.
 - Use Workload Identity Federation; do not commit service-account keys or runtime secrets.
 - Do not create Google Cloud resources or migrate the full application in this workflow-foundation change.
 - Keep production deployment behind the `production` GitHub Environment; the repository owner configures required reviewers and cloud variables.
 
 ## Review Focus
 
-- A workflow-only change must not claim application checks passed; source paths trigger CI only after a runnable package is present.
-- A changed component missing its package manifest or lockfile must produce an actionable failure.
+- A workflow-only PR must not imply application source changed; it should run regression checks for migrated packages already present in the merge commit.
+- A changed component missing its package manifest or matching npm/pnpm/uv lockfile must produce an actionable failure.
 - Missing GCP/Firebase configuration must be visible as deploy-not-configured; it must never be reported as a successful deployment.
 - Fork pull requests must not receive Google Cloud credentials or deploy privileges.
 - User/admin frontends must build to the Firebase Hosting directories declared in `firebase.json`.
@@ -43,14 +43,14 @@
 - Create: `.github/workflows/ci.yml`
 
 **Interfaces:**
-- Consumes the existing or migrated package manifests and lockfiles in `BE/`, `FE/user/`, `FE/admin/`, and `ML/`.
-- Produces a required PR check that runs package build, typecheck, lint, and tests when the relevant package exists; missing scripts or lockfiles for a changed package fail with a clear message.
+- Consumes the existing or migrated package manifests and lockfiles in `BE/`, `FE/user/`, `FE/admin/`, `ml/`, and `ML/`.
+- Produces a required PR check that runs package build, typecheck, lint/style checks, and tests when the relevant package exists; changed packages missing both supported script forms or their lockfile fail with a clear message.
 
 - [x] Add a pull-request trigger scoped to application/workflow paths, a reusable `workflow_call` full-validation mode for master/release deploys, and `workflow_dispatch` without treating an empty repository as tested.
-- [x] Add Node checks using Node 22 and pnpm 12.15.0 for packages with their manifests and frozen lockfile.
-- [x] Add Python checks using Python 3.12 and `uv sync --frozen --group dev`, `uv run ruff check`, and `uv run pytest` when `ML/pyproject.toml` exists.
+- [x] Add Node checks using Node 22 and either a package-local npm lockfile or pnpm 12.15.0 workspace lockfile; run build/typecheck, lint or format check, and test or smoke test.
+- [x] Add Python checks using Python 3.12 on Ubuntu and Windows with `uv lock --check`, `uv sync --locked --group dev`, Ruff lint/format checks, and pytest when `ml/` or `ML/` contains a package.
 - [x] Fail the preflight when a changed application component has no runnable manifest or required lockfile; report absent optional components as not migrated.
-- [x] Validate workflow YAML with `actionlint` and inspect trigger/job conditions for a workflow-only change and a component change.
+- [x] Validate workflow YAML with `actionlint` and verify merge-base detection plus full regression validation when a workflow-only PR targets a branch that advanced with migrated packages.
 
 ### Task 2: Google Cloud Deployment Foundation
 
@@ -66,9 +66,9 @@
 
 - [x] Define Firebase Hosting targets `user` and `admin` with public directories `FE/user/dist` and `FE/admin/dist`.
 - [x] Configure staging after successful reusable CI on merge to `master`, production on a published release after staging and the protected environment gate, and Firebase PR preview from the trusted deploy workflow after CI succeeds.
-- [x] Take the PR number from the trusted `workflow_run` payload; validate artifact frontend flags as JSON booleans and never execute downloaded artifact contents in the trusted workflow.
+- [x] Take the PR number from the trusted `workflow_run` payload; validate artifact frontend flags as JSON booleans, reject symbolic links, and never execute downloaded artifact contents in the trusted workflow.
 - [x] Authenticate with `google-github-actions/auth@v3` and Workload Identity Federation; grant `contents: read` and `id-token: write` to deploy jobs, with `actions: read` only on the trusted preview jobs that download CI artifacts.
-- [x] Deploy the API to Cloud Run from `BE/`; deploy ML only when a serving entrypoint exists. Do not deploy training notebooks or datasets.
+- [x] Deploy the API to Cloud Run from `BE/`; deploy ML only when `ml/serving/Dockerfile` or `ML/serving/Dockerfile` exists. Do not deploy training notebooks or datasets.
 - [x] Document the required Google APIs, WIF provider/service-account roles, GitHub Environment variables, Firebase site targets, and the manual owner-side environment protection step.
 - [x] Validate workflow YAML with `actionlint`, parse `firebase.json`, inspect permission scopes, and confirm deployment cannot run from fork PRs.
 

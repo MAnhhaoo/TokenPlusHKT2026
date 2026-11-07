@@ -4,10 +4,12 @@ on:
   push:
     branches: [master]
     paths:
+      - '.github/workflows/**'
       - 'BE/**'
       - 'FE/user/**'
       - 'FE/admin/**'
       - 'ML/**'
+      - 'ml/**'
       - 'package.json'
       - 'pnpm-lock.yaml'
       - 'pnpm-workspace.yaml'
@@ -108,14 +110,22 @@ jobs:
           set -euo pipefail
           artifact_root="$RUNNER_TEMP/hosting-artifacts"
           targets=()
+          reject_symlinks() {
+            if [[ -L "$1" ]] || find "$1" -type l -print -quit | grep -q .; then
+              echo "Hosting artifact contains a symbolic link: $1" >&2
+              exit 1
+            fi
+          }
           if [[ "$USER_CHANGED" == true ]]; then
             [[ -d "$artifact_root/hosting-user" ]] || { echo 'User frontend artifact is missing.' >&2; exit 1; }
+            reject_symlinks "$artifact_root/hosting-user"
             mkdir -p FE/user/dist
             cp -R "$artifact_root/hosting-user/." FE/user/dist/
             targets+=(user)
           fi
           if [[ "$ADMIN_CHANGED" == true ]]; then
             [[ -d "$artifact_root/hosting-admin" ]] || { echo 'Admin frontend artifact is missing.' >&2; exit 1; }
+            reject_symlinks "$artifact_root/hosting-admin"
             mkdir -p FE/admin/dist
             cp -R "$artifact_root/hosting-admin/." FE/admin/dist/
             targets+=(admin)
@@ -177,6 +187,7 @@ jobs:
       admin: ${{ steps.detect.outputs.admin }}
       ml: ${{ steps.detect.outputs.ml }}
       ml_serving: ${{ steps.detect.outputs.ml_serving }}
+      ml_serving_directory: ${{ steps.detect.outputs.ml_serving_directory }}
       any_application: ${{ steps.detect.outputs.any_application }}
       any_deployable: ${{ steps.detect.outputs.any_deployable }}
     steps:
@@ -221,7 +232,9 @@ jobs:
           has_changed_source BE && backend=true || true
           has_changed_source FE/user && user=true || true
           has_changed_source FE/admin && admin=true || true
-          has_changed_source ML && ml=true || true
+          for directory in ml ML; do
+            has_changed_source "$directory" && ml=true || true
+          done
 
           if grep -Eq '^(package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml)$' <<<"$changed_files"; then
             has_source_files BE && backend=true || true
@@ -234,7 +247,16 @@ jobs:
           fi
 
           ml_serving=false
-          if [[ "$ml" == true && -f ML/serving/Dockerfile ]]; then ml_serving=true; fi
+          ml_serving_directory=''
+          if [[ "$ml" == true ]]; then
+            if [[ -f ml/serving/Dockerfile ]]; then
+              ml_serving=true
+              ml_serving_directory=ml/serving
+            elif [[ -f ML/serving/Dockerfile ]]; then
+              ml_serving=true
+              ml_serving_directory=ML/serving
+            fi
+          fi
           any_application=false
           any_deployable=false
           [[ "$backend" == true || "$user" == true || "$admin" == true || "$ml" == true ]] && any_application=true
@@ -246,6 +268,7 @@ jobs:
             echo "admin=$admin"
             echo "ml=$ml"
             echo "ml_serving=$ml_serving"
+            echo "ml_serving_directory=$ml_serving_directory"
             echo "any_application=$any_application"
             echo "any_deployable=$any_deployable"
           } >> "$GITHUB_OUTPUT"
@@ -282,10 +305,12 @@ jobs:
         run: |
           {
             echo '## Deployment status'
-            if [[ "$CI_HAS_APPLICATION" != true || "$CHANGED_APPLICATION" != true ]]; then
-              echo 'No migrated application source was available for this revision. CI did not claim application checks passed, and no deployment ran.'
+            if [[ "$CHANGED_APPLICATION" != true ]]; then
+              echo 'No application source path changed in this revision. Full CI validation completed for migrated packages; no deployment ran.'
+            elif [[ "$CI_HAS_APPLICATION" != true ]]; then
+              echo 'No migrated application package was available to validate; no deployment ran.'
             elif [[ "$DEPLOYABLE" != true ]]; then
-              echo 'The changed ML package has no ML/serving/Dockerfile HTTP serving entrypoint. Training code, notebooks, and datasets were not deployed.'
+              echo 'The changed ML package has no ml/serving/Dockerfile or ML/serving/Dockerfile HTTP serving entrypoint. Training code, notebooks, and datasets were not deployed.'
             elif [[ "$STAGING_ENABLED" != true ]]; then
               echo 'GCP_DEPLOY_STAGING is not set to true. CI completed, but staging and production deployment were not configured.'
             fi
@@ -375,7 +400,7 @@ jobs:
         uses: google-github-actions/deploy-cloudrun@v3
         with:
           service: ${{ vars.CLOUD_RUN_ML_SERVICE || 'saigondrain-ml' }}
-          source: ./ML/serving
+          source: ./${{ needs.deployment-scope.outputs.ml_serving_directory }}
           project_id: ${{ vars.GCP_PROJECT_ID }}
           region: ${{ vars.GCP_REGION }}
           flags: --service-account=${{ vars.GCP_RUNTIME_SERVICE_ACCOUNT }} --no-allow-unauthenticated
@@ -395,12 +420,23 @@ jobs:
         uses: pnpm/action-setup@v6.1.0
         with:
           version: 12.15.0
-          cache: true
-          cache_dependency_path: pnpm-lock.yaml
 
       - name: Install locked frontend dependencies
         if: needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true'
-        run: pnpm install --frozen-lockfile
+        shell: bash
+        env:
+          USER_CHANGED: ${{ needs.deployment-scope.outputs.user }}
+          ADMIN_CHANGED: ${{ needs.deployment-scope.outputs.admin }}
+        run: |
+          set -euo pipefail
+          need_pnpm=false
+          if [[ "$USER_CHANGED" == true ]]; then
+            if [[ -f FE/user/package-lock.json ]]; then (cd FE/user && npm ci); else need_pnpm=true; fi
+          fi
+          if [[ "$ADMIN_CHANGED" == true ]]; then
+            if [[ -f FE/admin/package-lock.json ]]; then (cd FE/admin && npm ci); else need_pnpm=true; fi
+          fi
+          if [[ "$need_pnpm" == true ]]; then pnpm install --frozen-lockfile; fi
 
       - name: Export API URL for Vite
         if: needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true'
@@ -421,12 +457,16 @@ jobs:
       - name: Build user frontend
         if: needs.deployment-scope.outputs.user == 'true'
         working-directory: FE/user
-        run: pnpm run build
+        shell: bash
+        run: |
+          if [[ -f package-lock.json ]]; then npm run build; else pnpm run build; fi
 
       - name: Build admin frontend
         if: needs.deployment-scope.outputs.admin == 'true'
         working-directory: FE/admin
-        run: pnpm run build
+        shell: bash
+        run: |
+          if [[ -f package-lock.json ]]; then npm run build; else pnpm run build; fi
 
       - name: Setup Node.js for Firebase CLI
         if: needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true'
@@ -560,7 +600,7 @@ jobs:
         uses: google-github-actions/deploy-cloudrun@v3
         with:
           service: ${{ vars.CLOUD_RUN_ML_SERVICE || 'saigondrain-ml' }}
-          source: ./ML/serving
+          source: ./${{ needs.deployment-scope.outputs.ml_serving_directory }}
           project_id: ${{ vars.GCP_PROJECT_ID }}
           region: ${{ vars.GCP_REGION }}
           flags: --service-account=${{ vars.GCP_RUNTIME_SERVICE_ACCOUNT }} --no-allow-unauthenticated
@@ -576,12 +616,23 @@ jobs:
         uses: pnpm/action-setup@v6.1.0
         with:
           version: 12.15.0
-          cache: true
-          cache_dependency_path: pnpm-lock.yaml
 
       - name: Install locked frontend dependencies
         if: needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true'
-        run: pnpm install --frozen-lockfile
+        shell: bash
+        env:
+          USER_CHANGED: ${{ needs.deployment-scope.outputs.user }}
+          ADMIN_CHANGED: ${{ needs.deployment-scope.outputs.admin }}
+        run: |
+          set -euo pipefail
+          need_pnpm=false
+          if [[ "$USER_CHANGED" == true ]]; then
+            if [[ -f FE/user/package-lock.json ]]; then (cd FE/user && npm ci); else need_pnpm=true; fi
+          fi
+          if [[ "$ADMIN_CHANGED" == true ]]; then
+            if [[ -f FE/admin/package-lock.json ]]; then (cd FE/admin && npm ci); else need_pnpm=true; fi
+          fi
+          if [[ "$need_pnpm" == true ]]; then pnpm install --frozen-lockfile; fi
 
       - name: Export API URL for Vite
         if: needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true'
@@ -602,12 +653,16 @@ jobs:
       - name: Build user frontend
         if: needs.deployment-scope.outputs.user == 'true'
         working-directory: FE/user
-        run: pnpm run build
+        shell: bash
+        run: |
+          if [[ -f package-lock.json ]]; then npm run build; else pnpm run build; fi
 
       - name: Build admin frontend
         if: needs.deployment-scope.outputs.admin == 'true'
         working-directory: FE/admin
-        run: pnpm run build
+        shell: bash
+        run: |
+          if [[ -f package-lock.json ]]; then npm run build; else pnpm run build; fi
 
       - name: Setup Node.js for Firebase CLI
         if: needs.deployment-scope.outputs.user == 'true' || needs.deployment-scope.outputs.admin == 'true'
