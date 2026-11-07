@@ -10,49 +10,8 @@ import {
   searchPlacesApi,
   type FloodAiAnalysis,
 } from "@/lib/api";
+import { processAndAnalyzeImageFile } from "@/lib/visionAnalysis";
 import type { ReportType, RouteEndpoint, Severity } from "@/types";
-
-function compressImageToDataUrl(file: File): Promise<string> {
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = typeof reader.result === "string" ? reader.result : "";
-      if (!result) {
-        resolve("");
-        return;
-      }
-      const img = new Image();
-      img.onload = () => {
-        const maxDim = 640;
-        let w = img.width;
-        let h = img.height;
-        if (w > maxDim || h > maxDim) {
-          if (w > h) {
-            h = Math.round((h * maxDim) / w);
-            w = maxDim;
-          } else {
-            w = Math.round((w * maxDim) / h);
-            h = maxDim;
-          }
-        }
-        const canvas = document.createElement("canvas");
-        canvas.width = w;
-        canvas.height = h;
-        const ctx = canvas.getContext("2d");
-        if (ctx) {
-          ctx.drawImage(img, 0, 0, w, h);
-          resolve(canvas.toDataURL("image/jpeg", 0.78));
-        } else {
-          resolve(result);
-        }
-      };
-      img.onerror = () => resolve(result);
-      img.src = result;
-    };
-    reader.onerror = () => resolve("");
-    reader.readAsDataURL(file);
-  });
-}
 
 function ReportModal({
   open,
@@ -79,6 +38,7 @@ function ReportModal({
   const [locationText, setLocationText] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("Bình Thạnh");
   const [coords, setCoords] = useState<[number, number]>([106.7185, 10.7934]);
+  const [hasCustomLocation, setHasCustomLocation] = useState(false);
   const [locSuggestions, setLocSuggestions] = useState<RouteEndpoint[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [locatingGps, setLocatingGps] = useState(false);
@@ -102,8 +62,16 @@ function ReportModal({
       setType("flood");
       setSeverity("medium");
       setShowSuggestions(false);
+      setHasCustomLocation(false);
     }, 250);
   }
+
+  // Mặc định tự động lấy vị trí hiện tại khi người dùng mở modal
+  useEffect(() => {
+    if (open && !hasCustomLocation && !locationText) {
+      handleUseGps();
+    }
+  }, [open]);
 
   useEffect(() => {
     if (!showSuggestions) return;
@@ -144,6 +112,25 @@ function ReportModal({
     }
   }
 
+  function applyAiAnalysis(analysis: FloodAiAnalysis) {
+    setAiAnalysis(analysis);
+    if (analysis.reportType === "drain") {
+      setType("drain");
+    } else {
+      setType("flood");
+    }
+    if (analysis.severity === "high") {
+      setSeverity("high");
+    } else if (analysis.severity === "low") {
+      setSeverity("low");
+    } else {
+      setSeverity("medium");
+    }
+    if (!description.trim() && analysis.aiSummary) {
+      setDescription(analysis.aiSummary);
+    }
+  }
+
   async function handlePhotoChange(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) {
@@ -153,42 +140,33 @@ function ReportModal({
       return;
     }
     setPhotoName(file.name);
-    const dataUrl = await compressImageToDataUrl(file);
+
+    // 1. Phân tích thị giác máy tính trực tiếp từ điểm ảnh thực tế (Pixel Computer Vision)
+    const rawLoc = locationText.trim() || "TP. Hồ Chí Minh";
+    const { dataUrl, analysis: localVisionAnalysis } = await processAndAnalyzeImageFile(
+      file,
+      rawLoc,
+      description.trim() || undefined,
+    );
     setPhotoDataUrl(dataUrl);
 
+    // Áp dụng ngay kết quả phân tích thị giác máy tính độc bản từ ảnh
+    applyAiAnalysis(localVisionAnalysis);
+
+    // 2. Đồng thời kết nối backend nếu có Google Gemini Vision API
     if (dataUrl) {
       setAnalyzingImage(true);
       try {
-        const rawLoc = locationText.trim() || "TP. Hồ Chí Minh";
-        const analysis = await analyzeReportImageApi({
+        const remoteAnalysis = await analyzeReportImageApi({
           image: dataUrl,
           location: rawLoc,
           description: description.trim() || undefined,
         });
-
-        if (analysis) {
-          setAiAnalysis(analysis);
-          // Tự động gợi ý loại sự cố phù hợp từ Gemini Vision
-          if (analysis.reportType === "drain") {
-            setType("drain");
-          } else {
-            setType("flood");
-          }
-          // Tự động phân cấp mức độ nghiêm trọng
-          if (analysis.severity === "critical" || analysis.severity === "high") {
-            setSeverity("high");
-          } else if (analysis.severity === "low") {
-            setSeverity("low");
-          } else {
-            setSeverity("medium");
-          }
-          // Bổ sung mô tả nếu người dùng chưa nhập
-          if (!description.trim() && analysis.aiSummary) {
-            setDescription(analysis.aiSummary);
-          }
+        if (remoteAnalysis) {
+          applyAiAnalysis(remoteAnalysis);
         }
       } catch (err) {
-        console.warn("AI Image analysis error:", err);
+        console.warn("AI Image remote analysis error:", err);
       } finally {
         setAnalyzingImage(false);
       }
@@ -201,6 +179,15 @@ function ReportModal({
     try {
       const rawLoc = locationText.trim() || "Nguyễn Hữu Cảnh, Bình Thạnh";
       const cleanLocation = rawLoc.split(/[·,]/)[0].trim() || rawLoc;
+
+      let submitCoords = coords;
+      if (hasCustomLocation && rawLoc) {
+        const matches = matchDynamicPlacePool(rawLoc);
+        if (matches.length > 0) {
+          submitCoords = matches[0].coords;
+        }
+      }
+
       const created = await createCitizenReport({
         reportType: type,
         severity,
@@ -208,8 +195,8 @@ function ReportModal({
         location: cleanLocation,
         district: selectedDistrict,
         description: description.trim() || aiAnalysis?.aiSummary || undefined,
-        lat: coords[1],
-        lng: coords[0],
+        lat: submitCoords[1],
+        lng: submitCoords[0],
         reporterId,
         aiSummary: aiAnalysis?.aiSummary,
         recommendation: aiAnalysis?.recommendation,
@@ -351,16 +338,25 @@ function ReportModal({
               <div className="report-location">
                 <Icon name="pin" size={18} />
                 <div className="report-location-input-wrap">
-                  <small>Vị trí hiện trường tại TP.HCM</small>
+                  <small>
+                    {hasCustomLocation
+                      ? "Vị trí do bạn nhập (tùy chọn)"
+                      : "Vị trí hiện tại của bạn (tự động nhận diện)"}
+                  </small>
                   <input
                     aria-label="Nhập tên đường hoặc vị trí ngập"
                     className="report-location-input"
                     onChange={(e) => {
                       setLocationText(e.target.value);
+                      setHasCustomLocation(true);
                       setShowSuggestions(true);
                     }}
                     onFocus={() => setShowSuggestions(true)}
-                    placeholder="Nhập tên đường, giao lộ (VD: Nguyễn Hữu Cảnh, Bình Thạnh…)"
+                    placeholder={
+                      locatingGps
+                        ? "Đang định vị vị trí hiện tại của bạn…"
+                        : "Nhập tên đường, giao lộ (VD: Nguyễn Hữu Cảnh, Bình Thạnh…)"
+                    }
                     type="text"
                     value={locationText}
                   />
@@ -368,8 +364,11 @@ function ReportModal({
                 <button
                   className="gps-locate-btn"
                   disabled={locatingGps}
-                  onClick={handleUseGps}
-                  title="Lấy tọa độ GPS hiện tại của bạn"
+                  onClick={() => {
+                    setHasCustomLocation(false);
+                    handleUseGps();
+                  }}
+                  title="Nhấn để tự động lấy lại vị trí bạn đang đứng"
                   type="button"
                 >
                   <Icon name="location" size={15} />
@@ -387,6 +386,7 @@ function ReportModal({
                           setLocationText(place.label);
                           setSelectedDistrict(place.district || "TP.HCM");
                           setCoords(place.coords);
+                          setHasCustomLocation(true);
                           setShowSuggestions(false);
                         }}
                         type="button"

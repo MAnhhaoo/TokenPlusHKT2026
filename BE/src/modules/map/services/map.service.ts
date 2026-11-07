@@ -212,7 +212,7 @@ export class MapService {
       if (!isRainFlooded && !isTideFlooded && !isAtRisk) {
         if (
           activeLayers.includes("history") &&
-          histCount >= 8 &&
+          histCount >= 5 &&
           (!query.severity ||
             query.severity === "all" ||
             point.severity === query.severity)
