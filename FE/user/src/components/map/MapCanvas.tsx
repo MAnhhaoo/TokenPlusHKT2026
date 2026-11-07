@@ -902,6 +902,96 @@ function MapCanvas({
       m.remove();
     }
     floodMarkersRef.current = [];
+
+
+    for (const pt of floodPoints) {
+      if (pt.type !== "flood" && pt.type !== "pending" && pt.type !== "risk") continue;
+      // Tab Bản đồ chỉ hiển thị các điểm nguy cơ ngập thời gian thực, loại bỏ hoàn toàn báo cáo cộng đồng
+      if ((pt as any).linkedReportId || pt.id.startsWith("p_RP-") || pt.id.startsWith("report-")) continue;
+      // Không vẽ các điểm khô ráo depth <= 0 khi ở chế độ thời gian thực
+      if (mapMode !== "history" && (pt.depth || 0) <= 0) continue;
+
+      const el = document.createElement("div");
+      el.className = `libre-flood-marker ${pt.severity} severity-${pt.severity}`;
+      const histCount = (pt as any).historyCount;
+      const depthInfo =
+        pt.depth && pt.depth > 0 ? `Mực nước ngập: ${pt.depth} cm` : "Chưa ghi nhận độ sâu";
+      const extraInfo =
+        mapMode === "history" && histCount
+          ? ` · Lịch sử ngập: ${histCount} lần`
+          : pt.rainfall > 0
+            ? ` · Mưa: ${pt.rainfall} mm`
+            : "";
+      const recessionText = pt.estimatedDurationMin
+        ? ` · Dự kiến hết ngập: ~${pt.estimatedDurationMin}p (${pt.estimatedClearAt?.split(",")[0] || ""})`
+        : "";
+      el.title = `${pt.label} (${pt.district}) · ${depthInfo}${extraInfo}${recessionText}`;
+
+      const badgeText =
+        pt.depth && pt.depth > 0 ? `${pt.depth}cm` : histCount ? `${histCount} lần` : "";
+      const etaMini =
+        pt.estimatedDurationMin && pt.depth > 0
+          ? `<span class="flood-mini-eta">~${pt.estimatedDurationMin}p</span>`
+          : "";
+      el.innerHTML = `<span class="libre-flood-pulse"></span><span class="flood-label">${pt.label}</span><span class="flood-depth">${badgeText}</span>${etaMini}`;
+      el.addEventListener("click", (ev) => {
+        ev.stopPropagation();
+        el.classList.toggle("is-expanded-marker");
+      });
+
+      const severityLabel =
+        pt.severity === "critical"
+          ? "Ngập nguy hiểm (>40cm)"
+          : pt.severity === "high"
+            ? "Ngập đáng chú ý (~25cm)"
+            : "Ngập nhẹ (~12cm)";
+
+      const popupHtml = `
+        <div class="map-point-popup">
+          <div class="popup-top">
+            <span class="popup-badge ${pt.severity}">${severityLabel}</span>
+            <strong>${pt.label}</strong>
+            <small>${pt.district}</small>
+          </div>
+          <div class="popup-grid">
+            <div class="popup-stat"><span>Mực nước:</span><strong>${pt.depth} cm</strong></div>
+            <div class="popup-stat"><span>Lượng mưa:</span><strong>${pt.rainfall} mm</strong></div>
+            ${
+              pt.estimatedDurationMin
+                ? `<div class="popup-stat stat-recession"><span>Dự kiến hết ngập:</span><strong>~${pt.estimatedDurationMin} phút (${pt.estimatedClearAt?.split(",")[0] || ""})</strong></div>`
+                : ""
+            }
+            ${
+              pt.drainageRateCmPerMin
+                ? `<div class="popup-stat"><span>Tốc độ rút:</span><strong>~${pt.drainageRateCmPerMin} cm/phút</strong></div>`
+                : ""
+            }
+            ${
+              pt.historyCount
+                ? `<div class="popup-stat"><span>Lịch sử ngập:</span><strong>${pt.historyCount} lần</strong></div>`
+                : ""
+            }
+          </div>
+        </div>
+      `;
+
+      const popup = new maplibregl.Popup({
+        offset: 22,
+        closeButton: true,
+        closeOnClick: true,
+        className: "saigon-drain-popup",
+      }).setHTML(popupHtml);
+
+      const marker = new maplibregl.Marker({
+        element: el,
+        anchor: "center",
+      })
+        .setLngLat([pt.lng, pt.lat])
+        .setPopup(popup)
+        .addTo(map);
+
+      floodMarkersRef.current.push(marker);
+    }
   }, [ready, floodPoints, mapMode]);
 
   useEffect(() => {

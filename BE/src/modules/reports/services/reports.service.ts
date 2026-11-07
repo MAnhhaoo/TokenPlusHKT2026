@@ -537,15 +537,64 @@ export class ReportsService {
    * Chuyển đổi trạng thái Khóa / Mở khóa của báo cáo (Toggle Lock).
    */
   async toggleLock(id: string, reason?: string) {
-    const report = await this.reportRepo.findOne({ where: { id } });
-    if (!report) {
-      throw new NotFoundException(`Không tìm thấy báo cáo ${id}`);
+    const { saved, linkedPoint, isLocked } = await this.withTransaction(
+      async ({ reportRepo, mapPointRepo }) => {
+        const report = await reportRepo.findOne({ where: { id } });
+        if (!report) {
+          throw new NotFoundException(`Không tìm thấy báo cáo ${id}`);
+        }
+
+        const point = await mapPointRepo.findOne({
+          where: { linkedReportId: id },
+        });
+
+        if (report.status === "rejected") {
+          report.status = "verified";
+          report.rejectReason = undefined;
+          if (point) {
+            point.type = "flood";
+            point.depth = report.aiDepth || report.reportedDepth || 25;
+            await mapPointRepo.save(point);
+          }
+          const savedReport = await reportRepo.save(report);
+          return {
+            saved: savedReport,
+            linkedPoint: point ?? null,
+            isLocked: false,
+          };
+        } else {
+          report.status = "rejected";
+          report.rejectReason =
+            reason || "Quản trị viên đã tạm khóa báo cáo này";
+          if (point) {
+            point.type = "risk";
+            point.depth = 0;
+            await mapPointRepo.save(point);
+          }
+          const savedReport = await reportRepo.save(report);
+          return {
+            saved: savedReport,
+            linkedPoint: point ?? null,
+            isLocked: true,
+          };
+        }
+      },
+    );
+
+    const result = {
+      message: isLocked
+        ? `Đã khóa báo cáo ${id} và ẩn điểm ngập khỏi bản đồ công khai.`
+        : `Đã mở khóa báo cáo ${id} và hiển thị lại điểm ngập trên bản đồ.`,
+      report: saved,
+      updatedMapPoint: linkedPoint,
+    };
+
+    if (isLocked) {
+      this.realtimeService?.broadcast("report.rejected", result);
+    } else {
+      this.realtimeService?.broadcast("report.approved", result);
     }
 
-    if (report.status === "rejected") {
-      return this.approve(id);
-    } else {
-      return this.reject(id, reason || "Quản trị viên đã tạm khóa báo cáo này");
-    }
+    return result;
   }
 }

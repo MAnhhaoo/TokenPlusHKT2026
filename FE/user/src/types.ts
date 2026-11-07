@@ -26,11 +26,12 @@ export type IconName =
   | "swap"
   | "turn-left"
   | "turn-right"
-  | "user";
+  | "user"
+  | "users";
 
 export type RouteId = "safe" | "balanced";
 export type VehicleMode = "motorcycle" | "car";
-export type AppTab = "map" | "tracking" | "saved" | "weather";
+export type AppTab = "map" | "community" | "tracking" | "saved" | "weather";
 export type ReportType = "flood" | "drain";
 export type Severity = "low" | "medium" | "high";
 
@@ -134,4 +135,33 @@ export type SavedRoutePair = {
   name: string;
   origin: RouteEndpoint;
   destination: RouteEndpoint;
+};
+
+export type CommunityReport = {
+  id: string;
+  userId?: string;
+  userName?: string;
+  userPhone?: string;
+  location: string;
+  district: string;
+  coordinates?: string;
+  reportedAt: string;
+  minutesAgo: number;
+  description: string;
+  reportType: ReportType;
+  reportedDepth: number;
+  aiDepth: number;
+  aiConfidence: number;
+  severity: "critical" | "high" | "medium" | "low";
+  priority: string;
+  status: "pending" | "verified" | "rejected";
+  photoUrl?: string;
+  aiSummary?: string;
+  recommendation?: string;
+  historyCount?: number;
+  estimatedDurationMin?: number;
+  estimatedClearAt?: string;
+  drainageRateCmPerMin?: number;
+  lat?: number;
+  lng?: number;
 };

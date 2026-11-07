@@ -74,15 +74,16 @@ export async function getUserLocation(): Promise<UserGeoLocation> {
   return new Promise<UserGeoLocation>((resolve) => {
     let resolved = false;
 
-    // Timeout an toàn 4.5 giây: nếu GPS phần cứng quá lâu, tự động chuyển IP geolocation
+    // Timeout nhanh 2.2 giây: nếu GPS thiết bị phản hồi chậm, tự động chuyển IP geolocation
     const safetyTimer = window.setTimeout(async () => {
       if (!resolved) {
         resolved = true;
         const ipLoc = await fallbackIp();
         resolve(ipLoc);
       }
-    }, 4500);
+    }, 2200);
 
+    // Thử lấy vị trí với maximumAge để dùng ngay vị trí đã lưu trong bộ nhớ đệm (nếu có)
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         if (!resolved) {
@@ -95,41 +96,15 @@ export async function getUserLocation(): Promise<UserGeoLocation> {
           });
         }
       },
-      (err) => {
-        if (resolved) return;
-        // Nếu người dùng bấm Chặn (code === 1), chuyển thẳng sang fallback
-        if (err && err.code === 1) {
+      async (_err) => {
+        if (!resolved) {
           resolved = true;
           window.clearTimeout(safetyTimer);
-          void fallbackIp().then(resolve);
-          return;
+          const ipLoc = await fallbackIp();
+          resolve(ipLoc);
         }
-
-        // Thử lại ngay với độ chính xác tiêu chuẩn (tương thích cao trên PC/Laptop Windows)
-        navigator.geolocation.getCurrentPosition(
-          (pos) => {
-            if (!resolved) {
-              resolved = true;
-              window.clearTimeout(safetyTimer);
-              resolve({
-                latitude: pos.coords.latitude,
-                longitude: pos.coords.longitude,
-                isIpFallback: false,
-              });
-            }
-          },
-          async () => {
-            if (!resolved) {
-              resolved = true;
-              window.clearTimeout(safetyTimer);
-              const ipLoc = await fallbackIp();
-              resolve(ipLoc);
-            }
-          },
-          { enableHighAccuracy: false, timeout: 3000, maximumAge: 120000 },
-        );
       },
-      { enableHighAccuracy: true, timeout: 3500, maximumAge: 60000 },
+      { enableHighAccuracy: false, timeout: 2000, maximumAge: 300000 },
     );
   });
 }

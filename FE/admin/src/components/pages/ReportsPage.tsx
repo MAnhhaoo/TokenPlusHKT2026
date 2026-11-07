@@ -15,7 +15,8 @@ import SegmentedControl from "@/components/ui/SegmentedControl"
 import StatusPill from "@/components/ui/StatusPill"
 import { severityLabel } from "@/lib/severity"
 import { reportStatusCounts } from "@/lib/analytics"
-import type { FloodReport, ReportStatus, Severity } from "@/types"
+import CommunityReportsMap from "@/components/reports/CommunityReportsMap"
+import type { FloodReport, MapPoint, ReportStatus, Severity } from "@/types"
 
 const HCMC_ADMIN_DISTRICTS = [
   "Quận 1",
@@ -65,11 +66,16 @@ const statusLabel: Record<ReportStatus, string> = {
 
 function ReportsPage({
   reports,
+  points = [],
   onReview,
+  onToggleLock,
 }: {
   reports: FloodReport[]
+  points?: MapPoint[]
   onReview: (report: FloodReport) => void
+  onToggleLock?: (report: FloodReport) => void
 }) {
+  const [selectedReportId, setSelectedReportId] = useState<string | null>(null)
   const [status, setStatus] = useState<"all" | ReportStatus>("all")
   const [severity, setSeverity] = useState<"all" | Severity>("all")
   const [district, setDistrict] = useState("all")
@@ -147,6 +153,21 @@ function ReportsPage({
           </div>
         </div>
       </div>
+
+      {/* Bản đồ Giám sát Điểm ngập do Người dân báo cáo - Admin có quyền Khóa / Mở */}
+      <CommunityReportsMap
+        reports={reports}
+        selectedReportId={selectedReportId}
+        onSelectReport={(r) => setSelectedReportId(r ? r.id : null)}
+        onToggleLock={(r) => {
+          if (onToggleLock) {
+            onToggleLock(r)
+          } else {
+            onReview(r)
+          }
+        }}
+        onReview={onReview}
+      />
 
       <section className="panel">
         <div className="reports-toolbar">
@@ -271,22 +292,42 @@ function ReportsPage({
                         {statusLabel[report.status]}
                       </StatusPill>
                     </td>
-                    <td data-label="Thao tác">
-                      {report.status === "rejected" ? (
+                    <td data-label="Thao tác" style={{ whiteSpace: "nowrap" }}>
+                      <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
+                        {report.status === "rejected" ? (
+                          <Button
+                            variant="secondary"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              if (onToggleLock) onToggleLock(report)
+                              else onReview(report)
+                            }}
+                          >
+                            <Unlock size={13} /> Mở khóa
+                          </Button>
+                        ) : (
+                          <Button
+                            variant="danger"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              if (onToggleLock) onToggleLock(report)
+                              else onReview(report)
+                            }}
+                          >
+                            <Lock size={13} /> Khóa
+                          </Button>
+                        )}
                         <Button
-                          variant="secondary"
-                          onClick={() => onReview(report)}
+                          variant="ghost"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setSelectedReportId(report.id)
+                          }}
+                          title="Xem vị trí trên bản đồ"
                         >
-                          <Unlock size={14} /> Mở khóa
+                          Xem vị trí
                         </Button>
-                      ) : (
-                        <Button
-                          variant="danger"
-                          onClick={() => onReview(report)}
-                        >
-                          <Lock size={14} /> Khóa
-                        </Button>
-                      )}
+                      </div>
                     </td>
                   </tr>
                 ))}

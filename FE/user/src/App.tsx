@@ -1,4 +1,5 @@
 import WeatherPage from "@/components/weather/WeatherPage";
+import CommunityPage from "@/components/community/CommunityPage";
 import { useEffect, useRef, useState } from "react";
 import BottomNav from "@/components/layout/BottomNav";
 import TopBar from "@/components/layout/TopBar";
@@ -13,6 +14,7 @@ import AuthModal from "@/components/auth/AuthModal";
 import {
   EMPTY_ROUTES,
   fetchActiveAlertsApi,
+  fetchCommunityReportsApi,
   fetchCurrentWeather,
   fetchForecastSlots,
   fetchJourneyRoutes,
@@ -29,6 +31,7 @@ import type {
   AppTab,
   VehicleMode,
   AreaAlertItem,
+  CommunityReport,
   CommunityUserProfile,
   ForecastSlot,
   MapFloodPoint,
@@ -82,9 +85,10 @@ function App() {
   const [liveRemainingKm, setLiveRemainingKm] = useState<string | null>(null);
   const [liveRemainingMin, setLiveRemainingMin] = useState<number | null>(null);
   const [stepForwardTrigger, setStepForwardTrigger] = useState(0);
-  const [mainView, setMainView] = useState<"map" | "weather">("map");
+  const [mainView, setMainView] = useState<"map" | "community" | "weather">("map");
   const [weatherTheme, setWeatherTheme] = useState<"sunny" | "rainy" | "cloudy" | "night">("rainy");
   const [activeTab, setActiveTab] = useState<AppTab>("map");
+  const [communityReports, setCommunityReports] = useState<CommunityReport[]>([]);
 
   const [origin, setOrigin] = useState<RouteEndpoint | null>(null);
   const [destination, setDestination] = useState<RouteEndpoint | null>(null);
@@ -123,20 +127,22 @@ function App() {
     };
   }, [forecastIndex, mapMode, forecasts, weather]);
 
-  // 1. Tải dữ liệu hệ thống khởi động (Thời tiết, Dự báo, Điểm ngập, Cảnh báo) - CHỈ CHẠY 1 LẦN KHI MOUNT
+  // 1. Tải dữ liệu hệ thống khởi động (Thời tiết, Dự báo, Điểm ngập, Cảnh báo, Báo cáo cộng đồng) - CHỈ CHẠY 1 LẦN KHI MOUNT
   useEffect(() => {
     let active = true;
     async function loadFromBackend() {
-      const [weatherSnap, forecastRes, pointsRes, alertsRes] = await Promise.all([
+      const [weatherSnap, forecastRes, pointsRes, alertsRes, communityRes] = await Promise.all([
         fetchCurrentWeather(),
         fetchForecastSlots(),
         fetchMapPointsApi(),
         fetchActiveAlertsApi(),
+        fetchCommunityReportsApi(),
       ]);
       if (!active) return;
       if (weatherSnap) setWeather(weatherSnap);
       if (forecastRes.slots.length > 0) setForecasts(forecastRes.slots);
       if (pointsRes.length > 0) setFloodPoints(pointsRes);
+      if (communityRes.length > 0) setCommunityReports(communityRes);
       setActiveAlerts(alertsRes);
     }
     loadFromBackend();
@@ -157,6 +163,11 @@ function App() {
         const alertsRes = await fetchActiveAlertsApi();
         if (!active) return;
         setActiveAlerts(alertsRes);
+      },
+      onReportsChanged: async () => {
+        const communityRes = await fetchCommunityReportsApi();
+        if (!active) return;
+        setCommunityReports(communityRes);
       },
     });
 
@@ -316,6 +327,12 @@ function App() {
       setPanelExpanded(false);
       return;
     }
+    if (tab === "community") {
+      setActiveTab("community");
+      setMainView("community");
+      setPanelExpanded(false);
+      return;
+    }
     setMainView("map");
     setActiveTab(tab);
     setPanelExpanded(tab !== "map");
@@ -331,7 +348,7 @@ function App() {
         panelExpanded ? "panel-expanded" : "panel-collapsed"
       } ${isNavigating ? "is-navigating" : ""} ${mainView === "weather" ? `in-weather-view theme-${weatherTheme}` : ""}`}
     >
-      <h1 className="sr-only">SaigonDrain AI — Bản đồ an toàn TP.HCM</h1>
+      <h1 className="sr-only">SaigonDrain AI — Bản đồ TP.HCM</h1>
       <TopBar
         activeMainTab={mainView}
         alertCount={activeAlerts.length}
@@ -347,7 +364,8 @@ function App() {
         }}
         onSelectMainTab={(tab) => {
           setMainView(tab);
-          setActiveTab(tab === "weather" ? "weather" : "map");
+          setActiveTab(tab);
+          setPanelExpanded(false);
         }}
         onSyncWeather={handleSyncWeather}
         weather={weather}
@@ -355,6 +373,22 @@ function App() {
 
       {mainView === "weather" ? (
         <WeatherPage onThemeChange={setWeatherTheme} />
+      ) : mainView === "community" ? (
+        <CommunityPage
+          reports={communityReports}
+          onOpenReportModal={() => setReportOpen(true)}
+          onNavigateToAvoid={(report) => {
+            if (report.lat && report.lng) {
+              setDestination({
+                label: report.location,
+                district: report.district,
+                coords: [report.lng, report.lat],
+              });
+              setMainView("map");
+              setActiveTab("map");
+            }
+          }}
+        />
       ) : (
         <>
           {!isNavigating && (
@@ -621,7 +655,7 @@ function App() {
 
       {!isNavigating && (
         <BottomNav
-          activeTab={mainView === "weather" ? "weather" : activeTab}
+          activeTab={mainView === "weather" ? "weather" : mainView === "community" ? "community" : activeTab}
           onSelect={selectTab}
         />
       )}
@@ -641,11 +675,17 @@ function App() {
             saveAuthSession(updated);
           }
           const { slotRain, mapMode: currentMode } = mapQueryStateRef.current;
-          const pts = await fetchMapPointsApi(slotRain, currentMode);
+          const [pts, commReps] = await Promise.all([
+            fetchMapPointsApi(slotRain, currentMode),
+            fetchCommunityReportsApi(),
+          ]);
           if (pts.length > 0 || newPoint) {
             setFloodPoints(
               newPoint && !pts.some((p) => p.id === newPoint.id) ? [newPoint, ...pts] : pts,
             );
+          }
+          if (commReps.length > 0) {
+            setCommunityReports(commReps);
           }
         }}
         open={reportOpen}
