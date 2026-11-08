@@ -75,6 +75,11 @@ jobs:
             user=true
           fi
 
+          # Every master merge is deployable, including docs-only successors.
+          # Otherwise a newer docs commit could supersede an app deployment
+          # without ever deploying the application delta it contains.
+          backend=true
+          user=true
           any_application=false
           [[ "$backend" == true || "$user" == true ]] && any_application=true
           {
@@ -171,7 +176,7 @@ jobs:
           user=false
           any_deployable=false
           staged_sha=''
-          force_full=false
+          force_full=true
           if [[ "$current" == true ]]; then
             if [[ "$GITHUB_EVENT_NAME" == release ]]; then
               changed_files="$(git ls-files | grep -vE '(^|/)\.gitkeep$' || true)"

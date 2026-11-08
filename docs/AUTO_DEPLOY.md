@@ -1,6 +1,6 @@
 # Automatic website deployment
 
-Merging application changes into `master` runs CI, deploys staging, and then deploys production automatically when staging succeeds. Publishing a `v*` release remains supported. Obsolete revisions are skipped before production deployment.
+Every merge into `master` runs CI, deploys staging, and then deploys production automatically when staging succeeds. This includes documentation-only successors, so a newer documentation commit cannot strand application changes from an older skipped deployment. Publishing a `v*` release remains supported. Obsolete revisions are skipped before production deployment.
 
 Changes under `BE/`, `FE/user/`, and `FE/admin/` are recognized. Admin changes use the combined frontend deployment scope. CI checks the admin typecheck and build in addition to the existing BE and user checks.
 
