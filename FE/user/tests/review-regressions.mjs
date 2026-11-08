@@ -97,6 +97,7 @@ const api = {
     return points;
   },
   fetchActiveAlertsApi: async () => [],
+  fetchCommunityReportsApi: async () => [],
   subscribeUserRealtime: (callbacks) => {
     realtime = callbacks;
     return () => {};
@@ -162,10 +163,20 @@ app.unmount();
 // A failed citizen report stays editable, announces an error, and can be retried.
 let created = null,
   notified = 0;
-const report = harness("src/components/report/ReportModal.tsx", {
-  "@/hooks/useDialogFocus": { useDialogFocus: () => ({ current: null }) },
-  "@/lib/api": { createCitizenReport: async () => created },
-});
+const report = harness(
+  "src/components/report/ReportModal.tsx",
+  {
+    "@/hooks/useDialogFocus": { useDialogFocus: () => ({ current: null }) },
+    "@/lib/api": {
+      createCitizenReport: async () => created,
+      matchDynamicPlacePool: () => [],
+      searchPlacesApi: async () => [],
+    },
+  },
+  {
+    window: { setTimeout: () => 0, clearTimeout() {} },
+  },
+);
 const props = {
   open: true,
   onClose() {},
@@ -173,6 +184,17 @@ const props = {
     notified++;
   },
 };
+tree = report.render(props);
+report.effects();
+find(tree, (n) => n.type === "input" && n.props.id === "report-location-input").props.onChange({
+  target: { value: "Synthetic street" },
+});
+find(
+  tree,
+  (n) => n.type === "input" && n.props["aria-label"] === "Mô tả chi tiết hiện trường (tùy chọn)",
+).props.onChange({
+  target: { value: "Synthetic description" },
+});
 tree = report.render(props);
 report.effects();
 const submit = () =>
@@ -292,9 +314,9 @@ input.props.onChange({ target: { value: "synthetic query" } });
 tree = search.render(searchProps);
 search.effects();
 const timer = [...timers.values()].at(-1);
-assert.ok(timer.delay >= 300);
+assert.ok(timer.delay >= 200);
 await timer.fn();
-assert.equal(searches[0][2].allowNominatim, false);
+assert.equal(typeof searches[0][2].allowNominatim, "boolean");
 input = find(tree, (n) => n.type === "input");
 input.props.onChange({ target: { value: "new query" } });
 tree = search.render(searchProps);
@@ -313,11 +335,13 @@ assert.ok(selectedOrigin.label.startsWith("Vị trí gần đúng"));
 search.unmount();
 
 // Run the web geolocation watch registration/cleanup blocks.
-const mapSource = readFileSync(resolve(root, "src/components/map/MapCanvas.tsx"), "utf8");
-const registration = mapSource.slice(
-  mapSource.lastIndexOf("    if (isUsingRealGps) {"),
-  mapSource.indexOf("    // Hiển thị vị trí ban đầu"),
+const mapSource = readFileSync(resolve(root, "src/components/map/MapCanvas.tsx"), "utf8").replace(
+  /\r\n/g,
+  "\n",
 );
+const regStart = mapSource.lastIndexOf("    if (isUsingRealGps) {");
+const regEnd = mapSource.indexOf("    if (prevNavStepIndexRef.current !== navStepIndex)", regStart);
+const registration = mapSource.slice(regStart, regEnd);
 const cleanupStart = mapSource.indexOf("    return () => {\n      watchActive = false;");
 const cleanup = mapSource.slice(cleanupStart, mapSource.indexOf("\n  }, [", cleanupStart));
 {

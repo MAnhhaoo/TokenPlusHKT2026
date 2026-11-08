@@ -333,14 +333,6 @@ function ReportModal({
 
               <div className="prediction-details-grid">
                 <div className="prediction-stat">
-                  <span className="stat-label">Mực nước ước lượng</span>
-                  <strong className="stat-value">
-                    {createdData?.reportedDepth
-                      ? `~${createdData.reportedDepth} cm (tham khảo)`
-                      : "Chưa xác định"}
-                  </strong>
-                </div>
-                <div className="prediction-stat">
                   <span className="stat-label">Trạng thái kiểm duyệt</span>
                   <strong className="stat-value">Chờ Admin xác minh</strong>
                 </div>
@@ -407,9 +399,9 @@ function ReportModal({
               <div className="severity-options">
                 {(
                   [
-                    ["low", "Nhẹ", "Dưới mắt cá (~12cm)"],
-                    ["medium", "Đáng chú ý", "Qua nửa bánh xe (~25cm)"],
-                    ["high", "Nguy hiểm", "Không thể đi qua (>40cm)"],
+                    ["low", "Nhẹ", "Nước mấp mé mặt đường"],
+                    ["medium", "Đáng chú ý", "Ngập bánh xe, đi lại chậm"],
+                    ["high", "Nguy hiểm", "Ngập sâu, khó di chuyển"],
                   ] as [Severity, string, string][]
                 ).map(([id, title, caption]) => (
                   <button
@@ -569,15 +561,6 @@ function ReportModal({
                   </span>
                 </div>
                 <div className="ai-metrics-row">
-                  <div className="ai-metric">
-                    <small>Mực nước ước lượng</small>
-                    <strong>
-                      {typeof aiAnalysis.estimatedDepthCm === "number" &&
-                      aiAnalysis.estimatedDepthCm > 0
-                        ? `~${aiAnalysis.estimatedDepthCm} cm (tham khảo)`
-                        : "Chưa đủ căn cứ đo"}
-                    </strong>
-                  </div>
                   <div className="ai-metric">
                     <small>Thời tiết qua ảnh</small>
                     <strong>{aiAnalysis.weatherCondition || "Chưa rõ qua ảnh"}</strong>

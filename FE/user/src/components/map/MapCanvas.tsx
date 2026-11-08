@@ -917,26 +917,16 @@ function MapCanvas({
       const el = document.createElement("div");
       el.className = `libre-flood-marker ${pt.severity} severity-${pt.severity}`;
       const histCount = (pt as any).historyCount;
-      const depthInfo =
-        pt.depth && pt.depth > 0 ? `Mực nước ngập: ${pt.depth} cm` : "Chưa ghi nhận độ sâu";
       const extraInfo =
         mapMode === "history" && histCount
           ? ` · Lịch sử ngập: ${histCount} lần`
           : pt.rainfall > 0
             ? ` · Mưa: ${pt.rainfall} mm`
             : "";
-      const recessionText = pt.estimatedDurationMin
-        ? ` · Dự kiến hết ngập: ~${pt.estimatedDurationMin}p (${pt.estimatedClearAt?.split(",")[0] || ""})`
-        : "";
-      el.title = `${pt.label} (${pt.district}) · ${depthInfo}${extraInfo}${recessionText}`;
+      el.title = `${pt.label} (${pt.district})${extraInfo}`;
 
-      const badgeText =
-        pt.depth && pt.depth > 0 ? `${pt.depth}cm` : histCount ? `${histCount} lần` : "";
-      const etaMini =
-        pt.estimatedDurationMin && pt.depth > 0
-          ? `<span class="flood-mini-eta">~${pt.estimatedDurationMin}p</span>`
-          : "";
-      el.innerHTML = `<span class="libre-flood-pulse"></span><span class="flood-label">${pt.label}</span><span class="flood-depth">${badgeText}</span>${etaMini}`;
+      const badgeText = histCount ? `${histCount} lần` : "";
+      el.innerHTML = `<span class="libre-flood-pulse"></span><span class="flood-label">${pt.label}</span>${badgeText ? `<span class="flood-depth">${badgeText}</span>` : ""}`;
       el.addEventListener("click", (ev) => {
         ev.stopPropagation();
         el.classList.toggle("is-expanded-marker");
@@ -944,10 +934,10 @@ function MapCanvas({
 
       const severityLabel =
         pt.severity === "critical"
-          ? "Ngập nguy hiểm (>40cm)"
+          ? "Ngập nguy hiểm"
           : pt.severity === "high"
-            ? "Ngập đáng chú ý (~25cm)"
-            : "Ngập nhẹ (~12cm)";
+            ? "Ngập đáng chú ý"
+            : "Ngập nhẹ";
 
       const popupHtml = `
         <div class="map-point-popup">
@@ -957,18 +947,7 @@ function MapCanvas({
             <small>${pt.district}</small>
           </div>
           <div class="popup-grid">
-            <div class="popup-stat"><span>Mực nước:</span><strong>${pt.depth} cm</strong></div>
             <div class="popup-stat"><span>Lượng mưa:</span><strong>${pt.rainfall} mm</strong></div>
-            ${
-              pt.estimatedDurationMin
-                ? `<div class="popup-stat stat-recession"><span>Dự kiến hết ngập:</span><strong>~${pt.estimatedDurationMin} phút (${pt.estimatedClearAt?.split(",")[0] || ""})</strong></div>`
-                : ""
-            }
-            ${
-              pt.drainageRateCmPerMin
-                ? `<div class="popup-stat"><span>Tốc độ rút:</span><strong>~${pt.drainageRateCmPerMin} cm/phút</strong></div>`
-                : ""
-            }
             ${
               pt.historyCount
                 ? `<div class="popup-stat"><span>Lịch sử ngập:</span><strong>${pt.historyCount} lần</strong></div>`

@@ -128,22 +128,36 @@ function ReportReviewModal({
           style={{
             marginBottom: "16px",
             padding: "12px 16px",
-            background: "rgba(16, 185, 129, 0.1)",
-            border: "1px solid rgba(16, 185, 129, 0.3)",
+            background:
+              report.status === "verified"
+                ? "rgba(16, 185, 129, 0.1)"
+                : "rgba(245, 158, 11, 0.12)",
+            border:
+              report.status === "verified"
+                ? "1px solid rgba(16, 185, 129, 0.3)"
+                : "1px solid rgba(245, 158, 11, 0.35)",
             borderRadius: "8px",
             display: "flex",
             alignItems: "center",
             gap: "12px",
-            color: "#047857",
+            color: report.status === "verified" ? "#047857" : "#b45309",
           }}
         >
-          <Sparkles size={20} style={{ flexShrink: 0, color: "#10b981" }} />
+          <Sparkles
+            size={20}
+            style={{
+              flexShrink: 0,
+              color: report.status === "verified" ? "#10b981" : "#d97706",
+            }}
+          />
           <div>
             <strong style={{ display: "block", fontSize: "14px", fontWeight: 600 }}>
-              ⚡ Tự động duyệt bởi AI Gemini · Đang hiển thị trực tiếp trên bản đồ TP.HCM
+              {report.status === "verified"
+                ? "✓ Báo cáo đã được xác minh · Đang hiển thị trên bản đồ công khai"
+                : "⏳ Báo cáo đang chờ Quản trị viên xác minh (pending)"}
             </strong>
             <span style={{ fontSize: "12.5px", color: "var(--text-muted, #64748b)" }}>
-              Báo cáo được AI phân tích và đưa thẳng lên bản đồ công khai. Quản trị viên có quyền Khóa báo cáo nếu phát hiện sai lệch hoặc spam.
+              Kết quả từ AI chỉ đóng vai trò gợi ý kiểm duyệt. Quản trị viên xác nhận hoặc từ chối báo cáo dựa trên bằng chứng thực tế.
             </span>
           </div>
         </div>
@@ -184,10 +198,6 @@ function ReportReviewModal({
               </strong>
             </div>
             <div className="ai-stats">
-              <span>
-                <small>Mức nước ước tính</small>
-                <b>{report.aiDepth} cm</b>
-              </span>
               <span>
                 <small>Loại sự cố</small>
                 <b>{report.priority}</b>

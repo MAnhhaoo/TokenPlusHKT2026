@@ -1566,7 +1566,8 @@ h3 {
   background: var(--mist);
 }
 
-.forecast-tabs button {
+.forecast-tabs button,
+.forecast-tabs .forecast-slot-item {
   display: flex;
   min-height: 96px;
   flex-direction: column;
@@ -1577,17 +1578,15 @@ h3 {
   border-radius: 12px;
   background: transparent;
   color: var(--ink-soft);
+  cursor: default;
   transition:
     background 180ms ease,
     border-color 180ms ease,
     box-shadow 180ms ease;
 }
 
-.forecast-tabs button:hover {
-  background: rgb(255 255 255 / 55%);
-}
-
-.forecast-tabs button.is-active {
+.forecast-tabs button.is-active,
+.forecast-tabs .forecast-slot-item.is-active {
   border-color: var(--line);
   background: var(--white);
   box-shadow: var(--shadow-sm);
@@ -1626,11 +1625,13 @@ h3 {
   transition: transform 220ms ease;
 }
 
-.forecast-tabs button.zone-1 .forecast-meter i {
+.forecast-tabs button.zone-1 .forecast-meter i,
+.forecast-tabs .forecast-slot-item.zone-1 .forecast-meter i {
   background: #c9941c;
 }
 
-.forecast-tabs button.zone-2 .forecast-meter i {
+.forecast-tabs button.zone-2 .forecast-meter i,
+.forecast-tabs .forecast-slot-item.zone-2 .forecast-meter i {
   background: var(--coral);
 }
 

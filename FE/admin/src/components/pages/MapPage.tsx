@@ -163,18 +163,18 @@ function MapPage({
             <i className="legend-dot critical" />
             <strong>Nghiêm trọng (Đỏ)</strong>
             <span>
-              Mực nước trên 35 cm, xe máy chết máy, cần điều tiết giao thông.
+              Ngập sâu diện rộng, nguy cơ xe chết máy cao, cần điều tiết giao thông.
             </span>
           </div>
           <div>
             <i className="legend-dot high" />
             <strong>Cảnh báo cao (Cam)</strong>
-            <span>Mực nước 20 – 35 cm, phương tiện gầm thấp khó lưu thông.</span>
+            <span>Ngập đáng kể mặt đường, phương tiện gầm thấp khó lưu thông.</span>
           </div>
           <div>
             <i className="legend-dot medium" />
             <strong>Ngập nhẹ (Vàng)</strong>
-            <span>Mực nước 10 – 20 cm, di chuyển chậm được.</span>
+            <span>Nước đọng trên mặt đường, phương tiện di chuyển chậm được.</span>
           </div>
           <div>
             <i className="legend-dot" style={{ background: "#7c3aed" }} />
