@@ -153,44 +153,7 @@ function AnalyticsPage({
           items={irdDistrictBreakdown()}
           title="Điểm đen ngập lụt theo Quận/Huyện"
         />
-        <DistributionChart
-          description="Nhóm người dùng theo điểm tin cậy cộng đồng."
-          items={trustBands(users).map((band) => ({
-            label: band.label,
-            count: band.count,
-            percent: band.percent,
-            key: band.key,
-          }))}
-          title="Phân bố điểm tin cậy cộng đồng"
-        />
       </div>
-
-      <section className="panel contributors-panel">
-        <SectionHeader
-          action={<StatusPill tone="safe">{users.length} tài khoản</StatusPill>}
-          description="Xếp theo số báo cáo đã được xác minh."
-          title="Đóng góp cộng đồng nổi bật"
-        />
-        <div className="contributor-list">
-          {contributors.map((user, index) => (
-            <div className="contributor-row" key={user.id}>
-              <span className="rank">{index + 1}</span>
-              <span className="table-avatar">{user.initials}</span>
-              <div className="contributor-info">
-                <strong>{user.name}</strong>
-                <span>
-                  {user.district} · {user.verifiedReports}/{user.reports} báo cáo
-                  đã xác minh
-                </span>
-              </div>
-              <div className="contributor-score">
-                <strong>{user.trustScore}</strong>
-                <span>điểm tin cậy</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
     </div>
   )
 }

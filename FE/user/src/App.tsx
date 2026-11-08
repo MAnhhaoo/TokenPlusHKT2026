@@ -69,6 +69,7 @@ function App() {
   const [vehicleMode, setVehicleMode] = useState<VehicleMode>("motorcycle");
   const [reportOpen, setReportOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
+  const [pendingReportAfterAuth, setPendingReportAfterAuth] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [notifMode, setNotifMode] = useState<"alerts" | "guide">("alerts");
   const [currentUser, setCurrentUser] = useState<CommunityUserProfile | null>(() =>
@@ -320,6 +321,10 @@ function App() {
     setNavStepIndex(0);
   }
 
+  function handleRequestReport() {
+    setReportOpen(true);
+  }
+
   function selectTab(tab: AppTab) {
     if (tab === "weather") {
       setActiveTab("weather");
@@ -376,7 +381,7 @@ function App() {
       ) : mainView === "community" ? (
         <CommunityPage
           reports={communityReports}
-          onOpenReportModal={() => setReportOpen(true)}
+          onOpenReportModal={handleRequestReport}
           onNavigateToAvoid={(report) => {
             if (report.lat && report.lng) {
               setDestination({
@@ -410,7 +415,7 @@ function App() {
                 isNavigating={isNavigating}
                 navigationSteps={navigationSteps}
                 onRemoveSavedRoute={handleRemoveSavedRoute}
-                onReport={() => setReportOpen(true)}
+                onReport={handleRequestReport}
                 onSaveCurrentRoute={handleSaveCurrentRoute}
                 onSelectSavedRoute={handleSelectSavedRoute}
                 onStart={toggleNavigation}
@@ -613,7 +618,7 @@ function App() {
 
             <MapLegend selectedRoute={selectedRoute} />
 
-            <button className="report-fab" onClick={() => setReportOpen(true)} type="button">
+            <button className="report-fab" onClick={handleRequestReport} type="button">
               <span>
                 <Icon name="plus" size={20} />
               </span>
@@ -634,7 +639,7 @@ function App() {
                 isNavigating={isNavigating}
                 navigationSteps={navigationSteps}
                 onRemoveSavedRoute={handleRemoveSavedRoute}
-                onReport={() => setReportOpen(true)}
+                onReport={handleRequestReport}
                 onSaveCurrentRoute={handleSaveCurrentRoute}
                 onSelectSavedRoute={handleSelectSavedRoute}
                 onStart={toggleNavigation}
@@ -695,9 +700,24 @@ function App() {
       />
 
       <AuthModal
+        authNotice={
+          pendingReportAfterAuth
+            ? "Vui lòng đăng nhập hoặc đăng ký tài khoản để gửi báo cáo điểm ngập."
+            : null
+        }
         currentUser={currentUser}
-        onAuthSuccess={(user) => setCurrentUser(user)}
-        onClose={() => setAuthOpen(false)}
+        onAuthSuccess={(user) => {
+          setCurrentUser(user);
+          if (pendingReportAfterAuth) {
+            setPendingReportAfterAuth(false);
+            setAuthOpen(false);
+            setReportOpen(true);
+          }
+        }}
+        onClose={() => {
+          setPendingReportAfterAuth(false);
+          setAuthOpen(false);
+        }}
         onLogout={() => setCurrentUser(null)}
         open={authOpen}
       />

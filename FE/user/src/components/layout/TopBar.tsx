@@ -129,32 +129,6 @@ function TopBar({
           <Icon name="bell" size={20} />
           {alertCount > 0 && <span aria-hidden="true" className="notification-dot" />}
         </button>
-
-        <button
-          aria-label={
-            currentUser ? `Tài khoản ${currentUser.name}` : "Đăng nhập hoặc Đăng ký tài khoản"
-          }
-          className={`user-button ${currentUser ? "is-logged-in" : "is-guest"}`}
-          onClick={onOpenAuth}
-          title={
-            currentUser
-              ? `${currentUser.name} (${currentUser.district})`
-              : "Nhấn để Đăng nhập / Đăng ký"
-          }
-          type="button"
-        >
-          {currentUser ? (
-            <>
-              <span className="user-chip-initials">{currentUser.initials}</span>
-              <span className="user-chip-name">{currentUser.name}</span>
-            </>
-          ) : (
-            <>
-              <Icon name="user" size={17} />
-              <span className="user-chip-name">Đăng nhập</span>
-            </>
-          )}
-        </button>
       </div>
     </header>
   );

@@ -2554,8 +2554,14 @@ h3 {
   transition: background 180ms ease;
 }
 
-.primary-modal-button:hover {
+.primary-modal-button:hover:not(:disabled) {
   background: var(--teal-deep);
+}
+
+.primary-modal-button:disabled {
+  background: #94a3b8;
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
 .report-success {
