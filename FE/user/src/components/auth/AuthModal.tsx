@@ -27,12 +27,14 @@ function AuthModal({
   currentUser,
   onAuthSuccess,
   onLogout,
+  authNotice,
 }: {
   open: boolean;
   onClose: () => void;
   currentUser: CommunityUserProfile | null;
   onAuthSuccess: (user: CommunityUserProfile) => void;
   onLogout: () => void;
+  authNotice?: string | null;
 }) {
   const [mode, setMode] = useState<"login" | "register">("login");
   const [identifier, setIdentifier] = useState("");
@@ -254,6 +256,11 @@ function AuthModal({
               </button>
             </div>
 
+            {authNotice && !errorMsg && !successMsg && (
+              <p className="auth-feedback error" role="status">
+                {authNotice}
+              </p>
+            )}
             {errorMsg && <p className="auth-feedback error">{errorMsg}</p>}
             {successMsg && <p className="auth-feedback success">{successMsg}</p>}
 

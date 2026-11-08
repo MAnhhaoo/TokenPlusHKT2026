@@ -61,6 +61,7 @@ function ReportModal({
       setPhotoDataUrl("");
       setAiAnalysis(null);
       setAnalyzingImage(false);
+      setLocationText("");
       setDescription("");
       setType("flood");
       setSeverity("medium");
@@ -69,12 +70,9 @@ function ReportModal({
     }, 250);
   }
 
-  // Mặc định tự động lấy vị trí hiện tại khi người dùng mở modal
-  useEffect(() => {
-    if (open && !hasCustomLocation && !locationText) {
-      handleUseGps();
-    }
-  }, [open]);
+  const canSubmit =
+    locationText.trim().length > 0 &&
+    (description.trim().length > 0 || Boolean(photoDataUrl) || Boolean(photoName));
 
   useEffect(() => {
     if (!showSuggestions) return;
@@ -180,6 +178,12 @@ function ReportModal({
   }
 
   async function handleSubmit() {
+    if (!canSubmit) {
+      setSubmitError(
+        "Vui lòng nhập vị trí ngập và mô tả hiện trường (hoặc đính kèm ảnh) trước khi gửi báo cáo.",
+      );
+      return;
+    }
     setSubmitting(true);
     setSubmitError(null);
     try {
@@ -426,9 +430,7 @@ function ReportModal({
 
             <div className="report-location-field">
               <label className="report-location-label" htmlFor="report-location-input">
-                {hasCustomLocation
-                  ? "Vị trí ngập (do bạn nhập)"
-                  : "Vị trí hiện tại của bạn (tự động nhận diện)"}
+                Vị trí ngập (bắt buộc) *
               </label>
               <div className="report-location-input-row">
                 <Icon name="pin" size={18} />
@@ -490,8 +492,9 @@ function ReportModal({
             </div>
 
             <label className="auth-field">
-              <span>Mô tả chi tiết hiện trường (tùy chọn)</span>
+              <span>Mô tả chi tiết hiện trường (bắt buộc nếu chưa có ảnh) *</span>
               <input
+                aria-label="Mô tả chi tiết hiện trường (tùy chọn)"
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="VD: Nước ngập nửa bánh xe máy, xe chết máy nhiều…"
                 type="text"
@@ -587,8 +590,13 @@ function ReportModal({
             {submitError && <p role="alert">{submitError}</p>}
             <button
               className="primary-modal-button"
-              disabled={submitting}
+              disabled={submitting || analyzingImage || !canSubmit}
               onClick={handleSubmit}
+              title={
+                !canSubmit
+                  ? "Vui lòng nhập vị trí ngập và mô tả (hoặc thêm ảnh) để gửi báo cáo"
+                  : undefined
+              }
               type="button"
             >
               {submitting ? "Đang gửi báo cáo..." : "Gửi báo cáo cộng đồng"}

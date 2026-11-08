@@ -174,6 +174,16 @@ export const HCMC_DISTRICTS = [
 export class WeatherService {
   private readonly logger = new Logger(WeatherService.name);
   private latestMinutely15Slots: [number, number, number, number] | null = null;
+  private weatherCache = new Map<
+    string,
+    { snapshot: WeatherSnapshotEntity; expiresAt: number }
+  >();
+  private inflightWeather = new Map<string, Promise<WeatherSnapshotEntity>>();
+  private districtRainCache: {
+    map: Map<string, number>;
+    expiresAt: number;
+  } | null = null;
+  private inflightDistrictRain: Promise<Map<string, number>> | null = null;
 
   constructor(
     private readonly httpService: HttpService,
@@ -258,6 +268,37 @@ export class WeatherService {
       lat ?? Number(this.configService.get<number>("DEFAULT_LAT", 10.7769));
     const targetLng =
       lng ?? Number(this.configService.get<number>("DEFAULT_LNG", 106.7009));
+    const cacheKey = `${targetLat.toFixed(3)},${targetLng.toFixed(3)}`;
+    const now = Date.now();
+    const cached = this.weatherCache.get(cacheKey);
+    if (cached && cached.expiresAt > now) {
+      return cached.snapshot;
+    }
+    const existingInflight = this.inflightWeather.get(cacheKey);
+    if (existingInflight) {
+      return existingInflight;
+    }
+
+    const requestPromise = this.fetchCurrentWeatherInternal(
+      targetLat,
+      targetLng,
+      locationName,
+      cacheKey,
+    );
+    this.inflightWeather.set(cacheKey, requestPromise);
+    try {
+      return await requestPromise;
+    } finally {
+      this.inflightWeather.delete(cacheKey);
+    }
+  }
+
+  private async fetchCurrentWeatherInternal(
+    targetLat: number,
+    targetLng: number,
+    locationName: string,
+    cacheKey: string,
+  ): Promise<WeatherSnapshotEntity> {
     const baseUrl = this.configService.get<string>(
       "OPEN_METEO_BASE_URL",
       "https://api.open-meteo.com/v1",
@@ -361,7 +402,12 @@ export class WeatherService {
         hourlyForecast,
       });
 
-      return await this.weatherRepo.save(snapshot);
+      const saved = await this.weatherRepo.save(snapshot);
+      this.weatherCache.set(cacheKey, {
+        snapshot: saved,
+        expiresAt: Date.now() + 180_000,
+      });
+      return saved;
     } catch (error) {
       this.logger.warn(
         `Không thể kết nối Open-Meteo API (${(error as Error).message}), sử dụng dữ liệu fallback/cache.`,
@@ -371,6 +417,10 @@ export class WeatherService {
         take: 1,
       });
       if (latest.length > 0) {
+        this.weatherCache.set(cacheKey, {
+          snapshot: latest[0],
+          expiresAt: Date.now() + 60_000,
+        });
         return latest[0];
       }
 
@@ -413,7 +463,12 @@ export class WeatherService {
           },
         ],
       });
-      return await this.weatherRepo.save(fallbackSnapshot);
+      const savedFallback = await this.weatherRepo.save(fallbackSnapshot);
+      this.weatherCache.set(cacheKey, {
+        snapshot: savedFallback,
+        expiresAt: Date.now() + 60_000,
+      });
+      return savedFallback;
     }
   }
 
@@ -421,6 +476,26 @@ export class WeatherService {
    * Gọi Open-Meteo multi-location để lấy lượng mưa thời gian thực chính xác của từng quận/huyện
    */
   async getRealtimeDistrictRainMap(): Promise<Map<string, number>> {
+    const now = Date.now();
+    if (this.districtRainCache && this.districtRainCache.expiresAt > now) {
+      return this.districtRainCache.map;
+    }
+    if (this.inflightDistrictRain) {
+      return this.inflightDistrictRain;
+    }
+
+    const requestPromise = this.fetchRealtimeDistrictRainMapInternal();
+    this.inflightDistrictRain = requestPromise;
+    try {
+      return await requestPromise;
+    } finally {
+      this.inflightDistrictRain = null;
+    }
+  }
+
+  private async fetchRealtimeDistrictRainMapInternal(): Promise<
+    Map<string, number>
+  > {
     const rainMap = new Map<string, number>();
     const baseUrl = this.configService.get<string>(
       "OPEN_METEO_BASE_URL",
@@ -459,14 +534,21 @@ export class WeatherService {
           }
         }
       });
+      this.districtRainCache = {
+        map: rainMap,
+        expiresAt: Date.now() + 180_000,
+      };
       return rainMap;
     } catch (err) {
       this.logger.warn(
         `Lỗi lấy mưa quận Open-Meteo: ${(err as Error).message}`,
       );
       try {
-        const cityWeather = await this.getCurrentWeather();
-        const baseRain = Number(cityWeather?.currentRainMm ?? 0);
+        const latest = await this.weatherRepo.find?.({
+          order: { fetchedAt: "DESC" },
+          take: 1,
+        });
+        const baseRain = Number(latest?.[0]?.currentRainMm ?? 0);
         HCMC_DISTRICTS.forEach((d) => {
           rainMap.set(d.district, baseRain);
           rainMap.set(d.district.toLowerCase(), baseRain);
@@ -474,6 +556,10 @@ export class WeatherService {
       } catch {
         // ignore
       }
+      this.districtRainCache = {
+        map: rainMap,
+        expiresAt: Date.now() + 60_000,
+      };
       return rainMap;
     }
   }

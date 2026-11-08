@@ -6,7 +6,6 @@ import {
   LayoutDashboard,
   Map,
   MoreHorizontal,
-  Users,
   X,
 } from "lucide-react"
 import IconButton from "@/components/ui/IconButton"
@@ -87,7 +86,6 @@ function Sidebar({
       page: "reports",
       count: pendingCount,
     },
-        { label: "Người dùng", icon: Users, page: "users" },
     { label: "Phân tích dữ liệu", icon: BarChart3, page: "analytics" },
   ]
 

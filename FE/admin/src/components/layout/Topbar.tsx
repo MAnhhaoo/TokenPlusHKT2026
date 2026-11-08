@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { CloudRain, Download, Droplets, Menu } from "lucide-react"
+import { CloudRain, Droplets, Menu } from "lucide-react"
 import Button from "@/components/ui/Button"
 import Heading from "@/components/ui/Heading"
 import IconButton from "@/components/ui/IconButton"
@@ -131,10 +131,6 @@ function Topbar({
         {page === "overview" && onViewReports ? (
           <Button aria-label="Báo cáo cộng đồng" onClick={onViewReports}>
             <Droplets size={16} /> <span>Báo cáo cộng đồng</span>
-          </Button>
-        ) : page === "users" ? (
-          <Button aria-label="Xuất dữ liệu" onClick={onExportUsers}>
-            <Download size={16} /> <span>Xuất dữ liệu</span>
           </Button>
         ) : null}
       </div>
