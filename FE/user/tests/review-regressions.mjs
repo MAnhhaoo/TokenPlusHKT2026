@@ -50,6 +50,13 @@ function harness(file, mocks = {}, globals = {}) {
     require(name) {
       if (name === "react") return react;
       if (name === "react/jsx-runtime") return { jsx, jsxs: jsx };
+      if (name === "@/lib/polling")
+        return {
+          startPolling(task) {
+            void task();
+            return () => {};
+          },
+        };
       if (name in mocks) return mocks[name];
       return { default: name.split("/").at(-1) };
     },

@@ -92,18 +92,15 @@ export default function CommunityReportsMap({
   }, [reports])
 
   const filteredReports = useMemo(() => {
-    if (filterMode === "active") {
-      return reportsWithCoords.filter((r) => r.status !== "rejected")
-    }
     if (filterMode === "locked") {
-      return reportsWithCoords.filter((r) => r.status === "rejected")
+      return []
     }
-    return reportsWithCoords
+    return reportsWithCoords.filter((r) => r.status !== "rejected")
   }, [reportsWithCoords, filterMode])
 
   const selectedReport = useMemo(() => {
-    return reportsWithCoords.find((r) => r.id === selectedReportId) ?? null
-  }, [reportsWithCoords, selectedReportId])
+    return filteredReports.find((r) => r.id === selectedReportId) ?? null
+  }, [filteredReports, selectedReportId])
 
   const counts = useMemo(() => {
     const total = reports.length
@@ -240,12 +237,9 @@ export default function CommunityReportsMap({
         {filteredReports.map((report) => {
           const pos = getPosition(report.parsedLat, report.parsedLng)
           const isSelected = selectedReportId === report.id
-          const isLocked = report.status === "rejected"
           const isPending = report.status === "pending"
 
-          let markerBg = isLocked
-            ? "#6b7280"
-            : report.severity === "critical"
+          const markerBg = report.severity === "critical"
               ? "#dc2626"
               : report.severity === "high"
                 ? "#d97706"
@@ -254,7 +248,7 @@ export default function CommunityReportsMap({
           return (
             <button
               key={report.id}
-              className={`map-marker ${isLocked ? "is-locked" : ""} ${isSelected ? "selected" : ""}`}
+              className={`map-marker ${isSelected ? "selected" : ""}`}
               style={{
                 position: "absolute",
                 left: pos.left,
@@ -272,27 +266,22 @@ export default function CommunityReportsMap({
                 alignItems: "center",
                 gap: "4px",
                 cursor: "pointer",
-                zIndex: isSelected ? 40 : isLocked ? 10 : 25,
+                zIndex: isSelected ? 40 : 25,
                 fontSize: "11px",
                 fontWeight: 700,
               }}
               onClick={() => onSelectReport(isSelected ? null : report)}
               type="button"
-              title={`${report.location} (${report.district}) · ${isLocked ? "Đã khóa" : report.status === "verified" ? "Đã xác minh" : "Chờ duyệt"}`}
+              title={`${report.location} (${report.district}) · ${report.status === "verified" ? "Đã xác minh" : "Chờ duyệt"}`}
             >
               <span>
-                {isLocked ? (
-                  <Lock size={12} />
-                ) : isPending ? (
+                {isPending ? (
                   <AlertTriangle size={12} />
                 ) : (
                   <Droplets size={12} />
                 )}
               </span>
               <span>{report.location.split(",")[0].trim()}</span>
-              {isLocked && (
-                <span style={{ opacity: 0.9, fontSize: "10px", marginLeft: "2px" }}>🔒</span>
-              )}
             </button>
           )
         })}

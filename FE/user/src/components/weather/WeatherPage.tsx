@@ -1,3 +1,4 @@
+import { startPolling } from "@/lib/polling";
 import { useEffect, useRef, useState } from "react";
 import { getUserLocation } from "@/lib/location";
 import { reverseGeocodeApi, subscribeUserRealtime } from "@/lib/api";
@@ -368,6 +369,9 @@ function WeatherPage({
 }) {
   const [data, setData] = useState<DetailedWeatherData>(DEFAULT_HCMC_WEATHER);
   const [loading, setLoading] = useState(false);
+  const [gpsError, setGpsError] = useState<string | null>(null);
+  const targetRevisionRef = useRef(0);
+  const weatherRequestRef = useRef(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [searching, setSearching] = useState(false);
   const [searchResults, setSearchResults] = useState<
@@ -395,45 +399,49 @@ function WeatherPage({
     let active = true;
 
     async function refreshCurrentTarget() {
+      const revision = targetRevisionRef.current;
+      const request = ++weatherRequestRef.current;
       const { lat, lng, name } = currentTargetRef.current;
       const res = await fetchFullRealWeather(lat, lng, name);
-      if (active) {
+      if (
+        active &&
+        revision === targetRevisionRef.current &&
+        request === weatherRequestRef.current
+      ) {
         setData(res);
         onThemeChange?.(res.theme);
         setLoading(false);
       }
     }
 
-    async function loadInitial() {
-      setLoading(true);
-      // 1. Lấy ngay thời tiết thực của TP.HCM trong < 300ms (không bị chặn bởi popup chờ quyền GPS)
-      await refreshCurrentTarget();
-
-      // 2. Chạy ngầm định vị GPS thực tế (chỉ cập nhật tự động nếu có tín hiệu GPS/Wi-Fi thực, không lấy tọa độ trạm nhà mạng IP)
+    async function refreshGps() {
+      if (userSelectedRef.current) return;
+      const revision = targetRevisionRef.current;
       try {
-        const { latitude, longitude, isIpFallback } = await getUserLocation();
-        if (!active || userSelectedRef.current || isIpFallback) return;
+        const { latitude, longitude } = await getUserLocation({ requirePrecise: true });
+        if (!active || userSelectedRef.current || revision !== targetRevisionRef.current) return;
         const geo = await reverseGeocodeApi(latitude, longitude);
-        if (!active || userSelectedRef.current) return;
-        const locationLabel = geo.district
-          ? `${geo.district}, TP.HCM`
-          : geo.location || "TP. Hồ Chí Minh";
+        if (!active || userSelectedRef.current || revision !== targetRevisionRef.current) return;
         currentTargetRef.current = {
           lat: latitude,
           lng: longitude,
-          name: locationLabel,
+          name: geo.location || geo.district || "Vị trí của bạn",
         };
-        const res = await fetchFullRealWeather(latitude, longitude, locationLabel);
-        if (active && !userSelectedRef.current) {
-          setData(res);
-          onThemeChange?.(res.theme);
-        }
+        targetRevisionRef.current++;
+        setGpsError(null);
+        await refreshCurrentTarget();
       } catch {
-        // Giữ dữ liệu thực của TP.HCM đã nạp ở bước 1
+        if (active && !userSelectedRef.current && revision === targetRevisionRef.current) {
+          setGpsError(
+            "Chưa lấy được GPS chính xác. Đang giữ khu vực đã chọn; hãy bật quyền vị trí hoặc chọn địa điểm.",
+          );
+        }
       }
     }
 
-    loadInitial();
+    setLoading(true);
+    const stopWeatherPolling = startPolling(refreshCurrentTarget, 60_000);
+    const stopGpsPolling = startPolling(refreshGps, 30_000);
 
     const unsubscribe = subscribeUserRealtime({
       onWeatherUpdated: () => {
@@ -441,14 +449,12 @@ function WeatherPage({
       },
     });
 
-    const intervalId = window.setInterval(() => {
-      void refreshCurrentTarget();
-    }, 60_000);
-
     return () => {
       active = false;
       unsubscribe();
-      window.clearInterval(intervalId);
+      stopWeatherPolling();
+      stopGpsPolling();
+      targetRevisionRef.current++;
     };
   }, []);
 
@@ -484,12 +490,16 @@ function WeatherPage({
 
   // Chọn một địa điểm tìm được
   async function handleSelectLocation(loc: { name: string; lat: number; lng: number }) {
+    const revision = ++targetRevisionRef.current;
+    const request = ++weatherRequestRef.current;
+    setGpsError(null);
     userSelectedRef.current = true;
     currentTargetRef.current = { lat: loc.lat, lng: loc.lng, name: loc.name };
     setShowDropdown(false);
     setSearchQuery("");
     setLoading(true);
     const fresh = await fetchFullRealWeather(loc.lat, loc.lng, loc.name);
+    if (revision !== targetRevisionRef.current || request !== weatherRequestRef.current) return;
     setData(fresh);
     onThemeChange?.(fresh.theme);
     setLoading(false);
@@ -497,23 +507,32 @@ function WeatherPage({
 
   // Định vị GPS của người dùng hiện tại và tự động nhận diện Quận/Phường thực tế
   async function handleUseGps() {
+    const revision = ++targetRevisionRef.current;
+    setGpsError(null);
     setLoading(true);
     try {
-      const { latitude, longitude } = await getUserLocation();
+      const { latitude, longitude } = await getUserLocation({ requirePrecise: true });
       const geo = await reverseGeocodeApi(latitude, longitude);
+      if (revision !== targetRevisionRef.current) return;
       const locationLabel =
         geo.location || (geo.district ? `${geo.district}, TP.HCM` : "TP. Hồ Chí Minh");
 
       userSelectedRef.current = false;
       currentTargetRef.current = { lat: latitude, lng: longitude, name: locationLabel };
+      const request = ++weatherRequestRef.current;
       const fresh = await fetchFullRealWeather(latitude, longitude, locationLabel);
+      if (revision !== targetRevisionRef.current || request !== weatherRequestRef.current) return;
       setData(fresh);
       onThemeChange?.(fresh.theme);
       onLocateUser?.();
     } catch (err) {
-      console.warn("Failed to locate weather position:", err);
+      if (revision === targetRevisionRef.current) {
+        setGpsError(
+          "Không lấy được vị trí chính xác. Hãy bật quyền vị trí/GPS hoặc chọn địa điểm thủ công.",
+        );
+      }
     } finally {
-      setLoading(false);
+      if (revision === targetRevisionRef.current) setLoading(false);
     }
   }
 
@@ -605,6 +624,7 @@ function WeatherPage({
         </header>
 
         {/* Hero Current Weather Card */}
+        {gpsError && <p role="status">{gpsError}</p>}
         <section className="weather-hero-card">
           <div className="hero-left-content">
             <div className="location-indicator">
