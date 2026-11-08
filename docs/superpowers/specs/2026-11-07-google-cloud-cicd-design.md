@@ -20,7 +20,6 @@ Set up a GitHub Actions pipeline for the application packages being moved into t
 ## Deferred
 
 - FE/admin CI and deployment.
-- ML checks and deployment.
 - Firebase Hosting pull request previews.
 - API authentication/CORS changes and public browser access to Cloud Run.
 - Creation of Google Cloud resources or automatic provisioning of GitHub Environments.
@@ -42,5 +41,5 @@ Set up a GitHub Actions pipeline for the application packages being moved into t
 4. A published release follows staging first and deploys the same revision to production only when enabled and approved.
 5. An incomplete staging attempt causes the next eligible staging run to redeploy all current BE and FE/user packages.
 6. Google Cloud authentication uses WIF; deploy jobs do not store long-lived service-account keys.
-7. Admin, ML, and PR preview jobs are absent from this initial scope.
+7. Admin and PR preview jobs are absent from this initial scope.
 8. API deploys attach the environment's Cloud SQL instance and inject the database password from Secret Manager; staging and production use separate database configuration.
