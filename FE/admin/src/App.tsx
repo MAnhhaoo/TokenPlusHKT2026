@@ -6,18 +6,14 @@ import Sidebar from "@/components/layout/Sidebar"
 import OverviewPage from "@/components/pages/OverviewPage"
 import MapPage from "@/components/pages/MapPage"
 import ReportsPage from "@/components/pages/ReportsPage"
-import AlertsPage from "@/components/pages/AlertsPage"
 import UsersPage from "@/components/pages/UsersPage"
 import AnalyticsPage from "@/components/pages/AnalyticsPage"
 import ReportReviewModal from "@/components/reports/ReportReviewModal"
-import AlertModal from "@/components/alerts/AlertModal"
 import ConfirmDialog from "@/components/ui/ConfirmDialog"
 import UserDetailModal from "@/components/users/UserDetailModal"
 import {
   approveReportApi,
   buildRealtimeAdminMapPoints,
-  createAlertApi,
-  endAlertApi,
   fetchAdminInitialData,
   fetchCurrentWeatherApi,
   fetchUsersCsvBlob,
@@ -25,11 +21,9 @@ import {
   subscribeAdminRealtime,
   syncWeatherForecastsApi,
   toggleReportLockApi,
-  updateAlertApi,
   updateUserStatusApi,
 } from "@/lib/api"
 import type {
-  AlertDraft,
   AreaAlert,
   CommunityUser,
   FloodReport,
@@ -68,11 +62,6 @@ export default function App() {
   const [trendRange, setTrendRange] = useState<keyof TrendsMap>("24h")
   const [reviewing, setReviewing] = useState<FloodReport | null>(null)
   const [rejecting, setRejecting] = useState<FloodReport | null>(null)
-  const [alertModal, setAlertModal] = useState<{
-    mode: "create" | "edit"
-    alert?: AreaAlert
-  } | null>(null)
-  const [endingAlert, setEndingAlert] = useState<AreaAlert | null>(null)
   const [toast, setToast] = useState<string | null>(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [page, setPage] = useState<Page>("overview")
@@ -323,49 +312,6 @@ export default function App() {
     )
   }
 
-  const saveAlert = async (draft: AlertDraft) => {
-    if (alertModal?.mode === "edit" && alertModal.alert) {
-      const targetId = alertModal.alert.id
-      const updated = await updateAlertApi(targetId, draft)
-      setAlerts((current) =>
-        current.map((alert) =>
-          alert.id === targetId ? (updated ?? { ...alert, ...draft }) : alert,
-        ),
-      )
-      setToast(`Đã cập nhật cảnh báo ${targetId}.`)
-    } else {
-      const created = await createAlertApi(draft)
-      const nextNumber = 190 + alerts.length
-      setAlerts((current) => [
-        created ?? {
-          id: `AL-0${nextNumber}`,
-          ...draft,
-          startedAt: "18:49",
-          status: "active",
-          createdBy: "Nguyễn Minh",
-        },
-        ...current,
-      ])
-      setToast("Cảnh báo mới đã được phát tới các kênh đã chọn.")
-    }
-    setAlertModal(null)
-  }
-
-  const endAlert = async () => {
-    if (!endingAlert) return
-    const targetId = endingAlert.id
-    const ended = await endAlertApi(targetId)
-    setAlerts((current) =>
-      current.map((alert) =>
-        alert.id === targetId
-          ? (ended ?? { ...alert, status: "ended" })
-          : alert,
-      ),
-    )
-    setToast(`Đã kết thúc cảnh báo ${targetId}.`)
-    setEndingAlert(null)
-  }
-
   const selectedUser = users.find((user) => user.id === selectedUserId) ?? null
 
   const exportUsers = async () => {
@@ -458,7 +404,7 @@ export default function App() {
       />
       <main className="main">
         <Topbar
-          onCreateAlert={() => setAlertModal({ mode: "create" })}
+          onViewReports={() => navigate("reports")}
           onExportUsers={exportUsers}
           onOpenMenu={() => setSidebarOpen(true)}
           onSyncWeather={handleSyncWeather}
@@ -469,10 +415,7 @@ export default function App() {
         <div className="content">
           {page === "overview" && (
             <OverviewPage
-              alerts={alerts}
               layers={layers}
-              onEditAlert={(alert) => setAlertModal({ mode: "edit", alert })}
-              onEndAlert={setEndingAlert}
               onNavigate={navigate}
               onReview={setReviewing}
               onSelectPoint={selectMapPoint}
@@ -485,6 +428,7 @@ export default function App() {
               severityFilter={severityFilter}
               trendRange={trendRange}
               trendsData={trendsData}
+              users={users}
               weather={weather}
             />
           )}
@@ -553,22 +497,6 @@ export default function App() {
           onClose={() => setRejecting(null)}
           onConfirm={rejectReport}
           withReason
-        />
-      )}
-      {alertModal && (
-        <AlertModal
-          initial={alertModal.alert}
-          onClose={() => setAlertModal(null)}
-          onSave={saveAlert}
-        />
-      )}
-      {endingAlert && (
-        <ConfirmDialog
-          title="Kết thúc cảnh báo?"
-          description={`${endingAlert.area} sẽ không còn hiển thị là khu vực đang cảnh báo.`}
-          confirmLabel="Kết thúc cảnh báo"
-          onClose={() => setEndingAlert(null)}
-          onConfirm={endAlert}
         />
       )}
       {selectedUser && (

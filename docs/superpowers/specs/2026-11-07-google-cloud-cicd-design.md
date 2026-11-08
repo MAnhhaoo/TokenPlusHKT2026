@@ -13,6 +13,8 @@ Set up a GitHub Actions pipeline for the application packages being moved into t
 - On published releases, validate all migrated packages, deploy the release revision to staging, then deploy the same revision to production through the protected production Environment.
 - Authenticate GitHub Actions to Google Cloud with Workload Identity Federation.
 - Host FE/user on Firebase Hosting and BE on Cloud Run.
+- Connect each Cloud Run API environment to its own Cloud SQL PostgreSQL instance using a Cloud Run SQL attachment and Secret Manager credentials.
+- Keep the 30-day Cloud SQL trial scoped to staging; production must use a separate database and secret.
 - Keep Cloud Run private by default. Public access requires a later application-authentication decision.
 
 ## Deferred
@@ -41,3 +43,4 @@ Set up a GitHub Actions pipeline for the application packages being moved into t
 5. An incomplete staging attempt causes the next eligible staging run to redeploy all current BE and FE/user packages.
 6. Google Cloud authentication uses WIF; deploy jobs do not store long-lived service-account keys.
 7. Admin, ML, and PR preview jobs are absent from this initial scope.
+8. API deploys attach the environment's Cloud SQL instance and inject the database password from Secret Manager; staging and production use separate database configuration.

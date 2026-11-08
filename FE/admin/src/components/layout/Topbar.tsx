@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { CloudRain, Download, Menu, Plus } from "lucide-react"
+import { CloudRain, Download, Droplets, Menu } from "lucide-react"
 import Button from "@/components/ui/Button"
 import Heading from "@/components/ui/Heading"
 import IconButton from "@/components/ui/IconButton"
@@ -46,7 +46,7 @@ const pageMeta: Record<
     title: "Báo cáo hiện trường",
     subtitle: "Hàng chờ xác minh, bộ lọc chất lượng và trạng thái xử lý",
   },
-    users: {
+  users: {
     eyebrow: "Dữ liệu cộng đồng",
     title: "Quản lý người dùng",
     subtitle: "Hồ sơ, quyền truy cập và chất lượng đóng góp cộng đồng",
@@ -61,14 +61,14 @@ const pageMeta: Record<
 function Topbar({
   page,
   onOpenMenu,
-  onCreateAlert,
+  onViewReports,
   onExportUsers,
   weather,
   onSyncWeather,
 }: {
   page: Page
   onOpenMenu: () => void
-  onCreateAlert: () => void
+  onViewReports?: () => void
   onExportUsers: () => void
   weather?: WeatherSnapshot | null
   onSyncWeather?: () => void
@@ -128,9 +128,9 @@ function Topbar({
             <b>{weatherSummary}</b>
           </span>
         </div>
-        {page === "overview" ? (
-          <Button aria-label="Tạo cảnh báo" onClick={onCreateAlert}>
-            <Plus size={17} /> <span>Tạo cảnh báo</span>
+        {page === "overview" && onViewReports ? (
+          <Button aria-label="Báo cáo cộng đồng" onClick={onViewReports}>
+            <Droplets size={16} /> <span>Báo cáo cộng đồng</span>
           </Button>
         ) : page === "users" ? (
           <Button aria-label="Xuất dữ liệu" onClick={onExportUsers}>

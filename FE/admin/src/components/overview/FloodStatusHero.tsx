@@ -1,4 +1,4 @@
-import { BellRing, CloudRain, Map } from "lucide-react"
+import { CloudRain, Droplets, Map } from "lucide-react"
 import Button from "@/components/ui/Button"
 import StatusPill from "@/components/ui/StatusPill"
 import WaterGauge from "@/components/ui/WaterGauge"
@@ -6,13 +6,13 @@ import type { WeatherSnapshot } from "@/types"
 
 function FloodStatusHero({
   onViewMap,
-  onViewAlerts,
+  onViewReports,
   weather,
 }: {
   pendingCount?: number
   activeAlertCount?: number
   onViewMap: () => void
-  onViewAlerts: () => void
+  onViewReports: () => void
   weather?: WeatherSnapshot | null
 }) {
   const rainValue = weather ? Math.round(weather.currentRainMm) : 0
@@ -41,8 +41,8 @@ function FloodStatusHero({
           <Button onClick={onViewMap}>
             <Map size={16} /> Xem trên bản đồ
           </Button>
-          <Button variant="secondary" onClick={onViewAlerts}>
-            <BellRing size={16} /> Xem cảnh báo
+          <Button variant="secondary" onClick={onViewReports}>
+            <Droplets size={16} /> Báo cáo cộng đồng
           </Button>
         </div>
       </div>

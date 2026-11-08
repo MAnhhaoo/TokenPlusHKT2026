@@ -44,6 +44,11 @@ Configure environment variables separately for staging and production:
 | `GCP_WORKLOAD_IDENTITY_PROVIDER` | Every deploy | Full WIF provider resource name. |
 | `GCP_DEPLOY_SERVICE_ACCOUNT` | Every deploy | GitHub Actions deployer identity. |
 | `GCP_RUNTIME_SERVICE_ACCOUNT` | API deploy | Cloud Run runtime identity. |
+| `GCP_SQL_INSTANCE_CONNECTION_NAME` | API deploy | Cloud SQL connection name in `project:region:instance` format; each Environment must point to its own database instance. |
+| `DB_DATABASE` | API deploy | PostgreSQL database name. |
+| `DB_USERNAME` | API deploy | Built-in PostgreSQL application user. |
+| `DB_PASSWORD_SECRET_NAME` | API deploy | Secret Manager secret ID containing that user's password; never put the password itself in a GitHub variable. |
+| `DB_SYNCHRONIZE` | API deploy | Explicit TypeORM setting. Use `true` only for the blank staging trial while bootstrapping; production must use `false` and a migration process. |
 | `GCP_API_PUBLIC` | Optional API deploy | Set to `true` only after the API has its own authentication. Unset keeps Cloud Run private. |
 | `CLOUD_RUN_API_SERVICE` | Optional API deploy | Defaults to `saigondrain-api`. |
 | `VITE_API_BASE_URL` | User frontend deploy when API is not deployed in the same run | API URL baked into the Vite build. |
@@ -59,10 +64,34 @@ Enable the APIs needed by the selected service:
 - Cloud Run: `run.googleapis.com`.
 - Cloud Build: `cloudbuild.googleapis.com`.
 - Artifact Registry: `artifactregistry.googleapis.com`.
+- Cloud SQL Admin: `sqladmin.googleapis.com`.
+- Secret Manager: `secretmanager.googleapis.com`.
 - Firebase Hosting: `firebasehosting.googleapis.com`.
 - Firebase Management: `firebase.googleapis.com` when adding Firebase to an existing project or managing Firebase resources.
 
 For Cloud Run source deploys, grant the deployer `roles/run.sourceDeveloper` and `roles/serviceusage.serviceUsageConsumer`, plus `roles/iam.serviceAccountUser` on the runtime account. Grant the Cloud Build service account `roles/run.builder` where required. For Hosting, grant the deployer `roles/firebasehosting.admin` and `roles/serviceusage.apiKeysViewer`. Keep the runtime account separate from the GitHub deployer. See [Cloud Run source deployment setup](https://docs.cloud.google.com/run/docs/deploying-source-code) and [Firebase Hosting IAM roles](https://firebase.google.com/docs/projects/iam/roles-predefined-product).
+
+For each Cloud Run API runtime service account, grant `roles/cloudsql.client` on the project and `roles/secretmanager.secretAccessor` on that environment's database-password secret. The deploy workflow attaches Cloud SQL with `--add-cloudsql-instances` and sets `DB_HOST` to `/cloudsql/<connection-name>`; the database password is injected from Secret Manager as `DB_PASSWORD`. The Cloud SQL Unix socket connection is encrypted by Cloud SQL's connector integration. Do not open PostgreSQL port 5432 to the public internet.
+
+Create a Secret Manager secret named by `DB_PASSWORD_SECRET_NAME` and store only the `saigondrain_app` database user's password in it. Keep the secret in Google Cloud; do not add its value to the repository, workflow file, GitHub variables, or chat.
+
+### Current staging PostgreSQL trial
+
+The currently created trial instance is for staging only. Set these values in the GitHub `staging` Environment:
+
+| Environment variable | Value |
+| --- | --- |
+| `GCP_PROJECT_ID` | `tokenplus2026-514007` |
+| `GCP_REGION` | `asia-southeast1` |
+| `GCP_SQL_INSTANCE_CONNECTION_NAME` | `tokenplus2026-514007:asia-southeast1:saigondrain-pg-trial` |
+| `DB_DATABASE` | `saigondrain` |
+| `DB_USERNAME` | `saigondrain_app` |
+| `DB_PASSWORD_SECRET_NAME` | `saigondrain-db-password` |
+| `DB_SYNCHRONIZE` | `true` |
+
+Before the first API deploy, connect to `saigondrain` in Cloud SQL Studio as `postgres` and run `CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`. TypeORM uses `uuid-ossp` by default for generated UUID columns; install it with the admin account so the application role does not need elevated extension privileges. See [TypeORM's PostgreSQL driver options](https://typeorm.io/docs/drivers/postgres/).
+
+The current backend has no TypeORM migrations. `DB_SYNCHRONIZE=true` is a temporary staging bootstrap for this new, empty trial database; it can change the schema as entities change and must not be used for production. Before enabling production deployment, create a separate production database and Secret Manager secret, implement and apply migrations, and set production `DB_SYNCHRONIZE=false`. Never point production at the 30-day trial instance.
 
 ## Workload Identity Federation
 
