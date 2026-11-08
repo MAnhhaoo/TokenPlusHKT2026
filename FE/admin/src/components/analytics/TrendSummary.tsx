@@ -1,4 +1,4 @@
-import { ArrowUpRight, CloudRain, Sparkles, Waves } from "lucide-react"
+import { ArrowUpRight, CloudRain, Waves } from "lucide-react"
 import Heading from "@/components/ui/Heading"
 import type { TrendsMap } from "@/types"
 
@@ -77,10 +77,6 @@ function TrendSummary({
             <span>{labels[peakReportsIndex] || "—"}</span>
           </div>
         </div>
-      </div>
-      <div className="trend-insight">
-        <Sparkles size={16} />
-        <p>{data?.insight || "Chưa có nhận định xu hướng."}</p>
       </div>
     </section>
   )

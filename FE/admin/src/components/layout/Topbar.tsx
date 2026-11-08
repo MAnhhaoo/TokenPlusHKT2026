@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Bell, CloudRain, Download, Menu, Plus } from "lucide-react"
+import { CloudRain, Download, Menu, Plus } from "lucide-react"
 import Button from "@/components/ui/Button"
 import Heading from "@/components/ui/Heading"
 import IconButton from "@/components/ui/IconButton"
@@ -100,11 +100,7 @@ function Topbar({
           <Menu size={20} />
         </IconButton>
         <div>
-          <div className="page-eyebrow">
-            Trung tâm điều hành
-            <span>/</span>
-            {meta.eyebrow}
-          </div>
+          <div className="page-eyebrow">Trung tâm điều hành</div>
           <div className="page-title-row">
             <Heading level={1} className="page-title">
               {meta.title}
@@ -132,10 +128,6 @@ function Topbar({
             <b>{weatherSummary}</b>
           </span>
         </div>
-        <IconButton label="Thông báo" className="notification-button">
-          <Bell size={19} />
-          <i />
-        </IconButton>
         {page === "overview" ? (
           <Button aria-label="Tạo cảnh báo" onClick={onCreateAlert}>
             <Plus size={17} /> <span>Tạo cảnh báo</span>
