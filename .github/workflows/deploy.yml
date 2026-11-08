@@ -61,6 +61,7 @@ jobs:
           user=false
           has_changed_source BE && backend=true || true
           has_changed_source FE/user && user=true || true
+          has_changed_source FE/admin && user=true || true
           if grep -Eq '^(package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml)$' <<<"$changed_files"; then
             has_source_files BE && backend=true || true
             has_source_files FE/user && user=true || true
@@ -69,6 +70,16 @@ jobs:
             [[ -f FE/user/package.json ]] && user=true || true
           fi
 
+          if grep -Eq '^(\.github/workflows/|scripts/staging-deploy-scope\.mjs$)' <<<"$changed_files"; then
+            backend=true
+            user=true
+          fi
+
+          # Every master merge is deployable, including docs-only successors.
+          # Otherwise a newer docs commit could supersede an app deployment
+          # without ever deploying the application delta it contains.
+          backend=true
+          user=true
           any_application=false
           [[ "$backend" == true || "$user" == true ]] && any_application=true
           {
@@ -91,7 +102,7 @@ jobs:
     if: >-
       (github.event_name == 'push' || github.event_name == 'release') &&
       needs.validate.result == 'success' &&
-      needs.validate.outputs.any_application == 'true' &&
+      needs.deployment-scope.outputs.any_application == 'true' &&
       vars.GCP_DEPLOY_STAGING == 'true'
     runs-on: ubuntu-latest
     environment: staging
@@ -165,7 +176,7 @@ jobs:
           user=false
           any_deployable=false
           staged_sha=''
-          force_full=false
+          force_full=true
           if [[ "$current" == true ]]; then
             if [[ "$GITHUB_EVENT_NAME" == release ]]; then
               changed_files="$(git ls-files | grep -vE '(^|/)\.gitkeep$' || true)"
@@ -428,6 +439,17 @@ jobs:
         run: |
           if [[ -f package-lock.json ]]; then npm run build; else pnpm run build; fi
 
+      - name: Build admin into combined hosting bundle
+        if: steps.staging_revision.outputs.current == 'true' && steps.staging_revision.outputs.user == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm --prefix FE/admin ci
+          npm --prefix FE/admin run typecheck
+          npm --prefix FE/admin run build -- --base=/admin/
+          mkdir -p FE/user/dist/admin
+          cp -R FE/admin/dist/. FE/user/dist/admin/
+
       - name: Setup Node.js for Firebase CLI
         if: steps.staging_revision.outputs.current == 'true' && steps.staging_revision.outputs.user == 'true'
         uses: actions/setup-node@v7
@@ -447,7 +469,10 @@ jobs:
 
       - name: Verify live user frontend
         if: steps.staging_revision.outputs.current == 'true' && steps.staging_revision.outputs.user == 'true'
-        run: curl --fail --silent --show-error --retry 3 "https://${FIREBASE_USER_SITE_ID}.web.app/" >/dev/null
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --retry 3 "https://${FIREBASE_USER_SITE_ID}.web.app/" >/dev/null
+          curl --fail --silent --show-error --retry 3 "https://${FIREBASE_USER_SITE_ID}.web.app/admin/" | grep -q '/admin/assets/'
 
       - name: Mark staging attempt successful
         if: steps.staging_revision.outputs.current == 'true' && steps.staging_revision.outputs.any_deployable == 'true'
@@ -483,8 +508,10 @@ jobs:
   deploy-production:
     name: Deploy production
     if: >-
-      github.event_name == 'release' &&
+      (github.event_name == 'push' || github.event_name == 'release') &&
       needs.deploy-staging.result == 'success' &&
+      needs.deploy-staging.outputs.current == 'true' &&
+      needs.deploy-staging.outputs.any_deployable == 'true' &&
       needs.deploy-staging.outputs.staged_sha == github.sha &&
       vars.GCP_DEPLOY_PRODUCTION == 'true'
     runs-on: ubuntu-latest
@@ -511,6 +538,7 @@ jobs:
       DB_PASSWORD_SECRET_NAME: ${{ vars.DB_PASSWORD_SECRET_NAME }}
       DB_SYNCHRONIZE: ${{ vars.DB_SYNCHRONIZE }}
       CORS_ORIGINS: ${{ vars.CORS_ORIGINS }}
+      GEMINI_API_KEY_SECRET_NAME: ${{ vars.GEMINI_API_KEY_SECRET_NAME }}
       VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
       FIREBASE_PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
       FIREBASE_USER_SITE_ID: ${{ vars.FIREBASE_USER_SITE_ID }}
@@ -521,25 +549,17 @@ jobs:
           ref: ${{ github.sha }}
           persist-credentials: false
 
-      - name: Check that this is still the latest release
+      - name: Check that this revision is still master
         id: release_revision
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          release_tag="$(jq -r '.release.tag_name' "$GITHUB_EVENT_PATH")"
-          latest_release="$(
-            gh api --paginate "repos/${GITHUB_REPOSITORY}/releases?per_page=100" \
-              --jq '.[] | select(.draft == false and .prerelease == false and .published_at != null) | [.published_at, .id, .tag_name] | @tsv' \
-              | LC_ALL=C sort -t $'\t' -k1,1r -k2,2nr \
-              | sed -n '1p'
-          )"
-          latest_tag="${latest_release##*$'\t'}"
-          [[ -n "$latest_tag" ]] || { echo 'No published release was returned by the GitHub API.' >&2; exit 1; }
-          if [[ "$latest_tag" != "$release_tag" ]]; then
-            echo "Production deploy skipped: $release_tag was superseded by $latest_tag." >> "$GITHUB_STEP_SUMMARY"
+          latest_sha="$(gh api "repos/${GITHUB_REPOSITORY}/commits/master" --jq .sha)"
+          if [[ "$latest_sha" != "$GITHUB_SHA" ]]; then
             echo 'current=false' >> "$GITHUB_OUTPUT"
+            echo "Production skipped: $GITHUB_SHA was superseded by $latest_sha." >> "$GITHUB_STEP_SUMMARY"
           else
             echo 'current=true' >> "$GITHUB_OUTPUT"
           fi
@@ -548,13 +568,13 @@ jobs:
         if: steps.release_revision.outputs.current == 'true'
         shell: bash
         env:
-          BACKEND_CHANGED: ${{ needs.deployment-scope.outputs.backend }}
-          USER_CHANGED: ${{ needs.deployment-scope.outputs.user }}
+          BACKEND_CHANGED: "true"
+          USER_CHANGED: "true"
         run: |
           set -euo pipefail
           required=(GCP_PROJECT_ID GCP_REGION GCP_WORKLOAD_IDENTITY_PROVIDER GCP_DEPLOY_SERVICE_ACCOUNT)
           if [[ "$BACKEND_CHANGED" == true ]]; then
-            required+=(GCP_RUNTIME_SERVICE_ACCOUNT GCP_SQL_INSTANCE_CONNECTION_NAME DB_DATABASE DB_USERNAME DB_PASSWORD_SECRET_NAME DB_SYNCHRONIZE CORS_ORIGINS)
+            required+=(GCP_RUNTIME_SERVICE_ACCOUNT GCP_SQL_INSTANCE_CONNECTION_NAME DB_DATABASE DB_USERNAME DB_PASSWORD_SECRET_NAME DB_SYNCHRONIZE CORS_ORIGINS GEMINI_API_KEY_SECRET_NAME)
           fi
           if [[ "$USER_CHANGED" == true ]]; then required+=(FIREBASE_PROJECT_ID FIREBASE_USER_SITE_ID); fi
           for name in "${required[@]}"; do
@@ -599,7 +619,7 @@ jobs:
 
       - name: Deploy API to Cloud Run from BE
         id: deploy_api
-        if: steps.release_revision.outputs.current == 'true' && needs.deployment-scope.outputs.backend == 'true'
+        if: steps.release_revision.outputs.current == 'true'
         uses: google-github-actions/deploy-cloudrun@v3
         with:
           service: ${{ vars.CLOUD_RUN_API_SERVICE || 'saigondrain-api' }}
@@ -616,6 +636,7 @@ jobs:
             CORS_ORIGINS=${{ vars.CORS_ORIGINS }}
           secrets: |-
             DB_PASSWORD=${{ vars.DB_PASSWORD_SECRET_NAME }}:latest
+            GEMINI_API_KEY=${{ vars.GEMINI_API_KEY_SECRET_NAME }}:latest
           flags: >-
             --service-account=${{ vars.GCP_RUNTIME_SERVICE_ACCOUNT }}
             --add-cloudsql-instances=${{ vars.GCP_SQL_INSTANCE_CONNECTION_NAME }}
@@ -625,7 +646,7 @@ jobs:
             --args=""
 
       - name: Verify production API health
-        if: steps.release_revision.outputs.current == 'true' && needs.deployment-scope.outputs.backend == 'true' && vars.GCP_API_PUBLIC == 'true'
+        if: steps.release_revision.outputs.current == 'true' && vars.GCP_API_PUBLIC == 'true'
         shell: bash
         env:
           DEPLOYED_API_URL: ${{ steps.deploy_api.outputs.url }}
@@ -655,19 +676,19 @@ jobs:
           fi
 
       - name: Setup Node.js for user frontend
-        if: steps.release_revision.outputs.current == 'true' && needs.deployment-scope.outputs.user == 'true'
+        if: steps.release_revision.outputs.current == 'true'
         uses: actions/setup-node@v7
         with:
           node-version: 22.23.4
 
       - name: Setup pnpm for user frontend
-        if: steps.release_revision.outputs.current == 'true' && needs.deployment-scope.outputs.user == 'true'
+        if: steps.release_revision.outputs.current == 'true'
         uses: pnpm/action-setup@v6.1.0
         with:
           version: 12.15.0
 
       - name: Install locked user frontend dependencies
-        if: steps.release_revision.outputs.current == 'true' && needs.deployment-scope.outputs.user == 'true'
+        if: steps.release_revision.outputs.current == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -678,7 +699,7 @@ jobs:
           fi
 
       - name: Export API URL for Vite
-        if: steps.release_revision.outputs.current == 'true' && needs.deployment-scope.outputs.user == 'true'
+        if: steps.release_revision.outputs.current == 'true'
         shell: bash
         env:
           DEPLOYED_API_URL: ${{ steps.deploy_api.outputs.url }}
@@ -696,36 +717,50 @@ jobs:
           echo "VITE_API_BASE_URL=$api_url" >> "$GITHUB_ENV"
 
       - name: Build user frontend
-        if: steps.release_revision.outputs.current == 'true' && needs.deployment-scope.outputs.user == 'true'
+        if: steps.release_revision.outputs.current == 'true'
         working-directory: FE/user
         shell: bash
         run: |
           if [[ -f package-lock.json ]]; then npm run build; else pnpm run build; fi
 
+      - name: Build admin into combined hosting bundle
+        if: steps.release_revision.outputs.current == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm --prefix FE/admin ci
+          npm --prefix FE/admin run typecheck
+          npm --prefix FE/admin run build -- --base=/admin/
+          mkdir -p FE/user/dist/admin
+          cp -R FE/admin/dist/. FE/user/dist/admin/
+
       - name: Setup Node.js for Firebase CLI
-        if: steps.release_revision.outputs.current == 'true' && needs.deployment-scope.outputs.user == 'true'
+        if: steps.release_revision.outputs.current == 'true'
         uses: actions/setup-node@v7
         with:
           node-version: 24.22.2
 
       - name: Install Firebase CLI
-        if: steps.release_revision.outputs.current == 'true' && needs.deployment-scope.outputs.user == 'true'
+        if: steps.release_revision.outputs.current == 'true'
         run: npm install --global firebase-tools@15.34.2
 
       - name: Deploy user Firebase Hosting site
-        if: steps.release_revision.outputs.current == 'true' && needs.deployment-scope.outputs.user == 'true'
+        if: steps.release_revision.outputs.current == 'true'
         run: |
           set -euo pipefail
           firebase target:apply hosting user "$FIREBASE_USER_SITE_ID" --project "$FIREBASE_PROJECT_ID"
           firebase deploy --project "$FIREBASE_PROJECT_ID" --only hosting:user --non-interactive
 
       - name: Verify live user frontend
-        if: steps.release_revision.outputs.current == 'true' && needs.deployment-scope.outputs.user == 'true'
-        run: curl --fail --silent --show-error --retry 3 "https://${FIREBASE_USER_SITE_ID}.web.app/" >/dev/null
+        if: steps.release_revision.outputs.current == 'true'
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --retry 3 "https://${FIREBASE_USER_SITE_ID}.web.app/" >/dev/null
+          curl --fail --silent --show-error --retry 3 "https://${FIREBASE_USER_SITE_ID}.web.app/admin/" | grep -q '/admin/assets/'
 
       - name: Summarize production deployment
         if: steps.release_revision.outputs.current == 'true'
-        run: echo 'Production deploy completed for the release revision after the production Environment gate.' >> "$GITHUB_STEP_SUMMARY"
+        run: echo 'Production deploy completed automatically after CI and staging.' >> "$GITHUB_STEP_SUMMARY"
 
   deploy-status:
     name: Deployment status
@@ -736,7 +771,7 @@ jobs:
       - name: Explain CI/CD result
         env:
           EVENT_NAME: ${{ github.event_name }}
-          APP_AVAILABLE: ${{ needs.validate.outputs.any_application }}
+          APP_AVAILABLE: ${{ needs.deployment-scope.outputs.any_application }}
           VALIDATE_RESULT: ${{ needs.validate.result }}
           STAGING_RESULT: ${{ needs.deploy-staging.result }}
           STAGING_CURRENT: ${{ needs.deploy-staging.outputs.current }}
@@ -759,12 +794,10 @@ jobs:
             echo 'This staging run was superseded by a newer revision and skipped.' >> "$GITHUB_STEP_SUMMARY"
           elif [[ "$STAGING_RESULT" == success && "$STAGING_DEPLOYABLE" != true ]]; then
             echo 'CI completed. No BE or FE/user source changed since staging; no deploy was needed.' >> "$GITHUB_STEP_SUMMARY"
-          elif [[ "$STAGING_RESULT" == success && "$EVENT_NAME" == release && "$PRODUCTION_ENABLED" != true ]]; then
+          elif [[ "$STAGING_RESULT" == success && "$PRODUCTION_ENABLED" != true ]]; then
             echo 'Staging completed. Production is disabled; set GCP_DEPLOY_PRODUCTION=true after configuring the protected production Environment.' >> "$GITHUB_STEP_SUMMARY"
-          elif [[ "$STAGING_RESULT" == success && "$EVENT_NAME" == push ]]; then
-            echo 'CI and staging deployment completed for BE and/or FE/user.' >> "$GITHUB_STEP_SUMMARY"
           elif [[ "$PRODUCTION_RESULT" == success && "$PRODUCTION_CURRENT" != true ]]; then
             echo 'Production deploy was skipped because a newer release is available.' >> "$GITHUB_STEP_SUMMARY"
           elif [[ "$PRODUCTION_RESULT" == success ]]; then
-            echo 'CI, staging, and production deployment completed for the release.' >> "$GITHUB_STEP_SUMMARY"
+            echo 'CI, staging, and production deployment completed for this revision.' >> "$GITHUB_STEP_SUMMARY"
           fi

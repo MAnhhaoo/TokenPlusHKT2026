@@ -31,7 +31,8 @@ function hasChangedSource(directory, changedFiles) {
 
 export function computeStagingDeployScope(changedFiles, trackedFiles, { forceFull = false } = {}) {
   let backend = hasChangedSource(packageDirectories.backend, changedFiles);
-  let user = hasChangedSource(packageDirectories.user, changedFiles);
+  let user = hasChangedSource(packageDirectories.user, changedFiles) ||
+    hasChangedSource("FE/admin", changedFiles);
 
   if (forceFull) {
     backend ||= hasSourceFiles(packageDirectories.backend, trackedFiles);
