@@ -8,6 +8,13 @@ const trackedFiles = [
   'FE/user/src/main.tsx',
 ];
 
+test('admin-only edits redeploy the combined user and admin hosting bundle', () => {
+  assert.deepEqual(
+    computeStagingDeployScope(['FE/admin/src/App.tsx'], trackedFiles),
+    { backend: false, user: true, anyDeployable: true },
+  );
+});
+
 test('workflow-only changes redeploy the available BE and FE/user packages', () => {
   assert.deepEqual(
     computeStagingDeployScope(['.github/workflows/deploy.yml'], trackedFiles),

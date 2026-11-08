@@ -104,6 +104,7 @@ jobs:
           source_user=false
           has_changed_source BE "$source_changed_files" && source_backend=true || true
           has_changed_source FE/user "$source_changed_files" && source_user=true || true
+          has_changed_source FE/admin "$source_changed_files" && source_user=true || true
           source_any_application=false
           [[ "$source_backend" == true || "$source_user" == true ]] && source_any_application=true
 
@@ -116,6 +117,7 @@ jobs:
           user=false
           has_changed_source BE "$changed_files" && backend=true || true
           has_changed_source FE/user "$changed_files" && user=true || true
+          has_changed_source FE/admin "$changed_files" && user=true || true
 
           if grep -Eq '^(package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml)$' <<<"$changed_files"; then
             has_source_files BE && backend=true || true
@@ -276,6 +278,13 @@ jobs:
           else
             package_run test:smoke
           fi
+
+      - name: Validate admin frontend included in hosting
+        if: matrix.component == 'FE/user'
+        run: |
+          npm --prefix FE/admin ci
+          npm --prefix FE/admin run typecheck
+          npm --prefix FE/admin run build -- --base=/admin/
 
   ci-summary:
     name: CI result
