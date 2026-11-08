@@ -86,6 +86,7 @@ export async function createTypeOrmOptions(
       synchronize,
       migrations,
       migrationsRun,
+      uuidExtension: "pgcrypto",
     };
   }
 
@@ -126,5 +127,6 @@ export async function createTypeOrmOptions(
     synchronize,
     migrations,
     migrationsRun,
+    uuidExtension: "pgcrypto",
   };
 }

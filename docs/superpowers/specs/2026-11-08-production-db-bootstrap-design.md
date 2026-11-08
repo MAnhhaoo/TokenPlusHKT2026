@@ -8,6 +8,7 @@ Allow the NestJS API to start against a new production PostgreSQL database with 
 
 - Create the current TypeORM entity schema through a versioned migration.
 - Run pending migrations when the API connects with synchronization disabled.
+- Serialize pending migrations across concurrent Cloud Run starts with a PostgreSQL advisory lock.
 - Pass and validate the production `CORS_ORIGINS` value in the Cloud Run deployment.
 - Keep the existing staging synchronization behavior unchanged.
 
@@ -27,6 +28,8 @@ Allow the NestJS API to start against a new production PostgreSQL database with 
 
 - Add one baseline migration covering the eight currently registered entity tables.
 - Configure TypeORM to load compiled and source migration files and run them only when `DB_SYNCHRONIZE` is false.
+- Serialize migration history table creation and migration execution with a PostgreSQL advisory lock.
+- Configure TypeORM UUID generation to use `gen_random_uuid()` so the migration default matches entity metadata.
 - Make the baseline table creation idempotent so an existing staging schema created by synchronization is not destroyed if the migration is later enabled there.
 - Require `CORS_ORIGINS` for production backend deployments and include it in Cloud Run environment variables.
 - Keep the production service/site isolation in GitHub Environment variables (`saigondrain-api-prod` and `saigondrain-prod-2026-514007`).

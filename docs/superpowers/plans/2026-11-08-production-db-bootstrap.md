@@ -4,7 +4,7 @@
 
 **Goal:** Make the API able to initialize a new production PostgreSQL schema safely and allow the production Firebase site through CORS.
 
-**Architecture:** Keep NestJS and TypeORM. Add one baseline migration for registered entities, run migrations when synchronization is disabled, and pass the production CORS origin through the existing Cloud Run deployment workflow.
+**Architecture:** Keep NestJS and TypeORM. Add one baseline migration for registered entities, run migrations under a PostgreSQL advisory lock when synchronization is disabled, align UUID defaults, and pass the production CORS origin through the existing Cloud Run deployment workflow.
 
 **Tech Stack:** NestJS 11, TypeORM 0.3, PostgreSQL 18, GitHub Actions, Cloud Run.
 
@@ -41,6 +41,8 @@
 - [x] Add a TypeORM migration with idempotent `CREATE TABLE IF NOT EXISTS` statements for `area_alerts`, `trend_series`, `forecast_slots`, `route_options`, `map_points`, `flood_reports`, `community_users`, and `weather_snapshots`.
 - [x] Configure migration discovery for both `src` (`.ts`) and compiled `dist` (`.js`) paths.
 - [x] Set `migrationsRun` to true only when `DB_SYNCHRONIZE` is false; keep current staging behavior.
+- [x] Serialize migration startup across Cloud Run instances with a PostgreSQL advisory lock.
+- [x] Set TypeORM's UUID extension option to `pgcrypto` to match the migration's `gen_random_uuid()` default.
 - [x] Make `down` drop the baseline tables in reverse creation order.
 
 ### Task 2: Production CORS deployment wiring
@@ -54,6 +56,7 @@
 
 - [x] Require `CORS_ORIGINS` when the production backend changes.
 - [x] Include `CORS_ORIGINS` in the production Cloud Run environment variables.
+- [x] Expose production `CORS_ORIGINS` to the workflow's validation step through the job environment.
 
 ### Task 3: Static verification
 
@@ -62,4 +65,5 @@
 
 - [x] Run the BE TypeScript compiler (`tsc --noEmit -p BE/tsconfig.json`) and confirm it succeeds. The local pnpm shim could not launch in this Windows shell.
 - [x] Run `git diff --check` and confirm it reports no whitespace errors.
+- [ ] Run Prettier check on the changed TypeScript files.
 - [x] Do not create Cloud SQL, trigger a release, or deploy production as part of this code change.

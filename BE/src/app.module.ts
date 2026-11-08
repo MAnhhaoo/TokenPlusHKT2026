@@ -2,6 +2,7 @@ import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { createTypeOrmOptions } from "./config/typeorm.config";
+import { createTypeOrmDataSource } from "./config/typeorm-data-source.factory";
 import { WeatherModule } from "./modules/weather/weather.module";
 import { MapModule } from "./modules/map/map.module";
 import { JourneyModule } from "./modules/journey/journey.module";
@@ -22,6 +23,7 @@ import { HealthModule } from "./modules/health/health.module";
       inject: [ConfigService],
       useFactory: (configService: ConfigService) =>
         createTypeOrmOptions(configService),
+      dataSourceFactory: createTypeOrmDataSource,
     }),
     RealtimeModule,
     HealthModule,
