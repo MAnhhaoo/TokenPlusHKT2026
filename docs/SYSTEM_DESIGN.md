@@ -3,7 +3,7 @@
 
 **Mã tài liệu:** SD-SYS-2026-V2  
 **Phiên bản:** 2.0.0 (Unified Monorepo Architecture)  
-**Tác giả:** Đội ngũ Kỹ sư Hệ thống SaigonDrain & HCMC Road Flood ML  
+**Tác giả:** Đội ngũ Kỹ sư Hệ thống SaigonDrain AI  
 **Trạng thái:** Implemented & Verified  
 
 ---
@@ -16,47 +16,37 @@ Hệ thống được tổ chức theo mô hình **Unified Monorepo**, phân tá
 graph TD
     subgraph ClientLayer ["1. TẦNG GIAO DIỆN (FRONTEND)"]
         UserApp["🌐 User Web App (React 19 + Vite + MapLibre GL)<br/>Bản đồ cảnh báo & điều hướng né ngập"]
-        AdminApp["💻 Admin Dashboard (React + Vite + Recharts)<br/>Trung tâm điều hành & kiểm duyệt"]
+        AdminApp["💻 Admin Dashboard (React 19 + Vite)<br/>Trung tâm điều hành & kiểm duyệt"]
     end
 
     subgraph GatewayLayer ["2. TẦNG CỔNG DỊCH VỤ (BACKEND API - NestJS)"]
         JourneyMod["🚗 Journey Module<br/>(Alley Extender & Multi-modal Routing)"]
         MapMod["🗺️ Map Module<br/>(Vector Tiles & Flood Points)"]
         WeatherMod["🌦️ Weather Module<br/>(Rainfall Forecast & Tide Curve)"]
-        ReportsMod["📢 Reports Module<br/>(Citizen Crowdsourcing)"]
+        ReportsMod["📢 Reports Module<br/>(Citizen Crowdsourcing & Gemini Vision)"]
         RealtimeMod["⚡ Realtime Module<br/>(Server-Sent Events Broadcast)"]
     end
 
     subgraph ExternalServices ["3. DỊCH VỤ NGOÀI & DỮ LIỆU ĐỘNG"]
-        OpenMeteo["Open-Meteo API<br/>(Dự báo lượng mưa mm/h)"]
-        TidalData["Dữ liệu Trạm Thủy văn<br/>(Phú An / Nhà Bè)"]
+        OpenMeteo["Open-Meteo API<br/>(Dự báo lượng mưa mm/h & Cao độ)"]
+        GeminiAPI["Google Gemini Vision API<br/>(Phân tích ảnh hiện trường hỗ trợ duyệt)"]
         OSRM["OSRM Routing Engine<br/>& Google Routes v2"]
         VectorTiles["OpenFreeMap / CARTO<br/>(Vector Basemap Tiles)"]
     end
 
-    subgraph MLLayer ["4. TẦNG HỌC MÁY & DỮ LIỆU KHÔNG GIAN (ML CORE)"]
-        MLSpec["SPEC & Methodology<br/>(HCMC Road Flood ML)"]
-        GISData["D01-D07: IRD Floods, FABDEM 30m,<br/>OSM Networks, ESA WorldCover"]
-        FeatureStore["Bảng thuộc tính 150m<br/>(elevation, slope, water, builtup)"]
-        MLModel["Mô hình MCDA & LightGBM<br/>Presence-Background Learning"]
-        MLArtifacts["Road Susceptibility Lookup Table<br/>(Điểm nguy cơ ngập đoạn đường)"]
-    end
-
-    subgraph StorageLayer ["5. TẦNG LƯU TRỮ (PERSISTENCE)"]
-        PostgresDB[(PostgreSQL 16 / SQLite<br/>TypeORM Entity Management)]
+    subgraph StorageLayer ["4. TẦNG LƯU TRỮ (PERSISTENCE)"]
+        PostgresDB[(PostgreSQL 16<br/>TypeORM Entity Management)]
+        IRDDataset["Dữ liệu 250 Điểm Ngập Lịch sử IRD<br/>(hcmc_flood_hotspots.json)"]
     end
 
     UserApp -->|REST / Geolocation| GatewayLayer
     AdminApp -->|REST / SSE Admin| GatewayLayer
     GatewayLayer -->|Sync Hourly Weather| OpenMeteo
-    GatewayLayer -->|Calculate Dynamic Tides| TidalData
+    ReportsMod -->|Structured JSON Vision| GeminiAPI
     JourneyMod -->|Fetch Multi-modal Routes| OSRM
     UserApp -->|Render 3D Vector Tiles| VectorTiles
     GatewayLayer -->|Read / Write Entities| PostgresDB
-    MLLayer -->|Export Susceptibility Table| GatewayLayer
-    FeatureStore --> MLModel
-    GISData --> FeatureStore
-    MLModel --> MLArtifacts
+    IRDDataset -->|Seed & Hydrological Lookup| PostgresDB
 ```
 
 ---
@@ -161,35 +151,14 @@ classDiagram
 
 ---
 
-### 2.3. Phân hệ Trí tuệ Nhân tạo & Học máy (`ml/`)
+### 2.3. Phân hệ Phân tích Ảnh Hiện trường & Dữ liệu Ngập Lịch sử (`GeminiVisionService` & `dataset/`)
 
-Kế thừa kiến trúc nghiên cứu khoa học chuyên sâu từ `hcmc-road-flood-ml`:
-
-```text
-ml/
-├── configs/                  # File cấu hình thí nghiệm, features, vùng nghiên cứu (YAML)
-├── data/raw/manifest.yaml    # Bản kê mã băm SHA-256 nguồn dữ liệu khoa học
-├── docs/                     # Tài liệu học thuật (methodology, model_card, data_card)
-├── notebooks/                # Google Colab workflow (colab_first_workflow.ipynb)
-├── scripts/                  # Bộ script thực thi (run_pipeline, train, evaluate)
-├── src/flood_ml/             # Mã nguồn Python (features, labeling, training, utils)
-├── tests/                    # Bộ kiểm thử đơn vị & tích hợp
-├── ML_TRAINING_SPEC.md       # Đặc tả kỹ thuật huấn luyện mô hình chi tiết
-└── pyproject.toml            # Môi trường quản lý gói uv / Python 3.12
-```
-
-- **Đơn vị phân tích:** Phân đoạn đường mục tiêu $150\text{ m}$ cắt theo nút giao OpenStreetMap trên địa bàn TP.HCM (EPSG:9210).
-- **Bộ đặc trưng GIS:**
-  1. `elevation_median_m`: Cao độ trung vị từ mô hình FABDEM 30m.
-  2. `relative_elevation_m`: Chênh lệch cao độ lòng chảo so với bán kính lân cận 500m.
-  3. `slope_mean_deg`: Độ dốc địa hình trung bình (thuật toán Horn $3 \times 3$).
-  4. `dist_water_m`: Khoảng cách Euclid tới mạng lưới sông/kênh/rạch tự nhiên IRD.
-  5. `builtup_ratio_250m`: Tỷ lệ bề mặt bê tông hóa đô thị từ ảnh vệ tinh ESA WorldCover 10m.
-- **Phương pháp Mô hình hóa:**
-  - **MCDA Baseline:** Chuẩn hóa robust bách phân vị $P_5 - P_{95}$, kết hợp 4 kịch bản trọng số (Equal, Terrain-Heavy, Water-Heavy, Built-up-Heavy).
-  - **Track B (Presence-Background Learning):** Huấn luyện mô hình phân loại LightGBM / Regularized Logistic Regression kết hợp lấy mẫu nền (background sampling tỷ lệ 1:10) trên tập các đoạn đường chưa có báo cáo ngập.
-  - **Ngăn chặn rò rỉ không gian:** Chia khối $2.000\text{ m} \times 2.000\text{ m}$ với vùng đệm an toàn $1.000\text{ m}$ (Spatial Guard).
-- **Xuất bản Artifacts:** Điểm rủi ro tương đối (Susceptibility Score) được xuất ra file JSON nạp trực tiếp vào cơ sở dữ liệu backend của SaigonDrain.
+- **Dữ liệu Không gian & Lịch sử Ngập (`dataset/HCMC_floods` & `hcmc_flood_hotspots.json`):**
+  - Tổng hợp các điểm đen ngập úng lịch sử tại TP.HCM kèm tọa độ địa lý, quận/huyện, cao độ địa hình (`elevationM`), ngưỡng mưa gây ngập (`rainThresholdMm`) và tần suất lịch sử (`historyCount`).
+- **Trợ lý Phân tích Ảnh Đa phương thức (`GeminiVisionService`):**
+  - Sử dụng mô hình **Google Gemini Vision (`gemini-2.5-flash`)** kết hợp `responseSchema` (JSON có cấu trúc) để phân tích ảnh hiện trường do người dân gửi lên.
+  - Chỉ ước lượng `estimatedDepthCm` khi trong ảnh có vật chuẩn tham chiếu rõ ràng; trả `null` và gắn trạng thái `evidenceStatus: "insufficient_evidence"` khi ảnh mờ hoặc không đủ căn cứ.
+  - Kết quả từ AI chỉ dùng làm đề xuất hỗ trợ kiểm duyệt; báo cáo mới luôn ở trạng thái `pending` cho đến khi Quản trị viên xác minh (`verified`).
 
 ---
 
@@ -210,7 +179,7 @@ erDiagram
         float depthCm
         string description
         string district
-        float susceptibilityScore
+        int historyCount
     }
     FLOOD_REPORT {
         string id PK

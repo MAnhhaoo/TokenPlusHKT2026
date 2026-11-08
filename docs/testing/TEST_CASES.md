@@ -7,7 +7,7 @@ Mốc mã nguồn: `38d9d490805d835f2ce12dcfc473bb711df69b13` (`origin/master`, 
 - **P0:** auth, ghi dữ liệu, không báo thành công giả, tính toàn vẹn báo cáo và điều hướng.
 - **P1:** validation, fallback, filters, ranh giới số liệu, accessibility và responsive.
 - **PASS / FAIL / BLOCKED / NOT RUN** là trạng thái thực thi, khác với mức ưu tiên. Ca thủ công không được tính vào số test tự động đã pass.
-- Dữ liệu giả: tài khoản `.test`, tọa độ fixture TP.HCM, ảnh tổng hợp, model CPU nhỏ. Reset state/DB/clock giữa các test theo fixture của từng phân hệ.
+- Dữ liệu giả: tài khoản `.test`, tọa độ fixture TP.HCM, ảnh tổng hợp. Reset state/DB/clock giữa các test theo fixture của từng phân hệ.
 
 ## Danh mục ca chi tiết
 
@@ -17,7 +17,6 @@ Mỗi bảng liên kết bên dưới chứa ID, ưu tiên, tiền điều kiệ
 |---|---|---|---|
 | BE — token, guard, báo cáo, cảnh báo, định tuyến/provider | [BE_CASES.md](BE_CASES.md) | Jest unit + Supertest HTTP + PostgreSQL integration | Mock HTTP provider; DB test riêng |
 | Admin và user web | [FE_CASES.md](FE_CASES.md) | Playwright browser, API/SSE/địa điểm/GPS fixture | Không cần BE hoặc provider thật |
-| ML — preprocessing/inference/pipeline | [ML_CASES.md](ML_CASES.md) | pytest unit/integration với dữ liệu nhỏ | CPU, model tổng hợp, không training đầy đủ |
 
 ## Luồng liên phân hệ cần kiểm soát
 
@@ -28,7 +27,6 @@ Mỗi bảng liên kết bên dưới chứa ID, ưu tiên, tiền điều kiệ
 | SYS-03 | P0 | Backend mutation trả 500/network error | Admin duyệt/sửa dữ liệu | UI không chuyển sang thành công giả, giữ khả năng thử lại | FE admin mutation failure regression |
 | SYS-04 | P0 | Auth bắt buộc; citizen/operator token | Gọi HTTP operator bằng từng loại token | Chỉ operator/coordinator được phép; citizen bị từ chối | BE auth guard + HTTP regression |
 | SYS-05 | P1 | API fixture chậm, request cũ trả sau request mới | Tìm điểm/đổi tuyến liên tiếp | Kết quả cuối tương ứng lựa chọn mới nhất | FE user stale-response cases |
-| SYS-06 | P1 | Model bundle giả, feature order cố định | Dự đoán batch và single cùng dữ liệu | Xác suất/tier nhất quán, cột gốc được bảo toàn | ML inference cases |
 
 Đây là ánh xạ hành vi giữa các lớp, **không phải** khẳng định đã chạy một trình duyệt nối trực tiếp BE thật. Kết quả cụ thể xem TEST_REPORT.
 

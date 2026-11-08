@@ -18,7 +18,7 @@ Thành phố Hồ Chí Minh là một trong những đại đô thị chịu ả
 - Các ứng dụng bản đồ phổ biến (Google Maps, Apple Maps) hiện chỉ tối ưu theo thời gian di chuyển lý thuyết, hoàn toàn không có thông số về mức ngập nước, loại phương tiện chịu ngập hay hướng dẫn người dùng né tránh các tuyến đường ngập sâu.
 
 ### 1.2. Sứ mệnh Sản phẩm (Product Mission)
-**SaigonDrain AI** là nền tảng bản đồ số và điều hướng giao thông thông minh đầu tiên tại TP.HCM kết hợp giữa **Mô hình Trí tuệ nhân tạo (Machine Learning Susceptibility)**, **Dữ liệu thủy triều & thời tiết thời gian thực** cùng **Cơ chế báo cáo cộng đồng (Crowdsourcing)**, cung cấp lộ trình di chuyển an toàn, khô ráo cho từng loại phương tiện (Xe máy và Xe hơi).
+**SaigonDrain AI** là nền tảng bản đồ số và điều hướng giao thông thông minh tại TP.HCM kết hợp giữa **Dữ liệu điểm ngập lịch sử & thủy văn**, **Dữ liệu thời tiết thời gian thực (Open-Meteo)** cùng **Cơ chế báo cáo cộng đồng có hỗ trợ phân tích ảnh Google Gemini Vision**, cung cấp lộ trình di chuyển ít rủi ro ngập cho từng loại phương tiện (Xe máy và Xe hơi).
 
 ---
 
@@ -81,11 +81,11 @@ mindmap
 - **Mô phỏng Triều cường Động theo giờ (Dynamic Hourly Tidal Depth):**
   - Thay vì hiển thị con số đồng nhất, hệ thống tính toán mực nước ngập chi tiết cho từng điểm đen dựa trên cao độ lịch sử (`h.depth`), khoảng cách tới sông rạch và hàm sin biến thiên của chu kỳ bán nhật triều TP.HCM (đỉnh triều 05:00 - 07:00 sáng và 17:00 - 19:00 chiều).
 
-### F-03: Tích hợp Trí tuệ Nhân tạo Đánh giá Nguy cơ Ngập (AI Flood Susceptibility)
-- **Mô hình Học máy & MCDA:**
-  - Nhập khẩu module nghiên cứu từ `ml/` (mô hình MCDA 5 tiêu chí: Cao độ FABDEM 30m, Độ dốc Horn 3x3, Khoảng cách thủy hệ, Chỉ số đô thị hóa ESA WorldCover, Mật độ điểm ngập IRD).
-  - Chấm điểm nguy cơ ngập tương đối (0.00 – 1.00) cho từng phân đoạn đường.
-  - Hiển thị huy hiệu kiểm định AI ("Mô hình ML xếp hạng an toàn", "Đoạn đường có nguy cơ địa hình trũng") giúp người dùng an tâm lựa chọn.
+### F-03: Phân tích Ảnh Hiện trường & Đánh giá Rủi ro Ngập (Gemini Vision & Hydrological Scoring)
+- **Đánh giá Địa hình & Thủy văn:**
+  - Kết hợp dữ liệu điểm ngập lịch sử IRD, cao độ địa hình và lượng mưa thực tế theo quận từ Open-Meteo để chấm điểm phạt rủi ro (`riskPenalty`) cho từng nhánh lộ trình OSRM.
+- **Trợ lý Kiểm duyệt Ảnh Google Gemini Vision:**
+  - Phân tích ảnh hiện trường do người dân đính kèm (ước lượng độ sâu ngập khi có vật chuẩn rõ ràng, trả `null` khi không đủ căn cứ, gắn nhãn `clear / uncertain / insufficient_evidence`) để hỗ trợ Quản trị viên xác minh báo cáo (`pending` → `verified`).
 
 ### F-04: Bản đồ Số Tương tác & Điều hướng Thời gian thực (Live GPS Navigation)
 - Nền tảng bản đồ vector MapLibre GL 3D hiển thị mượt mà 60 FPS, không phụ thuộc API key tốn phí.
@@ -116,6 +116,6 @@ timeline
     title Lộ trình Phát triển Hệ thống SaigonDrain AI
     Giai đoạn 1 (Nền tảng) : Khảo sát 425 điểm ngập IRD : Xây dựng Backend NestJS : Thiết lập Vector Basemap MapLibre
     Giai đoạn 2 (Điều hướng & Động) : Tích hợp thời tiết Open-Meteo : Tích hợp chu kỳ triều cường : Phát triển tính năng chọn Xe máy & Xe hơi : Thuật toán Alley Extender
-    Giai đoạn 3 (AI & ML) : Nhập module hcmc-road-flood-ml : Chuẩn hóa đặc trưng GIS FABDEM : Xây dựng tài liệu huấn luyện ML_TRAINING_SPEC
+    Giai đoạn 3 (AI & Dữ liệu) : Tích hợp Google Gemini Vision hỗ trợ kiểm duyệt ảnh : Đồng bộ 250 điểm ngập lịch sử IRD & PostgreSQL
     Giai đoạn 4 (Phát hành) : Hoàn thiện PRD, SYSTEM_DESIGN, API_SPEC, AI_SAFETY : Kiểm thử E2E Web User & Admin
 ```

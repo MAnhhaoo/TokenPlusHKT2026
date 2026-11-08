@@ -197,35 +197,14 @@ Truy vấn danh sách điểm ngập và trạm cảnh báo trên bản đồ.
     "depthCm": 38,
     "cause": "Triều cường dâng",
     "district": "Quận 7",
-    "susceptibilityScore": 0.89,
+    "historyCount": 14,
     "verified": true
   }
 ]
 ```
 
-### 4.3. `GET /api/map/ml/susceptibility`
-**Tích hợp Module AI:** Lấy danh sách phân đoạn đường kèm chỉ số nhạy cảm ngập lụt được tính toán từ mô hình Machine Learning / MCDA trong `ml/`.
-
-- **Response 200 OK:**
-```json
-{
-  "modelVersion": "2.0.0",
-  "algorithm": "LightGBM-PU-Ensemble",
-  "totalSegmentsEvaluated": 425,
-  "segments": [
-    {
-      "segmentId": "SEG_Q7_HUYNH_TAN_PHAT",
-      "street": "Huỳnh Tấn Phát",
-      "district": "Quận 7",
-      "susceptibilityScore": 0.92,
-      "elevationMedianM": 0.85,
-      "distanceWaterM": 65.0,
-      "builtupRatio": 0.84,
-      "riskCategory": "Rất cao"
-    }
-  ]
-}
-```
+### 4.3. `GET /api/map/geocode/reverse` & `GET /api/map/elevation`
+Truy vấn địa chỉ đường/quận từ tọa độ GPS và tra cứu cao độ địa hình thực tế (Open-Meteo Elevation API).
 
 ---
 

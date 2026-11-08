@@ -8,7 +8,7 @@
 
 **Tech Stack:** React 19, TypeScript, Vite 8, MapLibre GL, Tailwind CSS 4, pnpm 12.15.0, Oxfmt 0.75.0.
 
-**Spec:** `Trien_Khai_Phan_2_Thu_Tu_Cac_Buoc.docx` (Step 4), plus the user's approved Cloud Run API/ML and Firebase Hosting frontend decision.
+**Spec:** `Trien_Khai_Phan_2_Thu_Tu_Cac_Buoc.docx` (Step 4), plus the user's approved Cloud Run API and Firebase Hosting frontend decision.
 
 ## Global Constraints
 

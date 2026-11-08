@@ -4,7 +4,6 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue.svg)](https://www.typescriptlang.org/)
 [![NestJS](https://img.shields.io/badge/NestJS-11.0-ea2845.svg)](https://nestjs.com/)
 [![React](https://img.shields.io/badge/React-19.0-61dafb.svg)](https://react.dev/)
-[![Python](https://img.shields.io/badge/Python-3.12-3776ab.svg)](https://www.python.org/)
 
 ---
 
@@ -63,7 +62,7 @@ TokenPlus/
 5. **Thuật toán Thủy văn & Địa hình thực tế (Deterministic Hydrological Algorithm):**
    - Tự động tính toán lượng mưa hiệu dụng thời gian thực từ Open-Meteo đối chiếu với 250 điểm IRD, cao độ $K_{\text{topo}}$, tần suất $K_{\text{hist}}$ và chu kỳ triều cường sông Sài Gòn.
 6. **Google Gemini Multimodal Vision API:**
-   - Phân tích ảnh chụp hiện trường do người dân gửi về, tự động đo lường độ sâu ngập, phát hiện cống tắc và tự động duyệt đưa lên bản đồ cộng đồng.
+   - Phân tích ảnh chụp hiện trường do người dân gửi về (ước lượng mức độ ngập khi đủ vật chuẩn tham chiếu, nhận diện tình trạng cống) để đề xuất thông tin hỗ trợ Quản trị viên kiểm duyệt báo cáo cộng đồng.
 
 ---
 

@@ -1,6 +1,6 @@
 # Google Cloud CI/CD
 
-The pipeline currently covers only the NestJS API in `BE/` and the public user frontend in `FE/user/`. Admin, ML, and pull request preview deployments are outside this stage.
+The pipeline currently covers only the NestJS API in `BE/` and the public user frontend in `FE/user/`. Admin and pull request preview deployments are outside this stage.
 
 ## Pipeline
 
