@@ -35,6 +35,8 @@ npm --prefix FE/admin run test:regressions
 
 ## Bộ test cũ
 
+Sau tích hợp master `0ac855d`, chạy lại `npm --prefix FE/user run test:system`: **5 PASS, 3 FAIL** (FE-U01, FE-U02, FE-U08), đều chờ nhãn nút đăng nhập cũ. FE-U07 đã PASS nhờ cập nhật từ master. Kết quả 4 PASS/4 FAIL dưới đây là baseline lịch sử trước tích hợp.
+
 `npm --prefix FE/user run test:system`: 4 PASS, 4 FAIL (FE-U01, FE-U02, FE-U07, FE-U08). Đối chiếu bản HEAD độc lập trong `.cache/gps-baseline` cũng 4 PASS, 4 FAIL cùng ID. U01/U02/U08 chờ nhãn nút đăng nhập cũ; U07 selector khớp hai gợi ý. U01 baseline lần đầu timeout tải trang; chạy riêng lại xác nhận lỗi nhãn nút giống bản sửa. Các ca GPS U04/U05 và báo cáo U03 đều PASS trên cả hai bản.
 
 `npm --prefix FE/user run test:regressions`: PASS sau khi tích hợp `origin/master` tại `0ac855d`. Các cập nhật test harness/debounce mới từ master được giữ lại; chỉ bổ sung mock polling vào harness. Kết quả FAIL debounce ghi nhận ban đầu tại `7bb238a` đã được thay thế bằng lần kiểm tra PASS này.
