@@ -36,7 +36,7 @@ export class ReportsService {
   ) {}
 
   /**
-   * Phân tích ảnh hiện trường bằng mô hình Google Gemini 1.5 Flash Vision.
+   * Phân tích ảnh hiện trường bằng mô hình Google Gemini Vision (hỗ trợ kiểm duyệt).
    */
   async analyzeImage(dto: AnalyzeImageDto) {
     return this.geminiVisionService.analyzeImage(
@@ -73,138 +73,14 @@ export class ReportsService {
   }
 
   /**
-   * Tính toán và tự động gia hạn thời gian rút nước theo lượng mưa thời gian thực.
-   * Nếu đã tới thời điểm dự kiến (ví dụ 1h) mà trời vẫn còn mưa thì tự động tính lại và kéo dài tiếp.
+   * Cập nhật số phút trôi qua thực tế kể từ thời điểm tạo báo cáo (không tự sinh thời gian nước rút giả định).
    */
-  private evaluateDynamicReportRecession(
-    report: FloodReportEntity,
-    cityRainMm: number,
-    districtRainMap: Map<string, number>,
-  ) {
-    const now = Date.now();
-
-    // 1. Cập nhật số phút trôi qua thực tế
+  private updateElapsedMinutes(report: FloodReportEntity) {
     if (report.createdAt) {
       report.minutesAgo = Math.max(
         1,
-        Math.round((now - new Date(report.createdAt).getTime()) / 60000),
+        Math.round((Date.now() - new Date(report.createdAt).getTime()) / 60000),
       );
-    }
-
-    // 2. Tra cứu lượng mưa thực tế tại quận của báo cáo
-    const cleanDist = (report.district || "").toLowerCase().trim();
-    let currentRain = cityRainMm;
-    if (districtRainMap.has(cleanDist)) {
-      currentRain = districtRainMap.get(cleanDist)!;
-    } else {
-      for (const [distKey, rVal] of districtRainMap.entries()) {
-        if (cleanDist.includes(distKey) || distKey.includes(cleanDist)) {
-          currentRain = rVal;
-          break;
-        }
-      }
-    }
-
-    const drainageRate = report.drainageRateCmPerMin || 0.65;
-    const initialDepth = report.reportedDepth || report.aiDepth || 24;
-
-    // 3. Phân tích thời điểm kết thúc dự kiến đã lưu
-    let clearTimestamp = 0;
-    if (report.estimatedClearAt && report.estimatedClearAt.includes(":")) {
-      const match = /^(\d{1,2}):(\d{2})/.exec(report.estimatedClearAt.trim());
-      if (match) {
-        const [_, h, m] = match;
-        const baseDate = report.createdAt
-          ? new Date(report.createdAt)
-          : new Date();
-        const d = new Date(baseDate);
-        d.setHours(Number(h), Number(m), 0, 0);
-        if (d.getTime() < baseDate.getTime() - 60000) {
-          d.setDate(d.getDate() + 1);
-        }
-        clearTimestamp = d.getTime();
-      }
-    }
-
-    if (!clearTimestamp && report.estimatedDurationMin && report.createdAt) {
-      clearTimestamp =
-        new Date(report.createdAt).getTime() +
-        report.estimatedDurationMin * 60000;
-    }
-
-    // 4. KIỂM TRA THỜI GIAN THỰC TẾ:
-    // Nếu đã tới hoặc qua thời gian dự kiến (clearTimestamp <= now)
-    if (clearTimestamp && now >= clearTimestamp) {
-      if (currentRain > 0.5) {
-        // TRỜI VẪN TIẾP TỤC MƯA THEO THỜI GIAN THỰC:
-        // Nước mưa liên tục bổ sung nên không thể rút theo dự kiến cũ.
-        // Tự động tính toán lại và kéo dài tiếp!
-        const additionalMinutes = Math.max(
-          30,
-          Math.round((currentRain * 12) / drainageRate),
-        );
-        const newClearDate = new Date(now + additionalMinutes * 60000);
-        const clearHourStr = String(newClearDate.getHours()).padStart(2, "0");
-        const clearMinStr = String(newClearDate.getMinutes()).padStart(2, "0");
-        const newClearAt = `${clearHourStr}:${clearMinStr}, ${String(
-          newClearDate.getDate(),
-        ).padStart(
-          2,
-          "0",
-        )}/${String(newClearDate.getMonth() + 1).padStart(2, "0")}/${newClearDate.getFullYear()}`;
-
-        report.estimatedDurationMin = additionalMinutes;
-        report.estimatedClearAt = newClearAt;
-        if (!report.description?.includes("Tự động gia hạn")) {
-          report.description =
-            `${report.description || ""} (Đang tiếp tục mưa ${currentRain.toFixed(1)}mm/h, AI tự động gia hạn thời gian rút nước thêm ~${additionalMinutes} phút).`.trim();
-        }
-      } else {
-        // TRỜI ĐÃ TẠNH MƯA: Tính toán lượng nước đã tiêu thoát theo tốc độ cống
-        const elapsedMinutes = Math.max(
-          0,
-          (now -
-            (report.createdAt ? new Date(report.createdAt).getTime() : now)) /
-            60000,
-        );
-        const recededDepth = Math.max(
-          0,
-          Math.round(initialDepth - drainageRate * elapsedMinutes),
-        );
-        if (recededDepth <= 2) {
-          report.estimatedDurationMin = 0;
-          report.estimatedClearAt = "Đã rút hết nước";
-          report.reportedDepth = 0;
-          report.aiDepth = 0;
-        } else {
-          const remainingMins = Math.max(
-            5,
-            Math.ceil(recededDepth / drainageRate),
-          );
-          report.estimatedDurationMin = remainingMins;
-          const newClearDate = new Date(now + remainingMins * 60000);
-          const clearHourStr = String(newClearDate.getHours()).padStart(2, "0");
-          const clearMinStr = String(newClearDate.getMinutes()).padStart(
-            2,
-            "0",
-          );
-          report.estimatedClearAt = `${clearHourStr}:${clearMinStr}, ${String(
-            newClearDate.getDate(),
-          ).padStart(
-            2,
-            "0",
-          )}/${String(newClearDate.getMonth() + 1).padStart(2, "0")}/${newClearDate.getFullYear()}`;
-          report.reportedDepth = recededDepth;
-          report.aiDepth = recededDepth;
-        }
-      }
-    } else if (clearTimestamp && now < clearTimestamp) {
-      // Chưa tới giờ kết thúc: Cập nhật số phút còn lại thực tế
-      const remainingMinutes = Math.max(
-        1,
-        Math.round((clearTimestamp - now) / 60000),
-      );
-      report.estimatedDurationMin = remainingMinutes;
     }
   }
 
@@ -222,23 +98,8 @@ export class ReportsService {
       order: { createdAt: "DESC" },
     });
 
-    let cityRainMm = 0;
-    let districtRainMap = new Map<string, number>();
-    if (this.weatherService) {
-      try {
-        const [weather, rainMap] = await Promise.all([
-          this.weatherService.getCurrentWeather(),
-          this.weatherService.getRealtimeDistrictRainMap(),
-        ]);
-        cityRainMm = Number(weather?.currentRainMm ?? 0);
-        districtRainMap = rainMap;
-      } catch {
-        // Bỏ qua lỗi thời tiết
-      }
-    }
-
     for (const report of reports) {
-      this.evaluateDynamicReportRecession(report, cityRainMm, districtRainMap);
+      this.updateElapsedMinutes(report);
     }
 
     return reports;
@@ -253,22 +114,7 @@ export class ReportsService {
       throw new NotFoundException(`Không tìm thấy báo cáo ${id}`);
     }
 
-    let cityRainMm = 0;
-    let districtRainMap = new Map<string, number>();
-    if (this.weatherService) {
-      try {
-        const [weather, rainMap] = await Promise.all([
-          this.weatherService.getCurrentWeather(),
-          this.weatherService.getRealtimeDistrictRainMap(),
-        ]);
-        cityRainMm = Number(weather?.currentRainMm ?? 0);
-        districtRainMap = rainMap;
-      } catch {
-        // Bỏ qua
-      }
-    }
-
-    this.evaluateDynamicReportRecession(report, cityRainMm, districtRainMap);
+    this.updateElapsedMinutes(report);
 
     const sameDistrictPending = await this.reportRepo.find({
       where: { district: report.district, status: "pending" },
@@ -290,7 +136,8 @@ export class ReportsService {
   }
 
   /**
-   * Tạo báo cáo ngập/tắc cống mới từ người dân, tự động Reverse Geocode và tạo điểm chờ duyệt.
+   * Tạo báo cáo ngập/tắc cống mới từ người dân, tự động Reverse Geocode và tạo điểm chờ duyệt (pending).
+   * Báo cáo mới luôn ở trạng thái pending cho đến khi Quản trị viên xác minh.
    */
   async create(dto: CreateReportDto): Promise<FloodReportEntity> {
     const lat = dto.lat ?? 10.7791;
@@ -338,7 +185,7 @@ export class ReportsService {
       dto.visual ?? (dto.reportType === "drain" ? "drain" : "street");
     let detectedSeverity = dto.severity;
 
-    // Tự động phân tích ảnh hiện trường bằng Google Gemini Multimodal nếu có đính kèm ảnh và chưa phân tích trước đó
+    // Phân tích ảnh hiện trường bằng Google Gemini Multimodal (chỉ đề xuất hỗ trợ kiểm duyệt, không tự tạo số giả)
     if (dto.photoUrl && !aiSummary) {
       try {
         const visionResult = await this.geminiVisionService.analyzeImage(
@@ -347,13 +194,29 @@ export class ReportsService {
           dto.description,
         );
         if (visionResult) {
-          aiDepth = visionResult.estimatedDepthCm;
-          aiConfidence = visionResult.confidence;
-          if (!aiSummary) aiSummary = visionResult.aiSummary;
-          if (!recommendation) recommendation = visionResult.recommendation;
-          visual = visionResult.visual;
-          if (!dto.reportedDepth && visionResult.estimatedDepthCm > 0) {
-            reportedDepth = visionResult.estimatedDepthCm;
+          if (
+            typeof visionResult.estimatedDepthCm === "number" &&
+            visionResult.estimatedDepthCm > 0
+          ) {
+            aiDepth = visionResult.estimatedDepthCm;
+            if (!dto.reportedDepth) {
+              reportedDepth = visionResult.estimatedDepthCm;
+            }
+          }
+          if (
+            typeof visionResult.confidence === "number" &&
+            visionResult.confidence > 0
+          ) {
+            aiConfidence = visionResult.confidence;
+          }
+          if (!aiSummary && visionResult.aiSummary) {
+            aiSummary = visionResult.aiSummary;
+          }
+          if (!recommendation && visionResult.recommendation) {
+            recommendation = visionResult.recommendation;
+          }
+          if (visionResult.visual) {
+            visual = visionResult.visual;
           }
           if (!dto.severity || dto.severity === "medium") {
             detectedSeverity = visionResult.severity;
@@ -378,12 +241,8 @@ export class ReportsService {
           ? "critical"
           : detectedSeverity;
 
-    const isAutoVerified = Boolean(
-      dto.photoUrl || dto.aiSummary || dto.recommendation,
-    );
-
-    // 1. Đối chiếu lịch sử ngập và cao độ địa hình thực tế tại khu vực này
-    let historyCount = 6;
+    // 1. Đối chiếu lịch sử ngập và cao độ địa hình thực tế tại khu vực này (nếu có trong DB)
+    let historyCount = 0;
     let elevationM = 2.2;
     try {
       const allPoints = await this.mapPointRepo.find();
@@ -400,7 +259,7 @@ export class ReportsService {
         );
       }
       if (matchedPoint) {
-        historyCount = matchedPoint.historyCount || 6;
+        historyCount = matchedPoint.historyCount || 0;
         elevationM = matchedPoint.elevationM || 2.2;
       }
     } catch {
@@ -417,187 +276,77 @@ export class ReportsService {
       currentRain = 0;
     }
 
-    // 3. Thuật toán Thủy văn tính toán tốc độ thoát nước và thời gian hết ngập
-    let drainageRate =
-      elevationM <= 1.4
-        ? 0.35
-        : elevationM <= 1.8
-          ? 0.45
-          : elevationM <= 2.5
-            ? 0.65
-            : 0.85;
+    const { saved, savedPoint } = await this.withTransaction(
+      async ({ reportRepo, mapPointRepo, userRepo }) => {
+        const report = reportRepo.create({
+          id: nextId,
+          location,
+          district,
+          reportedAt: timeStr,
+          minutesAgo: 1,
+          description:
+            dto.description ||
+            aiSummary ||
+            (dto.reportType === "drain"
+              ? "Báo cáo miệng cống thoát nước tại hiện trường."
+              : "Báo cáo nước dâng trên mặt đường tại hiện trường."),
+          reportType: dto.reportType,
+          reportedDepth,
+          aiDepth,
+          aiConfidence,
+          severity: normalizedSeverity,
+          // Báo cáo mới luôn ở trạng thái pending, chỉ chuyển sang verified khi Admin xác minh
+          status: "pending",
+          priority:
+            dto.reportType === "drain" ? "Cống tắc" : "Trục đường chính",
+          coordinates:
+            dto.coordinates || `${lat.toFixed(4)}, ${lng.toFixed(4)}`,
+          historyCount,
+          visual,
+          photoUrl: dto.photoUrl,
+          reporterId: dto.reporterId,
+          aiSummary,
+          recommendation,
+        });
 
-    if (dto.reportType === "drain") {
-      drainageRate = Math.round(drainageRate * 0.6 * 100) / 100;
-    }
-    if (historyCount >= 10) {
-      drainageRate = Math.round(drainageRate * 0.8 * 100) / 100;
-    }
-    drainageRate = Math.max(0.2, drainageRate);
+        const savedReport = await reportRepo.save(report);
 
-    // Thời gian thoát nước cơ bản tính từ độ sâu ngập
-    let estimatedDurationMin = Math.round(reportedDepth / drainageRate);
+        const newPoint = mapPointRepo.create({
+          id: `p_${savedReport.id}`,
+          x: 50,
+          y: 50,
+          lat,
+          lng,
+          elevationM,
+          // Điểm mới ở trạng thái pending chờ điều phối viên xác minh
+          type: "pending",
+          severity: normalizedSeverity,
+          label: location,
+          district,
+          rainfall: currentRain,
+          depth: reportedDepth,
+          historyCount,
+          linkedReportId: savedReport.id,
+        });
+        const savedMapPoint = await mapPointRepo.save(newPoint);
 
-    // Bổ sung thời gian kéo dài nếu thời tiết đang có mưa
-    if (currentRain >= 15) {
-      estimatedDurationMin += 45;
-    } else if (currentRain >= 5) {
-      estimatedDurationMin += 25;
-    }
+        if (dto.reporterId) {
+          const user = await userRepo.findOne({
+            where: { id: dto.reporterId },
+          });
+          if (user) {
+            user.reports += 1;
+            await userRepo.save(user);
+          }
+        }
 
-    // Kiểm tra đỉnh triều cường sông Sài Gòn
-    const vnHour = new Date(
-      now.toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" }),
-    ).getHours();
-    const isTidePeak =
-      (vnHour >= 16 && vnHour <= 19) || (vnHour >= 4 && vnHour <= 7);
-    const cleanDist = (district || "").toLowerCase();
-    const isRiverside =
-      elevationM <= 1.6 &&
-      (cleanDist.includes("7") ||
-        cleanDist.includes("nhà bè") ||
-        cleanDist.includes("bình thạnh") ||
-        cleanDist.includes("thủ đức") ||
-        cleanDist.includes("8") ||
-        cleanDist.includes("4"));
-
-    if (isTidePeak && isRiverside) {
-      estimatedDurationMin += 35;
-    }
-
-    estimatedDurationMin = Math.max(15, estimatedDurationMin);
-
-    const clearDate = new Date(
-      now.getTime() + estimatedDurationMin * 60 * 1000,
+        return { saved: savedReport, savedPoint: savedMapPoint };
+      },
     );
-    const clearHourStr = String(clearDate.getHours()).padStart(2, "0");
-    const clearMinStr = String(clearDate.getMinutes()).padStart(2, "0");
-    const estimatedClearAt = `${clearHourStr}:${clearMinStr}, ${String(
-      clearDate.getDate(),
-    ).padStart(
-      2,
-      "0",
-    )}/${String(clearDate.getMonth() + 1).padStart(2, "0")}/${clearDate.getFullYear()}`;
-
-    const clearNotice = ` Dự kiến nước rút hết sau ~${estimatedDurationMin} phút (khoảng ${clearHourStr}:${clearMinStr}).`;
-    if (aiSummary && !aiSummary.includes("Dự kiến nước rút")) {
-      aiSummary += clearNotice;
-    }
-
-    const report = this.reportRepo.create({
-      id: nextId,
-      location,
-      district,
-      reportedAt: timeStr,
-      minutesAgo: 1,
-      description:
-        dto.description ||
-        aiSummary ||
-        (dto.reportType === "drain"
-          ? "Miệng cống bị rác che kín, nước thoát chậm tại hiện trường."
-          : "Nước đang dâng trên mặt đường, phương tiện di chuyển chậm."),
-      reportType: dto.reportType,
-      reportedDepth,
-      aiDepth,
-      aiConfidence,
-      severity: normalizedSeverity,
-      // Báo cáo có ảnh/AI tự động duyệt ngay lập tức, báo cáo thủ công chờ duyệt
-      status: isAutoVerified ? "verified" : "pending",
-      priority: dto.reportType === "drain" ? "Cống tắc" : "Trục đường chính",
-      coordinates: dto.coordinates || `${lat.toFixed(4)}, ${lng.toFixed(4)}`,
-      historyCount,
-      visual,
-      photoUrl: dto.photoUrl,
-      reporterId: dto.reporterId,
-      aiSummary,
-      recommendation,
-      estimatedDurationMin,
-      estimatedClearAt,
-      drainageRateCmPerMin: drainageRate,
-    });
-
-    const saved = await this.reportRepo.save(report);
-
-    const newPoint = this.mapPointRepo.create({
-      id: `p_${saved.id}`,
-      x: 50,
-      y: 50,
-      lat,
-      lng,
-      elevationM,
-      // Điểm ngập được tự động hiển thị trực tiếp lên bản đồ cộng đồng khi đã xác nhận
-      type: isAutoVerified ? "flood" : "pending",
-      severity: normalizedSeverity,
-      label: location,
-      district,
-      rainfall: currentRain,
-      depth: reportedDepth,
-      historyCount,
-      estimatedDurationMin,
-      estimatedClearAt,
-      drainageRateCmPerMin: drainageRate,
-      linkedReportId: saved.id,
-    });
-    const savedPoint = await this.mapPointRepo.save(newPoint);
-
-    // Tự động tạo và phát cảnh báo khẩn cấp đến toàn cộng đồng (Area Alert)
-    let savedAlert: AreaAlertEntity | null = null;
-    try {
-      const alertCount = await this.alertRepo.count();
-      const alertId = `AL-0${190 + alertCount}`;
-      const startHourMin = `${String(now.getHours()).padStart(2, "0")}:${String(
-        now.getMinutes(),
-      ).padStart(2, "0")}`;
-      const endHourMin = `${clearHourStr}:${clearMinStr}`;
-
-      const alertLevel =
-        normalizedSeverity === "critical"
-          ? "Nghiêm trọng"
-          : detectedSeverity === "high" || detectedSeverity === "medium"
-            ? "Cảnh báo"
-            : "Theo dõi";
-
-      const newAlert = this.alertRepo.create({
-        id: alertId,
-        area: `${location}, ${district}`,
-        level: alertLevel,
-        hazardType:
-          dto.reportType === "drain" ? "Cống tắc nghẽn" : "Ngập úng mặt đường",
-        title: `Cảnh báo ngập: ${location}`,
-        message: `Mực nước quan trắc ~${reportedDepth} cm. Lượng mưa hiện tại: ${currentRain} mm. Lịch sử ghi nhận ${historyCount} lần ngập. Dự kiến nước rút hoàn toàn sau ~${estimatedDurationMin} phút (khoảng ${endHourMin}).`,
-        startedAt: startHourMin,
-        expiresAt: endHourMin,
-        status: "active",
-      });
-      savedAlert = await this.alertRepo.save(newAlert);
-    } catch {
-      // Safe fallback if alert table insert fails
-    }
-
-    // Tự động ghi nhận đóng góp tích cực cho người dân
-    if (dto.reporterId) {
-      const user = await this.userRepo.findOne({
-        where: { id: dto.reporterId },
-      });
-      if (user) {
-        user.reports += 1;
-        user.verifiedReports += 1;
-        user.trustScore = Math.min(100, user.trustScore + 2);
-        await this.userRepo.save(user);
-      }
-    }
 
     this.realtimeService?.broadcast("report.created", {
       report: saved,
       mapPoint: savedPoint,
-      alert: savedAlert,
-    });
-    if (savedAlert) {
-      this.realtimeService?.broadcast("alert.created", savedAlert);
-    }
-    this.realtimeService?.broadcast("report.approved", {
-      report: saved,
-      updatedMapPoint: savedPoint,
     });
 
     return Object.assign(saved, { mapPoint: savedPoint });
