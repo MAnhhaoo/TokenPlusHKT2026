@@ -197,33 +197,13 @@ jobs:
               fi
             fi
 
-            has_source_files() {
-              git ls-files "$1" | grep -qvE '(^|/)\.gitkeep$'
-            }
-            has_changed_source() {
-              local directory="$1"
-              while IFS= read -r file; do
-                if [[ "$file" == "$directory/"* && "${file##*/}" != .gitkeep ]]; then
-                  return 0
-                fi
-              done <<<"$changed_files"
-              return 1
-            }
-
-            has_changed_source BE && backend=true || true
-            has_changed_source FE/user && user=true || true
-            if [[ "$force_full" == true ]]; then
-              has_source_files BE && backend=true || true
-              has_source_files FE/user && user=true || true
+            scope_json="$(STAGING_FORCE_FULL="$force_full" node scripts/staging-deploy-scope.mjs <<<"$changed_files")"
+            backend="$(jq -r '.backend' <<<"$scope_json")"
+            user="$(jq -r '.user' <<<"$scope_json")"
+            any_deployable="$(jq -r '.anyDeployable' <<<"$scope_json")"
+            if grep -Eq '^(\.github/workflows/deploy\.yml|scripts/staging-deploy-scope\.mjs)$' <<<"$changed_files"; then
+              echo 'The staging deployment workflow changed; all current BE and FE/user packages will be redeployed.' >> "$GITHUB_STEP_SUMMARY"
             fi
-            if grep -Eq '^(package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml)$' <<<"$changed_files"; then
-              has_source_files BE && backend=true || true
-              has_source_files FE/user && user=true || true
-            fi
-            if grep -qx 'firebase.json' <<<"$changed_files"; then
-              [[ -f FE/user/package.json ]] && user=true || true
-            fi
-            [[ "$backend" == true || "$user" == true ]] && any_deployable=true
             if [[ "$any_deployable" == true ]]; then
               staged_sha="$GITHUB_SHA"
             else

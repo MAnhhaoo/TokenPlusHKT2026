@@ -156,6 +156,9 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Test staging deployment scope
+        run: node --test scripts/staging-deploy-scope.test.mjs
+
       - name: Explain validation scope
         shell: bash
         env:
