@@ -22,12 +22,12 @@ export class ReportsController {
   constructor(private readonly reportsService: ReportsService) {}
 
   /**
-   * Phân tích ảnh hiện trường bằng mô hình Google Gemini 1.5 Flash Vision.
+   * Phân tích ảnh hiện trường bằng mô hình Google Gemini Vision (hỗ trợ kiểm duyệt, không tự động duyệt).
    */
   @Post("analyze-image")
   @ApiOperation({
     summary:
-      "Phân tích ảnh hiện trường bằng Google Gemini Multimodal AI (ước tính mực nước, thời tiết, tình trạng cống, đánh giá rủi ro)",
+      "Phân tích ảnh hiện trường bằng Google Gemini Multimodal AI (ước lượng mức độ ngập khi đủ căn cứ và hỗ trợ kiểm duyệt)",
   })
   analyzeImage(@Body() dto: AnalyzeImageDto) {
     return this.reportsService.analyzeImage(dto);

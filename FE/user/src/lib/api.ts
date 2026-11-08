@@ -1375,13 +1375,14 @@ export async function fetchJourneyRoutes(
 
 export interface FloodAiAnalysis {
   hasFlooding: boolean;
-  estimatedDepthCm: number;
+  estimatedDepthCm: number | null;
   reportType: "flood" | "drain";
   severity: "critical" | "high" | "medium" | "low";
-  weatherCondition: string;
-  drainStatus: string;
+  evidenceStatus?: "clear" | "uncertain" | "insufficient_evidence";
+  weatherCondition: string | null;
+  drainStatus: string | null;
   visual: "street" | "drain" | "traffic" | "night";
-  confidence: number;
+  confidence: number | null;
   aiSummary: string;
   recommendation: string;
   provider: string;
@@ -1399,69 +1400,15 @@ export async function analyzeReportImageApi(payload: {
       body: JSON.stringify(payload),
     });
     if (res.ok) {
-      return await res.json();
+      const data = await res.json();
+      if (data && typeof data === "object" && "hasFlooding" in data) {
+        return data as FloodAiAnalysis;
+      }
     }
   } catch {
-    // Fallback to client-side heuristic engine
+    // Không tự phát sinh dữ liệu giả khi API không phản hồi
   }
-
-  // Client-side Vision Heuristic Fallback dựa trên dữ liệu ảnh thực tế
-  const imgStr = payload.image || "";
-  let imgHash = 0;
-  for (let i = 0; i < imgStr.length; i += Math.max(1, Math.floor(imgStr.length / 300))) {
-    imgHash = ((imgHash << 5) - imgHash + imgStr.charCodeAt(i)) | 0;
-  }
-  const absHash = Math.abs(imgHash);
-
-  const text = `${payload.location || ""} ${payload.description || ""}`.toLowerCase();
-  const isDrain =
-    text.includes("cống") || text.includes("rác") || text.includes("miệng") || absHash % 7 === 0;
-
-  const isCritical =
-    text.includes("nguy hiểm") ||
-    text.includes("chết máy") ||
-    text.includes("sâu") ||
-    text.includes("lút");
-
-  let estimatedDepth = 20 + (absHash % 16); // 20 - 35 cm
-  if (isCritical) {
-    estimatedDepth = 36 + (absHash % 12); // 36 - 47 cm
-  } else if (isDrain) {
-    estimatedDepth = 15 + (absHash % 9); // 15 - 23 cm
-  }
-
-  const severity: Severity =
-    estimatedDepth >= 35 ? "high" : estimatedDepth >= 20 ? "medium" : "low";
-
-  const loc = payload.location ? payload.location.split(",")[0].trim() : "tuyến đường này";
-
-  return {
-    hasFlooding: true,
-    estimatedDepthCm: estimatedDepth,
-    reportType: isDrain ? "drain" : "flood",
-    severity,
-    weatherCondition:
-      absHash % 3 === 0
-        ? "Trời tối / Ban đêm, tầm nhìn hạn chế"
-        : absHash % 3 === 1
-          ? "Trời âm u, mây đen dông bão đang có mưa rào"
-          : "Trời nhiều mây, độ ẩm cao",
-    drainStatus: isDrain
-      ? "Cống bị rác bít kín, nước thoát chậm"
-      : estimatedDepth >= 30
-        ? "Cống quá tải do triều cường sông dâng cao"
-        : "Cống đang tiêu thoát nước",
-    visual: isDrain ? "drain" : estimatedDepth >= 35 ? "traffic" : "street",
-    confidence: 84 + (absHash % 12),
-    aiSummary: isDrain
-      ? `Phát hiện miệng cống tại ${loc} bị rác thải che bít. Nước ứ đọng xung quanh khoảng ~${estimatedDepth} cm.`
-      : `Phát hiện mực nước ngập mặt đường ước tính ~${estimatedDepth} cm tại ${loc}. Phương tiện di chuyển chậm.`,
-    recommendation:
-      estimatedDepth >= 35
-        ? "Nước ngập sâu chạm ống xả, phương tiện xe máy không nên di chuyển vào đoạn đường này."
-        : "Chú ý giảm tốc độ và quan sát vỉa hè khi di chuyển qua đoạn đường ngập.",
-    provider: "SaigonDrain AI Vision Engine",
-  };
+  return null;
 }
 
 async function snapCoordinateToRoad(
@@ -1505,6 +1452,7 @@ async function snapCoordinateToRoad(
 
 export type CitizenReportResult = {
   id: string;
+  status?: string;
   aiDepth?: number;
   aiConfidence?: number;
   reportedDepth?: number;
@@ -1549,32 +1497,9 @@ export async function createCitizenReport(payload: {
       return await res.json();
     }
   } catch {
-    // Fallback below
+    // Không tự tạo báo cáo giả nếu mất kết nối máy chủ
   }
-
-  // Fallback offline đảm bảo không bao giờ chặn trải nghiệm người dùng
-  const fallbackId = `RP-${Math.floor(2420 + Math.random() * 800)}`;
-  const depth =
-    finalPayload.reportedDepth ??
-    (finalPayload.severity === "high" ? 42 : finalPayload.severity === "medium" ? 25 : 12);
-  const drainageRate = finalPayload.reportType === "drain" ? 0.45 : 0.65;
-  const durationMin = Math.round(depth / drainageRate) + 15;
-  const clearDate = new Date(Date.now() + durationMin * 60 * 1000);
-  const clearHourStr = String(clearDate.getHours()).padStart(2, "0");
-  const clearMinStr = String(clearDate.getMinutes()).padStart(2, "0");
-  const estimatedClearAt = `${clearHourStr}:${clearMinStr}, ${String(clearDate.getDate()).padStart(2, "0")}/${String(clearDate.getMonth() + 1).padStart(2, "0")}/${clearDate.getFullYear()}`;
-
-  return {
-    id: fallbackId,
-    reportedDepth: depth,
-    aiDepth: depth,
-    aiConfidence: 91,
-    estimatedDurationMin: durationMin,
-    estimatedClearAt,
-    drainageRateCmPerMin: drainageRate,
-    location: finalPayload.location,
-    district: finalPayload.district,
-  };
+  return null;
 }
 
 export const HCM_DISTRICT_COORDS: Array<{ name: string; lat: number; lng: number }> = [

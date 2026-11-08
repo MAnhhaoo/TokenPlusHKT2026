@@ -1,4 +1,5 @@
 import { ReportsService } from "./services/reports.service";
+import { GeminiVisionService } from "./services/gemini-vision.service";
 
 describe("ReportsService", () => {
   let service: ReportsService;
@@ -9,11 +10,15 @@ describe("ReportsService", () => {
 
   beforeEach(() => {
     mockReportRepo = {
+      find: jest.fn().mockResolvedValue([]),
       findOne: jest.fn(),
+      create: jest.fn((entity) => entity),
       save: jest.fn((entity) => Promise.resolve(entity)),
     };
     mockMapPointRepo = {
+      find: jest.fn().mockResolvedValue([]),
       findOne: jest.fn(),
+      create: jest.fn((entity) => entity),
       save: jest.fn((entity) => Promise.resolve(entity)),
     };
     mockUserRepo = {
@@ -26,7 +31,10 @@ describe("ReportsService", () => {
       save: jest.fn((entity) => Promise.resolve(entity)),
     };
     mockMapService = {
-      reverseGeocode: jest.fn(),
+      reverseGeocode: jest.fn().mockResolvedValue({
+        location: "Nguyễn Hữu Cảnh",
+        district: "Bình Thạnh",
+      }),
     };
     const mockGeminiVisionService = {
       analyzeImage: jest.fn().mockResolvedValue({
@@ -34,13 +42,14 @@ describe("ReportsService", () => {
         estimatedDepthCm: 32,
         reportType: "flood",
         severity: "critical",
+        evidenceStatus: "clear",
         weatherCondition: "Trời đang mưa to",
-        drainStatus: "Bình thường",
+        drainStatus: "Không quan sát thấy miệng cống trong ảnh",
         visual: "traffic",
-        confidence: 94,
+        confidence: 88,
         aiSummary: "Nước ngập ngang bánh xe máy.",
         recommendation: "Hạn chế lưu thông.",
-        provider: "Google Gemini 1.5 Flash Vision",
+        provider: "Google Gemini Vision (gemini-2.5-flash)",
       }),
     };
 
@@ -78,5 +87,35 @@ describe("ReportsService", () => {
     expect(result.report.status).toBe("verified");
     expect(result.updatedMapPoint?.type).toBe("flood");
     expect(result.updatedMapPoint?.depth).toBe(32);
+  });
+
+  it("keeps newly created reports with photos in pending state until Admin verifies", async () => {
+    const created = await service.create({
+      reportType: "flood",
+      severity: "high",
+      location: "Nguyễn Hữu Cảnh, Bình Thạnh",
+      photoUrl: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/",
+    });
+
+    expect(created.status).toBe("pending");
+    expect((created as any).mapPoint?.type).toBe("pending");
+    expect(created.estimatedClearAt).toBeUndefined();
+    expect(created.estimatedDurationMin).toBeUndefined();
+  });
+
+  it("does not fabricate AI vision numbers when GEMINI_API_KEY is not configured", async () => {
+    const prevKey = process.env.GEMINI_API_KEY;
+    delete process.env.GEMINI_API_KEY;
+    try {
+      const vision = new GeminiVisionService();
+      const res = await vision.analyzeImage(
+        "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/",
+        "Nguyễn Hữu Cảnh",
+        "Ngập nước",
+      );
+      expect(res).toBeNull();
+    } finally {
+      if (prevKey !== undefined) process.env.GEMINI_API_KEY = prevKey;
+    }
   });
 });

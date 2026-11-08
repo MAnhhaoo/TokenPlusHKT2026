@@ -1,83 +1,87 @@
 import { Injectable, Logger } from "@nestjs/common";
 import axios from "axios";
 
+export type EvidenceStatus = "clear" | "uncertain" | "insufficient_evidence";
+
 export interface FloodImageAnalysisResult {
   hasFlooding: boolean;
-  estimatedDepthCm: number;
+  estimatedDepthCm: number | null;
   reportType: "flood" | "drain";
   severity: "critical" | "high" | "medium" | "low";
-  weatherCondition: string;
-  drainStatus: string;
+  evidenceStatus: EvidenceStatus;
+  weatherCondition: string | null;
+  drainStatus: string | null;
   visual: "street" | "drain" | "night" | "traffic";
-  confidence: number;
+  confidence: number | null;
   aiSummary: string;
   recommendation: string;
-  provider: "Google Gemini 1.5 Flash Vision" | "SaigonDrain AI Vision Engine";
+  provider: string;
 }
+
+const ALLOWED_IMAGE_MIMES = new Set([
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+]);
 
 @Injectable()
 export class GeminiVisionService {
   private readonly logger = new Logger(GeminiVisionService.name);
 
   /**
-   * Phân tích ảnh hiện trường bằng mô hình đa phương thức Google Gemini 1.5 Flash Vision.
-   * Nếu chưa cấu hình GEMINI_API_KEY hoặc xảy ra lỗi kết nối, hệ thống tự động chuyển sang
-   * SaigonDrain AI Vision Heuristic Engine để luôn đảm bảo tính sẵn sàng cao (High Availability).
+   * Phân tích ảnh hiện trường bằng mô hình đa phương thức Google Gemini Vision (JSON có cấu trúc).
+   * Lưu ý: Kết quả từ AI chỉ đóng vai trò gợi ý hỗ trợ kiểm duyệt, không bảo đảm chính xác 100%
+   * và không dùng để tự động duyệt báo cáo. Nếu chưa cấu hình GEMINI_API_KEY, ảnh không hợp lệ
+   * hoặc gọi API thất bại, hệ thống trả về null (tuyệt đối không tự sinh dữ liệu giả).
    */
   async analyzeImage(
     imageDataUrlOrBase64: string,
     location?: string,
     userDescription?: string,
-  ): Promise<FloodImageAnalysisResult> {
+  ): Promise<FloodImageAnalysisResult | null> {
     const apiKey = process.env.GEMINI_API_KEY?.trim();
-    const primaryModel =
-      process.env.GEMINI_MODEL?.trim() || "gemini-3.5-flash-lite";
+    const primaryModel = process.env.GEMINI_MODEL?.trim() || "gemini-2.5-flash";
 
-    // Hỗ trợ cả định dạng API key Google AI Studio truyền thống (AIzaSy...) và định dạng mới (AQ...)
     const isValidKey = Boolean(apiKey && apiKey.length >= 20);
+    if (!isValidKey || !this.isBase64Image(imageDataUrlOrBase64)) {
+      return null;
+    }
 
-    if (isValidKey && this.isBase64Image(imageDataUrlOrBase64)) {
-      const candidateModels = [
-        primaryModel,
-        "gemini-3.5-flash-lite",
-        "gemini-3.5-flash",
-        "gemini-3-flash-preview",
-      ];
-      const uniqueModels = Array.from(new Set(candidateModels));
+    const candidateModels = [
+      primaryModel,
+      "gemini-2.5-flash",
+      "gemini-2.5-flash-lite",
+      "gemini-3-flash-preview",
+    ];
+    const uniqueModels = Array.from(new Set(candidateModels));
 
-      for (const model of uniqueModels) {
-        try {
-          const geminiResult = await this.callGeminiVisionApi(
-            apiKey!,
-            model,
-            imageDataUrlOrBase64,
-            location,
-            userDescription,
-          );
-          if (geminiResult) {
-            return {
-              ...geminiResult,
-              provider: "Google Gemini 1.5 Flash Vision",
-            };
-          }
-        } catch (err: any) {
-          this.logger.warn(
-            `Gọi Gemini Vision API với ${model} thất bại (${err?.response?.status || err?.message}). Thử mô hình kế tiếp...`,
-          );
+    for (const model of uniqueModels) {
+      try {
+        const geminiResult = await this.callGeminiVisionApi(
+          apiKey!,
+          model,
+          imageDataUrlOrBase64,
+          location,
+          userDescription,
+        );
+        if (geminiResult) {
+          return geminiResult;
         }
+      } catch (err: any) {
+        this.logger.warn(
+          `Gọi Gemini Vision API với ${model} thất bại (${err?.response?.status || err?.message}). Thử mô hình kế tiếp...`,
+        );
       }
     }
 
-    // SaigonDrain Computer Vision Engine phân tích trực tiếp dữ liệu ảnh
-    return this.fallbackHeuristicAnalysis(
-      imageDataUrlOrBase64,
-      location,
-      userDescription,
-    );
+    return null;
   }
 
   /**
-   * Gọi Google Generative Language REST API với mô hình Gemini Multimodal Vision.
+   * Gọi Google Generative Language REST API với JSON Schema kiểm soát cấu trúc đầu ra.
+   * Temperature thấp và JSON Schema chỉ giúp chuẩn hóa định dạng phản hồi, không triệt tiêu hoàn toàn sai số nhận diện.
    */
   private async callGeminiVisionApi(
     apiKey: string,
@@ -87,51 +91,40 @@ export class GeminiVisionService {
     userDescription?: string,
   ): Promise<FloodImageAnalysisResult | null> {
     const { mimeType, base64Data } = this.extractBase64(imageDataUrl);
-    if (!base64Data) return null;
+    if (!base64Data || !ALLOWED_IMAGE_MIMES.has(mimeType.toLowerCase())) {
+      return null;
+    }
 
-    // Không truyền key vào query string để tương thích hoàn toàn với cả khóa AIzaSy và AQ
     const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
 
     const prompt = `
-Bạn là chuyên gia thị giác máy tính và cứu hộ đô thị của hệ thống SaigonDrain AI (TP. Hồ Chí Minh).
-Nhiệm vụ của bạn là phân tích bức ảnh hiện trường do người dân chụp gửi lên, phát hiện tình trạng ngập nước, cống thoát nước, mưa gió và đánh giá rủi ro giao thông.
+Bạn là trợ lý phân tích hình ảnh hỗ trợ kiểm duyệt báo cáo ngập úng và thoát nước đô thị của hệ thống SaigonDrain AI (TP. Hồ Chí Minh).
+Nhiệm vụ của bạn là quan sát trung thực bức ảnh do người dân gửi lên để hỗ trợ điều phối viên xác minh. Tuyệt đối KHÔNG tự bịa đặt thông tin không có trong ảnh.
 
-Thông tin kèm theo (nếu có):
-- Vị trí hiện trường: ${location || "TP. Hồ Chí Minh"}
+Thông tin ngữ cảnh người dùng cung cấp (chỉ để tham khảo):
+- Vị trí báo cáo: ${location || "Chưa rõ"}
 - Mô tả của người gửi: ${userDescription || "Không có mô tả"}
 
-QUY TẮC PHÂN TÍCH THỊ GIÁC:
-1. Mực nước ngập (estimatedDepthCm):
-   - Mắt cá chân hoặc lấp xấp mặt đường: 10 - 15 cm.
-   - Nửa bánh xe máy hoặc ngập nửa bắp chân: 20 - 30 cm.
-   - Ngập quá bánh xe máy, tới ống pô hoặc gần yên xe: 35 - 55 cm.
-   - Ngập tới nắp capo ô tô: 60 - 100 cm.
-   - Không có nước hoặc chỉ ẩm: 0 - 5 cm.
-2. Mức độ nghiêm trọng (severity):
-   - "critical": Nước ngập sâu >= 35 cm, xe chết máy hàng loạt hoặc nước chảy xiết nguy hiểm.
-   - "high": Nước ngập 25 - 34 cm, xe máy di chuyển rất khó khăn, nguy cơ ngập ống pô.
-   - "medium": Nước ngập 15 - 24 cm, phương tiện di chuyển chậm.
-   - "low": Nước đọng nhẹ < 15 cm, vẫn đi lại bình thường.
-3. Loại sự cố (reportType):
-   - "drain": Nếu trọng tâm bức ảnh là miệng cống, hố ga bị rác che kín, tắc nghẹt hoặc nắp cống hỏng.
-   - "flood": Nếu trọng tâm là toàn cảnh ngập đường, triều cường hoặc nước dâng.
-4. Thời tiết quan sát được (weatherCondition): "Trời đang mưa lớn", "Mưa rào", "Mưa phùn", "Trời âm u nhiều mây", hoặc "Trời khô ráo/tạnh mưa".
-5. Tình trạng cống (drainStatus): "Cống bị rác bít kín", "Cống đang sủi bọt/nước thoát chậm", "Không nhìn thấy miệng cống", hoặc "Thoát nước bình thường".
-6. Visual: "street" (mặt đường), "drain" (miệng cống), "traffic" (phương tiện ngập/kẹt xe), hoặc "night" (ảnh chụp ban đêm).
-
-BẮT BUỘC TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON (Không dùng Markdown, không thêm text ngoài JSON) theo đúng cấu trúc:
-{
-  "hasFlooding": boolean,
-  "estimatedDepthCm": number,
-  "reportType": "flood" | "drain",
-  "severity": "critical" | "high" | "medium" | "low",
-  "weatherCondition": string,
-  "drainStatus": string,
-  "visual": "street" | "drain" | "traffic" | "night",
-  "confidence": number,
-  "aiSummary": string,
-  "recommendation": string
-}
+QUY TẮC PHÂN TÍCH TRUNG THỰC (KHÔNG TỰ PHÁT SINH DỮ LIỆU):
+1. Nhận diện cảnh ngập / tắc cống (hasFlooding) và trạng thái bằng chứng (evidenceStatus):
+   - Cần phân biệt rõ: cảnh ngập đường thực sự hoặc miệng cống bị nghẹt rác VỚI ảnh mặt đường chỉ hơi ướt sau mưa, vũng nước nhỏ không đáng kể, hoặc ảnh không liên quan.
+   - Nếu ảnh không có ngập và không thấy sự cố cống thoát nước, hoặc ảnh mờ/không liên quan: trả "hasFlooding": false, "estimatedDepthCm": null, "evidenceStatus": "insufficient_evidence".
+   - "evidenceStatus":
+     + "clear": Ảnh rõ nét, thấy rõ tình trạng ngập hoặc miệng cống và có vật tham chiếu.
+     + "uncertain": Thấy có nước hoặc cống nhưng góc chụp/ánh sáng khó xác định mức độ.
+     + "insufficient_evidence": Ảnh mờ, thiếu vật tham chiếu hoặc không đủ căn cứ kết luận.
+2. Ước lượng độ sâu ngập (estimatedDepthCm):
+   - Chỉ ước lượng khi trong ảnh có mặt nước ngập VÀ nhìn thấy vật tham chiếu đủ rõ.
+   - Hướng dẫn tham khảo tương đối (lưu ý kích thước vỉa hè, bánh xe từng loại xe và góc chụp có thể khác nhau, KHÔNG coi là chuẩn cố định tuyệt đối):
+     + Nước mấp mé mặt đường / mắt cá chân: khoảng 10 - 15 cm.
+     + Nước ngập khoảng nửa bánh xe máy: khoảng 20 - 30 cm.
+     + Nước ngập quá nửa bánh xe máy / chạm ống xả: khoảng 35 - 50 cm.
+   - NẾU ảnh không thấy rõ vật tham chiếu để ước lượng hoặc không có ngập: BẮT BUỘC trả "estimatedDepthCm": null. Tuyệt đối không tự tạo số cm.
+3. Mức độ đề xuất (severity): "low" | "medium" | "high" | "critical" dựa trên mức độ quan sát được.
+4. Loại báo cáo (reportType): "drain" nếu trọng tâm ảnh là miệng cống/hố ga; "flood" nếu là mặt đường.
+5. Thời tiết (weatherCondition) & Tình trạng cống (drainStatus):
+   - Chỉ mô tả những gì thực sự nhìn thấy trong ảnh. Nếu qua ảnh không nhìn thấy miệng cống thì ghi rõ "Không quan sát thấy miệng cống trong ảnh". Nếu không rõ thời tiết thì trả null.
+6. Khuyến nghị (recommendation): Chỉ đưa khuyến cáo an toàn giao thông thận trọng, không tuyên bố cấm đường tự động hoặc giờ nước rút.
 `;
 
     const requestBody = {
@@ -149,8 +142,42 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON (Không dùng Markdown, k
         },
       ],
       generationConfig: {
-        temperature: 0.15,
+        temperature: 0.2,
         responseMimeType: "application/json",
+        responseSchema: {
+          type: "OBJECT",
+          properties: {
+            hasFlooding: { type: "BOOLEAN" },
+            estimatedDepthCm: { type: "INTEGER", nullable: true },
+            reportType: { type: "STRING", enum: ["flood", "drain"] },
+            severity: {
+              type: "STRING",
+              enum: ["critical", "high", "medium", "low"],
+            },
+            evidenceStatus: {
+              type: "STRING",
+              enum: ["clear", "uncertain", "insufficient_evidence"],
+            },
+            weatherCondition: { type: "STRING", nullable: true },
+            drainStatus: { type: "STRING", nullable: true },
+            visual: {
+              type: "STRING",
+              enum: ["street", "drain", "traffic", "night"],
+            },
+            confidence: { type: "INTEGER", nullable: true },
+            aiSummary: { type: "STRING" },
+            recommendation: { type: "STRING" },
+          },
+          required: [
+            "hasFlooding",
+            "reportType",
+            "severity",
+            "evidenceStatus",
+            "visual",
+            "aiSummary",
+            "recommendation",
+          ],
+        },
       },
     };
 
@@ -163,10 +190,10 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON (Không dùng Markdown, k
     });
 
     const candidates = response.data?.candidates;
-    if (!candidates || candidates.length === 0) return null;
+    if (!Array.isArray(candidates) || candidates.length === 0) return null;
 
     const rawText = candidates[0]?.content?.parts?.[0]?.text;
-    if (!rawText) return null;
+    if (!rawText || typeof rawText !== "string") return null;
 
     try {
       const cleanJson = rawText
@@ -174,31 +201,69 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON (Không dùng Markdown, k
         .replace(/```/g, "")
         .trim();
       const parsed = JSON.parse(cleanJson);
+      if (!parsed || typeof parsed !== "object") return null;
+
+      const rawDepth = parsed.estimatedDepthCm;
+      const estimatedDepthCm =
+        typeof rawDepth === "number" &&
+        Number.isFinite(rawDepth) &&
+        rawDepth > 0 &&
+        rawDepth <= 200
+          ? Math.round(rawDepth)
+          : null;
+
+      const rawConfidence = parsed.confidence;
+      const confidence =
+        typeof rawConfidence === "number" &&
+        Number.isFinite(rawConfidence) &&
+        rawConfidence >= 0 &&
+        rawConfidence <= 100
+          ? Math.round(rawConfidence)
+          : null;
+
+      const evidenceStatus: EvidenceStatus = [
+        "clear",
+        "uncertain",
+        "insufficient_evidence",
+      ].includes(parsed.evidenceStatus)
+        ? parsed.evidenceStatus
+        : estimatedDepthCm !== null
+          ? "uncertain"
+          : "insufficient_evidence";
 
       return {
-        hasFlooding: Boolean(parsed.hasFlooding ?? true),
-        estimatedDepthCm: Number(parsed.estimatedDepthCm ?? 25),
+        hasFlooding: Boolean(parsed.hasFlooding),
+        estimatedDepthCm,
         reportType: parsed.reportType === "drain" ? "drain" : "flood",
         severity: ["critical", "high", "medium", "low"].includes(
           parsed.severity,
         )
           ? parsed.severity
           : "medium",
-        weatherCondition: String(parsed.weatherCondition || "Trời đang có mưa"),
-        drainStatus: String(parsed.drainStatus || "Đang theo dõi miệng cống"),
+        evidenceStatus,
+        weatherCondition:
+          typeof parsed.weatherCondition === "string" &&
+          parsed.weatherCondition.trim()
+            ? parsed.weatherCondition.trim()
+            : null,
+        drainStatus:
+          typeof parsed.drainStatus === "string" && parsed.drainStatus.trim()
+            ? parsed.drainStatus.trim()
+            : null,
         visual: ["street", "drain", "traffic", "night"].includes(parsed.visual)
           ? parsed.visual
           : "street",
-        confidence: Math.min(99, Math.max(75, Number(parsed.confidence ?? 94))),
-        aiSummary: String(
-          parsed.aiSummary ||
-            "Hệ thống phát hiện ngập úng cục bộ trên tuyến đường, phương tiện cần chú ý an toàn.",
-        ),
-        recommendation: String(
-          parsed.recommendation ||
-            "Phương tiện xe máy gầm thấp nên giảm tốc độ hoặc chọn lộ trình đường cao hơn.",
-        ),
-        provider: "Google Gemini 1.5 Flash Vision",
+        confidence,
+        aiSummary:
+          typeof parsed.aiSummary === "string" && parsed.aiSummary.trim()
+            ? parsed.aiSummary.trim()
+            : "Đề xuất AI từ ảnh hiện trường (cần quản trị viên kiểm duyệt).",
+        recommendation:
+          typeof parsed.recommendation === "string" &&
+          parsed.recommendation.trim()
+            ? parsed.recommendation.trim()
+            : "Chú ý quan sát thực tế tại hiện trường và di chuyển thận trọng.",
+        provider: `Google Gemini Vision (${model})`,
       };
     } catch (parseErr) {
       this.logger.error("Lỗi parse JSON phản hồi từ Gemini API:", parseErr);
@@ -206,189 +271,10 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON (Không dùng Markdown, k
     }
   }
 
-  /**
-   * SaigonDrain Computer Vision Engine:
-   * Phân tích trực tiếp dữ liệu nhị phân ảnh (Byte Buffer & Entropy), quang phổ và bối cảnh hiện trường:
-   * 1. Giải mã Base64 -> Buffer ảnh thực tế để trích xuất vân tay ảnh (Image Feature Fingerprint).
-   * 2. Phân tích mật độ điểm ảnh tối/sáng (Luminance Variance) nhận diện chụp ngày hay đêm, mưa dông.
-   * 3. Tính toán mực nước ngập (estimatedDepthCm) theo tỷ lệ vật chuẩn đô thị TP.HCM.
-   * 4. Tự động sinh báo cáo tóm tắt độc bản riêng cho từng ảnh, không bao giờ bị trùng lặp.
-   */
-  private fallbackHeuristicAnalysis(
-    imageData: string,
-    location?: string,
-    userDescription?: string,
-  ): FloodImageAnalysisResult {
-    const { base64Data } = this.extractBase64(imageData);
-    let imageBuffer: Buffer | null = null;
-    try {
-      if (base64Data) {
-        imageBuffer = Buffer.from(base64Data, "base64");
-      }
-    } catch {
-      imageBuffer = null;
-    }
-
-    // 1. Tính toán vân tay số và độ phân tán entropy từ buffer ảnh thực tế
-    let imageFingerprint = 0;
-    let byteLuminanceSum = 0;
-    let sampleCount = 0;
-
-    if (imageBuffer && imageBuffer.length > 50) {
-      const step = Math.max(1, Math.floor(imageBuffer.length / 400));
-      for (let i = 0; i < imageBuffer.length; i += step) {
-        const byte = imageBuffer[i];
-        imageFingerprint =
-          ((imageFingerprint << 5) - imageFingerprint + byte) | 0;
-        byteLuminanceSum += byte;
-        sampleCount++;
-      }
-    }
-
-    const avgByteLuminance =
-      sampleCount > 0 ? byteLuminanceSum / sampleCount : 120;
-    const absFingerprint = Math.abs(imageFingerprint);
-
-    // 2. Nhận diện bối cảnh không gian & thời gian
-    const text = `${location || ""} ${userDescription || ""}`.toLowerCase();
-
-    const isNight =
-      avgByteLuminance < 75 ||
-      text.includes("tối") ||
-      text.includes("đêm") ||
-      new Date().getHours() >= 19 ||
-      new Date().getHours() <= 5;
-
-    const isDarkStorm =
-      !isNight &&
-      (avgByteLuminance < 115 ||
-        text.includes("mưa to") ||
-        text.includes("dông"));
-
-    const isDrain =
-      text.includes("cống") ||
-      text.includes("rác") ||
-      text.includes("tắc") ||
-      text.includes("hố ga") ||
-      text.includes("miệng cống") ||
-      text.includes("drain") ||
-      absFingerprint % 7 === 0;
-
-    const isCriticalKeyword =
-      text.includes("sâu") ||
-      text.includes("nửa bánh") ||
-      text.includes("chết máy") ||
-      text.includes("nước tràn") ||
-      text.includes("nguy hiểm") ||
-      text.includes("lút") ||
-      text.includes("pô xe");
-
-    // 3. Ước tính mực nước ngập (cm) dựa trên vân tay điểm ảnh và vật chuẩn giao thông
-    let estimatedDepthCm: number;
-    let severity: "critical" | "high" | "medium" | "low";
-
-    // Biến thiên độ sâu thực tế từ 10cm - 46cm dựa trên tỷ lệ điểm ảnh
-    const depthVariance = absFingerprint % 16; // 0 - 15
-
-    if (isCriticalKeyword) {
-      estimatedDepthCm = 36 + (absFingerprint % 14); // 36 - 49 cm
-      severity = "critical";
-    } else if (isDrain) {
-      estimatedDepthCm = 15 + (absFingerprint % 11); // 15 - 25 cm
-      severity = estimatedDepthCm >= 20 ? "high" : "medium";
-    } else {
-      // Phân bổ ngập theo mức độ sáng và độ phức tạp bề mặt nước
-      if (avgByteLuminance < 90) {
-        // Nước sâu phản xạ tối hoặc chụp ban đêm
-        estimatedDepthCm = 28 + depthVariance; // 28 - 43 cm
-        severity = estimatedDepthCm >= 35 ? "critical" : "high";
-      } else if (avgByteLuminance < 140) {
-        // Nước ngập qua mắt cá chân đến nửa bánh xe máy
-        estimatedDepthCm = 18 + depthVariance; // 18 - 33 cm
-        severity = estimatedDepthCm >= 25 ? "high" : "medium";
-      } else {
-        // Nước đọng nhẹ vỉa hè
-        estimatedDepthCm = 10 + (absFingerprint % 8); // 10 - 17 cm
-        severity = estimatedDepthCm >= 15 ? "medium" : "low";
-      }
-    }
-
-    const reportType = isDrain ? "drain" : "flood";
-    const visual = isNight
-      ? "night"
-      : isDrain
-        ? "drain"
-        : severity === "critical"
-          ? "traffic"
-          : "street";
-
-    let weatherCondition = "Trời nhiều mây, độ ẩm cao";
-    if (isNight) {
-      weatherCondition = "Trời tối / Ban đêm, tầm nhìn bị hạn chế";
-    } else if (isDarkStorm) {
-      weatherCondition = "Trời âm u, mây đen dông bão đang có mưa";
-    } else if (avgByteLuminance > 145) {
-      weatherCondition = "Trời tạnh ráo, ngập nước do triều cường sông dâng";
-    }
-
-    const drainStatus = isDrain
-      ? "Miệng cống bị rác và bọc nilon bít kín, nước thoát chậm"
-      : estimatedDepthCm >= 30
-        ? "Cống thoát nước quá tải, dòng chảy bị nghẽn do mực nước ngoài kênh cao"
-        : "Cống đang tiêu thoát nước bình thường";
-
-    // 4. Độ tin cậy tính toán (Confidence Score 82% - 96%)
-    const confidence = 84 + (absFingerprint % 12);
-
-    const placeName = location
-      ? location.split(",")[0].trim()
-      : "tuyến đường này";
-
-    // 5. Sinh nhận định và khuyến nghị độc bản
-    let aiSummary = "";
-    if (isDrain) {
-      aiSummary = `Phát hiện miệng cống tại ${placeName} bị rác che lấp lưới thoát nước. Nước ứ đọng xung quanh khoảng ~${estimatedDepthCm} cm.`;
-    } else if (severity === "critical") {
-      aiSummary = `Phát hiện ngập sâu diện rộng tại ${placeName}. Mực nước dâng ước tính ~${estimatedDepthCm} cm, chạm ống xả xe máy, nguy cơ chết máy rất cao.`;
-    } else if (severity === "high") {
-      aiSummary = `Phát hiện lòng đường tại ${placeName} bị ngập nước khoảng ~${estimatedDepthCm} cm (qua nửa bánh xe máy). Phương tiện di chuyển khó khăn.`;
-    } else if (severity === "medium") {
-      aiSummary = `Phát hiện mặt đường tại ${placeName} ngập nước đáng chú ý (~${estimatedDepthCm} cm, ngang mắt cá chân). Mặt đường trơn trượt.`;
-    } else {
-      aiSummary = `Mặt đường tại ${placeName} ghi nhận vũng nước đọng mép vỉa hè (~${estimatedDepthCm} cm). Xe cộ vẫn có thể lưu thông.`;
-    }
-
-    let recommendation = "";
-    if (severity === "critical") {
-      recommendation =
-        "Tuyệt đối không chạy xe máy qua đoạn ngập này để tránh thủy kích hỏng động cơ. Hãy chuyển hướng theo lộ trình tránh ngập.";
-    } else if (severity === "high") {
-      recommendation =
-        "Xe tay ga gầm thấp nên tránh đi vào. Xe số nên giữ đều ga số 1-2 và đi ở tim đường cao ráo hơn.";
-    } else if (severity === "medium") {
-      recommendation =
-        "Giảm tốc độ dưới 20 km/h, bật đèn chiếu gần và chú ý nắp cống hoặc hố ga hai bên vỉa hè.";
-    } else {
-      recommendation =
-        "Phương tiện lưu thông bình thường, giảm tốc khi đi qua vũng nước gần mép vỉa hè.";
-    }
-
-    return {
-      hasFlooding: true,
-      estimatedDepthCm,
-      reportType,
-      severity,
-      weatherCondition,
-      drainStatus,
-      visual,
-      confidence,
-      aiSummary,
-      recommendation,
-      provider: "SaigonDrain AI Vision Engine",
-    };
-  }
-
   private isBase64Image(str: string): boolean {
+    if (!str || typeof str !== "string") return false;
+    // Giới hạn kích thước chuỗi base64 (~10MB) để tránh quá tải bộ nhớ
+    if (str.length > 14_000_000) return false;
     return (
       str.startsWith("data:image/") ||
       (str.length > 100 && !str.startsWith("http"))

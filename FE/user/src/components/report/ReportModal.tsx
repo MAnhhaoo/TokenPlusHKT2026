@@ -118,12 +118,15 @@ function ReportModal({
 
   function applyAiAnalysis(analysis: FloodAiAnalysis) {
     setAiAnalysis(analysis);
+    if (!analysis.hasFlooding || analysis.evidenceStatus === "insufficient_evidence") {
+      return;
+    }
     if (analysis.reportType === "drain") {
       setType("drain");
     } else {
       setType("flood");
     }
-    if (analysis.severity === "high") {
+    if (analysis.severity === "critical" || analysis.severity === "high") {
       setSeverity("high");
     } else if (analysis.severity === "low") {
       setSeverity("low");
@@ -144,20 +147,16 @@ function ReportModal({
       return;
     }
     setPhotoName(file.name);
+    setAiAnalysis(null);
 
-    // 1. Phân tích thị giác máy tính trực tiếp từ điểm ảnh thực tế (Pixel Computer Vision)
     const rawLoc = locationText.trim() || "TP. Hồ Chí Minh";
-    const { dataUrl, analysis: localVisionAnalysis } = await processAndAnalyzeImageFile(
+    const { dataUrl } = await processAndAnalyzeImageFile(
       file,
       rawLoc,
       description.trim() || undefined,
     );
     setPhotoDataUrl(dataUrl);
 
-    // Áp dụng ngay kết quả phân tích thị giác máy tính độc bản từ ảnh
-    applyAiAnalysis(localVisionAnalysis);
-
-    // 2. Đồng thời kết nối backend nếu có Google Gemini Vision API
     if (dataUrl) {
       setAnalyzingImage(true);
       try {
@@ -212,7 +211,7 @@ function ReportModal({
       const cleanLocation = rawLoc.split(/[·,]/)[0].trim() || rawLoc;
       const defaultDepth = severity === "high" ? 35 : severity === "low" ? 12 : 24;
       const reportedDepth =
-        aiAnalysis?.estimatedDepthCm && aiAnalysis.estimatedDepthCm > 0
+        typeof aiAnalysis?.estimatedDepthCm === "number" && aiAnalysis.estimatedDepthCm > 0
           ? aiAnalysis.estimatedDepthCm
           : defaultDepth;
 
@@ -237,8 +236,14 @@ function ReportModal({
         aiSummary: aiAnalysis?.aiSummary,
         recommendation: aiAnalysis?.recommendation,
         reportedDepth,
-        aiDepth: aiAnalysis?.estimatedDepthCm,
-        aiConfidence: aiAnalysis?.confidence,
+        aiDepth:
+          typeof aiAnalysis?.estimatedDepthCm === "number" && aiAnalysis.estimatedDepthCm > 0
+            ? aiAnalysis.estimatedDepthCm
+            : undefined,
+        aiConfidence:
+          typeof aiAnalysis?.confidence === "number" && aiAnalysis.confidence >= 0
+            ? aiAnalysis.confidence
+            : undefined,
         visual: aiAnalysis?.visual,
       });
       if (!created) {
@@ -254,7 +259,7 @@ function ReportModal({
         lng: resolvedCoords[0],
         label: cleanLocation,
         district: resolvedDistrict,
-        type: "flood",
+        type: "pending",
         severity: severity === "high" ? "critical" : "medium",
         depth: created.aiDepth && created.aiDepth > 0 ? created.aiDepth : reportedDepth,
         rainfall: 0,
@@ -306,58 +311,54 @@ function ReportModal({
               <Icon name="check" size={30} />
             </span>
             <span className="success-pill">
-              {createdReportId ? `⚡ Đã phát cảnh báo · ${createdReportId}` : "⚡ Đã phát cảnh báo"}
+              {createdReportId ? `⏳ Chờ xác minh · ${createdReportId}` : "⏳ Chờ xác minh"}
             </span>
-            <h2 id="report-title">Cảnh báo đã lên bản đồ & hệ thống!</h2>
+            <h2 id="report-title">Đã tiếp nhận báo cáo hiện trường!</h2>
             <p id="report-description">
-              Hệ thống đã tự động đối chiếu hình ảnh AI Gemini, lượng mưa thực tế và lịch sử ngập
-              tại <strong>{locationText.trim() || "khu vực bạn chọn"}</strong> để phát cảnh báo đến
-              người đi đường.
+              Báo cáo tại <strong>{locationText.trim() || "khu vực bạn chọn"}</strong> đã được lưu ở
+              trạng thái <strong>Chờ xác minh (pending)</strong> để Trung tâm điều hành kiểm duyệt
+              trước khi phát cảnh báo chính thức.
             </p>
 
-            {/* Khối dự đoán thời gian hết ngập theo Thủy văn & Lượng mưa */}
             <div className="flood-prediction-banner">
               <div className="prediction-header">
-                <span className="prediction-icon">⏳</span>
+                <span className="prediction-icon">🛡️</span>
                 <div>
-                  <strong className="prediction-title">Dự kiến nước rút hoàn toàn</strong>
+                  <strong className="prediction-title">Thông tin ghi nhận & khuyến cáo</strong>
                   <p className="prediction-subtitle">
-                    Ước tính sau <strong>~{createdData?.estimatedDurationMin || 45} phút</strong>
-                    {createdData?.estimatedClearAt
-                      ? ` (khoảng ${createdData.estimatedClearAt.split(",")[0].trim()})`
-                      : ""}
+                    Người đi đường cần quan sát thực tế tại hiện trường và di chuyển thận trọng.
                   </p>
                 </div>
               </div>
 
               <div className="prediction-details-grid">
                 <div className="prediction-stat">
-                  <span className="stat-label">Mực nước ngập</span>
+                  <span className="stat-label">Mực nước ước lượng</span>
                   <strong className="stat-value">
-                    {createdData?.reportedDepth ||
-                      (severity === "high" ? 42 : severity === "medium" ? 25 : 12)}{" "}
-                    cm
+                    {createdData?.reportedDepth
+                      ? `~${createdData.reportedDepth} cm (tham khảo)`
+                      : "Chưa xác định"}
                   </strong>
                 </div>
                 <div className="prediction-stat">
-                  <span className="stat-label">Tốc độ tiêu thoát</span>
+                  <span className="stat-label">Trạng thái kiểm duyệt</span>
+                  <strong className="stat-value">Chờ Admin xác minh</strong>
+                </div>
+                <div className="prediction-stat">
+                  <span className="stat-label">Loại báo cáo</span>
                   <strong className="stat-value">
-                    ~{createdData?.drainageRateCmPerMin || 0.65} cm/phút
+                    {type === "drain" ? "Cống thoát nước" : "Ngập mặt đường"}
                   </strong>
                 </div>
                 <div className="prediction-stat">
-                  <span className="stat-label">Dữ liệu thời tiết</span>
-                  <strong className="stat-value">Open-Meteo Realtime</strong>
-                </div>
-                <div className="prediction-stat">
-                  <span className="stat-label">Mô hình tính toán</span>
-                  <strong className="stat-value">Thủy văn & Triều cường</strong>
+                  <span className="stat-label">Khu vực</span>
+                  <strong className="stat-value">{selectedDistrict || "TP.HCM"}</strong>
                 </div>
               </div>
             </div>
 
             <button className="primary-modal-button" onClick={closeModal} type="button">
-              Xem cảnh báo trên bản đồ
+              Đóng và quay lại bản đồ
             </button>
           </div>
         ) : (
@@ -549,8 +550,13 @@ function ReportModal({
               <div className="ai-result-card">
                 <div className="ai-result-header">
                   <span className="ai-badge">
-                    <Icon name="check" size={13} /> Gemini Vision AI ({aiAnalysis.confidence}% tin
-                    cậy)
+                    <Icon name="check" size={13} /> Đề xuất từ Gemini Vision (
+                    {aiAnalysis.evidenceStatus === "clear"
+                      ? "Đủ căn cứ"
+                      : aiAnalysis.evidenceStatus === "uncertain"
+                        ? "Cần đối chiếu thêm"
+                        : "Chưa đủ căn cứ"}
+                    )
                   </span>
                   <span className={`ai-severity-tag ${aiAnalysis.severity}`}>
                     {aiAnalysis.severity === "critical"
@@ -564,24 +570,29 @@ function ReportModal({
                 </div>
                 <div className="ai-metrics-row">
                   <div className="ai-metric">
-                    <small>Mực nước AI</small>
-                    <strong>~{aiAnalysis.estimatedDepthCm} cm</strong>
+                    <small>Mực nước ước lượng</small>
+                    <strong>
+                      {typeof aiAnalysis.estimatedDepthCm === "number" &&
+                      aiAnalysis.estimatedDepthCm > 0
+                        ? `~${aiAnalysis.estimatedDepthCm} cm (tham khảo)`
+                        : "Chưa đủ căn cứ đo"}
+                    </strong>
                   </div>
                   <div className="ai-metric">
-                    <small>Thời tiết</small>
-                    <strong>{aiAnalysis.weatherCondition}</strong>
+                    <small>Thời tiết qua ảnh</small>
+                    <strong>{aiAnalysis.weatherCondition || "Chưa rõ qua ảnh"}</strong>
                   </div>
                   <div className="ai-metric">
                     <small>Miệng cống</small>
-                    <strong>{aiAnalysis.drainStatus}</strong>
+                    <strong>{aiAnalysis.drainStatus || "Không thấy rõ"}</strong>
                   </div>
                 </div>
                 <p className="ai-summary-text">
-                  🤖 <strong>Nhận định AI:</strong> {aiAnalysis.aiSummary}
+                  🤖 <strong>Gợi ý kiểm duyệt AI:</strong> {aiAnalysis.aiSummary}
                 </p>
                 {aiAnalysis.recommendation && (
                   <div className="ai-recommendation-box">
-                    <strong>💡 Khuyến nghị cho người dân:</strong> {aiAnalysis.recommendation}
+                    <strong>💡 Khuyến cáo thận trọng:</strong> {aiAnalysis.recommendation}
                   </div>
                 )}
               </div>
