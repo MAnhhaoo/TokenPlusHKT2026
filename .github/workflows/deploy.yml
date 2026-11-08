@@ -102,7 +102,7 @@ jobs:
     if: >-
       (github.event_name == 'push' || github.event_name == 'release') &&
       needs.validate.result == 'success' &&
-      needs.validate.outputs.any_application == 'true' &&
+      needs.deployment-scope.outputs.any_application == 'true' &&
       vars.GCP_DEPLOY_STAGING == 'true'
     runs-on: ubuntu-latest
     environment: staging
@@ -771,7 +771,7 @@ jobs:
       - name: Explain CI/CD result
         env:
           EVENT_NAME: ${{ github.event_name }}
-          APP_AVAILABLE: ${{ needs.validate.outputs.any_application }}
+          APP_AVAILABLE: ${{ needs.deployment-scope.outputs.any_application }}
           VALIDATE_RESULT: ${{ needs.validate.result }}
           STAGING_RESULT: ${{ needs.deploy-staging.result }}
           STAGING_CURRENT: ${{ needs.deploy-staging.outputs.current }}
