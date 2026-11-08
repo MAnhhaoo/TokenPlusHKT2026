@@ -99,8 +99,9 @@ function ReportModal({
 
   async function handleUseGps() {
     setLocatingGps(true);
+    setSubmitError(null);
     try {
-      const { latitude, longitude } = await getUserLocation();
+      const { latitude, longitude } = await getUserLocation({ requirePrecise: true });
       const geo = await reverseGeocodeApi(latitude, longitude);
       setLocationText(geo.district ? `${geo.location}, ${geo.district}` : geo.location);
       setSelectedDistrict(geo.district || "TP.HCM");
@@ -108,9 +109,9 @@ function ReportModal({
       setShowSuggestions(false);
     } catch (err) {
       console.warn("Failed to locate position in ReportModal:", err);
-      setLocationText("TP. Hồ Chí Minh");
-      setSelectedDistrict("Quận 1");
-      setCoords([106.7009, 10.7769]);
+      setSubmitError(
+        "Không lấy được vị trí chính xác. Hãy bật quyền vị trí/GPS hoặc chọn vị trí thủ công.",
+      );
     } finally {
       setLocatingGps(false);
     }

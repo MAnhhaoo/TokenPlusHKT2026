@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react"
+import { startPolling } from "@/lib/polling"
+import { useEffect, useRef, useState } from "react"
 import { Check, X } from "lucide-react"
 import Topbar from "@/components/layout/Topbar"
 import IconButton from "@/components/ui/IconButton"
@@ -68,11 +69,14 @@ export default function App() {
   const [users, setUsers] = useState<CommunityUser[]>([])
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null)
 
+  const dataRevision = useRef(0)
+
   useEffect(() => {
     let active = true
     async function loadInitial() {
+      const revision = dataRevision.current
       const data = await fetchAdminInitialData()
-      if (!active || !data.live) return
+      if (!active || revision !== dataRevision.current || !data.live) return
       if (Array.isArray(data.reports)) {
         setReports(data.reports)
       }
@@ -104,11 +108,12 @@ export default function App() {
       if (data.weather) setWeather(data.weather)
       setIsLiveBackend(true)
     }
-    loadInitial()
+    const stopPolling = startPolling(loadInitial)
 
     const unsubscribe = subscribeAdminRealtime({
       onReportCreated: ({ report, mapPoint }) => {
         if (!active) return
+        dataRevision.current++
         setReports((current) =>
           current.some((r) => r.id === report.id)
             ? current
@@ -127,6 +132,7 @@ export default function App() {
       },
       onReportApproved: ({ report, updatedMapPoint }) => {
         if (!active) return
+        dataRevision.current++
         setReports((current) =>
           current.map((item) => (item.id === report.id ? report : item)),
         )
@@ -140,12 +146,14 @@ export default function App() {
       },
       onReportRejected: ({ report }) => {
         if (!active) return
+        dataRevision.current++
         setReports((current) =>
           current.map((item) => (item.id === report.id ? report : item)),
         )
       },
       onAlertCreated: (alert) => {
         if (!active) return
+        dataRevision.current++
         setAlerts((current) =>
           current.some((a) => a.id === alert.id)
             ? current
@@ -154,22 +162,26 @@ export default function App() {
       },
       onAlertUpdated: (alert) => {
         if (!active) return
+        dataRevision.current++
         setAlerts((current) =>
           current.map((a) => (a.id === alert.id ? alert : a)),
         )
       },
       onAlertEnded: (alert) => {
         if (!active) return
+        dataRevision.current++
         setAlerts((current) =>
           current.map((a) => (a.id === alert.id ? alert : a)),
         )
       },
       onWeatherUpdated: ({ snapshot }) => {
         if (!active) return
+        dataRevision.current++
         if (snapshot) setWeather(snapshot)
       },
       onUserUpdated: ({ action, user }) => {
         if (!active || !user) return
+        dataRevision.current++
         setUsers((current) => {
           const exists = current.some((u) => u.id === user.id)
           if (exists) {
@@ -187,6 +199,7 @@ export default function App() {
 
     return () => {
       active = false
+      stopPolling()
       unsubscribe()
     }
   }, [])
@@ -239,6 +252,7 @@ export default function App() {
     if (!reviewing) return
     const targetId = reviewing.id
     const apiResult = await approveReportApi(targetId)
+    dataRevision.current++
     setReports((current) =>
       current.map((report) =>
         report.id === targetId
@@ -265,6 +279,7 @@ export default function App() {
     if (!rejecting) return
     const targetId = rejecting.id
     const apiResult = await rejectReportApi(targetId, reason)
+    dataRevision.current++
     setReports((current) =>
       current.map((report) =>
         report.id === targetId
@@ -284,6 +299,7 @@ export default function App() {
 
   const handleToggleLock = async (report: FloodReport) => {
     const apiResult = await toggleReportLockApi(report.id)
+    dataRevision.current++
     if (apiResult?.report) {
       setReports((current) =>
         current.map((r) => (r.id === report.id ? apiResult.report : r)),
@@ -311,6 +327,13 @@ export default function App() {
         : `Đã mở khóa báo cáo ${report.id} (${report.location}) và hiển thị lại trên bản đồ.`,
     )
   }
+
+  const hiddenReportIds = new Set(
+    reports.filter((report) => report.status === "rejected").map((report) => report.id),
+  )
+  const visibleMapPoints = mapPoints.filter(
+    (point) => !point.linkedReportId || !hiddenReportIds.has(point.linkedReportId),
+  )
 
   const selectedUser = users.find((user) => user.id === selectedUserId) ?? null
 
@@ -377,6 +400,7 @@ export default function App() {
     if (!selectedUser) return
     const targetId = selectedUser.id
     const updatedUser = await updateUserStatusApi(targetId, status)
+    dataRevision.current++
     setUsers((current) =>
       current.map((user) =>
         user.id === targetId ? (updatedUser ?? { ...user, status }) : user,
@@ -419,7 +443,7 @@ export default function App() {
               onNavigate={navigate}
               onReview={setReviewing}
               onSelectPoint={selectMapPoint}
-              points={mapPoints}
+              points={visibleMapPoints}
               reports={reports}
               selectedMapPoint={selectedMapPoint}
               setLayers={setLayers}
@@ -436,7 +460,7 @@ export default function App() {
             <MapPage
               layers={layers}
               onSelectPoint={selectMapPoint}
-              points={mapPoints}
+              points={visibleMapPoints}
               reports={reports}
               selectedMapPoint={selectedMapPoint}
               setLayers={setLayers}
@@ -448,7 +472,7 @@ export default function App() {
             <ReportsPage
               onReview={setReviewing}
               onToggleLock={handleToggleLock}
-              points={mapPoints}
+              points={visibleMapPoints}
               reports={reports}
             />
           )}
@@ -462,7 +486,7 @@ export default function App() {
           {page === "analytics" && (
             <AnalyticsPage
               alerts={alerts}
-              points={mapPoints}
+              points={visibleMapPoints}
               reports={reports}
               setTrendRange={setTrendRange}
               trendRange={trendRange}

@@ -1,3 +1,4 @@
+import { startPolling } from "@/lib/polling";
 import WeatherPage from "@/components/weather/WeatherPage";
 import CommunityPage from "@/components/community/CommunityPage";
 import { useEffect, useRef, useState } from "react";
@@ -110,6 +111,9 @@ function App() {
     mapMode: "realtime",
   });
 
+  const mapRequestRef = useRef(0);
+  const backendRevisionRef = useRef(0);
+
   useEffect(() => {
     let active = true;
     const currentSlot = forecasts[forecastIndex] ?? forecasts[0];
@@ -119,53 +123,64 @@ function App() {
     mapQueryStateRef.current = { slotRain, mapMode };
 
     async function updatePoints() {
+      const request = ++mapRequestRef.current;
       const pts = await fetchMapPointsApi(slotRain, mapMode);
-      if (active) setFloodPoints(pts);
+      if (active && request === mapRequestRef.current) setFloodPoints(pts);
     }
-    updatePoints();
+    const stopPolling = startPolling(updatePoints);
     return () => {
       active = false;
+      stopPolling();
     };
   }, [forecastIndex, mapMode, forecasts, weather]);
 
-  // 1. Tải dữ liệu hệ thống khởi động (Thời tiết, Dự báo, Điểm ngập, Cảnh báo, Báo cáo cộng đồng) - CHỈ CHẠY 1 LẦN KHI MOUNT
+  // Tải dữ liệu và polling dự phòng khi realtime mất kết nối.
   useEffect(() => {
     let active = true;
     async function loadFromBackend() {
-      const [weatherSnap, forecastRes, pointsRes, alertsRes, communityRes] = await Promise.all([
+      const revision = backendRevisionRef.current;
+      const [weatherSnap, forecastRes, alertsRes, communityRes] = await Promise.all([
         fetchCurrentWeather(),
         fetchForecastSlots(),
-        fetchMapPointsApi(),
         fetchActiveAlertsApi(),
         fetchCommunityReportsApi(),
       ]);
-      if (!active) return;
-      if (weatherSnap) setWeather(weatherSnap);
-      if (forecastRes.slots.length > 0) setForecasts(forecastRes.slots);
-      if (pointsRes.length > 0) setFloodPoints(pointsRes);
-      if (communityRes.length > 0) setCommunityReports(communityRes);
+      if (!active || revision !== backendRevisionRef.current) return;
+      if (weatherSnap)
+        setWeather((prev) =>
+          JSON.stringify(prev) === JSON.stringify(weatherSnap) ? prev : weatherSnap,
+        );
+      if (forecastRes.slots.length > 0)
+        setForecasts((prev) =>
+          JSON.stringify(prev) === JSON.stringify(forecastRes.slots) ? prev : forecastRes.slots,
+        );
+      setCommunityReports(communityRes);
       setActiveAlerts(alertsRes);
     }
-    loadFromBackend();
+    const stopPolling = startPolling(loadFromBackend);
 
     const unsubscribe = subscribeUserRealtime({
       onWeatherUpdated: ({ snapshot, slots }) => {
+        backendRevisionRef.current++;
         if (!active) return;
         if (snapshot) setWeather(snapshot);
         if (slots && slots.length > 0) setForecasts(slots);
       },
       onRouteRecomputeNeeded: async () => {
+        const request = ++mapRequestRef.current;
         const { slotRain, mapMode: currentMode } = mapQueryStateRef.current;
         const pointsRes = await fetchMapPointsApi(slotRain, currentMode);
-        if (!active) return;
+        if (!active || request !== mapRequestRef.current) return;
         setFloodPoints(pointsRes);
       },
       onAlertsChanged: async () => {
+        backendRevisionRef.current++;
         const alertsRes = await fetchActiveAlertsApi();
         if (!active) return;
         setActiveAlerts(alertsRes);
       },
       onReportsChanged: async () => {
+        backendRevisionRef.current++;
         const communityRes = await fetchCommunityReportsApi();
         if (!active) return;
         setCommunityReports(communityRes);
@@ -174,6 +189,7 @@ function App() {
 
     return () => {
       active = false;
+      stopPolling();
       unsubscribe();
     };
   }, []);

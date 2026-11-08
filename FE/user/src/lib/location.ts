@@ -4,15 +4,28 @@ export type UserGeoLocation = {
   isIpFallback: boolean;
 };
 
-export async function getUserLocation(): Promise<UserGeoLocation> {
+const validCoordinates = (latitude: number, longitude: number) =>
+  Number.isFinite(latitude) &&
+  Number.isFinite(longitude) &&
+  Math.abs(latitude) <= 90 &&
+  Math.abs(longitude) <= 180;
+
+export async function getUserLocation({
+  requirePrecise = false,
+}: { requirePrecise?: boolean } = {}): Promise<UserGeoLocation> {
   const fallbackIp = async (): Promise<UserGeoLocation> => {
+    if (requirePrecise) {
+      throw new Error(
+        "Không lấy được vị trí chính xác. Hãy bật quyền vị trí/GPS hoặc chọn vị trí thủ công.",
+      );
+    }
     try {
       const res = await fetch("https://get.geojs.io/v1/ip/geo.json", {
         signal: AbortSignal.timeout(3000),
       });
       if (res.ok) {
         const data = await res.json();
-        if (data && data.latitude && data.longitude) {
+        if (data && validCoordinates(Number(data.latitude), Number(data.longitude))) {
           return {
             latitude: parseFloat(data.latitude),
             longitude: parseFloat(data.longitude),
@@ -30,7 +43,11 @@ export async function getUserLocation(): Promise<UserGeoLocation> {
       });
       if (res2.ok) {
         const data2 = await res2.json();
-        if (data2 && data2.success && data2.latitude && data2.longitude) {
+        if (
+          data2 &&
+          data2.success &&
+          validCoordinates(Number(data2.latitude), Number(data2.longitude))
+        ) {
           return {
             latitude: Number(data2.latitude),
             longitude: Number(data2.longitude),
@@ -71,40 +88,25 @@ export async function getUserLocation(): Promise<UserGeoLocation> {
     // ignore permissions API error
   }
 
-  return new Promise<UserGeoLocation>((resolve) => {
-    let resolved = false;
-
-    // Timeout nhanh 2.2 giây: nếu GPS thiết bị phản hồi chậm, tự động chuyển IP geolocation
-    const safetyTimer = window.setTimeout(async () => {
-      if (!resolved) {
-        resolved = true;
-        const ipLoc = await fallbackIp();
-        resolve(ipLoc);
-      }
-    }, 2200);
-
-    // Thử lấy vị trí với maximumAge để dùng ngay vị trí đã lưu trong bộ nhớ đệm (nếu có)
+  return new Promise<UserGeoLocation>((resolve, reject) => {
+    const fallback = () => {
+      void fallbackIp().then(resolve, reject);
+    };
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        if (!resolved) {
-          resolved = true;
-          window.clearTimeout(safetyTimer);
-          resolve({
-            latitude: pos.coords.latitude,
-            longitude: pos.coords.longitude,
-            isIpFallback: false,
-          });
+        const { latitude, longitude, accuracy } = pos.coords;
+        if (
+          !validCoordinates(latitude, longitude) ||
+          !Number.isFinite(accuracy) ||
+          accuracy > 200
+        ) {
+          fallback();
+          return;
         }
+        resolve({ latitude, longitude, isIpFallback: false });
       },
-      async (_err) => {
-        if (!resolved) {
-          resolved = true;
-          window.clearTimeout(safetyTimer);
-          const ipLoc = await fallbackIp();
-          resolve(ipLoc);
-        }
-      },
-      { enableHighAccuracy: false, timeout: 2000, maximumAge: 300000 },
+      fallback,
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 },
     );
   });
 }

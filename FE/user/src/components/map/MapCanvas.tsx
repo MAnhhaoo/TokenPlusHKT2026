@@ -825,6 +825,8 @@ function MapCanvas({
         try {
           watchIdRef.current = navigator.geolocation.watchPosition(
             (pos) => {
+              // Do not snap a coarse network fix to a nearby road or trigger a reroute.
+              if (!Number.isFinite(pos.coords.accuracy) || pos.coords.accuracy > 200) return;
               handleRawGpsUpdate(
                 pos.coords.longitude,
                 pos.coords.latitude,

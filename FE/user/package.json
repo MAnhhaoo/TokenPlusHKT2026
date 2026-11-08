@@ -11,7 +11,8 @@
     "format": "oxfmt",
     "test:smoke": "node tests/smoke.mjs",
     "test:system": "node --test --test-concurrency=1 tests/system.test.mjs",
-    "test:regressions": "node tests/review-regressions.mjs"
+    "test:regressions": "node tests/review-regressions.mjs",
+    "test:gps": "node --test --test-concurrency=1 tests/location-polling.test.mjs tests/gps-browser.test.mjs"
   },
   "dependencies": {
     "maplibre-gl": "^6.14.0",
