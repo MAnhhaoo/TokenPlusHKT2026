@@ -1,4 +1,3 @@
-import { Sparkles } from "lucide-react"
 import Heading from "@/components/ui/Heading"
 import type { TrendsMap } from "@/types"
 
@@ -133,11 +132,6 @@ function TrendChart({
         </div>
         <div className="legend-item">
           <span className="legend-line rain" /> Lượng mưa
-        </div>
-        <div className="insight">
-          <Sparkles size={14} />{" "}
-          {data?.insight ||
-            "Dữ liệu trực quan hóa từ mô hình quan trắc lượng mưa và báo cáo cộng đồng."}
         </div>
       </div>
     </section>

@@ -473,11 +473,6 @@ export default function App() {
 
           <footer className="page-footer">
             <span>SaigonDrain AI · Trung tâm điều hành đô thị thông minh</span>
-            <span>
-              {isLiveBackend
-                ? "Đã kết nối Backend API & Open-Meteo · Hệ thống Vận hành TP.HCM"
-                : "SaigonDrain AI v2.0 · Hệ thống Vận hành & Cảnh báo Ngập lụt Đô thị TP.HCM"}
-            </span>
           </footer>
         </div>
       </main>
