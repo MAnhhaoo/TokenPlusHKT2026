@@ -11,6 +11,7 @@ import { UsersModule } from "./modules/users/users.module";
 import { AnalyticsModule } from "./modules/analytics/analytics.module";
 import { SeedModule } from "./modules/seed/seed.module";
 import { RealtimeModule } from "./modules/realtime/realtime.module";
+import { HealthModule } from "./modules/health/health.module";
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { RealtimeModule } from "./modules/realtime/realtime.module";
         createTypeOrmOptions(configService),
     }),
     RealtimeModule,
+    HealthModule,
     WeatherModule,
     MapModule,
     JourneyModule,

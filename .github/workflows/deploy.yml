@@ -329,9 +329,22 @@ jobs:
           fi
           api_root="${api_url%/}"
           api_root="${api_root%/api}"
-          frontend_origin="https://${FIREBASE_USER_SITE_ID}.web.app"
           headers_file="$(mktemp)"
-          trap 'rm -f "$headers_file"' EXIT
+          response_file="$(mktemp)"
+          trap 'rm -f "$headers_file" "$response_file"' EXIT
+          frontend_origin="https://${FIREBASE_USER_SITE_ID}.web.app"
+
+          health_status="$(curl --silent --show-error --output "$response_file" --write-out '%{http_code}' "$api_root/health")"
+          if [[ "$health_status" != 200 ]]; then
+            echo "::error title=Staging API health check failed::Expected GET /health to return HTTP 200, received $health_status."
+            cat "$response_file"
+            exit 1
+          fi
+          if ! jq --exit-status '(.status == "ok") and (.version | type == "string" and length > 0)' "$response_file" >/dev/null; then
+            echo '::error title=Staging API health check failed::GET /health must return status=ok and a non-empty version.'
+            cat "$response_file"
+            exit 1
+          fi
 
           preflight_status="$(curl --silent --show-error --output /dev/null --dump-header "$headers_file" --write-out '%{http_code}' \
             --request OPTIONS \
@@ -608,6 +621,36 @@ jobs:
             --${{ vars.GCP_API_PUBLIC == 'true' && 'allow-unauthenticated' || 'no-allow-unauthenticated' }}
             --command=""
             --args=""
+
+      - name: Verify production API health
+        if: steps.release_revision.outputs.current == 'true' && needs.deployment-scope.outputs.backend == 'true' && vars.GCP_API_PUBLIC == 'true'
+        shell: bash
+        env:
+          DEPLOYED_API_URL: ${{ steps.deploy_api.outputs.url }}
+          CONFIGURED_API_URL: ${{ vars.VITE_API_BASE_URL }}
+        run: |
+          set -euo pipefail
+          api_url="$DEPLOYED_API_URL"
+          if [[ -z "$api_url" ]]; then api_url="$CONFIGURED_API_URL"; fi
+          if [[ -z "$api_url" ]]; then
+            echo '::error title=Production API URL missing::Deploy the API first or set VITE_API_BASE_URL in the production GitHub Environment.'
+            exit 1
+          fi
+          api_root="${api_url%/}"
+          api_root="${api_root%/api}"
+          response_file="$(mktemp)"
+          trap 'rm -f "$response_file"' EXIT
+          health_status="$(curl --silent --show-error --retry 3 --output "$response_file" --write-out '%{http_code}' "$api_root/health")"
+          if [[ "$health_status" != 200 ]]; then
+            echo "::error title=Production API health check failed::Expected GET /health to return HTTP 200, received $health_status."
+            cat "$response_file"
+            exit 1
+          fi
+          if ! jq --exit-status '(.status == "ok") and (.version | type == "string" and length > 0)' "$response_file" >/dev/null; then
+            echo '::error title=Production API health check failed::GET /health must return status=ok and a non-empty version.'
+            cat "$response_file"
+            exit 1
+          fi
 
       - name: Setup Node.js for user frontend
         if: steps.release_revision.outputs.current == 'true' && needs.deployment-scope.outputs.user == 'true'
