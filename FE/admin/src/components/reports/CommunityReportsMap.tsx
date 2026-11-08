@@ -278,7 +278,7 @@ export default function CommunityReportsMap({
               }}
               onClick={() => onSelectReport(isSelected ? null : report)}
               type="button"
-              title={`${report.location} (${report.district}) · ${isLocked ? "Đã khóa" : `Ngập ${report.aiDepth || report.reportedDepth || 25}cm`}`}
+              title={`${report.location} (${report.district}) · ${isLocked ? "Đã khóa" : report.status === "verified" ? "Đã xác minh" : "Chờ duyệt"}`}
             >
               <span>
                 {isLocked ? (
@@ -290,9 +290,9 @@ export default function CommunityReportsMap({
                 )}
               </span>
               <span>{report.location.split(",")[0].trim()}</span>
-              <span style={{ opacity: 0.9, fontSize: "10px", marginLeft: "2px" }}>
-                {isLocked ? "🔒" : `${report.aiDepth || report.reportedDepth || 25}cm`}
-              </span>
+              {isLocked && (
+                <span style={{ opacity: 0.9, fontSize: "10px", marginLeft: "2px" }}>🔒</span>
+              )}
             </button>
           )
         })}
@@ -337,8 +337,8 @@ export default function CommunityReportsMap({
                 {selectedReport.status === "rejected"
                   ? "🔒 Đã khóa / Ẩn"
                   : selectedReport.status === "verified"
-                    ? "⚡ Đang mở (AI duyệt)"
-                    : "Chờ duyệt"}
+                    ? "✓ Đã xác minh"
+                    : "⏳ Chờ duyệt"}
               </StatusPill>
               <span style={{ fontSize: "11px", color: "var(--ink-soft)", marginLeft: "auto" }}>
                 {selectedReport.minutesAgo} phút trước
@@ -347,23 +347,13 @@ export default function CommunityReportsMap({
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px", fontSize: "11.5px", background: "var(--mist)", padding: "8px 10px", borderRadius: "8px", marginBottom: "10px" }}>
               <div>
-                <span style={{ color: "var(--ink-soft)" }}>Mực nước: </span>
-                <strong>{selectedReport.aiDepth || selectedReport.reportedDepth} cm</strong>
+                <span style={{ color: "var(--ink-soft)" }}>Loại sự cố: </span>
+                <strong>{selectedReport.priority || "Ngập mặt đường"}</strong>
               </div>
               <div>
                 <span style={{ color: "var(--ink-soft)" }}>Lịch sử: </span>
-                <strong>{selectedReport.historyCount || 5} lần</strong>
+                <strong>{selectedReport.historyCount || 1} lần</strong>
               </div>
-              {selectedReport.estimatedClearAt === "Đã rút hết nước" || selectedReport.estimatedDurationMin === 0 ? (
-                <div style={{ gridColumn: "span 2" }}>
-                  <span style={{ color: "#10b981", fontWeight: 700 }}>✓ Nước đã rút hết hoàn toàn</span>
-                </div>
-              ) : selectedReport.estimatedDurationMin ? (
-                <div style={{ gridColumn: "span 2" }}>
-                  <span style={{ color: "var(--teal)", fontWeight: 600 }}>Dự kiến nước rút: </span>
-                  <strong>~{selectedReport.estimatedDurationMin} phút</strong> ({selectedReport.estimatedClearAt?.split(",")[0] || ""})
-                </div>
-              ) : null}
             </div>
 
             {selectedReport.aiSummary && (

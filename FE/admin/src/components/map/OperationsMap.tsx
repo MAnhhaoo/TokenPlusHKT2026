@@ -106,7 +106,6 @@ function OperationsMap({
     (p) => p.type === "flood" || p.type === "pending",
   ).length
   const riskCount = points.filter((p) => p.type === "risk").length
-  const rainCount = points.filter((p) => p.type === "sensor").length
   const historyCount = points.filter((p) => p.type === "history").length
 
   const layerOptions = [
@@ -119,21 +118,14 @@ function OperationsMap({
     },
     {
       id: "risk" as MapLayer,
-      label: "Nguy cơ",
+      label: "Nguy cơ ngập",
       count: riskCount,
       icon: <TriangleAlert size={14} />,
       variant: "risk",
     },
     {
-      id: "rain" as MapLayer,
-      label: "Mưa dự báo",
-      count: rainCount,
-      icon: <CloudRain size={14} />,
-      variant: "rain",
-    },
-    {
       id: "history" as MapLayer,
-      label: "Lịch sử ngập",
+      label: "Lịch sử ngập IRD",
       count: historyCount,
       icon: <History size={14} />,
       variant: "history",
@@ -308,14 +300,12 @@ function OperationsMap({
               <small className="marker-badge">
                 {point.label}
                 {point.type === "history"
-                  ? ` · Lịch sử ${point.historyCount} lần${point.maxDepth || point.depth ? ` (Max ${point.maxDepth || point.depth}cm)` : ""}`
+                  ? ` · Lịch sử ${point.historyCount} lần`
                   : point.type === "risk"
                     ? ` · Nguy cơ ${severityLabel(point.severity)}`
                     : point.type === "sensor"
                       ? ` · Mưa ${point.rainfall} mm/h`
-                      : point.depth > 0
-                        ? ` · Ngập ${point.depth} cm`
-                        : ` · An toàn`}
+                      : ` · ${severityLabel(point.severity)}`}
               </small>
             </button>
           )
@@ -373,12 +363,7 @@ function OperationsMap({
                     <b>{selected.historyCount} lần</b>Số lần ngập
                   </span>
                   <span>
-                    <b>
-                      {selected.maxDepth || selected.depth
-                        ? `${selected.maxDepth || selected.depth} cm`
-                        : "Chưa ghi nhận"}
-                    </b>
-                    Đỉnh ngập kỷ lục
+                    <b>{severityLabel(selected.severity)}</b>Mức độ ghi nhận
                   </span>
                   <span>
                     <b>{selected.elevationM || 2.0} m</b>Cao độ địa hình
@@ -411,11 +396,7 @@ function OperationsMap({
               ) : (
                 <>
                   <span>
-                    <b>
-                      {selected.depth || "—"}
-                      {selected.depth ? " cm" : ""}
-                    </b>
-                    Mực nước hiện tại
+                    <b>{severityLabel(selected.severity)}</b>Mức độ ngập
                   </span>
                   <span>
                     <b>{selected.rainfall} mm</b>Lượng mưa
@@ -445,10 +426,7 @@ function OperationsMap({
             <i className="legend-dot" style={{ background: "var(--sun)" }} /> Nguy cơ ngập
           </span>
           <span>
-            <i className="legend-dot" style={{ background: "var(--rain)" }} /> Trạm đo mưa
-          </span>
-          <span>
-            <i className="legend-dot" style={{ background: "#8b5cf6" }} /> Lịch sử IRD
+            <i className="legend-dot" style={{ background: "#8b5cf6" }} /> Lịch sử ngập IRD
           </span>
         </div>
       </div>

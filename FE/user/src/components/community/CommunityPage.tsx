@@ -89,7 +89,7 @@ export default function CommunityPage({
     const total = activeReports.length;
     const floods = activeReports.filter((r) => r.reportType === "flood").length;
     const drains = activeReports.filter((r) => r.reportType === "drain").length;
-    const aiVerified = activeReports.filter((r) => r.aiConfidence > 70).length;
+    const aiVerified = activeReports.filter((r) => r.status === "verified").length;
     return { total, floods, drains, aiVerified };
   }, [activeReports]);
 
@@ -157,7 +157,7 @@ export default function CommunityPage({
                 Bản đồ & Tin tức Cộng đồng
               </h2>
               <p className="community-feed-subtitle">
-                Điểm ngập & cống tắc do người dân TP.HCM chia sẻ, AI thẩm định tức thì
+                Điểm ngập & cống tắc do người dân TP.HCM chia sẻ, hỗ trợ kiểm duyệt thực tế
               </p>
             </div>
             <button
@@ -187,7 +187,7 @@ export default function CommunityPage({
             </div>
             <div className="comm-stat-card">
               <span className="stat-num text-green">{stats.aiVerified}</span>
-              <span className="stat-desc">AI thẩm định</span>
+              <span className="stat-desc">Đã xác minh</span>
             </div>
           </div>
 
@@ -282,7 +282,6 @@ export default function CommunityPage({
             ) : (
               filteredReports.map((report) => {
                 const isSelected = report.id === selectedReportId;
-                const depth = report.aiDepth || report.reportedDepth || 20;
 
                 return (
                   <article
@@ -301,10 +300,10 @@ export default function CommunityPage({
                       <div className="report-card-badges">
                         <span className={`comm-sev-badge ${report.severity}`}>
                           {report.severity === "critical"
-                            ? "Nguy hiểm (>40cm)"
+                            ? "Nguy hiểm"
                             : report.severity === "high"
-                              ? "Chú ý (~25cm)"
-                              : "Nhẹ (~12cm)"}
+                              ? "Đáng chú ý"
+                              : "Nhẹ"}
                         </span>
                         <span className="comm-type-badge">
                           {report.reportType === "drain" ? "Cống tắc" : "Đường ngập"}
@@ -332,55 +331,6 @@ export default function CommunityPage({
                               e.currentTarget.style.display = "none";
                             }}
                           />
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Drainage Prediction Bar */}
-                    <div className="report-card-hydrology">
-                      <div className="hydro-item">
-                        <span className="hydro-label">Mực nước:</span>
-                        <strong className={`hydro-val ${report.severity}`}>{depth} cm</strong>
-                      </div>
-                      {report.estimatedClearAt === "Đã rút hết nước" ||
-                      report.estimatedDurationMin === 0 ? (
-                        <div className="hydro-item">
-                          <span className="hydro-label">Hiện trạng:</span>
-                          <strong className="hydro-val" style={{ color: "#10b981" }}>
-                            ✓ Đã rút hết nước
-                          </strong>
-                        </div>
-                      ) : report.estimatedDurationMin ? (
-                        <div className="hydro-item">
-                          <span className="hydro-label">Dự kiến rút:</span>
-                          <strong className="hydro-val text-teal">
-                            ~{report.estimatedDurationMin} phút
-                          </strong>
-                          {report.estimatedClearAt && (
-                            <small className="hydro-sub">
-                              ({report.estimatedClearAt.split(",")[0]})
-                            </small>
-                          )}
-                          {report.description?.includes("tự động gia hạn") && (
-                            <span
-                              style={{
-                                display: "inline-block",
-                                fontSize: "10px",
-                                color: "#0369a1",
-                                background: "#e0f2fe",
-                                padding: "1px 6px",
-                                borderRadius: "4px",
-                                marginTop: "2px",
-                              }}
-                            >
-                              🌧️ Tự động gia hạn
-                            </span>
-                          )}
-                        </div>
-                      ) : (
-                        <div className="hydro-item">
-                          <span className="hydro-label">Lịch sử ngập:</span>
-                          <strong className="hydro-val">{report.historyCount || 4} lần</strong>
                         </div>
                       )}
                     </div>

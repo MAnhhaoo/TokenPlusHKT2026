@@ -140,7 +140,6 @@ export default function CommunityMap({
       const lng = report.lng!;
       const lat = report.lat!;
       const isSelected = report.id === selectedReportId;
-      const depth = report.aiDepth || report.reportedDepth || 20;
 
       const markerEl = document.createElement("div");
       markerEl.className = `community-flood-marker severity-${report.severity} ${
@@ -156,7 +155,7 @@ export default function CommunityMap({
         <span class="community-marker-pulse"></span>
         <span class="community-marker-body">
           <span class="community-marker-icon">${iconSvg}</span>
-          <span class="community-marker-depth">${depth}cm</span>
+          <span class="community-marker-depth">${report.reportType === "drain" ? "Cống" : "Ngập"}</span>
         </span>
         <span class="community-marker-tail"></span>
       `;
@@ -172,7 +171,7 @@ export default function CommunityMap({
       popupEl.innerHTML = `
         <div class="community-popup-header">
           <span class="community-popup-badge ${report.severity}">
-            ${report.severity === "critical" ? "Ngập sâu (>40cm)" : report.severity === "high" ? "Ngập vừa (~25cm)" : "Ngập nhẹ (~12cm)"}
+            ${report.severity === "critical" ? "Ngập sâu" : report.severity === "high" ? "Ngập vừa" : "Ngập nhẹ"}
           </span>
           <span class="community-popup-time">${report.minutesAgo} phút trước</span>
         </div>
@@ -187,20 +186,13 @@ export default function CommunityMap({
 
         <div class="community-popup-stats">
           <div class="stat-box">
-            <span class="stat-lbl">Mực nước</span>
-            <strong class="stat-val ${report.severity}">${depth} cm</strong>
+            <span class="stat-lbl">Loại sự cố</span>
+            <strong class="stat-val ${report.severity}">${report.reportType === "drain" ? "Cống tắc" : "Đường ngập"}</strong>
           </div>
-          ${
-            report.estimatedDurationMin
-              ? `<div class="stat-box">
-                  <span class="stat-lbl">Dự kiến rút</span>
-                  <strong class="stat-val text-teal">~${report.estimatedDurationMin} phút</strong>
-                </div>`
-              : `<div class="stat-box">
-                  <span class="stat-lbl">Lịch sử</span>
-                  <strong class="stat-val">${report.historyCount || 5} lần</strong>
-                </div>`
-          }
+          <div class="stat-box">
+            <span class="stat-lbl">Trạng thái</span>
+            <strong class="stat-val">${report.status === "verified" ? "Đã xác minh" : "Chờ duyệt"}</strong>
+          </div>
         </div>
 
         ${

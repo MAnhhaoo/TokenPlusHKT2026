@@ -79,6 +79,8 @@ export function buildRealtimeAdminMapPoints(
   if (Array.isArray(rawPoints)) {
     for (const pt of rawPoints) {
       if (!pt?.id || seenIds.has(pt.id)) continue
+      // Các điểm lịch sử sẽ được nạp đồng nhất ở bước 2 (đủ 250 điểm IRD, tránh nhân đôi ID)
+      if (pt.type === "history") continue
       // Loại bỏ hoàn toàn báo cáo người dân khỏi bản đồ vận hành (chỉ hiển thị ở tab Báo cáo cộng đồng)
       if (
         (pt as any).linkedReportId ||

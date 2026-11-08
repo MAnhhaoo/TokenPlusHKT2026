@@ -194,15 +194,15 @@ for (const granted of [true, false])
       ? { permissions: ["geolocation"], geolocation: { latitude: 10.79, longitude: 106.71 } }
       : {},
   );
-test("FE-U06 forecasts selection and SSE alert refresh reach notifications", async () => {
+test("FE-U06 forecasts display and SSE alert refresh reach notifications", async () => {
   let alerts = [alert];
   await run(api({ "GET /api/alerts": () => ({ body: alerts }) }), async (f) => {
-    const next = f.page.getByRole("button", {
-      name: "+30 phút: 12 mm mưa, nguy cơ cao",
-      exact: true,
-    });
-    await next.click();
-    assert.equal(await next.getAttribute("aria-pressed"), "true");
+    await visible(
+      f.page.getByRole("listitem", {
+        name: "+30 phút: 12 mm mưa, nguy cơ cao",
+        exact: true,
+      }),
+    );
     await f.page.getByRole("button", { name: /Cảnh báo khu vực, có 1/ }).click();
     await visible(f.page.getByText("Synthetic warning", { exact: true }));
     await f.page.keyboard.press("Escape");
@@ -214,7 +214,7 @@ test("FE-U06 forecasts selection and SSE alert refresh reach notifications", asy
       snapshot: { ...weather, temperatureC: 25 },
       slots: [{ ...slots[0], rain: "8.4 mm" }],
     });
-    await visible(f.page.getByRole("button", { name: /Hiện tại: 8.4 mm/ }));
+    await visible(f.page.getByRole("listitem", { name: /Hiện tại: 8.4 mm/ }));
   });
 });
 test("FE-U07 route endpoints use keyboard suggestions, backend route and discard stale autocomplete", async () => {
@@ -302,14 +302,14 @@ test("FE-U07 route endpoints use keyboard suggestions, backend route and discard
       for (let i = 0; i < 30 && !first; i++) await delay(50);
       assert.ok(first, "old request started");
       await origin.fill("Fresh origin");
-      await visible(page.getByRole("button", { name: /^Synthetic Fresh origin/ }));
+      await visible(page.getByRole("button", { name: /^Synthetic Fresh origin/ }).first());
       first();
       await delay(100);
       assert.equal(await page.getByRole("button", { name: /^Synthetic Old query/ }).count(), 0);
       await origin.press("Enter");
       const destination = page.locator('input[aria-label="Nhập điểm đến"]:visible');
       await destination.fill("Fresh destination");
-      await visible(page.getByRole("button", { name: /^Synthetic Fresh destination/ }));
+      await visible(page.getByRole("button", { name: /^Synthetic Fresh destination/ }).first());
       await destination.press("Enter");
       await visible(page.getByText("Synthetic safe route", { exact: true }).first());
       assert.ok(requests.some((r) => r.path === "/api/journey/compute-route"));

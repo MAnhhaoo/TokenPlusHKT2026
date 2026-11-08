@@ -142,58 +142,9 @@ export class MapService {
             query.severity === "all" ||
             point.severity === query.severity)
         ) {
-          // Tính toán suy giảm mực nước theo thời gian thực tế đã trôi qua (Hydrological Water Recession)
-          let dynamicDepth = point.depth;
-          let calculatedSeverity = point.severity;
-          let isCleared = false;
-
-          if (
-            point.updatedAt &&
-            point.drainageRateCmPerMin &&
-            point.depth > 0
-          ) {
-            const minutesElapsed = Math.max(
-              0,
-              Math.floor(
-                (Date.now() - new Date(point.updatedAt).getTime()) / 60000,
-              ),
-            );
-            // Nếu lượng mưa tại thành phố/quận nhỏ (< 3mm) nghĩa là trời đã tạnh hoặc mưa rất nhỏ
-            if (cityRainMm < 3) {
-              const recededDepth = Math.round(
-                point.depth - point.drainageRateCmPerMin * minutesElapsed,
-              );
-              dynamicDepth = Math.max(0, recededDepth);
-            }
-
-            if (dynamicDepth <= 3) {
-              isCleared = true;
-              dynamicDepth = 0;
-            } else if (dynamicDepth >= 35) {
-              calculatedSeverity = "critical";
-            } else if (dynamicDepth >= 20) {
-              calculatedSeverity = "high";
-            } else {
-              calculatedSeverity = "medium";
-            }
-          }
-
-          if (isCleared) {
-            if (activeLayers.includes("history")) {
-              dynamicPoints.push({
-                ...point,
-                depth: 0,
-                type: "history",
-                label: `${point.label} (Đã rút hết nước)`,
-              });
-            }
-          } else {
-            dynamicPoints.push({
-              ...point,
-              depth: dynamicDepth,
-              severity: calculatedSeverity,
-            });
-          }
+          dynamicPoints.push({
+            ...point,
+          });
         }
         continue;
       }
@@ -329,49 +280,12 @@ export class MapService {
         continue;
       }
 
-      let durationMin = point.estimatedDurationMin;
-      let clearTimeStr = point.estimatedClearAt;
-      let drainRate = point.drainageRateCmPerMin;
-
-      if (dynamicDepth > 0 && (!durationMin || !clearTimeStr)) {
-        const pointDrainageRate =
-          elevation <= 1.4
-            ? 0.35
-            : elevation <= 1.8
-              ? 0.45
-              : elevation <= 2.5
-                ? 0.65
-                : 0.85;
-        drainRate =
-          (point.historyCount || 0) >= 10
-            ? Math.round(pointDrainageRate * 0.8 * 100) / 100
-            : pointDrainageRate;
-        durationMin = Math.round(dynamicDepth / drainRate);
-        if (localRain >= 15) durationMin += 45;
-        else if (localRain >= 5) durationMin += 25;
-        if (isTidePeak && isRiversideLowland) durationMin += 35;
-        durationMin = Math.max(15, durationMin);
-
-        const clearDate = new Date(Date.now() + durationMin * 60 * 1000);
-        const clearHourStr = String(clearDate.getHours()).padStart(2, "0");
-        const clearMinStr = String(clearDate.getMinutes()).padStart(2, "0");
-        clearTimeStr = `${clearHourStr}:${clearMinStr}, ${String(
-          clearDate.getDate(),
-        ).padStart(
-          2,
-          "0",
-        )}/${String(clearDate.getMonth() + 1).padStart(2, "0")}/${clearDate.getFullYear()}`;
-      }
-
       dynamicPoints.push({
         ...point,
         rainfall: localRain,
         depth: dynamicDepth,
         type: calculatedType,
         severity,
-        estimatedDurationMin: durationMin,
-        estimatedClearAt: clearTimeStr,
-        drainageRateCmPerMin: drainRate,
       });
     }
 
@@ -397,7 +311,7 @@ export class MapService {
           ) {
             continue;
           }
-          const depth = r.reportedDepth || r.aiDepth || 24;
+          const depth = r.reportedDepth || r.aiDepth || 0;
           if (depth <= 0) continue;
           const severity: PointSeverity =
             r.severity === "critical" ||
