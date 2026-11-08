@@ -2,6 +2,7 @@ import { ConfigService } from "@nestjs/config";
 import { TypeOrmModuleOptions } from "@nestjs/typeorm";
 import { Logger } from "@nestjs/common";
 import { Client } from "pg";
+import { join } from "node:path";
 
 const logger = new Logger("TypeOrmConfig");
 
@@ -59,6 +60,8 @@ export async function createTypeOrmOptions(
   const dbType = configService.get<string>("DB_TYPE", "postgres");
   const isIsolatedTestRun =
     dbType === "sqljs" || process.env.NODE_ENV === "test";
+  const migrationsRun = !synchronize && !isIsolatedTestRun;
+  const migrations = [join(__dirname, "../migrations/*{.js,.ts}")];
 
   if (databaseUrl && !isIsolatedTestRun) {
     const isCloud =
@@ -81,6 +84,9 @@ export async function createTypeOrmOptions(
         : undefined,
       autoLoadEntities: true,
       synchronize,
+      migrations,
+      migrationsRun,
+      uuidExtension: "pgcrypto",
     };
   }
 
@@ -119,5 +125,8 @@ export async function createTypeOrmOptions(
     database,
     autoLoadEntities: true,
     synchronize,
+    migrations,
+    migrationsRun,
+    uuidExtension: "pgcrypto",
   };
 }

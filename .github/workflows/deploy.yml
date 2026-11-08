@@ -510,6 +510,7 @@ jobs:
       DB_USERNAME: ${{ vars.DB_USERNAME }}
       DB_PASSWORD_SECRET_NAME: ${{ vars.DB_PASSWORD_SECRET_NAME }}
       DB_SYNCHRONIZE: ${{ vars.DB_SYNCHRONIZE }}
+      CORS_ORIGINS: ${{ vars.CORS_ORIGINS }}
       VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
       FIREBASE_PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
       FIREBASE_USER_SITE_ID: ${{ vars.FIREBASE_USER_SITE_ID }}
@@ -553,7 +554,7 @@ jobs:
           set -euo pipefail
           required=(GCP_PROJECT_ID GCP_REGION GCP_WORKLOAD_IDENTITY_PROVIDER GCP_DEPLOY_SERVICE_ACCOUNT)
           if [[ "$BACKEND_CHANGED" == true ]]; then
-            required+=(GCP_RUNTIME_SERVICE_ACCOUNT GCP_SQL_INSTANCE_CONNECTION_NAME DB_DATABASE DB_USERNAME DB_PASSWORD_SECRET_NAME DB_SYNCHRONIZE)
+            required+=(GCP_RUNTIME_SERVICE_ACCOUNT GCP_SQL_INSTANCE_CONNECTION_NAME DB_DATABASE DB_USERNAME DB_PASSWORD_SECRET_NAME DB_SYNCHRONIZE CORS_ORIGINS)
           fi
           if [[ "$USER_CHANGED" == true ]]; then required+=(FIREBASE_PROJECT_ID FIREBASE_USER_SITE_ID); fi
           for name in "${required[@]}"; do
@@ -566,11 +567,11 @@ jobs:
             echo '::error title=Production not configured::DB_SYNCHRONIZE must be false in the production GitHub Environment.'
             exit 1
           fi
-          if [[ "$BACKEND_CHANGED" == true && "$GCP_SQL_INSTANCE_CONNECTION_NAME" == "tokenplus2026-514007:asia-southeast1:saigondrain-pg-trial" ]]; then
+          if [[ "$BACKEND_CHANGED" == true && "$GCP_SQL_INSTANCE_CONNECTION_NAME" == "tokenplus2026-514007:asia-southeast1:saigondrain-pg-trial" && "${{ vars.ALLOW_SHARED_DEMO_DATABASE }}" != true ]]; then
             echo '::error title=Production not configured::The 30-day staging trial instance cannot be used by production.'
             exit 1
           fi
-          if [[ "$BACKEND_CHANGED" == true && "$DB_PASSWORD_SECRET_NAME" == "saigondrain-db-password" ]]; then
+          if [[ "$BACKEND_CHANGED" == true && "$DB_PASSWORD_SECRET_NAME" == "saigondrain-db-password" && "${{ vars.ALLOW_SHARED_DEMO_DATABASE }}" != true ]]; then
             echo '::error title=Production not configured::Production must use its own Secret Manager database-password secret.'
             exit 1
           fi
@@ -612,6 +613,7 @@ jobs:
             DB_USERNAME=${{ vars.DB_USERNAME }}
             DB_DATABASE=${{ vars.DB_DATABASE }}
             DB_SYNCHRONIZE=${{ vars.DB_SYNCHRONIZE }}
+            CORS_ORIGINS=${{ vars.CORS_ORIGINS }}
           secrets: |-
             DB_PASSWORD=${{ vars.DB_PASSWORD_SECRET_NAME }}:latest
           flags: >-
