@@ -328,8 +328,8 @@ jobs:
             --add-cloudsql-instances=${{ vars.GCP_SQL_INSTANCE_CONNECTION_NAME }}
             --remove-env-vars=DATABASE_URL
             --${{ vars.GCP_API_PUBLIC == 'true' && 'allow-unauthenticated' || 'no-allow-unauthenticated' }}
-            --command=node
-            --args=dist/main.js
+            --command=""
+            --args=""
 
       - name: Setup Node.js for user frontend
         if: steps.staging_revision.outputs.current == 'true' && steps.staging_revision.outputs.user == 'true'
@@ -569,8 +569,8 @@ jobs:
             --add-cloudsql-instances=${{ vars.GCP_SQL_INSTANCE_CONNECTION_NAME }}
             --remove-env-vars=DATABASE_URL
             --${{ vars.GCP_API_PUBLIC == 'true' && 'allow-unauthenticated' || 'no-allow-unauthenticated' }}
-            --command=node
-            --args=dist/main.js
+            --command=""
+            --args=""
 
       - name: Setup Node.js for user frontend
         if: steps.release_revision.outputs.current == 'true' && needs.deployment-scope.outputs.user == 'true'
